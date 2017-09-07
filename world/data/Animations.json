@@ -1,0 +1,4 @@
+[
+null,
+{"id":1,"animation1Hue":0,"animation1Name":"Attack1","animation2Hue":0,"animation2Name":"","frames":[[[0,0,0,10,0,0,255,1]],[[-1,0,0,10,0,0,255,1],[0,60.5,-50.5,100,0,0,255,1]]],"name":"打击/物理","position":1,"timings":[{"flashColor":[255,255,255,255],"flashDuration":2,"flashScope":1,"frame":0,"se":{"name":"Item3","pan":0,"pitch":100,"volume":90}}]}
+]
