@@ -1,3 +1,33 @@
+Input._onKeyDown = function(event) {
+    //如果 需要避免默认 (键值)
+    var focusedElement = document.activeElement;
+    if (focusedElement && focusedElement.type == "text") {
+        if (event.keyCode != 13) {
+            return
+        }
+    } else {
+        if (this._shouldPreventDefault(event.keyCode)) {
+            //避免默认
+            event.preventDefault();
+        }
+    }
+
+
+    //键值===144
+    if (event.keyCode === 144) { // Numlock  数字开关
+        //清除
+        this.clear();
+    }
+    var buttonName = this.keyMapper[event.keyCode];
+    //如果 键名
+    if (buttonName) {
+        //当前状态 键 =true
+        this._currentState[buttonName] = true;
+    }
+};
+
+
+
 Graphics._createAllElements = function() {
     this._createErrorPrinter();
     this._createCanvas();
@@ -8,7 +38,7 @@ Graphics._createAllElements = function() {
     this._createModeBox();
     this._createGameFontLoader();
 
-    this._createInputs() //修改
+    this._createElements() //修改
 };
 
 /**更新所有成分
@@ -24,102 +54,114 @@ Graphics._updateAllElements = function() {
     this._updateUpperCanvas();
     this._updateRenderer();
 
-    this._updateInputs(); //添加
+    this._updateElements(); //添加
 
     this._paintUpperCanvas();
 };
 
 
 //创建输入组
-Graphics._createInputs = function() {
-    this._inputs = {}
+Graphics._createElements = function() {
+    this._elements = {}
 };
 
 
 //返回
-Graphics._input = function(id) {
-    return this._inputs[id]
+Graphics._element = function(id) {
+    return this._elements[id]
 };
 
 
 //移除输入
-Graphics._removeInput = function(id) {
-    if (this._inputs[id]) {
-        this._inputs[id].remove()
+Graphics._removeElement = function(id) {
+    if (this._elements[id]) {
+        this._elements[id].remove()
     }
 };
 
-Graphics._removeInputs = function() {
-    for (var i in this._inputs) {
-        this._removeInput(this._inputs[i])
+Graphics._removeElements = function() {
+    for (var i in this._elements) {
+        this._removeElement(this._elements[i])
     }
 };
-
 
 
 //添加输入
-Graphics._addInput = function(id, type, style, set) {
-    this._removeInput(id)
-    var input = document.createElement("input");
-    input.id = id;
-    input.setAttribute("type", type || "text")
-    input.style.zIndex = 12;
-    input.style.position = 'absolute';
-    input.style.margin = 'auto';
-    input.style.background = 'transparent'
-    input.style.border = 10
-    input.style.color = "#fff" //"#FFF"
-    input.style["font-weight"] = "bold"
-    this._setInput(input, set)
-    this._setInputStyle(input, style)
-    document.body.appendChild(input);
-    return this._inputs[id] = input
+Graphics._inputAdd = function(id, type, style, set) {
+    return this._elementAdd(id, "input", type || "text", style, set)
+};
+
+//添加输入
+Graphics._elementAdd = function(id, ele, type, style, set) {
+    return this._addElement(document.body, id, ele, type, style, set)
+};
+
+//添加输入
+Graphics._addElement = function(body, id, ele, type, style, set) {
+    this._removeElement(id)
+    if (body) {
+        var element = document.createElement(ele);
+        element.id = id;
+        element.setAttribute("type", type)
+        element.style.zIndex = 12;
+        element.style.position = 'absolute';
+        element.style.margin = 'auto';
+        element.style.background = 'transparent'
+        element.style.border = 10
+        element.style.color = "#fff" //"#FFF"
+        element.style["font-weight"] = "bold"
+        this._setElement(element, set)
+        this._setElementStyle(element, style)
+        body.appendChild(element);
+        return this._elements[id] = element
+    }
 };
 
 
-Graphics._setInput = function(input, style) {
-    if (input && style) {
+
+Graphics._setElement = function(element, style) {
+    if (element && style) {
         for (var i in style) {
-            input[i] = style[i]
+            element[i] = style[i]
         }
     };
 }
 
 
-Graphics._setInputStyle = function(input, style) {
-    if (input && style) {
-        input._style = { x: 0, y: 0, width: 120, height: 20, fontSize: 18 }
+Graphics._setElementStyle = function(element, style) {
+    if (element && style) {
+        element._style = { x: 0, y: 0, width: 120, height: 20, fontSize: 18 }
         for (var i in style) {
-            if (i in input._style) {
-                input._style[i] = style[i]
+            if (i in element._style) {
+                element._style[i] = style[i]
             } else {
-                input.style[i] = style[i]
+                element.style[i] = style[i]
             }
         }
-        this._updateInput(input)
+        this._updateElement(element)
     };
 }
 
-
-Graphics._updateInputs = function() {
-    for (var i in this._inputs) {
-        this._updateInput(this._inputs[i])
+/**更新输入组 */
+Graphics._updateElements = function() {
+    for (var i in this._elements) {
+        this._updateElement(this._elements[i])
     }
 }
 
 //更新输入
-Graphics._updateInput = function(input) {
-    if (input) {
-        var s = input._style
+Graphics._updateElement = function(element) {
+    if (element) {
+        var s = element._style
         var x = s.x * this._realScale + (window.innerWidth - this._width * this._realScale) / 2
         var y = s.y * this._realScale + (window.innerHeight - this._height * this._realScale) / 2
         var width = s.width * this._realScale;
         var height = s.height * this._realScale;
         var fontSize = s.fontSize * this._realScale;
-        input.style.top = y + 'px';
-        input.style.left = x + 'px';
-        input.style.width = width + 'px';
-        input.style.height = height + 'px';
-        input.style.fontSize = fontSize + 'px';
+        element.style.top = y + 'px';
+        element.style.left = x + 'px';
+        element.style.width = width + 'px';
+        element.style.height = height + 'px';
+        element.style.fontSize = fontSize + 'px';
     }
 }
