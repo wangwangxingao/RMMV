@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Scene_Debug */
 /** 场景调试 */
@@ -16,17 +15,22 @@ Scene_Debug.prototype.constructor = Scene_Debug;
 Scene_Debug.prototype.initialize = function() {
     Scene_MenuBase.prototype.initialize.call(this);
 };
-/**创造 */
+/**创建 */
 Scene_Debug.prototype.create = function() {
+    //场景基础 创建 呼叫(this)
     Scene_MenuBase.prototype.create.call(this);
+    //创建范围窗口()
     this.createRangeWindow();
+    //创建编辑窗口()
     this.createEditWindow();
+    //创建调试帮助窗口()
     this.createDebugHelpWindow();
 };
 /**创建范围窗口 */
 Scene_Debug.prototype.createRangeWindow = function() {
+    //范围窗口 = 新 窗口调试范围(0,0)
     this._rangeWindow = new Window_DebugRange(0, 0);
-    this._rangeWindow.setHandler('ok',     this.onRangeOk.bind(this));
+    this._rangeWindow.setHandler('ok', this.onRangeOk.bind(this));
     this._rangeWindow.setHandler('cancel', this.popScene.bind(this));
     this.addWindow(this._rangeWindow);
 };
@@ -73,8 +77,8 @@ Scene_Debug.prototype.helpText = function() {
         return 'Enter : ON / OFF';
     } else {
         return ('Left     :  -1\n' +
-                'Right    :  +1\n' +
-                'Pageup   : -10\n' +
-                'Pagedown : +10');
+            'Right    :  +1\n' +
+            'Pageup   : -10\n' +
+            'Pagedown : +10');
     }
 };

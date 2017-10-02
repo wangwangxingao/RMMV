@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /**处理与JSON对象信息的静态类
  * The static class that handles JSON with object information.
@@ -18,11 +17,11 @@ function JsonEx() {
  * @property maxDepth
  * @type Number
  * @default 100
- */ 
+ */
 JsonEx.maxDepth = 100;
 
 JsonEx._id = 1;
-JsonEx._generateId = function(){
+JsonEx._generateId = function() {
     return JsonEx._id++;
 };
 
@@ -33,9 +32,9 @@ JsonEx._generateId = function(){
  *
  * @static
  * @method stringify
- * @param {object} object The object to be converted
+ * @param {{}} object The object to be converted
  * @return {string} The JSON string
- */ 
+ */
 JsonEx.stringify = function(object) {
     var circular = [];
     JsonEx._id = 1;
@@ -46,8 +45,8 @@ JsonEx.stringify = function(object) {
     return json;
 };
 
-JsonEx._restoreCircularReference = function(circulars){
-    circulars.forEach(function(circular){
+JsonEx._restoreCircularReference = function(circulars) {
+    circulars.forEach(function(circular) {
         var key = circular[0];
         var value = circular[1];
         var content = circular[2];
@@ -62,9 +61,9 @@ JsonEx._restoreCircularReference = function(circulars){
  * @static
  * @method parse
  * @param {string} json The JSON string
- * @return {object} The reconstructed object
+ * @return {{}} The reconstructed object
  */
-JsonEx.parse = function(json) { 
+JsonEx.parse = function(json) {
     var circular = [];
     var registry = {};
     var contents = this._decode(JSON.parse(json), circular, registry);
@@ -74,8 +73,8 @@ JsonEx.parse = function(json) {
     return contents;
 };
 
-JsonEx._linkCircularReference = function(contents, circulars, registry){
-    circulars.forEach(function(circular){
+JsonEx._linkCircularReference = function(contents, circulars, registry) {
+    circulars.forEach(function(circular) {
         var key = circular[0];
         var value = circular[1];
         var id = circular[2];
@@ -84,16 +83,16 @@ JsonEx._linkCircularReference = function(contents, circulars, registry){
     });
 };
 
-JsonEx._cleanMetadata = function(object){
-    if(!object) return;
+JsonEx._cleanMetadata = function(object) {
+    if (!object) return;
 
     delete object['@'];
     delete object['@c'];
 
-    if(typeof object === 'object'){
-        Object.keys(object).forEach(function(key){
+    if (typeof object === 'object') {
+        Object.keys(object).forEach(function(key) {
             var value = object[key];
-            if(typeof value === 'object'){
+            if (typeof value === 'object') {
                 JsonEx._cleanMetadata(value);
             }
         });
@@ -107,23 +106,23 @@ JsonEx._cleanMetadata = function(object){
  *
  * @static
  * @method makeDeepCopy
- * @param {object} object The object to be copied
- * @return {object} The copied object
- */ 
+ * @param {{}} object The object to be copied
+ * @return {{}} The copied object
+ */
 JsonEx.makeDeepCopy = function(object) {
-	//返回 解析 (转换 (对象))
+    //返回 解析 (转换 (对象))
     return this.parse(this.stringify(object));
 };
 
 /**编码
  * @static
  * @method _encode
- * @param {object} value
- * @param {array} circular
+ * @param {{}} value
+ * @param {[]} circular
  * @param {number} depth
- * @return {object}
+ * @return {{}}
  * @private
- */ 
+ */
 JsonEx._encode = function(value, circular, depth) {
     depth = depth || 0;
     if (++depth >= this.maxDepth) {
@@ -139,14 +138,14 @@ JsonEx._encode = function(value, circular, depth) {
         }
         for (var key in value) {
             if (value.hasOwnProperty(key) && !key.match(/^@./)) {
-                if(value[key] && typeof value[key] === 'object'){
-                    if(value[key]['@c']){
+                if (value[key] && typeof value[key] === 'object') {
+                    if (value[key]['@c']) {
                         circular.push([key, value, value[key]]);
-                        value[key] = {'@r': value[key]['@c']};
-                    }else{
+                        value[key] = { '@r': value[key]['@c'] };
+                    } else {
                         value[key] = this._encode(value[key], circular, depth + 1);
 
-                        if(value[key] instanceof Array){
+                        if (value[key] instanceof Array) {
                             //wrap array
                             circular.push([key, value, value[key]]);
 
@@ -156,7 +155,7 @@ JsonEx._encode = function(value, circular, depth) {
                             };
                         }
                     }
-                }else{
+                } else {
                     value[key] = this._encode(value[key], circular, depth + 1);
                 }
             }
@@ -169,10 +168,10 @@ JsonEx._encode = function(value, circular, depth) {
 /**解码
  * @static
  * @method _decode
- * @param {object} value
- * @param {array} circular
- * @param {object} registry
- * @return {object}
+ * @param {{}} value
+ * @param {[]} circular
+ * @param {{}} registry
+ * @return {{}}
  * @private
  */
 
@@ -189,13 +188,13 @@ JsonEx._decode = function(value, circular, registry) {
         }
         for (var key in value) {
             if (value.hasOwnProperty(key)) {
-                if(value[key] && value[key]['@a']){
+                if (value[key] && value[key]['@a']) {
                     //object is array wrapper
                     var body = value[key]['@a'];
                     body['@c'] = value[key]['@c'];
                     value[key] = body;
                 }
-                if(value[key] && value[key]['@r']){
+                if (value[key] && value[key]['@r']) {
                     //object is reference
                     circular.push([key, value, value[key]['@r']])
                 }
@@ -209,7 +208,7 @@ JsonEx._decode = function(value, circular, registry) {
 /**获得建设者名称
  * @static
  * @method _getConstructorName
- * @param {object} value
+ * @param {{}} value
  * @return {string}
  * @private
  */
@@ -225,9 +224,9 @@ JsonEx._getConstructorName = function(value) {
 /**重设原形
  * @static
  * @method _resetPrototype
- * @param {object} value
- * @param {object} prototype
- * @return {object}
+ * @param {{}} value
+ * @param {{}} prototype
+ * @return {{}}
  * @private
  */
 JsonEx._resetPrototype = function(value, prototype) {

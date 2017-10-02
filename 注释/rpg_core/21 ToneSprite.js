@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /**改变画面色彩的2D画布模式的精灵
  * The sprite which changes the screen color in 2D canvas mode.
@@ -48,7 +47,7 @@ ToneSprite.prototype.setTone = function(r, g, b, gray) {
 
 /**渲染画布
  * @method _renderCanvas
- * @param {object} renderSession
+ * @param {{}} renderSession
  * @private
  */
 ToneSprite.prototype._renderCanvas = function(renderer) {
@@ -97,7 +96,7 @@ ToneSprite.prototype._renderCanvas = function(renderer) {
 
 /**给予webgl
  * @method _renderWebGL
- * @param {object} renderSession
+ * @param {{}} renderSession
  * @private
  */
 ToneSprite.prototype._renderWebGL = function(renderer) {

@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Sprite_Character */
 /** 精灵人物 */
@@ -32,7 +31,7 @@ Sprite_Character.prototype.initMembers = function() {
     this._lowerBody = null;
 };
 /**设置人物 
- * @param {object} character 游戏人物 
+ * @param {{}} character 游戏人物 
  */
 Sprite_Character.prototype.setCharacter = function(character) {
     //人物 = character//人物
@@ -82,9 +81,9 @@ Sprite_Character.prototype.updateBitmap = function() {
 /**是图像变化 */
 Sprite_Character.prototype.isImageChanged = function() {
     return (this._tilesetId !== $gameMap.tilesetId() ||
-            this._tileId !== this._character.tileId() ||
-            this._characterName !== this._character.characterName() ||
-            this._characterIndex !== this._character.characterIndex());
+        this._tileId !== this._character.tileId() ||
+        this._characterName !== this._character.characterName() ||
+        this._characterIndex !== this._character.characterIndex());
 };
 /**设置图块位图 */
 Sprite_Character.prototype.setTileBitmap = function() {
@@ -189,7 +188,7 @@ Sprite_Character.prototype.updateHalfBodySprites = function() {
         this.createHalfBodySprites();
         this._upperBody.bitmap = this.bitmap;
         this._upperBody.visible = true;
-        this._upperBody.y = - this._bushDepth;
+        this._upperBody.y = -this._bushDepth;
         this._lowerBody.bitmap = this.bitmap;
         this._lowerBody.visible = true;
         this._upperBody.setBlendColor(this.getBlendColor());

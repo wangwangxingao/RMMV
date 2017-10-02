@@ -1,4 +1,3 @@
-
 /**-----------------------------------------------------------------------------*/
 /**包含游戏窗口的层
  * The layer which contains game windows.
@@ -106,7 +105,7 @@ WindowLayer.prototype.update = function() {
 
 /**渲染画布
  * @method _renderCanvas
- * @param {object} renderSession
+ * @param {{}} renderSession
  * @private
  */
 WindowLayer.prototype.renderCanvas = function(renderer) {
@@ -160,7 +159,7 @@ WindowLayer.prototype.renderCanvas = function(renderer) {
 
 /**画布清除窗口矩形
  * @method _canvasClearWindowRect
- * @param {object} renderSession
+ * @param {{}} renderSession
  * @param {Window} window
  * @private
  */
@@ -174,14 +173,14 @@ WindowLayer.prototype._canvasClearWindowRect = function(renderSession, window) {
 
 /**渲染webgl
  * @method _renderWebGL
- * @param {object} renderSession
+ * @param {{}} renderSession
  * @private
  */
 WindowLayer.prototype.renderWebGL = function(renderer) {
     if (!this.visible || !this.renderable) {
         return;
     }
-    if (this.children.length==0) {
+    if (this.children.length == 0) {
         return;
     }
 
@@ -226,7 +225,7 @@ WindowLayer.prototype.renderWebGL = function(renderer) {
  * @method _maskWindow
  * @param {Window} window
  * @private
- */ 
+ */
 
 WindowLayer.prototype._maskWindow = function(window, shift) {
     this._windowMask._currentBounds = null;
@@ -274,25 +273,25 @@ WindowLayer.prototype._maskWindow = function(window, shift) {
  * Adds a child to the container.
  *
  * @method addChild
- * @param {object} child The child to add
- * @return {object} The child that was added
+ * @param {{}} child The child to add
+ * @return {{}} The child that was added
  */
 
 /**添加一个子项到容器中指定索引处
  * Adds a child to the container at a specified index.
  *
  * @method addChildAt
- * @param {object} child The child to add
+ * @param {{}} child The child to add
  * @param {number} index The index to place the child in
- * @return {object} The child that was added
+ * @return {{}} The child that was added
  */
 
 /**从容器中删除一个子项
  * Removes a child from the container.
  *
  * @method removeChild
- * @param {object} child The child to remove
- * @return {object} The child that was removed
+ * @param {{}} child The child to remove
+ * @return {{}} The child that was removed
  */
 
 /**从指定索引位置的删除一个子项
@@ -300,6 +299,5 @@ WindowLayer.prototype._maskWindow = function(window, shift) {
  *
  * @method removeChildAt
  * @param {number} index The index to get the child from
- * @return {object} The child that was removed
+ * @return {{}} The child that was removed
  */
-

@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Window_ShopBuy */
 /** 窗口商店买 */
@@ -18,7 +17,7 @@ Window_ShopBuy.prototype.constructor = Window_ShopBuy;
  * @param {number} y y
  * @param {number} height 高
  * @param {[object]} shopGoods 物品组 
-*/
+ */
 Window_ShopBuy.prototype.initialize = function(x, y, height, shopGoods) {
     var width = this.windowWidth();
     Window_Selectable.prototype.initialize.call(this, x, y, width, height);
@@ -41,7 +40,7 @@ Window_ShopBuy.prototype.item = function() {
 };
 /**设置金钱 
  * @param {number} money
-*/
+ */
 Window_ShopBuy.prototype.setMoney = function(money) {
     this._money = money;
     this.refresh();
@@ -53,19 +52,19 @@ Window_ShopBuy.prototype.isCurrentItemEnabled = function() {
     return this.isEnabled(this._data[this.index()]);
 };
 /**价格 
- * @param {object} item 
+ * @param {{}} item 
  * @return {number} 
-*/
+ */
 Window_ShopBuy.prototype.price = function(item) {
     return this._price[this._data.indexOf(item)] || 0;
 };
 /**是允许 
- * @param {object} item
+ * @param {{}} item
  * @return {boolean}  
-*/
+ */
 Window_ShopBuy.prototype.isEnabled = function(item) {
     return (item && this.price(item) <= this._money &&
-            !$gameParty.hasMaxItems(item));
+        !$gameParty.hasMaxItems(item));
 };
 /**刷新 */
 Window_ShopBuy.prototype.refresh = function() {
@@ -80,15 +79,15 @@ Window_ShopBuy.prototype.makeItemList = function() {
     this._shopGoods.forEach(function(goods) {
         var item = null;
         switch (goods[0]) {
-        case 0:
-            item = $dataItems[goods[1]];
-            break;
-        case 1:
-            item = $dataWeapons[goods[1]];
-            break;
-        case 2:
-            item = $dataArmors[goods[1]];
-            break;
+            case 0:
+                item = $dataItems[goods[1]];
+                break;
+            case 1:
+                item = $dataWeapons[goods[1]];
+                break;
+            case 2:
+                item = $dataArmors[goods[1]];
+                break;
         }
         if (item) {
             this._data.push(item);
@@ -98,7 +97,7 @@ Window_ShopBuy.prototype.makeItemList = function() {
 };
 /**绘制项目 
  * @param {number} index 
-*/
+ */
 Window_ShopBuy.prototype.drawItem = function(index) {
     var item = this._data[index];
     var rect = this.itemRect(index);
@@ -107,11 +106,11 @@ Window_ShopBuy.prototype.drawItem = function(index) {
     this.changePaintOpacity(this.isEnabled(item));
     this.drawItemName(item, rect.x, rect.y, rect.width - priceWidth);
     this.drawText(this.price(item), rect.x + rect.width - priceWidth,
-                  rect.y, priceWidth, 'right');
+        rect.y, priceWidth, 'right');
     this.changePaintOpacity(true);
 };
 /**设置状态窗口
- * @param {object} statusWindow 
+ * @param {{}} statusWindow 
  */
 Window_ShopBuy.prototype.setStatusWindow = function(statusWindow) {
     this._statusWindow = statusWindow;

@@ -1,4 +1,3 @@
-
 /**===========================================================================
  * 图块地图 显示2D 图块基底 的 游戏地图 
  * The tilemap which displays 2D tile-based game map.
@@ -6,7 +5,7 @@
  * @class Tilemap
  * @constructor
  *===========================================================================
- */ 
+ */
 function Tilemap() {
     this.initialize.apply(this, arguments);
 }
@@ -46,7 +45,7 @@ Tilemap.prototype.initialize = function() {
      * @property bitmaps
      * @type Array
      *--------------------------------------------------------------------------
-     */ 
+     */
     //位图组 = []
     this.bitmaps = [];
 
@@ -57,7 +56,7 @@ Tilemap.prototype.initialize = function() {
      * @property origin
      * @type Point
      *--------------------------------------------------------------------------
-     */ 
+     */
     //原点 = 新 点
     this.origin = new Point();
 
@@ -68,7 +67,7 @@ Tilemap.prototype.initialize = function() {
      * @property flags
      * @type Array
      *--------------------------------------------------------------------------
-     */ 
+     */
     //标志组 = []
     this.flags = [];
 
@@ -79,7 +78,7 @@ Tilemap.prototype.initialize = function() {
      * @property animationCount
      * @type Number
      *--------------------------------------------------------------------------
-     */ 
+     */
     //动画计数 = 0
     this.animationCount = 0;
 
@@ -90,7 +89,7 @@ Tilemap.prototype.initialize = function() {
      * @property horizontalWrap
      * @type Boolean
      *--------------------------------------------------------------------------
-     */ 
+     */
     //水平循环 = false
     this.horizontalWrap = false;
 
@@ -101,11 +100,11 @@ Tilemap.prototype.initialize = function() {
      * @property verticalWrap
      * @type Boolean
      *--------------------------------------------------------------------------
-     */ 
+     */
     //垂直循环 = false
     this.verticalWrap = false;
 
-	//创建层
+    //创建层
     this._createLayers();
     //刷新
     this.refresh();
@@ -120,7 +119,7 @@ Tilemap.prototype.initialize = function() {
  * @property width
  * @type Number
  *--------------------------------------------------------------------------
- */  
+ */
 Object.defineProperty(Tilemap.prototype, 'width', {
     get: function() {
         return this._width;
@@ -141,7 +140,7 @@ Object.defineProperty(Tilemap.prototype, 'width', {
  * @property height
  * @type Number
  *--------------------------------------------------------------------------
- */  
+ */
 Object.defineProperty(Tilemap.prototype, 'height', {
     get: function() {
         return this._height;
@@ -161,7 +160,7 @@ Object.defineProperty(Tilemap.prototype, 'height', {
  * @property tileWidth
  * @type Number
  *--------------------------------------------------------------------------
- */  
+ */
 Object.defineProperty(Tilemap.prototype, 'tileWidth', {
     get: function() {
         return this._tileWidth;
@@ -181,7 +180,7 @@ Object.defineProperty(Tilemap.prototype, 'tileWidth', {
  * @property tileHeight
  * @type Number
  *--------------------------------------------------------------------------
- */  
+ */
 Object.defineProperty(Tilemap.prototype, 'tileHeight', {
     get: function() {
         return this._tileHeight;
@@ -204,9 +203,9 @@ Object.defineProperty(Tilemap.prototype, 'tileHeight', {
  * @param {number} height The height of the map in number of tiles
  * @param {[number]} data The one dimensional array for the map data
  *--------------------------------------------------------------------------
- */  
+ */
 Tilemap.prototype.setData = function(width, height, data) {
-	//地图宽 = width
+    //地图宽 = width
     this._mapWidth = width;
     //地图高 = height
     this._mapHeight = height;
@@ -223,13 +222,13 @@ Tilemap.prototype.setData = function(width, height, data) {
  * @type Boolean
  * @return {boolean} True if the tilemap is ready
  *--------------------------------------------------------------------------
- */  
+ */
 Tilemap.prototype.isReady = function() {
-	//循环 (开始时 i = 0 ; 当 i < 位图组 长度 ;每一次 i++)
+    //循环 (开始时 i = 0 ; 当 i < 位图组 长度 ;每一次 i++)
     for (var i = 0; i < this.bitmaps.length; i++) {
-	    //如果 位图组[i] 并且 不是 位图组[i] 是准备好
+        //如果 位图组[i] 并且 不是 位图组[i] 是准备好
         if (this.bitmaps[i] && !this.bitmaps[i].isReady()) {
-	        //返回 false
+            //返回 false
             return false;
         }
     }
@@ -243,21 +242,21 @@ Tilemap.prototype.isReady = function() {
  *
  * @method update
  *--------------------------------------------------------------------------
- */  
+ */
 Tilemap.prototype.update = function() {
-	//动画计数 ++
+    //动画计数 ++
     this.animationCount++;
     //动画帧 = 数学 向下取整 (   动画计数 / 30  )
     this.animationFrame = Math.floor(this.animationCount / 30);
     //子组 对每一个 方法(子项)
     this.children.forEach(function(child) {
-	    //如果 子项 更新 (子项 更新 存在)
+        //如果 子项 更新 (子项 更新 存在)
         if (child.update) {
-	        //子项 更新
+            //子项 更新
             child.update();
         }
     });
-    for (var i=0; i<this.bitmaps.length;i++) {
+    for (var i = 0; i < this.bitmaps.length; i++) {
         if (this.bitmaps[i]) {
             this.bitmaps[i].touch();
         }
@@ -268,7 +267,7 @@ Tilemap.prototype.update = function() {
  * Forces to refresh the tileset
  *
  * @method refresh
- */ 
+ */
 Tilemap.prototype.refreshTileset = function() {
 
 };
@@ -278,9 +277,9 @@ Tilemap.prototype.refreshTileset = function() {
  * Forces to repaint the entire tilemap.
  * @method refresh
  *--------------------------------------------------------------------------
- */  
+ */
 Tilemap.prototype.refresh = function() {
-	//需要重画
+    //需要重画
     this._needsRepaint = true;
     //最后砖的长度
     this._lastTiles.length = 0;
@@ -291,9 +290,9 @@ Tilemap.prototype.refresh = function() {
  * @method updateTransform
  * @private
  *--------------------------------------------------------------------------
- */  
+ */
 Tilemap.prototype.updateTransform = function() {
-	//ox = 数学 向下取整 ( 原点 x )
+    //ox = 数学 向下取整 ( 原点 x )
     var ox = Math.floor(this.origin.x);
     //oy = 数学 向下取整 ( 原点 y )
     var oy = Math.floor(this.origin.y);
@@ -322,9 +321,9 @@ Tilemap.prototype.updateTransform = function() {
  * @method _createLayers
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._createLayers = function() {
-	//宽 856
+    //宽 856
     var width = this._width;
     //高 664
     var height = this._height;
@@ -357,7 +356,7 @@ Tilemap.prototype._createLayers = function() {
      * 8 : Animation    动画
      * 9 : Destination  目的地
      *--------------------------------------------------------------------------
-     */ 
+     */
 
     //创建下层
     this._lowerLayer = new Sprite();
@@ -391,9 +390,9 @@ Tilemap.prototype._createLayers = function() {
  * @param {number} startY
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._updateLayerPositions = function(startX, startY) {
-	//m = 页边 20
+    //m = 页边 20
     var m = this._margin;
     //ox = 小于等于 原点 x 的最大整数
     var ox = Math.floor(this.origin.x);
@@ -437,7 +436,7 @@ Tilemap.prototype._updateLayerPositions = function(startX, startY) {
  * @param {number} startY
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._paintAllTiles = function(startX, startY) {
     var tileCols = Math.ceil(this._width / this._tileWidth) + 1;
     var tileRows = Math.ceil(this._height / this._tileHeight) + 1;
@@ -457,7 +456,7 @@ Tilemap.prototype._paintAllTiles = function(startX, startY) {
  * @param {number} y
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._paintTiles = function(startX, startY, x, y) {
     var tableEdgeVirtualId = 10000;
     //现在x = 开始x + x 
@@ -505,19 +504,19 @@ Tilemap.prototype._paintTiles = function(startX, startY, x, y) {
 
     //如果 y的上面图块 是平台图块 并且  不是 1层图块 是平台图块
     if (this._isTableTile(upperTileId1) && !this._isTableTile(tileId1)) {
-	    // 如果 不是  0层图块 是遮蔽图块(建筑,墙壁)
+        // 如果 不是  0层图块 是遮蔽图块(建筑,墙壁)
         if (!Tilemap.isShadowingTile(tileId0)) {
-	        //下面的图块组 添加 10000 +  y的上面图块 
+            //下面的图块组 添加 10000 +  y的上面图块 
             lowerTiles.push(tableEdgeVirtualId + upperTileId1);
         }
     }
 
-	//如果 是立交桥的位置
+    //如果 是立交桥的位置
     if (this._isOverpassPosition(mx, my)) {
         upperTiles.push(tileId2);
         upperTiles.push(tileId3);
     } else {
-	    //如果是较高图块
+        //如果是较高图块
         if (this._isHigherTile(tileId2)) {
             upperTiles.push(tileId2);
         } else {
@@ -535,7 +534,7 @@ Tilemap.prototype._paintTiles = function(startX, startY, x, y) {
     var lastLowerTiles = this._readLastTiles(0, lx, ly);
     //如果 下面的图块组 不等于 之前下面的图块组
     if (!lowerTiles.equals(lastLowerTiles) ||
-            (Tilemap.isTileA1(tileId0) && this._frameUpdated)) {
+        (Tilemap.isTileA1(tileId0) && this._frameUpdated)) {
         this._lowerBitmap.clearRect(dx, dy, this._tileWidth, this._tileHeight);
         for (var i = 0; i < lowerTiles.length; i++) {
             var lowerTileId = lowerTiles[i];
@@ -566,9 +565,10 @@ Tilemap.prototype._paintTiles = function(startX, startY, x, y) {
  * @param {number} i
  * @param {number} x
  * @param {number} y
+ * @return {[]}  
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._readLastTiles = function(i, x, y) {
 
     var array1 = this._lastTiles[i];
@@ -590,10 +590,10 @@ Tilemap.prototype._readLastTiles = function(i, x, y) {
  * @param {number} i
  * @param {number} x
  * @param {number} y
- * @param {array} tiles
+ * @param {[]} tiles
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._writeLastTiles = function(i, x, y, tiles) {
     var array1 = this._lastTiles[i];
     if (!array1) {
@@ -615,7 +615,7 @@ Tilemap.prototype._writeLastTiles = function(i, x, y, tiles) {
  * @param {number} dy
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._drawTile = function(bitmap, tileId, dx, dy) {
     if (Tilemap.isVisibleTile(tileId)) {
         if (Tilemap.isAutotile(tileId)) {
@@ -635,16 +635,16 @@ Tilemap.prototype._drawTile = function(bitmap, tileId, dx, dy) {
  * @param {number} dy
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._drawNormalTile = function(bitmap, tileId, dx, dy) {
-	//设置数字 =0
+    //设置数字 =0
     var setNumber = 0;
     //如果  是图块a5
     if (Tilemap.isTileA5(tileId)) {
-	    //设置数字 = 4
+        //设置数字 = 4
         setNumber = 4;
     } else {
-	    //设置数字 = 5 +  id /256
+        //设置数字 = 5 +  id /256
         setNumber = 5 + Math.floor(tileId / 256);
     }
     // w = 图块宽
@@ -655,11 +655,11 @@ Tilemap.prototype._drawNormalTile = function(bitmap, tileId, dx, dy) {
     var sx = (Math.floor(tileId / 128) % 2 * 8 + tileId % 8) * w;
     // sy = (图块id除256的余数 除 8 )除16 的余数 * 高
     var sy = (Math.floor(tileId % 256 / 8) % 16) * h;
-	//来源 = 图片组[setNumber//设置数字];
+    //来源 = 图片组[setNumber//设置数字];
     var source = this.bitmaps[setNumber];
     //如果 来源
     if (source) {
-	    //图片 绘制 (来源,sx,sy,w,h, dx,dy,w,h  )
+        //图片 绘制 (来源,sx,sy,w,h, dx,dy,w,h  )
         bitmap.bltImage(source, sx, sy, w, h, dx, dy, w, h);
     }
 };
@@ -673,9 +673,9 @@ Tilemap.prototype._drawNormalTile = function(bitmap, tileId, dx, dy) {
  * @param {number} dy
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._drawAutotile = function(bitmap, tileId, dx, dy) {
-	//自动图块表     基底自动图块表
+    //自动图块表     基底自动图块表
     var autotileTable = Tilemap.FLOOR_AUTOTILE_TABLE;
     //种类
     var kind = Tilemap.getAutotileKind(tileId);
@@ -694,7 +694,7 @@ Tilemap.prototype._drawAutotile = function(bitmap, tileId, dx, dy) {
     var isTable = false;
     //如果 是图块a1 
     if (Tilemap.isTileA1(tileId)) {
-	    //水表面索引
+        //水表面索引
         var waterSurfaceIndex = [0, 1, 2, 1][this.animationFrame % 4];
         //设置数字
         setNumber = 0;
@@ -702,47 +702,46 @@ Tilemap.prototype._drawAutotile = function(bitmap, tileId, dx, dy) {
         if (kind === 0) {
             bx = waterSurfaceIndex * 2;
             by = 0;
-        //种类 === 1 
+            //种类 === 1 
         } else if (kind === 1) {
             bx = waterSurfaceIndex * 2;
             by = 3;
-        //种类 === 2
+            //种类 === 2
         } else if (kind === 2) {
             bx = 6;
             by = 0;
-        //种类 === 3
+            //种类 === 3
         } else if (kind === 3) {
             bx = 6;
             by = 3;
-        //除此以外
+            //除此以外
         } else {
-	        //
+            //
             bx = Math.floor(tx / 4) * 8;
             by = ty * 6 + Math.floor(tx / 2) % 2 * 3;
             if (kind % 2 === 0) {
                 bx += waterSurfaceIndex * 2;
-            }
-            else {
+            } else {
                 bx += 6;
                 autotileTable = Tilemap.WATERFALL_AUTOTILE_TABLE;
                 by += this.animationFrame % 3;
             }
         }
-    //是图块a2
+        //是图块a2
     } else if (Tilemap.isTileA2(tileId)) {
-	    //设置数字 = 1 
+        //设置数字 = 1 
         setNumber = 1;
         bx = tx * 2;
         by = (ty - 2) * 3;
-        
+
         isTable = this._isTableTile(tileId);
-    //是图块a3
+        //是图块a3
     } else if (Tilemap.isTileA3(tileId)) {
         setNumber = 2;
         bx = tx * 2;
         by = (ty - 6) * 2;
         autotileTable = Tilemap.WALL_AUTOTILE_TABLE;
-    //是图块a4
+        //是图块a4
     } else if (Tilemap.isTileA4(tileId)) {
         setNumber = 3;
         bx = tx * 2;
@@ -751,20 +750,20 @@ Tilemap.prototype._drawAutotile = function(bitmap, tileId, dx, dy) {
             autotileTable = Tilemap.WALL_AUTOTILE_TABLE;
         }
     }
-	// 表 =  自动图块表[shape形态]
+    // 表 =  自动图块表[shape形态]
     var table = autotileTable[shape];
     //来源 =  图片 绘制 (来源,sx,sy,w,h, dx,dy,w,h  )
     var source = this.bitmaps[setNumber];
 
     if (table && source) {
-	    //w1 = 图块宽/2
+        //w1 = 图块宽/2
         var w1 = this._tileWidth / 2;
         //h1 = 图块高/2
         var h1 = this._tileHeight / 2;
         for (var i = 0; i < 4; i++) {
-	        //qsx =    表[i][0]   
+            //qsx =    表[i][0]   
             var qsx = table[i][0];
-	        //qsy =    表[i][1]   
+            //qsy =    表[i][1]   
             var qsy = table[i][1];
             //sx1 = (bx *2 + qsx)  * w1
             var sx1 = (bx * 2 + qsx) * w1;
@@ -776,13 +775,13 @@ Tilemap.prototype._drawAutotile = function(bitmap, tileId, dx, dy) {
                 var qsx2 = qsx;
                 var qsy2 = 3;
                 if (qsy === 1) {
-                    qsx2 = [0,3,2,1][qsx];
+                    qsx2 = [0, 3, 2, 1][qsx];
                 }
                 var sx2 = (bx * 2 + qsx2) * w1;
                 var sy2 = (by * 2 + qsy2) * h1;
                 bitmap.bltImage(source, sx2, sy2, w1, h1, dx1, dy1, w1, h1);
-                dy1 += h1/2;
-                bitmap.bltImage(source, sx1, sy1, w1, h1/2, dx1, dy1, w1, h1/2);
+                dy1 += h1 / 2;
+                bitmap.bltImage(source, sx1, sy1, w1, h1 / 2, dx1, dy1, w1, h1 / 2);
             } else {
                 bitmap.bltImage(source, sx1, sy1, w1, h1, dx1, dy1, w1, h1);
             }
@@ -799,7 +798,7 @@ Tilemap.prototype._drawAutotile = function(bitmap, tileId, dx, dy) {
  * @param {number} dy
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._drawTableEdge = function(bitmap, tileId, dx, dy) {
     if (Tilemap.isTileA2(tileId)) {
         var autotileTable = Tilemap.FLOOR_AUTOTILE_TABLE;
@@ -819,10 +818,10 @@ Tilemap.prototype._drawTableEdge = function(bitmap, tileId, dx, dy) {
                 var qsx = table[2 + i][0];
                 var qsy = table[2 + i][1];
                 var sx1 = (bx * 2 + qsx) * w1;
-                var sy1 = (by * 2 + qsy) * h1 + h1/2;
+                var sy1 = (by * 2 + qsy) * h1 + h1 / 2;
                 var dx1 = dx + (i % 2) * w1;
                 var dy1 = dy + Math.floor(i / 2) * h1;
-                bitmap.bltImage(source, sx1, sy1, w1, h1/2, dx1, dy1, w1, h1/2);
+                bitmap.bltImage(source, sx1, sy1, w1, h1 / 2, dx1, dy1, w1, h1 / 2);
             }
         }
     }
@@ -837,7 +836,7 @@ Tilemap.prototype._drawTableEdge = function(bitmap, tileId, dx, dy) {
  * @param {number} dy
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._drawShadow = function(bitmap, shadowBits, dx, dy) {
     if (shadowBits & 0x0f) {
         var w1 = this._tileWidth / 2;
@@ -862,7 +861,7 @@ Tilemap.prototype._drawShadow = function(bitmap, shadowBits, dx, dy) {
  * @return {number}
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._readMapData = function(x, y, z) {
     if (this._mapData) {
         var width = this._mapWidth;
@@ -890,7 +889,7 @@ Tilemap.prototype._readMapData = function(x, y, z) {
  * @return {boolean}
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._isHigherTile = function(tileId) {
     return this.flags[tileId] & 0x10;
 };
@@ -902,7 +901,7 @@ Tilemap.prototype._isHigherTile = function(tileId) {
  * @return {boolean}
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._isTableTile = function(tileId) {
     return Tilemap.isTileA2(tileId) && (this.flags[tileId] & 0x80);
 };
@@ -915,7 +914,7 @@ Tilemap.prototype._isTableTile = function(tileId) {
  * @return {boolean}
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._isOverpassPosition = function(mx, my) {
     return false;
 };
@@ -925,7 +924,7 @@ Tilemap.prototype._isOverpassPosition = function(mx, my) {
  * @method _sortChildren
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._sortChildren = function() {
     this.children.sort(this._compareChildOrder.bind(this));
 };
@@ -933,11 +932,11 @@ Tilemap.prototype._sortChildren = function() {
 /**--------------------------------------------------------------------------
  * 比较子项次序
  * @method _compareChildOrder
- * @param {object} a
- * @param {object} b
+ * @param {{}} a
+ * @param {{}} b
  * @private
  *--------------------------------------------------------------------------
- */ 
+ */
 Tilemap.prototype._compareChildOrder = function(a, b) {
     if (a.z !== b.z) {
         return a.z - b.z;
@@ -950,16 +949,16 @@ Tilemap.prototype._compareChildOrder = function(a, b) {
 
 /** Tile type checkers 图块种类检查*/
 
-Tilemap.TILE_ID_B      = 0;
-Tilemap.TILE_ID_C      = 256;
-Tilemap.TILE_ID_D      = 512;
-Tilemap.TILE_ID_E      = 768;
-Tilemap.TILE_ID_A5     = 1536;
-Tilemap.TILE_ID_A1     = 2048;
-Tilemap.TILE_ID_A2     = 2816;
-Tilemap.TILE_ID_A3     = 4352;
-Tilemap.TILE_ID_A4     = 5888;
-Tilemap.TILE_ID_MAX    = 8192;
+Tilemap.TILE_ID_B = 0;
+Tilemap.TILE_ID_C = 256;
+Tilemap.TILE_ID_D = 512;
+Tilemap.TILE_ID_E = 768;
+Tilemap.TILE_ID_A5 = 1536;
+Tilemap.TILE_ID_A1 = 2048;
+Tilemap.TILE_ID_A2 = 2816;
+Tilemap.TILE_ID_A3 = 4352;
+Tilemap.TILE_ID_A4 = 5888;
+Tilemap.TILE_ID_MAX = 8192;
 /**是可见图块*/
 Tilemap.isVisibleTile = function(tileId) {
     return tileId > 0 && tileId < this.TILE_ID_MAX;
@@ -1043,7 +1042,7 @@ Tilemap.isWallTopTile = function(tileId) {
 /**是墙壁部图块*/
 Tilemap.isWallSideTile = function(tileId) {
     return (this.isTileA3(tileId) || this.isTileA4(tileId)) &&
-            this.getAutotileKind(tileId) % 16 >= 8;
+        this.getAutotileKind(tileId) % 16 >= 8;
 };
 /**是墙图块*/
 Tilemap.isWallTile = function(tileId) {
@@ -1052,7 +1051,7 @@ Tilemap.isWallTile = function(tileId) {
 /**是地板类型自动图块*/
 Tilemap.isFloorTypeAutotile = function(tileId) {
     return (this.isTileA1(tileId) && !this.isWaterfallTile(tileId)) ||
-            this.isTileA2(tileId) || this.isWallTopTile(tileId);
+        this.isTileA2(tileId) || this.isWallTopTile(tileId);
 };
 /**是墙种类自动图块*/
 Tilemap.isWallTypeAutotile = function(tileId) {
@@ -1066,46 +1065,420 @@ Tilemap.isWaterfallTypeAutotile = function(tileId) {
 /** Autotile shape number to coordinates of tileset images*/
 /**基底自动图块表*/
 Tilemap.FLOOR_AUTOTILE_TABLE = [
-    [[2,4],[1,4],[2,3],[1,3]],[[2,0],[1,4],[2,3],[1,3]],
-    [[2,4],[3,0],[2,3],[1,3]],[[2,0],[3,0],[2,3],[1,3]],
-    [[2,4],[1,4],[2,3],[3,1]],[[2,0],[1,4],[2,3],[3,1]],
-    [[2,4],[3,0],[2,3],[3,1]],[[2,0],[3,0],[2,3],[3,1]],
-    [[2,4],[1,4],[2,1],[1,3]],[[2,0],[1,4],[2,1],[1,3]],
-    [[2,4],[3,0],[2,1],[1,3]],[[2,0],[3,0],[2,1],[1,3]],
-    [[2,4],[1,4],[2,1],[3,1]],[[2,0],[1,4],[2,1],[3,1]],
-    [[2,4],[3,0],[2,1],[3,1]],[[2,0],[3,0],[2,1],[3,1]],
-    [[0,4],[1,4],[0,3],[1,3]],[[0,4],[3,0],[0,3],[1,3]],
-    [[0,4],[1,4],[0,3],[3,1]],[[0,4],[3,0],[0,3],[3,1]],
-    [[2,2],[1,2],[2,3],[1,3]],[[2,2],[1,2],[2,3],[3,1]],
-    [[2,2],[1,2],[2,1],[1,3]],[[2,2],[1,2],[2,1],[3,1]],
-    [[2,4],[3,4],[2,3],[3,3]],[[2,4],[3,4],[2,1],[3,3]],
-    [[2,0],[3,4],[2,3],[3,3]],[[2,0],[3,4],[2,1],[3,3]],
-    [[2,4],[1,4],[2,5],[1,5]],[[2,0],[1,4],[2,5],[1,5]],
-    [[2,4],[3,0],[2,5],[1,5]],[[2,0],[3,0],[2,5],[1,5]],
-    [[0,4],[3,4],[0,3],[3,3]],[[2,2],[1,2],[2,5],[1,5]],
-    [[0,2],[1,2],[0,3],[1,3]],[[0,2],[1,2],[0,3],[3,1]],
-    [[2,2],[3,2],[2,3],[3,3]],[[2,2],[3,2],[2,1],[3,3]],
-    [[2,4],[3,4],[2,5],[3,5]],[[2,0],[3,4],[2,5],[3,5]],
-    [[0,4],[1,4],[0,5],[1,5]],[[0,4],[3,0],[0,5],[1,5]],
-    [[0,2],[3,2],[0,3],[3,3]],[[0,2],[1,2],[0,5],[1,5]],
-    [[0,4],[3,4],[0,5],[3,5]],[[2,2],[3,2],[2,5],[3,5]],
-    [[0,2],[3,2],[0,5],[3,5]],[[0,0],[1,0],[0,1],[1,1]]
+    [
+        [2, 4],
+        [1, 4],
+        [2, 3],
+        [1, 3]
+    ],
+    [
+        [2, 0],
+        [1, 4],
+        [2, 3],
+        [1, 3]
+    ],
+    [
+        [2, 4],
+        [3, 0],
+        [2, 3],
+        [1, 3]
+    ],
+    [
+        [2, 0],
+        [3, 0],
+        [2, 3],
+        [1, 3]
+    ],
+    [
+        [2, 4],
+        [1, 4],
+        [2, 3],
+        [3, 1]
+    ],
+    [
+        [2, 0],
+        [1, 4],
+        [2, 3],
+        [3, 1]
+    ],
+    [
+        [2, 4],
+        [3, 0],
+        [2, 3],
+        [3, 1]
+    ],
+    [
+        [2, 0],
+        [3, 0],
+        [2, 3],
+        [3, 1]
+    ],
+    [
+        [2, 4],
+        [1, 4],
+        [2, 1],
+        [1, 3]
+    ],
+    [
+        [2, 0],
+        [1, 4],
+        [2, 1],
+        [1, 3]
+    ],
+    [
+        [2, 4],
+        [3, 0],
+        [2, 1],
+        [1, 3]
+    ],
+    [
+        [2, 0],
+        [3, 0],
+        [2, 1],
+        [1, 3]
+    ],
+    [
+        [2, 4],
+        [1, 4],
+        [2, 1],
+        [3, 1]
+    ],
+    [
+        [2, 0],
+        [1, 4],
+        [2, 1],
+        [3, 1]
+    ],
+    [
+        [2, 4],
+        [3, 0],
+        [2, 1],
+        [3, 1]
+    ],
+    [
+        [2, 0],
+        [3, 0],
+        [2, 1],
+        [3, 1]
+    ],
+    [
+        [0, 4],
+        [1, 4],
+        [0, 3],
+        [1, 3]
+    ],
+    [
+        [0, 4],
+        [3, 0],
+        [0, 3],
+        [1, 3]
+    ],
+    [
+        [0, 4],
+        [1, 4],
+        [0, 3],
+        [3, 1]
+    ],
+    [
+        [0, 4],
+        [3, 0],
+        [0, 3],
+        [3, 1]
+    ],
+    [
+        [2, 2],
+        [1, 2],
+        [2, 3],
+        [1, 3]
+    ],
+    [
+        [2, 2],
+        [1, 2],
+        [2, 3],
+        [3, 1]
+    ],
+    [
+        [2, 2],
+        [1, 2],
+        [2, 1],
+        [1, 3]
+    ],
+    [
+        [2, 2],
+        [1, 2],
+        [2, 1],
+        [3, 1]
+    ],
+    [
+        [2, 4],
+        [3, 4],
+        [2, 3],
+        [3, 3]
+    ],
+    [
+        [2, 4],
+        [3, 4],
+        [2, 1],
+        [3, 3]
+    ],
+    [
+        [2, 0],
+        [3, 4],
+        [2, 3],
+        [3, 3]
+    ],
+    [
+        [2, 0],
+        [3, 4],
+        [2, 1],
+        [3, 3]
+    ],
+    [
+        [2, 4],
+        [1, 4],
+        [2, 5],
+        [1, 5]
+    ],
+    [
+        [2, 0],
+        [1, 4],
+        [2, 5],
+        [1, 5]
+    ],
+    [
+        [2, 4],
+        [3, 0],
+        [2, 5],
+        [1, 5]
+    ],
+    [
+        [2, 0],
+        [3, 0],
+        [2, 5],
+        [1, 5]
+    ],
+    [
+        [0, 4],
+        [3, 4],
+        [0, 3],
+        [3, 3]
+    ],
+    [
+        [2, 2],
+        [1, 2],
+        [2, 5],
+        [1, 5]
+    ],
+    [
+        [0, 2],
+        [1, 2],
+        [0, 3],
+        [1, 3]
+    ],
+    [
+        [0, 2],
+        [1, 2],
+        [0, 3],
+        [3, 1]
+    ],
+    [
+        [2, 2],
+        [3, 2],
+        [2, 3],
+        [3, 3]
+    ],
+    [
+        [2, 2],
+        [3, 2],
+        [2, 1],
+        [3, 3]
+    ],
+    [
+        [2, 4],
+        [3, 4],
+        [2, 5],
+        [3, 5]
+    ],
+    [
+        [2, 0],
+        [3, 4],
+        [2, 5],
+        [3, 5]
+    ],
+    [
+        [0, 4],
+        [1, 4],
+        [0, 5],
+        [1, 5]
+    ],
+    [
+        [0, 4],
+        [3, 0],
+        [0, 5],
+        [1, 5]
+    ],
+    [
+        [0, 2],
+        [3, 2],
+        [0, 3],
+        [3, 3]
+    ],
+    [
+        [0, 2],
+        [1, 2],
+        [0, 5],
+        [1, 5]
+    ],
+    [
+        [0, 4],
+        [3, 4],
+        [0, 5],
+        [3, 5]
+    ],
+    [
+        [2, 2],
+        [3, 2],
+        [2, 5],
+        [3, 5]
+    ],
+    [
+        [0, 2],
+        [3, 2],
+        [0, 5],
+        [3, 5]
+    ],
+    [
+        [0, 0],
+        [1, 0],
+        [0, 1],
+        [1, 1]
+    ]
 ];
 /**墙自动图块表*/
 Tilemap.WALL_AUTOTILE_TABLE = [
-    [[2,2],[1,2],[2,1],[1,1]],[[0,2],[1,2],[0,1],[1,1]],
-    [[2,0],[1,0],[2,1],[1,1]],[[0,0],[1,0],[0,1],[1,1]],
-    [[2,2],[3,2],[2,1],[3,1]],[[0,2],[3,2],[0,1],[3,1]],
-    [[2,0],[3,0],[2,1],[3,1]],[[0,0],[3,0],[0,1],[3,1]],
-    [[2,2],[1,2],[2,3],[1,3]],[[0,2],[1,2],[0,3],[1,3]],
-    [[2,0],[1,0],[2,3],[1,3]],[[0,0],[1,0],[0,3],[1,3]],
-    [[2,2],[3,2],[2,3],[3,3]],[[0,2],[3,2],[0,3],[3,3]],
-    [[2,0],[3,0],[2,3],[3,3]],[[0,0],[3,0],[0,3],[3,3]]
+    [
+        [2, 2],
+        [1, 2],
+        [2, 1],
+        [1, 1]
+    ],
+    [
+        [0, 2],
+        [1, 2],
+        [0, 1],
+        [1, 1]
+    ],
+    [
+        [2, 0],
+        [1, 0],
+        [2, 1],
+        [1, 1]
+    ],
+    [
+        [0, 0],
+        [1, 0],
+        [0, 1],
+        [1, 1]
+    ],
+    [
+        [2, 2],
+        [3, 2],
+        [2, 1],
+        [3, 1]
+    ],
+    [
+        [0, 2],
+        [3, 2],
+        [0, 1],
+        [3, 1]
+    ],
+    [
+        [2, 0],
+        [3, 0],
+        [2, 1],
+        [3, 1]
+    ],
+    [
+        [0, 0],
+        [3, 0],
+        [0, 1],
+        [3, 1]
+    ],
+    [
+        [2, 2],
+        [1, 2],
+        [2, 3],
+        [1, 3]
+    ],
+    [
+        [0, 2],
+        [1, 2],
+        [0, 3],
+        [1, 3]
+    ],
+    [
+        [2, 0],
+        [1, 0],
+        [2, 3],
+        [1, 3]
+    ],
+    [
+        [0, 0],
+        [1, 0],
+        [0, 3],
+        [1, 3]
+    ],
+    [
+        [2, 2],
+        [3, 2],
+        [2, 3],
+        [3, 3]
+    ],
+    [
+        [0, 2],
+        [3, 2],
+        [0, 3],
+        [3, 3]
+    ],
+    [
+        [2, 0],
+        [3, 0],
+        [2, 3],
+        [3, 3]
+    ],
+    [
+        [0, 0],
+        [3, 0],
+        [0, 3],
+        [3, 3]
+    ]
 ];
 /**瀑布自动图块表*/
 Tilemap.WATERFALL_AUTOTILE_TABLE = [
-    [[2,0],[1,0],[2,1],[1,1]],[[0,0],[1,0],[0,1],[1,1]],
-    [[2,0],[3,0],[2,1],[3,1]],[[0,0],[3,0],[0,1],[3,1]]
+    [
+        [2, 0],
+        [1, 0],
+        [2, 1],
+        [1, 1]
+    ],
+    [
+        [0, 0],
+        [1, 0],
+        [0, 1],
+        [1, 1]
+    ],
+    [
+        [2, 0],
+        [3, 0],
+        [2, 1],
+        [3, 1]
+    ],
+    [
+        [0, 0],
+        [3, 0],
+        [0, 1],
+        [3, 1]
+    ]
 ];
 
 /** The important members from Pixi.js*/
@@ -1117,7 +1490,7 @@ Tilemap.WATERFALL_AUTOTILE_TABLE = [
  * @property children
  * @type Array
  *--------------------------------------------------------------------------
- */ 
+ */
 
 /**--------------------------------------------------------------------------
  * [只读]包含地图子项的对象
@@ -1126,38 +1499,38 @@ Tilemap.WATERFALL_AUTOTILE_TABLE = [
  * @property parent
  * @type Object
  *--------------------------------------------------------------------------
- */ 
+ */
 
 /**--------------------------------------------------------------------------
  * 容器增加子项
  * Adds a child to the container.
  *
  * @method addChild
- * @param {object} child The child to add
- * @return {object} The child that was added
+ * @param {{}} child The child to add
+ * @return {{}} The child that was added
  *--------------------------------------------------------------------------
- */ 
+ */
 
 /**--------------------------------------------------------------------------
  * 添加一个子项到容器中指定索引处
  * Adds a child to the container at a specified index.
  *
  * @method addChildAt
- * @param {object} child The child to add
+ * @param {{}} child The child to add
  * @param {number} index The index to place the child in
- * @return {object} The child that was added
+ * @return {{}} The child that was added
  *--------------------------------------------------------------------------
- */ 
+ */
 
 /**--------------------------------------------------------------------------
  * 从容器中删除一个子项
  * Removes a child from the container.
  *
  * @method removeChild
- * @param {object} child The child to remove
- * @return {object} The child that was removed
+ * @param {{}} child The child to remove
+ * @return {{}} The child that was removed
  *--------------------------------------------------------------------------
- */ 
+ */
 
 /**--------------------------------------------------------------------------
  * 从指定索引位置的删除一个子项
@@ -1165,7 +1538,6 @@ Tilemap.WATERFALL_AUTOTILE_TABLE = [
  *
  * @method removeChildAt
  * @param {number} index The index to get the child from
- * @return {object} The child that was removed
+ * @return {{}} The child that was removed
  *--------------------------------------------------------------------------
- */ 
-
+ */

@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Window_ShopNumber */
 /** 窗口商店数目 */
@@ -18,7 +17,7 @@ Window_ShopNumber.prototype.constructor = Window_ShopNumber;
  * @param {number} x
  * @param {number} y
  * @param {number} height 
-*/
+ */
 Window_ShopNumber.prototype.initialize = function(x, y, height) {
     var width = this.windowWidth();
     Window_Selectable.prototype.initialize.call(this, x, y, width, height);
@@ -38,10 +37,10 @@ Window_ShopNumber.prototype.number = function() {
     return this._number;
 };
 /**安装 
- * @param {object} item
+ * @param {{}} item
  * @param {number} max
  * @param {number} price
-*/
+ */
 Window_ShopNumber.prototype.setup = function(item, max, price) {
     this._item = item;
     this._max = Math.floor(max);
@@ -181,8 +180,7 @@ Window_ShopNumber.prototype.isOkTriggered = function() {
     return Input.isTriggered('ok');
 };
 /**播放确定声音 */
-Window_ShopNumber.prototype.playOkSound = function() {
-};
+Window_ShopNumber.prototype.playOkSound = function() {};
 /**处理数字改变 */
 Window_ShopNumber.prototype.processNumberChange = function() {
     if (this.isOpenAndActive()) {
@@ -212,7 +210,7 @@ Window_ShopNumber.prototype.changeNumber = function(amount) {
 /**更新光标 */
 Window_ShopNumber.prototype.updateCursor = function() {
     this.setCursorRect(this.cursorX(), this.itemY(),
-                       this.cursorWidth(), this.lineHeight());
+        this.cursorWidth(), this.lineHeight());
 };
 /**当按键上 */
 Window_ShopNumber.prototype.onButtonUp = function() {

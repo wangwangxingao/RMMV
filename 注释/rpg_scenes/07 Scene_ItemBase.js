@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Scene_ItemBase */
 /** 场景物品基础 */
@@ -24,39 +23,39 @@ Scene_ItemBase.prototype.create = function() {
 /**创建角色窗口 */
 Scene_ItemBase.prototype.createActorWindow = function() {
     this._actorWindow = new Window_MenuActor();
-    this._actorWindow.setHandler('ok',     this.onActorOk.bind(this));
+    this._actorWindow.setHandler('ok', this.onActorOk.bind(this));
     this._actorWindow.setHandler('cancel', this.onActorCancel.bind(this));
     this.addWindow(this._actorWindow);
 };
 /**物品 
- * @return {object}
-*/
+ * @return {{}}
+ */
 Scene_ItemBase.prototype.item = function() {
     return this._itemWindow.item();
 };
 /**使用者 
  * @return {null}
-*/
+ */
 Scene_ItemBase.prototype.user = function() {
     return null;
 };
 /**是光标左 
  * @return {boolean}
-*/
+ */
 Scene_ItemBase.prototype.isCursorLeft = function() {
     return this._itemWindow.index() % 2 === 0;
 };
 /**显示替代窗口 
- * @param {object} window
-*/
+ * @param {{}} window
+ */
 Scene_ItemBase.prototype.showSubWindow = function(window) {
     window.x = this.isCursorLeft() ? Graphics.boxWidth - window.width : 0;
     window.show();
     window.activate();
 };
 /**隐藏替代窗口 
- * @param {object} window
-*/
+ * @param {{}} window
+ */
 Scene_ItemBase.prototype.hideSubWindow = function(window) {
     window.hide();
     window.deactivate();

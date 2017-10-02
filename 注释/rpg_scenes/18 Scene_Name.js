@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Scene_Name */
 /** 场景名称 */
@@ -15,18 +14,19 @@ Scene_Name.prototype = Object.create(Scene_MenuBase.prototype);
 Scene_Name.prototype.constructor = Scene_Name;
 /**初始化 */
 Scene_Name.prototype.initialize = function() {
-	//场景菜单基础 初始化 呼叫(this)
+    //场景菜单基础 初始化 呼叫(this)
     Scene_MenuBase.prototype.initialize.call(this);
 };
 /**准备 */
 Scene_Name.prototype.prepare = function(actorId, maxLength) {
-	//角色id  = actorId
+    //角色id  = actorId
     this._actorId = actorId;
     //最大长度 = maxLength
     this._maxLength = maxLength;
 };
 /**创建 */
 Scene_Name.prototype.create = function() {
+    //菜单基础 创建 呼叫(this)
     Scene_MenuBase.prototype.create.call(this);
     this._actor = $gameActors.actor(this._actorId);
     this.createEditWindow();

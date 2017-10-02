@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Scene_Shop */
 /** 场景商店 */
@@ -21,7 +20,7 @@ Scene_Shop.prototype.initialize = function() {
  * @param {[object]} goods 物品组
  * @param {boolean} purchaseOnly  只买
  * 
-*/
+ */
 Scene_Shop.prototype.prepare = function(goods, purchaseOnly) {
     this._goods = goods;
     this._purchaseOnly = purchaseOnly;
@@ -50,8 +49,8 @@ Scene_Shop.prototype.createGoldWindow = function() {
 Scene_Shop.prototype.createCommandWindow = function() {
     this._commandWindow = new Window_ShopCommand(this._goldWindow.x, this._purchaseOnly);
     this._commandWindow.y = this._helpWindow.height;
-    this._commandWindow.setHandler('buy',    this.commandBuy.bind(this));
-    this._commandWindow.setHandler('sell',   this.commandSell.bind(this));
+    this._commandWindow.setHandler('buy', this.commandBuy.bind(this));
+    this._commandWindow.setHandler('sell', this.commandSell.bind(this));
     this._commandWindow.setHandler('cancel', this.popScene.bind(this));
     this.addWindow(this._commandWindow);
 };
@@ -68,7 +67,7 @@ Scene_Shop.prototype.createNumberWindow = function() {
     var wh = this._dummyWindow.height;
     this._numberWindow = new Window_ShopNumber(0, wy, wh);
     this._numberWindow.hide();
-    this._numberWindow.setHandler('ok',     this.onNumberOk.bind(this));
+    this._numberWindow.setHandler('ok', this.onNumberOk.bind(this));
     this._numberWindow.setHandler('cancel', this.onNumberCancel.bind(this));
     this.addWindow(this._numberWindow);
 };
@@ -90,7 +89,7 @@ Scene_Shop.prototype.createBuyWindow = function() {
     this._buyWindow.setHelpWindow(this._helpWindow);
     this._buyWindow.setStatusWindow(this._statusWindow);
     this._buyWindow.hide();
-    this._buyWindow.setHandler('ok',     this.onBuyOk.bind(this));
+    this._buyWindow.setHandler('ok', this.onBuyOk.bind(this));
     this._buyWindow.setHandler('cancel', this.onBuyCancel.bind(this));
     this.addWindow(this._buyWindow);
 };
@@ -101,7 +100,7 @@ Scene_Shop.prototype.createCategoryWindow = function() {
     this._categoryWindow.y = this._dummyWindow.y;
     this._categoryWindow.hide();
     this._categoryWindow.deactivate();
-    this._categoryWindow.setHandler('ok',     this.onCategoryOk.bind(this));
+    this._categoryWindow.setHandler('ok', this.onCategoryOk.bind(this));
     this._categoryWindow.setHandler('cancel', this.onCategoryCancel.bind(this));
     this.addWindow(this._categoryWindow);
 };
@@ -112,7 +111,7 @@ Scene_Shop.prototype.createSellWindow = function() {
     this._sellWindow = new Window_ShopSell(0, wy, Graphics.boxWidth, wh);
     this._sellWindow.setHelpWindow(this._helpWindow);
     this._sellWindow.hide();
-    this._sellWindow.setHandler('ok',     this.onSellOk.bind(this));
+    this._sellWindow.setHandler('ok', this.onSellOk.bind(this));
     this._sellWindow.setHandler('cancel', this.onSellCancel.bind(this));
     this._categoryWindow.setItemWindow(this._sellWindow);
     this.addWindow(this._sellWindow);
@@ -199,12 +198,12 @@ Scene_Shop.prototype.onSellCancel = function() {
 Scene_Shop.prototype.onNumberOk = function() {
     SoundManager.playShop();
     switch (this._commandWindow.currentSymbol()) {
-    case 'buy':
-        this.doBuy(this._numberWindow.number());
-        break;
-    case 'sell':
-        this.doSell(this._numberWindow.number());
-        break;
+        case 'buy':
+            this.doBuy(this._numberWindow.number());
+            break;
+        case 'sell':
+            this.doSell(this._numberWindow.number());
+            break;
     }
     this.endNumberInput();
     this._goldWindow.refresh();
@@ -229,17 +228,17 @@ Scene_Shop.prototype.doSell = function(number) {
 Scene_Shop.prototype.endNumberInput = function() {
     this._numberWindow.hide();
     switch (this._commandWindow.currentSymbol()) {
-    case 'buy':
-        this.activateBuyWindow();
-        break;
-    case 'sell':
-        this.activateSellWindow();
-        break;
+        case 'buy':
+            this.activateBuyWindow();
+            break;
+        case 'sell':
+            this.activateSellWindow();
+            break;
     }
 };
 /**最多购买 
  * @return {number}
-*/
+ */
 Scene_Shop.prototype.maxBuy = function() {
     var max = $gameParty.maxItems(this._item) - $gameParty.numItems(this._item);
     var price = this.buyingPrice();
@@ -251,32 +250,32 @@ Scene_Shop.prototype.maxBuy = function() {
 };
 /**最大卖出 
  * @return {number} 
-*/
+ */
 Scene_Shop.prototype.maxSell = function() {
     return $gameParty.numItems(this._item);
 };
 /**金钱 
  * @return {number} 
-*/
+ */
 Scene_Shop.prototype.money = function() {
     return this._goldWindow.value();
 };
 /**通用单位 
  * @return {string} 
-*/
+ */
 Scene_Shop.prototype.currencyUnit = function() {
     return this._goldWindow.currencyUnit();
 };
 /**购买价格 
  * @return {number}  =
-*/
+ */
 Scene_Shop.prototype.buyingPrice = function() {
     return this._buyWindow.price(this._item);
 };
 /**出售价格 
  * @return {number} 
  * 
-*/
+ */
 Scene_Shop.prototype.sellingPrice = function() {
     return Math.floor(this._item.price / 2);
 };

@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Window_ShopSell */
 /** 窗口商店卖 */
@@ -18,14 +17,14 @@ Window_ShopSell.prototype.constructor = Window_ShopSell;
  * @param {number} y y 
  * @param {number} width 宽
  * @param {number} height 高
-*/
+ */
 Window_ShopSell.prototype.initialize = function(x, y, width, height) {
     Window_ItemList.prototype.initialize.call(this, x, y, width, height);
 };
 /**是允许 
- * @param {object} item 物品
+ * @param {{}} item 物品
  * @return {boolean}
-*/
+ */
 Window_ShopSell.prototype.isEnabled = function(item) {
     return item && item.price > 0;
 };

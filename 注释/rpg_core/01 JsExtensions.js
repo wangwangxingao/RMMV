@@ -1,4 +1,3 @@
-
 /**-----------------------------------------------------------------------------*/
 /**这不是一个类,但是包含一些方法添加到标准js中方法
  * This is not a class, but contains some methods that will be added to the
@@ -44,7 +43,7 @@ Number.prototype.mod = function(n) {
  * @method String.prototype.format
  * @param {Any} ...args The objects to format
  * @return {string} A formatted string
- */ 
+ */
 String.prototype.format = function() {
     var args = arguments;
     return this.replace(/%([0-9]+)/g, function(s, n) {
@@ -59,8 +58,8 @@ String.prototype.format = function() {
  * @method String.prototype.padZero
  * @param {number} length The length of the output string
  * @return {string} A string with leading zeros
- */ 
-String.prototype.padZero = function(length){
+ */
+String.prototype.padZero = function(length) {
     var s = this;
     while (s.length < length) {
         s = '0' + s;
@@ -75,8 +74,8 @@ String.prototype.padZero = function(length){
  * @method Number.prototype.padZero
  * @param {number} length The length of the output string
  * @return {string} A string with leading zeros
- */ 
-Number.prototype.padZero = function(length){
+ */
+Number.prototype.padZero = function(length) {
     return String(this).padZero(length);
 };
 
@@ -87,7 +86,7 @@ Object.defineProperties(Array.prototype, {
      * Checks whether the two arrays are same.
      *
      * @method Array.prototype.equals
-     * @param {array} array The array to compare to
+     * @param {[]} array The array to compare to
      * @return {boolean} True if the two arrays are same
      */
     equals: {
@@ -113,8 +112,8 @@ Object.defineProperties(Array.prototype, {
      * Makes a shallow copy of the array.
      *
      * @method Array.prototype.clone
-     * @return {array} A shallow copy of the array
-     */ 
+     * @return {[]} A shallow copy of the array
+     */
     clone: {
         enumerable: false,
         value: function() {
@@ -128,15 +127,15 @@ Object.defineProperties(Array.prototype, {
      * @method Array.prototype.contains
      * @param {Any} element The element to search for
      * @return {boolean} True if the array contains a given element
-     */ 
-    contains : {
+     */
+    contains: {
         enumerable: false,
         value: function(element) {
             return this.indexOf(element) >= 0;
         }
     }
 });
- 
+
 
 /**包含
  * 字符串包含
@@ -145,7 +144,7 @@ Object.defineProperties(Array.prototype, {
  * @method String.prototype.contains
  * @param {string} string The string to search for
  * @return {boolean} True if the string contains a given string
- */ 
+ */
 String.prototype.contains = function(string) {
     return this.indexOf(string) >= 0;
 };
@@ -158,7 +157,7 @@ String.prototype.contains = function(string) {
  * @method Math.randomInt
  * @param {number} max The upper boundary (excluded)
  * @return {number} A random integer
- */ 
+ */
 Math.randomInt = function(max) {
     return Math.floor(max * Math.random());
 };

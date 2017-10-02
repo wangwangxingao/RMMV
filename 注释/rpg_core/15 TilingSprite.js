@@ -1,4 +1,3 @@
-
 /**-----------------------------------------------------------------------------*/
 /**为平铺图像的精灵对象
  * The sprite object for a tiling image.
@@ -11,7 +10,7 @@ function TilingSprite() {
     this.initialize.apply(this, arguments);
 }
 
-TilingSprite.prototype = Object.create(PIXI.extras.PictureTilingSprite.prototype); 
+TilingSprite.prototype = Object.create(PIXI.extras.PictureTilingSprite.prototype);
 TilingSprite.prototype.constructor = TilingSprite;
 /**初始化*/
 TilingSprite.prototype.initialize = function(bitmap) {
@@ -43,7 +42,7 @@ TilingSprite.prototype._renderWebGL_PIXI = PIXI.extras.PictureTilingSprite.proto
 
 /**渲染画布
  * @method _renderCanvas
- * @param {object} renderer
+ * @param {{}} renderer
  * @private
  */
 TilingSprite.prototype._renderCanvas = function(renderer) {
@@ -57,9 +56,9 @@ TilingSprite.prototype._renderCanvas = function(renderer) {
 
 /**渲染WebGL
  * @method _renderWebGL
- * @param {object} renderer
+ * @param {{}} renderer
  * @private
- */ 
+ */
 TilingSprite.prototype._renderWebGL = function(renderer) {
     if (this._bitmap) {
         this._bitmap.touch();
@@ -78,7 +77,7 @@ TilingSprite.prototype._renderWebGL = function(renderer) {
  *
  * @property bitmap
  * @type Bitmap
- */ 
+ */
 Object.defineProperty(TilingSprite.prototype, 'bitmap', {
     get: function() {
         return this._bitmap;
@@ -102,7 +101,7 @@ Object.defineProperty(TilingSprite.prototype, 'bitmap', {
  *
  * @property opacity
  * @type Number
- */ 
+ */
 Object.defineProperty(TilingSprite.prototype, 'opacity', {
     get: function() {
         return this.alpha * 255;
@@ -205,7 +204,7 @@ TilingSprite.prototype._speedUpCustomBlendModes = Sprite.prototype._speedUpCusto
 
 /**
  * @method _renderWebGL
- * @param {object} renderer
+ * @param {{}} renderer
  * @private
  */
 TilingSprite.prototype._renderWebGL = function(renderer) {
@@ -243,4 +242,3 @@ TilingSprite.prototype._renderWebGL = function(renderer) {
  * @property y
  * @type Number
  */
-

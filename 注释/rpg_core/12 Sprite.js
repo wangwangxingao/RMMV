@@ -1,4 +1,3 @@
-
 /**-----------------------------------------------------------------------------*/
 /**呈现游戏画面的基本对象。
  * The basic object that is rendered to the game screen.
@@ -12,7 +11,7 @@ function Sprite() {
 }
 
 Sprite.prototype = Object.create(PIXI.Sprite.prototype);
-Sprite.prototype.constructor = Sprite; 
+Sprite.prototype.constructor = Sprite;
 
 Sprite.voidFilter = new PIXI.filters.VoidFilter();
 /**初始化*/
@@ -24,7 +23,7 @@ Sprite.prototype.initialize = function(bitmap) {
     this._bitmap = null;
     this._frame = new Rectangle();
     this._realFrame = new Rectangle();
-    
+
     this._blendColor = [0, 0, 0, 0];
     this._colorTone = [0, 0, 0, 0];
     this._canvas = null;
@@ -53,7 +52,7 @@ Sprite._counter = 0;
  *
  * @property bitmap
  * @type Bitmap
- */ 
+ */
 Object.defineProperty(Sprite.prototype, 'bitmap', {
     get: function() {
         return this._bitmap;
@@ -61,10 +60,10 @@ Object.defineProperty(Sprite.prototype, 'bitmap', {
     set: function(value) {
         if (this._bitmap !== value) {
             this._bitmap = value;
-            if(value){
+            if (value) {
                 this._refreshFrame = true;
                 value.addLoadListener(this._onBitmapLoad.bind(this));
-            }else{
+            } else {
                 this._refreshFrame = false;
                 this.texture.frame = Rectangle.emptyRectangle;
             }
@@ -79,7 +78,7 @@ Object.defineProperty(Sprite.prototype, 'bitmap', {
  *
  * @property width
  * @type Number
- */ 
+ */
 Object.defineProperty(Sprite.prototype, 'width', {
     get: function() {
         return this._frame.width;
@@ -97,7 +96,7 @@ Object.defineProperty(Sprite.prototype, 'width', {
  *
  * @property height
  * @type Number
- */ 
+ */
 Object.defineProperty(Sprite.prototype, 'height', {
     get: function() {
         return this._frame.height;
@@ -115,7 +114,7 @@ Object.defineProperty(Sprite.prototype, 'height', {
  *
  * @property opacity
  * @type Number
- */ 
+ */
 Object.defineProperty(Sprite.prototype, 'opacity', {
     get: function() {
         return this.alpha * 255;
@@ -167,7 +166,7 @@ Sprite.prototype.setFrame = function(x, y, width, height) {
     this._refreshFrame = false;
     var frame = this._frame;
     if (x !== frame.x || y !== frame.y ||
-            width !== frame.width || height !== frame.height) {
+        width !== frame.width || height !== frame.height) {
         frame.x = x;
         frame.y = y;
         frame.width = width;
@@ -181,7 +180,7 @@ Sprite.prototype.setFrame = function(x, y, width, height) {
  * Gets the blend color for the sprite.
  *
  * @method getBlendColor
- * @return {array} The blend color [r, g, b, a]
+ * @return {[number,number,number,number]} The blend color [r, g, b, a]
  */
 Sprite.prototype.getBlendColor = function() {
     return this._blendColor.clone();
@@ -192,7 +191,7 @@ Sprite.prototype.getBlendColor = function() {
  * Sets the blend color for the sprite.
  * 
  * @method setBlendColor 
- * @param {array} color The blend color [r, g, b, a] 
+ * @param {[number,number,number,number]} color The blend color [r, g, b, a] 
  */
 Sprite.prototype.setBlendColor = function(color) {
     if (!(color instanceof Array)) {
@@ -209,7 +208,7 @@ Sprite.prototype.setBlendColor = function(color) {
  * Gets the color tone for the sprite.
  * 
  * @method getColorTone
- * @return {array} The color tone [r, g, b, gray]
+ * @return {[number,number,number,number]} The color tone [r, g, b, gray]
  */
 Sprite.prototype.getColorTone = function() {
     return this._colorTone.clone();
@@ -220,7 +219,7 @@ Sprite.prototype.getColorTone = function() {
  * Sets the color tone for the sprite.
  *
  * @method setColorTone
- * @param {array} tone The color tone [r, g, b, gray]
+ * @param {[number,number,number,number]} tone The color tone [r, g, b, gray]
  */
 Sprite.prototype.setColorTone = function(tone) {
     if (!(tone instanceof Array)) {
@@ -237,7 +236,7 @@ Sprite.prototype.setColorTone = function(tone) {
  * @private
  */
 Sprite.prototype._onBitmapLoad = function(bitmapLoaded) {
-    if(bitmapLoaded === this._bitmap){
+    if (bitmapLoaded === this._bitmap) {
         if (this._refreshFrame && this._bitmap) {
             this._refreshFrame = false;
             this._frame.width = this._bitmap.width;
@@ -312,7 +311,7 @@ Sprite.prototype._refresh = function() {
  */
 Sprite.prototype._isInBitmapRect = function(x, y, w, h) {
     return (this._bitmap && x + w > 0 && y + h > 0 &&
-            x < this._bitmap.width && y < this._bitmap.height);
+        x < this._bitmap.width && y < this._bitmap.height);
 };
 
 /**需要着色
@@ -410,21 +409,21 @@ Sprite.prototype._executeTint = function(x, y, w, h) {
     context.drawImage(this._bitmap.canvas, x, y, w, h, 0, 0, w, h);
 };
 
- 
+
 
 Sprite.prototype._renderCanvas_PIXI = PIXI.Sprite.prototype._renderCanvas;
 Sprite.prototype._renderWebGL_PIXI = PIXI.Sprite.prototype._renderWebGL;
 
 /**提供画布
  * @method _renderCanvas
- * @param {object} renderer
+ * @param {{}} renderer
  * @private
  */
 Sprite.prototype._renderCanvas = function(renderer) {
     if (this.bitmap) {
         this.bitmap.touch();
     }
-    if(this.bitmap && !this.bitmap.isReady()){
+    if (this.bitmap && !this.bitmap.isReady()) {
         return;
     }
 
@@ -438,7 +437,7 @@ Sprite.prototype._renderCanvas = function(renderer) {
  * checks if we need to speed up custom blendmodes
  * @param renderer
  * @private
- */ 
+ */
 Sprite.prototype._speedUpCustomBlendModes = function(renderer) {
     var picture = renderer.plugins.picture;
     var blend = this.blendMode;
@@ -447,7 +446,7 @@ Sprite.prototype._speedUpCustomBlendModes = function(renderer) {
             var stage = renderer._lastObjectRendered;
             var f = stage._filters;
             if (!f || !f[0]) {
-                setTimeout(function () {
+                setTimeout(function() {
                     var f = stage._filters;
                     if (!f || !f[0]) {
                         stage.filters = [Sprite.voidFilter];
@@ -461,14 +460,14 @@ Sprite.prototype._speedUpCustomBlendModes = function(renderer) {
 
 /**提供webgl
  * @method _renderWebGL
- * @param {object} renderer
+ * @param {{}} renderer
  * @private
  */
 Sprite.prototype._renderWebGL = function(renderer) {
     if (this.bitmap) {
         this.bitmap.touch();
     }
-    if(this.bitmap && !this.bitmap.isReady()){
+    if (this.bitmap && !this.bitmap.isReady()) {
         return;
     }
     if (this.texture.frame.width > 0 && this.texture.frame.height > 0) {
@@ -496,7 +495,7 @@ Sprite.prototype._renderWebGL = function(renderer) {
         }
     }
 };
- 
+
 
 /** The important members from Pixi.js*/
 /** Pixi.js的重要成员*/
@@ -575,25 +574,25 @@ Sprite.prototype._renderWebGL = function(renderer) {
  * Adds a child to the container.
  *
  * @method addChild
- * @param {object} child The child to add
- * @return {object} The child that was added
+ * @param {{}} child The child to add
+ * @return {{}} The child that was added
  */
 
 /**添加一个子项到容器中指定索引处
  * Adds a child to the container at a specified index.
  *
  * @method addChildAt
- * @param {object} child The child to add
+ * @param {{}} child The child to add
  * @param {number} index The index to place the child in
- * @return {object} The child that was added
+ * @return {{}} The child that was added
  */
 
 /**从容器中删除一个子项
  * Removes a child from the container.
  *
  * @method removeChild
- * @param {object} child The child to remove
- * @return {object} The child that was removed
+ * @param {{}} child The child to remove
+ * @return {{}} The child that was removed
  */
 
 /**从指定索引位置的删除一个子项
@@ -601,5 +600,5 @@ Sprite.prototype._renderWebGL = function(renderer) {
  *
  * @method removeChildAt
  * @param {number} index The index to get the child from
- * @return {object} The child that was removed
+ * @return {{}} The child that was removed
  */

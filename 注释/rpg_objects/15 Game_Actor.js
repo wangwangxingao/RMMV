@@ -1,4 +1,3 @@
-
 /**-----------------------------------------------------------------------------*/
 /** Game_Actor*/
 /** 游戏角色*/
@@ -16,9 +15,9 @@ Game_Actor.prototype.constructor = Game_Actor;
 
 /**定义属性 */
 Object.defineProperty(Game_Actor.prototype, 'level', {
-	//获取
+    //获取
     get: function() {
-	    //返回 等级
+        //返回 等级
         return this._level;
     },
     //可设置的 true
@@ -26,14 +25,14 @@ Object.defineProperty(Game_Actor.prototype, 'level', {
 });
 /**初始化*/
 Game_Actor.prototype.initialize = function(actorId) {
-	//游戏战斗者 初始化 呼叫(this)
+    //游戏战斗者 初始化 呼叫(this)
     Game_Battler.prototype.initialize.call(this);
     //安装( 角色id )
     this.setup(actorId);
 };
 /**初始化成员*/
 Game_Actor.prototype.initMembers = function() {
-	//游戏战斗者 初始化成员 呼叫(this)
+    //游戏战斗者 初始化成员 呼叫(this)
     Game_Battler.prototype.initMembers.call(this);
     //角色id = 0
     this._actorId = 0;
@@ -66,13 +65,13 @@ Game_Actor.prototype.initMembers = function() {
     //最后菜单技能 = 新 游戏项目
     this._lastMenuSkill = new Game_Item();
     //最后战斗技能 = 新 游戏项目
-    this._lastBattleSkill  = new Game_Item();
+    this._lastBattleSkill = new Game_Item();
     //最后命令符号 = ''
     this._lastCommandSymbol = '';
 };
 /**安装*/
 Game_Actor.prototype.setup = function(actorId) {
-	//角色 = 数据角色组 [ actorId//角色id ]
+    //角色 = 数据角色组 [ actorId//角色id ]
     var actor = $dataActors[actorId];
     //角色id = actorId//角色id
     this._actorId = actorId;
@@ -101,96 +100,96 @@ Game_Actor.prototype.setup = function(actorId) {
 };
 /**角色id*/
 Game_Actor.prototype.actorId = function() {
-	//返回 角色id
+    //返回 角色id
     return this._actorId;
 };
 /**角色*/
 Game_Actor.prototype.actor = function() {
-	//返回 数据角色组 [角色id]
+    //返回 数据角色组 [角色id]
     return $dataActors[this._actorId];
 };
 /**名称*/
 Game_Actor.prototype.name = function() {
-	//返回 名称
+    //返回 名称
     return this._name;
 };
 /**设置名称*/
 Game_Actor.prototype.setName = function(name) {
-	//名称 = name//名称
+    //名称 = name//名称
     this._name = name;
 };
 /**昵称*/
 Game_Actor.prototype.nickname = function() {
-	//返回 昵称
+    //返回 昵称
     return this._nickname;
 };
 /**设置昵称*/
 Game_Actor.prototype.setNickname = function(nickname) {
-	//昵称 = nickname//昵称
+    //昵称 = nickname//昵称
     this._nickname = nickname;
 };
 /**人物简介*/
 Game_Actor.prototype.profile = function() {
-	//返回 人物简介
+    //返回 人物简介
     return this._profile;
 };
 /**设置人物简介*/
 Game_Actor.prototype.setProfile = function(profile) {
-	//人物简介 = profile//人物简介
+    //人物简介 = profile//人物简介
     this._profile = profile;
 };
 /**行走图名称*/
 Game_Actor.prototype.characterName = function() {
-	//返回 行走图名称
+    //返回 行走图名称
     return this._characterName;
 };
 /**行走图索引*/
 Game_Actor.prototype.characterIndex = function() {
-	//返回 行走图索引
+    //返回 行走图索引
     return this._characterIndex;
 };
 /**脸图名称*/
 Game_Actor.prototype.faceName = function() {
-	//返回 脸图名称
+    //返回 脸图名称
     return this._faceName;
 };
 /**脸图索引*/
 Game_Actor.prototype.faceIndex = function() {
-	//返回 脸图索引
+    //返回 脸图索引
     return this._faceIndex;
 };
 /**战斗图名称*/
 Game_Actor.prototype.battlerName = function() {
-	//返回 战斗图名称
+    //返回 战斗图名称
     return this._battlerName;
 };
 /**清除状态组*/
 Game_Actor.prototype.clearStates = function() {
-	//游戏战斗者 清除状态组 呼叫(this)
+    //游戏战斗者 清除状态组 呼叫(this)
     Game_Battler.prototype.clearStates.call(this);
     //状态步骤组 = {}
     this._stateSteps = {};
 };
 /**抹去状态*/
 Game_Actor.prototype.eraseState = function(stateId) {
-	//游戏战斗者 抹去状态 呼叫(this,状态id)
+    //游戏战斗者 抹去状态 呼叫(this,状态id)
     Game_Battler.prototype.eraseState.call(this, stateId);
     //删除 状态步骤组[状态id]
     delete this._stateSteps[stateId];
 };
 /**抹去状态计数*/
 Game_Actor.prototype.resetStateCounts = function(stateId) {
-	//游戏战斗者 抹去状态计数(状态id) 呼叫(this,状态id)
+    //游戏战斗者 抹去状态计数(状态id) 呼叫(this,状态id)
     Game_Battler.prototype.resetStateCounts.call(this, stateId);
     //状态步骤组[状态id]  =  数据状态组[状态id] 
     this._stateSteps[stateId] = $dataStates[stateId].stepsToRemove;
 };
 /**初始化图片*/
 Game_Actor.prototype.initImages = function() {
-	//角色 = 角色 
+    //角色 = 角色 
     var actor = this.actor();
     //行走图名称 = 角色 行走图名称
-    this._characterName = actor.characterName; 
+    this._characterName = actor.characterName;
     //行走图索引 = 角色 行走图索引
     this._characterIndex = actor.characterIndex;
     //脸图名称 =   角色 脸图名称
@@ -202,7 +201,7 @@ Game_Actor.prototype.initImages = function() {
 };
 /**经验值为等级*/
 Game_Actor.prototype.expForLevel = function(level) {
-	//c = 当前职业
+    //c = 当前职业
     var c = this.currentClass();
     //基础值 = c 经验值参数组[0]
     var basis = c.expParams[0];
@@ -213,61 +212,61 @@ Game_Actor.prototype.expForLevel = function(level) {
     //增加度b = c 经验值参数组[3]
     var acc_b = c.expParams[3];
     //返回 数学 四舍五入( 基础值 *  ( 数学 幂(等级-1,0.9+增加度a/250 ) ) * 等级 * 
-    return Math.round(basis*(Math.pow(level-1, 0.9+acc_a/250))*level*
-            //   (等级+1) / (6 + 数学 幂(等级 , 2) /50/增加度b  )  +  (等级-1) * 修正值 )
-            (level+1)/(6+Math.pow(level,2)/50/acc_b)+(level-1)*extra);
+    return Math.round(basis * (Math.pow(level - 1, 0.9 + acc_a / 250)) * level *
+        //   (等级+1) / (6 + 数学 幂(等级 , 2) /50/增加度b  )  +  (等级-1) * 修正值 )
+        (level + 1) / (6 + Math.pow(level, 2) / 50 / acc_b) + (level - 1) * extra);
 };
 /**初始化经验值*/
 Game_Actor.prototype.initExp = function() {
-	//经验值[职业id] = 当前等级经验值()
+    //经验值[职业id] = 当前等级经验值()
     this._exp[this._classId] = this.currentLevelExp();
 };
 /**当前经验值*/
 Game_Actor.prototype.currentExp = function() {
-	//返回 经验值[职业id]
+    //返回 经验值[职业id]
     return this._exp[this._classId];
 };
 /**当前等级经验值*/
 Game_Actor.prototype.currentLevelExp = function() {
-	//返回 经验值为等级(等级)
+    //返回 经验值为等级(等级)
     return this.expForLevel(this._level);
 };
 /**下一级经验值*/
 Game_Actor.prototype.nextLevelExp = function() {
-	//返回 经验值为等级(等级+1)
+    //返回 经验值为等级(等级+1)
     return this.expForLevel(this._level + 1);
 };
 /**下一级需要经验值*/
 Game_Actor.prototype.nextRequiredExp = function() {
-	//返回 下一级经验值() - 当前经验值()
+    //返回 下一级经验值() - 当前经验值()
     return this.nextLevelExp() - this.currentExp();
 };
 /**最大等级*/
 Game_Actor.prototype.maxLevel = function() {
-	//返回 角色 最大等级 
+    //返回 角色 最大等级 
     return this.actor().maxLevel;
 };
 /**是最大等级*/
 Game_Actor.prototype.isMaxLevel = function() {
-	//返回 等级 >= 最大等级 
+    //返回 等级 >= 最大等级 
     return this._level >= this.maxLevel();
 };
 /**初始化技能*/
 Game_Actor.prototype.initSkills = function() {
-	//技能组 = []
+    //技能组 = []
     this._skills = [];
     //当前职业 学习组 对每一个 方法( 学习 )
     this.currentClass().learnings.forEach(function(learning) {
-	    //如果 学习 等级 <= 等级
+        //如果 学习 等级 <= 等级
         if (learning.level <= this._level) {
-	        //学习技能 (学习 技能id)
+            //学习技能 (学习 技能id)
             this.learnSkill(learning.skillId);
         }
     }, this);
 };
 /**初始化装备组*/
 Game_Actor.prototype.initEquips = function(equips) {
-	//槽组 = 装备槽组
+    //槽组 = 装备槽组
     var slots = this.equipSlots();
     //最大槽数 = 槽组 长度
     var maxSlots = slots.length;
@@ -275,14 +274,14 @@ Game_Actor.prototype.initEquips = function(equips) {
     this._equips = [];
     //循环 ( 开始时 i = 0 ; 当 i < 最大槽数 ; 每一次 i++)
     for (var i = 0; i < maxSlots; i++) {
-	    //装备组[i] = 新 游戏项目
+        //装备组[i] = 新 游戏项目
         this._equips[i] = new Game_Item();
     }
     //循环 ( 开始时 j = 0 ; 当 j < 装备组 长度 ; 每一次 j++)
     for (var j = 0; j < equips.length; j++) {
-	    //如果 j < 最大槽数
+        //如果 j < 最大槽数
         if (j < maxSlots) {
-	        //装备组[j] 设置装备( 槽组[j] === 1 , 装备组[j] )
+            //装备组[j] 设置装备( 槽组[j] === 1 , 装备组[j] )
             this._equips[j].setEquip(slots[j] === 1, equips[j]);
         }
     }
@@ -293,16 +292,16 @@ Game_Actor.prototype.initEquips = function(equips) {
 };
 /**装备槽组*/
 Game_Actor.prototype.equipSlots = function() {
-	//槽组 =  []
-    var slots = []; 
+    //槽组 =  []
+    var slots = [];
     //循环 ( 开始时 i = 1 ; 当 i < 数据系统 装备种类组 ; 每一次 i++)
     for (var i = 1; i < $dataSystem.equipTypes.length; i++) {
-	    //槽组 添加(i)
+        //槽组 添加(i)
         slots.push(i);
     }
     //如果 槽组 长度 >= 2 并且 是双刀流
     if (slots.length >= 2 && this.isDualWield()) {
-	    //槽组[1] = 1
+        //槽组[1] = 1
         slots[1] = 1;
     }
     //返回 槽组
@@ -311,68 +310,68 @@ Game_Actor.prototype.equipSlots = function() {
 /**装备组
  * @return {[object]}
  * 
-*/
+ */
 Game_Actor.prototype.equips = function() {
-	//返回 装备组 映射 方法(项目)
+    //返回 装备组 映射 方法(项目)
     return this._equips.map(function(item) {
-	    //返回 项目 对象
+        //返回 项目 对象
         return item.object();
     });
 };
 /**武器组
  * @return {[object]}
  * 
-*/
+ */
 Game_Actor.prototype.weapons = function() {
-	//返回 装备组 过滤 方法(项目)
+    //返回 装备组 过滤 方法(项目)
     return this.equips().filter(function(item) {
-	    //返回 项目 并且 数据管理器 是武器(项目)
+        //返回 项目 并且 数据管理器 是武器(项目)
         return item && DataManager.isWeapon(item);
     });
 };
 /**防具组
  * @return {[object]}
  * 
-*/
+ */
 Game_Actor.prototype.armors = function() {
-	//返回 装备组 过滤 方法(项目)
+    //返回 装备组 过滤 方法(项目)
     return this.equips().filter(function(item) {
-	    //返回 项目 并且 数据管理器 是防具(项目)
+        //返回 项目 并且 数据管理器 是防具(项目)
         return item && DataManager.isArmor(item);
     });
 };
 /**有武器
- * @param {object} weapon 武器
+ * @param {{}} weapon 武器
  * @return {boolean}
  * 
-*/
+ */
 Game_Actor.prototype.hasWeapon = function(weapon) {
-	//返回 武器组 包含 (weapon//武器)
+    //返回 武器组 包含 (weapon//武器)
     return this.weapons().contains(weapon);
 };
 /**有防具
- * @param {object} armor 武器
+ * @param {{}} armor 武器
  * @return {boolean}
  * 
-*/
+ */
 Game_Actor.prototype.hasArmor = function(armor) {
-	//返回 防具组 包含 (armor//防具) 
+    //返回 防具组 包含 (armor//防具) 
     return this.armors().contains(armor);
 };
 /**是装备改变可以
  * @param {number} slotId 槽id
-*/
+ */
 Game_Actor.prototype.isEquipChangeOk = function(slotId) {
-	//返回 ( 不是 是装备种类锁定( 装备槽组 槽id )  并且 不是 是装备种类封印 ( 装备槽组 槽id )     )
+    //返回 ( 不是 是装备种类锁定( 装备槽组 槽id )  并且 不是 是装备种类封印 ( 装备槽组 槽id )     )
     return (!this.isEquipTypeLocked(this.equipSlots()[slotId]) &&
-            !this.isEquipTypeSealed(this.equipSlots()[slotId]));
+        !this.isEquipTypeSealed(this.equipSlots()[slotId]));
 };
 /**改变装备*/
 Game_Actor.prototype.changeEquip = function(slotId, item) {
-	//如果 交物品和队伍 物品 装备组[槽id]) 并且 (不是 物品 或者 装备槽组[槽id] === 物品 装备种类id)
+    //如果 交物品和队伍 物品 装备组[槽id]) 并且 (不是 物品 或者 装备槽组[槽id] === 物品 装备种类id)
     if (this.tradeItemWithParty(item, this.equips()[slotId]) &&
-            (!item || this.equipSlots()[slotId] === item.etypeId)) {
-	    //装备组[槽id] 设置对象 (item)
+        (!item || this.equipSlots()[slotId] === item.etypeId)) {
+        //装备组[槽id] 设置对象 (item)
         this._equips[slotId].setObject(item);
         //刷新
         this.refresh();
@@ -380,7 +379,7 @@ Game_Actor.prototype.changeEquip = function(slotId, item) {
 };
 /**强制改变装备*/
 Game_Actor.prototype.forceChangeEquip = function(slotId, item) {
-	//装备组[槽id] 设置对象 (item)
+    //装备组[槽id] 设置对象 (item)
     this._equips[slotId].setObject(item);
     //解放不能装备的物品(true)
     this.releaseUnequippableItems(true);
@@ -389,15 +388,15 @@ Game_Actor.prototype.forceChangeEquip = function(slotId, item) {
 };
 /**交换物品和队伍*/
 Game_Actor.prototype.tradeItemWithParty = function(newItem, oldItem) {
-	//如果 ( 新物品 并且 不是 游戏队伍 有物品(新物品))
+    //如果 ( 新物品 并且 不是 游戏队伍 有物品(新物品))
     if (newItem && !$gameParty.hasItem(newItem)) {
-	    //返回 false
+        //返回 false
         return false;
-    //否则 
+        //否则 
     } else {
-	    //游戏队伍 获得物品( 旧物品 ,1 )
+        //游戏队伍 获得物品( 旧物品 ,1 )
         $gameParty.gainItem(oldItem, 1);
-	    //游戏队伍 获得物品( 新物品 ,1 )
+        //游戏队伍 获得物品( 新物品 ,1 )
         $gameParty.loseItem(newItem, 1);
         //返回 true
         return true;
@@ -405,37 +404,37 @@ Game_Actor.prototype.tradeItemWithParty = function(newItem, oldItem) {
 };
 /**改变装备通过id*/
 Game_Actor.prototype.changeEquipById = function(etypeId, itemId) {
-	//槽id = 装备种类id - 1
+    //槽id = 装备种类id - 1
     var slotId = etypeId - 1;
     //如果 ( 装备槽组[槽id] === 1)
     if (this.equipSlots()[slotId] === 1) {
-	    //改变装备( 槽id , 数据武器组 [项目id] )
+        //改变装备( 槽id , 数据武器组 [项目id] )
         this.changeEquip(slotId, $dataWeapons[itemId]);
-    } else { 
-	    //改变装备( 槽id , 数据防具组 [项目id] )
+    } else {
+        //改变装备( 槽id , 数据防具组 [项目id] )
         this.changeEquip(slotId, $dataArmors[itemId]);
     }
 };
 /**是装备*/
 Game_Actor.prototype.isEquipped = function(item) {
-	//返回 装备组() 包含 ( 项目 )
+    //返回 装备组() 包含 ( 项目 )
     return this.equips().contains(item);
 };
 /**丢弃装备*/
 Game_Actor.prototype.discardEquip = function(item) {
-	//槽id = 装备组() 索引于 (项目)
+    //槽id = 装备组() 索引于 (项目)
     var slotId = this.equips().indexOf(item);
     //如果 槽id >=  0
     if (slotId >= 0) {
-	    //装备组[槽id] 设置对象 (null)
+        //装备组[槽id] 设置对象 (null)
         this._equips[slotId].setObject(null);
     }
 };
 /**解放不能装备的物品*/
 Game_Actor.prototype.releaseUnequippableItems = function(forcing) {
-	//循环
+    //循环
     for (;;) {
-	    //槽组 = 装备槽组
+        //槽组 = 装备槽组
         var slots = this.equipSlots();
         //装备组 = 装备组
         var equips = this.equips();
@@ -443,13 +442,13 @@ Game_Actor.prototype.releaseUnequippableItems = function(forcing) {
         var changed = false;
         //循环 ( 开始时 i = 0 ; 当 i < 装备组 长度 ; 每一次 i++)
         for (var i = 0; i < equips.length; i++) {
-	        //项目 = 装备组[i]
+            //项目 = 装备组[i]
             var item = equips[i];
             //如果 项目 并且 ( 不是 能装备(项目) 或者 项目 装备种类id  !== 槽组[i]  )
             if (item && (!this.canEquip(item) || item.etypeId !== slots[i])) {
-	            //如果 (不是 强迫)
+                //如果 (不是 强迫)
                 if (!forcing) {
-	                //交换物品和队伍(null ,项目 )
+                    //交换物品和队伍(null ,项目 )
                     this.tradeItemWithParty(null, item);
                 }
                 //装备组[i] 设置对象 (null)
@@ -460,7 +459,7 @@ Game_Actor.prototype.releaseUnequippableItems = function(forcing) {
         }
         //如果 不是 改变 
         if (!changed) {
-	        //跳出
+            //跳出
             break;
         }
     }
@@ -495,8 +494,8 @@ Game_Actor.prototype.optimizeEquipments = function() {
 };
 /**最好装备项目
  * @param {number} slotId 槽id
- * @return {object}
-*/
+ * @return {{}}
+ */
 Game_Actor.prototype.bestEquipItem = function(slotId) {
     //装备种类id = 装备槽组()[槽id]
     var etypeId = this.equipSlots()[slotId];
@@ -504,7 +503,7 @@ Game_Actor.prototype.bestEquipItem = function(slotId) {
     var items = $gameParty.equipItems().filter(function(item) {
         //返回 项目 装备种类id === 装备种类id 并且 能装备(项目)
         return item.etypeId === etypeId && this.canEquip(item);
-    //this
+        //this
     }, this);
     //最好项目 = null
     var bestItem = null;
@@ -526,8 +525,8 @@ Game_Actor.prototype.bestEquipItem = function(slotId) {
     return bestItem;
 };
 /**计算装备项目成绩
- * @param {object} item
-*/
+ * @param {{}} item
+ */
 Game_Actor.prototype.calcEquipItemPerformance = function(item) {
     //返回 项目 参数组 缩减 方法(a,b)
     return item.params.reduce(function(a, b) {
@@ -543,13 +542,13 @@ Game_Actor.prototype.isSkillWtypeOk = function(skill) {
     var wtypeId2 = skill.requiredWtypeId2;
     //如果((武器种类id1 === 0 并且 武器种类id2 ===0 ) 或者
     if ((wtypeId1 === 0 && wtypeId2 === 0) ||
-            //(武器种类id1>0 并且 是武器种类装备后(武器种类id1)) 或者
-            (wtypeId1 > 0 && this.isWtypeEquipped(wtypeId1)) ||
-            //(武器种类id2>0 并且 是武器种类装备后(武器种类id2)))
-            (wtypeId2 > 0 && this.isWtypeEquipped(wtypeId2))) {
+        //(武器种类id1>0 并且 是武器种类装备后(武器种类id1)) 或者
+        (wtypeId1 > 0 && this.isWtypeEquipped(wtypeId1)) ||
+        //(武器种类id2>0 并且 是武器种类装备后(武器种类id2)))
+        (wtypeId2 > 0 && this.isWtypeEquipped(wtypeId2))) {
         //返回 true
         return true;
-    //否则 
+        //否则 
     } else {
         //返回 false
         return false;
@@ -631,7 +630,7 @@ Game_Actor.prototype.usableSkills = function() {
     return this.skills().filter(function(skill) {
         //返回 能用(技能)
         return this.canUse(skill);
-    //,this
+        //,this
     }, this);
 };
 /**特性对象组*/
@@ -682,7 +681,7 @@ Game_Actor.prototype.paramMax = function(paramId) {
     //如果 (参数id === 0 )
     if (paramId === 0) {
         //返回 9999
-        return 9999;    // MHP
+        return 9999; // MHP
     }
     //返回 游戏战斗者 参数最大 呼叫(this,参数id)
     return Game_Battler.prototype.paramMax.call(this, paramId);
@@ -717,7 +716,7 @@ Game_Actor.prototype.attackAnimationId1 = function() {
     if (this.hasNoWeapons()) {
         //返回 赤手动画id
         return this.bareHandsAnimationId();
-    //否则
+        //否则
     } else {
         //武器组 = 武器组()
         var weapons = this.weapons();
@@ -759,7 +758,7 @@ Game_Actor.prototype.changeExp = function(exp, show) {
     if (show && this._level > lastLevel) {
         //显示等级上升( 寻找新技能组(之前技能组) )
         this.displayLevelUp(this.findNewSkills(lastSkills));
-    }//刷新()
+    } //刷新()
     this.refresh();
 };
 /**等级上升*/
@@ -773,7 +772,7 @@ Game_Actor.prototype.levelUp = function() {
             //学习技能 (学习 技能id)
             this.learnSkill(learning.skillId);
         }
-    //,this
+        //,this
     }, this);
 };
 /**等级下降*/
@@ -930,19 +929,19 @@ Game_Actor.prototype.performAction = function(action) {
     if (action.isAttack()) {
         //表现攻击()
         this.performAttack();
-    //如果(动作 是防御() )
+        //如果(动作 是防御() )
     } else if (action.isGuard()) {
         //请求动作( 'guard'//防御 )
         this.requestMotion('guard');
-    //如果(动作 是魔法技能() )
+        //如果(动作 是魔法技能() )
     } else if (action.isMagicSkill()) {
         //请求动作( 'spell'//吟唱 )
         this.requestMotion('spell');
-    //如果(动作 是技能() )
+        //如果(动作 是技能() )
     } else if (action.isSkill()) {
         //请求动作( 'skill'//技能 )
         this.requestMotion('skill');
-    //如果(动作 是物品() )
+        //如果(动作 是物品() )
     } else if (action.isItem()) {
         //请求动作( 'item'//物品 )
         this.requestMotion('item');
@@ -967,11 +966,11 @@ Game_Actor.prototype.performAttack = function() {
         if (attackMotion.type === 0) {
             //请求动作( 'thrust'//突刺 )
             this.requestMotion('thrust');
-        //否则 如果 (攻击动作 种类 === 1)
+            //否则 如果 (攻击动作 种类 === 1)
         } else if (attackMotion.type === 1) {
             //请求动作( 'swing'//挥舞 )
             this.requestMotion('swing');
-        //否则 如果 (攻击动作 种类 === 2)
+            //否则 如果 (攻击动作 种类 === 2)
         } else if (attackMotion.type === 2) {
             //请求动作( 'missile'//飞行道具 )
             this.requestMotion('missile');
@@ -1059,7 +1058,7 @@ Game_Actor.prototype.makeActionList = function() {
         action.setSkill(skill.id);
         //列表 添加 (动作)
         list.push(action);
-    //,this
+        //,this
     }, this);
     //返回 列表
     return list;
@@ -1106,7 +1105,7 @@ Game_Actor.prototype.makeActions = function() {
     if (this.numActions() > 0) {
         //设置动作状态( "undecided"//未定的 )
         this.setActionState('undecided');
-    //否则
+        //否则
     } else {
         //设置动作状态( "waiting"//等待 )
         this.setActionState('waiting');
@@ -1115,7 +1114,7 @@ Game_Actor.prototype.makeActions = function() {
     if (this.isAutoBattle()) {
         //制作自动战斗动作组()
         this.makeAutoBattleActions();
-    //否则 如果 ( 是混乱的() )
+        //否则 如果 ( 是混乱的() )
     } else if (this.isConfused()) {
         //制作混乱动作组()
         this.makeConfusionActions();
@@ -1135,7 +1134,7 @@ Game_Actor.prototype.onPlayerWalk = function() {
         this.states().forEach(function(state) {
             //更新状态步骤(状态)
             this.updateStateSteps(state);
-        //,this
+            //,this
         }, this);
         //显示增加状态()
         this.showAddedStates();
@@ -1166,7 +1165,7 @@ Game_Actor.prototype.showAddedStates = function() {
             //游戏消息 添加( 名称 + 状态 消息1)
             $gameMessage.add(this._name + state.message1);
         }
-    //,this
+        //,this
     }, this);
 };
 /**显示移除状态*/
@@ -1178,7 +1177,7 @@ Game_Actor.prototype.showRemovedStates = function() {
             //游戏消息 添加( 名称 + 状态 消息4)
             $gameMessage.add(this._name + state.message4);
         }
-    //,this
+        //,this
     }, this);
 };
 /**步数为了回合*/
@@ -1272,7 +1271,7 @@ Game_Actor.prototype.selectPreviousCommand = function() {
         this._actionInputIndex--;
         //返回 true
         return true;
-    //否则
+        //否则
     } else {
         //返回 false
         return false;
@@ -1316,9 +1315,8 @@ Game_Actor.prototype.testEscape = function(item) {
 };
 
 Game_Actor.prototype.meetsUsableItemConditions = function(item) {
-    if($gameParty.inBattle() && !BattleManager.canEscape() && this.testEscape(item)){
+    if ($gameParty.inBattle() && !BattleManager.canEscape() && this.testEscape(item)) {
         return false;
     }
     return Game_BattlerBase.prototype.meetsUsableItemConditions.call(this, item);
 };
-
