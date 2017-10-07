@@ -14,6 +14,7 @@ Sprite_Character.prototype = Object.create(Sprite_Base.prototype);
 Sprite_Character.prototype.constructor = Sprite_Character;
 /**初始化 */
 Sprite_Character.prototype.initialize = function(character) {
+    //精灵基础 初始化 呼叫(this)
     Sprite_Base.prototype.initialize.call(this);
     this.initMembers();
     this.setCharacter(character);
@@ -39,6 +40,7 @@ Sprite_Character.prototype.setCharacter = function(character) {
 };
 /**更新 */
 Sprite_Character.prototype.update = function() {
+    //精灵基础 更新 呼叫(this)
     Sprite_Base.prototype.update.call(this);
     this.updateBitmap();
     this.updateFrame();
@@ -49,6 +51,7 @@ Sprite_Character.prototype.update = function() {
 };
 /**更新可见度 */
 Sprite_Character.prototype.updateVisibility = function() {
+    //精灵 更新可见度 呼叫(this)
     Sprite_Base.prototype.updateVisibility.call(this);
     if (this._character.isTransparent()) {
         this.visible = false;

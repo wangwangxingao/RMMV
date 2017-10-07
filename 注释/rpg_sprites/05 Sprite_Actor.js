@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Sprite_Actor */
 /** 精灵角色 */
@@ -15,24 +14,24 @@ Sprite_Actor.prototype = Object.create(Sprite_Battler.prototype);
 Sprite_Actor.prototype.constructor = Sprite_Actor;
 /**动作 */
 Sprite_Actor.MOTIONS = {
-    walk:     { index: 0,  loop: true  },
-    wait:     { index: 1,  loop: true  },
-    chant:    { index: 2,  loop: true  },
-    guard:    { index: 3,  loop: true  },
-    damage:   { index: 4,  loop: false },
-    evade:    { index: 5,  loop: false },
-    thrust:   { index: 6,  loop: false },
-    swing:    { index: 7,  loop: false },
-    missile:  { index: 8,  loop: false },
-    skill:    { index: 9,  loop: false },
-    spell:    { index: 10, loop: false },
-    item:     { index: 11, loop: false },
-    escape:   { index: 12, loop: true  },
-    victory:  { index: 13, loop: true  },
-    dying:    { index: 14, loop: true  },
-    abnormal: { index: 15, loop: true  },
-    sleep:    { index: 16, loop: true  },
-    dead:     { index: 17, loop: true  }
+    walk: { index: 0, loop: true },
+    wait: { index: 1, loop: true },
+    chant: { index: 2, loop: true },
+    guard: { index: 3, loop: true },
+    damage: { index: 4, loop: false },
+    evade: { index: 5, loop: false },
+    thrust: { index: 6, loop: false },
+    swing: { index: 7, loop: false },
+    missile: { index: 8, loop: false },
+    skill: { index: 9, loop: false },
+    spell: { index: 10, loop: false },
+    item: { index: 11, loop: false },
+    escape: { index: 12, loop: true },
+    victory: { index: 13, loop: true },
+    dying: { index: 14, loop: true },
+    abnormal: { index: 15, loop: true },
+    sleep: { index: 16, loop: true },
+    dead: { index: 17, loop: true }
 };
 /**初始化 */
 Sprite_Actor.prototype.initialize = function(battler) {
@@ -201,11 +200,11 @@ Sprite_Actor.prototype.updateTargetPosition = function() {
     if (this._actor.isInputting() || this._actor.isActing()) {
         //步骤推进()
         this.stepForward();
-    //否则 如果(角色 能移动() 并且 战斗管理器 是逃跑())
+        //否则 如果(角色 能移动() 并且 战斗管理器 是逃跑())
     } else if (this._actor.canMove() && BattleManager.isEscaped()) {
         //撤退()
         this.retreat();
-    //否则 如果(不是 在初始位置())
+        //否则 如果(不是 在初始位置())
     } else if (!this.inHomePosition()) {
         //步骤返回
         this.stepBack();
@@ -283,11 +282,11 @@ Sprite_Actor.prototype.updateMotionCount = function() {
         if (this._motion.loop) {
             //图案 = (图案 + 1) % 4
             this._pattern = (this._pattern + 1) % 4;
-        //否则 如果(图案 < 2)
+            //否则 如果(图案 < 2)
         } else if (this._pattern < 2) {
             //图案 ++
             this._pattern++;
-        //否则
+            //否则
         } else {
             //刷新动作()
             this.refreshMotion();
@@ -310,7 +309,7 @@ Sprite_Actor.prototype.refreshMotion = function() {
     //如果(角色)
     if (actor) {
         //如果(动作 === 动作防御 && 不是 战斗管理器 是输入中() )
-	    if (this._motion === motionGuard && !BattleManager.isInputting()) {
+        if (this._motion === motionGuard && !BattleManager.isInputting()) {
             //返回
             return;
         }
@@ -320,27 +319,27 @@ Sprite_Actor.prototype.refreshMotion = function() {
         if (actor.isInputting() || actor.isActing()) {
             //开始动作("walk")
             this.startMotion('walk');
-        //否则 如果(状态动作 === 3 )
+            //否则 如果(状态动作 === 3 )
         } else if (stateMotion === 3) {
             //开始动作("dead")
             this.startMotion('dead');
-        //否则 如果(状态动作 === 2 )
+            //否则 如果(状态动作 === 2 )
         } else if (stateMotion === 2) {
             //开始动作("sleep")
             this.startMotion('sleep');
-        //否则 如果(角色 是吟唱() )
+            //否则 如果(角色 是吟唱() )
         } else if (actor.isChanting()) {
             //开始动作("chant")
             this.startMotion('chant');
-        //否则 如果(角色 是防御() 或者 角色 是防御等待() )
+            //否则 如果(角色 是防御() 或者 角色 是防御等待() )
         } else if (actor.isGuard() || actor.isGuardWaiting()) {
             //开始动作("guard")
             this.startMotion('guard');
-        //否则 如果(状态动作 === 1 )
+            //否则 如果(状态动作 === 1 )
         } else if (stateMotion === 1) {
             //开始动作("abnormal")
             this.startMotion('abnormal');
-        //否则 如果(角色 是濒死的() )
+            //否则 如果(角色 是濒死的() )
         } else if (actor.isDying()) {
             //开始动作("dying")
             this.startMotion('dying');
@@ -357,7 +356,7 @@ Sprite_Actor.prototype.refreshMotion = function() {
 /**开始记录动作 */
 Sprite_Actor.prototype.startEntryMotion = function() {
     //如果(角色 并且 角色 能移动())
-    if (this._actor && this._actor.canMove()) { 
+    if (this._actor && this._actor.canMove()) {
         //开始动作("walk")
         this.startMotion('walk');
         //开始移动(0,0,30)
@@ -395,12 +394,17 @@ Sprite_Actor.prototype.onMoveEnd = function() {
         this.refreshMotion();
     }
 };
-/**伤害偏移x */
+/**伤害偏移x 
+ * @return {number}
+ */
 Sprite_Actor.prototype.damageOffsetX = function() {
     //返回 -32
     return -32;
 };
-/**伤害偏移y */
+/**伤害偏移y
+ * @return {number}
+ * 
+ */
 Sprite_Actor.prototype.damageOffsetY = function() {
     //返回 0
     return 0;

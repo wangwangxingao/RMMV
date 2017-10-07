@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Sprite_Enemy */
 /** 精灵敌人 */
@@ -19,6 +18,7 @@ Sprite_Enemy.prototype.initialize = function(battler) {
 };
 /**初始化成员 */
 Sprite_Enemy.prototype.initMembers = function() {
+    //精灵战斗者 初始化成员 呼叫(this)
     Sprite_Battler.prototype.initMembers.call(this);
     this._enemy = null;
     this._appeared = false;
@@ -36,6 +36,7 @@ Sprite_Enemy.prototype.createStateIconSprite = function() {
 };
 /**设置战斗者 */
 Sprite_Enemy.prototype.setBattler = function(battler) {
+    //精灵战斗者 设置战斗者 呼叫(this)
     Sprite_Battler.prototype.setBattler.call(this, battler);
     this._enemy = battler;
     this.setHome(battler.screenX(), battler.screenY());
@@ -43,6 +44,7 @@ Sprite_Enemy.prototype.setBattler = function(battler) {
 };
 /**更新 */
 Sprite_Enemy.prototype.update = function() {
+    //精灵战斗者 更新 呼叫(this)
     Sprite_Battler.prototype.update.call(this);
     if (this._enemy) {
         this.updateEffect();
@@ -113,27 +115,27 @@ Sprite_Enemy.prototype.setupEffect = function() {
 Sprite_Enemy.prototype.startEffect = function(effectType) {
     this._effectType = effectType;
     switch (this._effectType) {
-    case 'appear':
-        this.startAppear();
-        break;
-    case 'disappear':
-        this.startDisappear();
-        break;
-    case 'whiten':
-        this.startWhiten();
-        break;
-    case 'blink':
-        this.startBlink();
-        break;
-    case 'collapse':
-        this.startCollapse();
-        break;
-    case 'bossCollapse':
-        this.startBossCollapse();
-        break;
-    case 'instantCollapse':
-        this.startInstantCollapse();
-        break;
+        case 'appear':
+            this.startAppear();
+            break;
+        case 'disappear':
+            this.startDisappear();
+            break;
+        case 'whiten':
+            this.startWhiten();
+            break;
+        case 'blink':
+            this.startBlink();
+            break;
+        case 'collapse':
+            this.startCollapse();
+            break;
+        case 'bossCollapse':
+            this.startBossCollapse();
+            break;
+        case 'instantCollapse':
+            this.startInstantCollapse();
+            break;
     }
     this.revertToNormal();
 };
@@ -176,27 +178,27 @@ Sprite_Enemy.prototype.updateEffect = function() {
     if (this._effectDuration > 0) {
         this._effectDuration--;
         switch (this._effectType) {
-        case 'whiten':
-            this.updateWhiten();
-            break;
-        case 'blink':
-            this.updateBlink();
-            break;
-        case 'appear':
-            this.updateAppear();
-            break;
-        case 'disappear':
-            this.updateDisappear();
-            break;
-        case 'collapse':
-            this.updateCollapse();
-            break;
-        case 'bossCollapse':
-            this.updateBossCollapse();
-            break;
-        case 'instantCollapse':
-            this.updateInstantCollapse();
-            break;
+            case 'whiten':
+                this.updateWhiten();
+                break;
+            case 'blink':
+                this.updateBlink();
+                break;
+            case 'appear':
+                this.updateAppear();
+                break;
+            case 'disappear':
+                this.updateDisappear();
+                break;
+            case 'collapse':
+                this.updateCollapse();
+                break;
+            case 'bossCollapse':
+                this.updateBossCollapse();
+                break;
+            case 'instantCollapse':
+                this.updateInstantCollapse();
+                break;
         }
         if (this._effectDuration === 0) {
             this._effectType = null;

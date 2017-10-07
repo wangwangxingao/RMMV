@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Sprite_Button */
 /** 精灵按钮 */
@@ -15,6 +14,7 @@ Sprite_Button.prototype = Object.create(Sprite.prototype);
 Sprite_Button.prototype.constructor = Sprite_Button;
 /**初始化 */
 Sprite_Button.prototype.initialize = function() {
+    //精灵 初始化 呼叫(this)
     Sprite.prototype.initialize.call(this);
     this._touching = false;
     this._coldFrame = null;
@@ -23,6 +23,7 @@ Sprite_Button.prototype.initialize = function() {
 };
 /**更新 */
 Sprite_Button.prototype.update = function() {
+    //精灵 更新 呼叫(this)
     Sprite.prototype.update.call(this);
     this.updateFrame();
     this.processTouch();
