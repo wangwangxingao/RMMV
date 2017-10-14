@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Sprite_Picture */
 /** 精灵图片 */
@@ -15,6 +14,7 @@ Sprite_Picture.prototype = Object.create(Sprite.prototype);
 Sprite_Picture.prototype.constructor = Sprite_Picture;
 /**初始化 */
 Sprite_Picture.prototype.initialize = function(pictureId) {
+    //精灵 初始化 呼叫(this)
     Sprite.prototype.initialize.call(this);
     this._pictureId = pictureId;
     this._pictureName = '';

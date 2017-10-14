@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Spriteset_Map */
 /** 精灵组地图 */
@@ -15,29 +14,43 @@ Spriteset_Map.prototype = Object.create(Spriteset_Base.prototype);
 Spriteset_Map.prototype.constructor = Spriteset_Map;
 /**初始化 */
 Spriteset_Map.prototype.initialize = function() {
+    //精灵组基础 初始化 呼叫(this)
     Spriteset_Base.prototype.initialize.call(this);
 };
 /**----------------------------------------------------------------------------- */
 /**创建较下的层 */
 /**----------------------------------------------------------------------------- */
 Spriteset_Map.prototype.createLowerLayer = function() {
+    //精灵组基础 创建较下的层 呼叫(this)
     Spriteset_Base.prototype.createLowerLayer.call(this);
+    //创建远景图()
     this.createParallax();
+    //创建图块地图()
     this.createTilemap();
+    //创建人物()
     this.createCharacters();
+    //创建阴影()
     this.createShadow();
+    //创建方向()
     this.createDestination();
+    //创建天气()
     this.createWeather();
 };
 /**----------------------------------------------------------------------------- */
 /**更新 */
 /**----------------------------------------------------------------------------- */
 Spriteset_Map.prototype.update = function() {
+    //精灵组基础 更新 呼叫(this)
     Spriteset_Base.prototype.update.call(this);
+    //更新图块设置()
     this.updateTileset();
+    //更新远景图()
     this.updateParallax();
+    //更新图块地图()
     this.updateTilemap();
+    //更新阴影()
     this.updateShadow();
+    //更新天气()
     this.updateWeather();
 };
 /**----------------------------------------------------------------------------- */
@@ -82,10 +95,10 @@ Spriteset_Map.prototype.createTilemap = function() {
 Spriteset_Map.prototype.loadTileset = function() {
     this._tileset = $gameMap.tileset();
     if (this._tileset) {
-	    //读取图块设置名字组 = 图块设置 图块设置名称组
+        //读取图块设置名字组 = 图块设置 图块设置名称组
         var tilesetNames = this._tileset.tilesetNames;
         for (var i = 0; i < tilesetNames.length; i++) {
-	        //图块地图 位图[i] = 
+            //图块地图 位图[i] = 
             this._tilemap.bitmaps[i] = ImageManager.loadTileset(tilesetNames[i]);
         }
         //新图块设置标志组 = 
@@ -101,7 +114,7 @@ Spriteset_Map.prototype.loadTileset = function() {
 /**创建人物 */
 /**----------------------------------------------------------------------------- */
 Spriteset_Map.prototype.createCharacters = function() {
-	//人物精灵 = []
+    //人物精灵 = []
     this._characterSprites = [];
 
     //添加事件 到 人物精灵
@@ -171,7 +184,7 @@ Spriteset_Map.prototype._canvasReAddParallax = function() {
     this._parallax = new TilingSprite();
     this._parallax.move(0, 0, Graphics.width, Graphics.height);
     this._parallax.bitmap = ImageManager.loadParallax(this._parallaxName);
-    this._baseSprite.addChildAt(this._parallax,index);
+    this._baseSprite.addChildAt(this._parallax, index);
 };
 /**----------------------------------------------------------------------------- */
 /**更新远景图 */
@@ -210,8 +223,12 @@ Spriteset_Map.prototype.updateShadow = function() {
 /**更新天气 */
 /**----------------------------------------------------------------------------- */
 Spriteset_Map.prototype.updateWeather = function() {
+    //天气 种类 = 游戏画面 天气种类()
     this._weather.type = $gameScreen.weatherType();
+    //天气 强度 = 游戏画面 天气强度()
     this._weather.power = $gameScreen.weatherPower();
+    //天气 原点 x = 游戏地图 显示x() * 游戏地图 图块宽()
     this._weather.origin.x = $gameMap.displayX() * $gameMap.tileWidth();
+    //天气 原点 y = 游戏地图 显示y() * 游戏地图 图块高()
     this._weather.origin.y = $gameMap.displayY() * $gameMap.tileHeight();
 };

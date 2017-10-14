@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Sprite_StateIcon */
 /** 精灵状态图标 */
@@ -15,12 +14,13 @@ Sprite_StateIcon.prototype = Object.create(Sprite.prototype);
 Sprite_StateIcon.prototype.constructor = Sprite_StateIcon;
 /**初始化 */
 Sprite_StateIcon.prototype.initialize = function() {
+    //精灵 初始化 呼叫(this)
     Sprite.prototype.initialize.call(this);
     this.initMembers();
     this.loadBitmap();
 };
 
-Sprite_StateIcon._iconWidth  = 32;
+Sprite_StateIcon._iconWidth = 32;
 Sprite_StateIcon._iconHeight = 32;
 /**初始化成员 */
 Sprite_StateIcon.prototype.initMembers = function() {

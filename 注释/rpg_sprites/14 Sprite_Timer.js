@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Sprite_Timer */
 /** 精灵计时器 */
@@ -15,6 +14,7 @@ Sprite_Timer.prototype = Object.create(Sprite.prototype);
 Sprite_Timer.prototype.constructor = Sprite_Timer;
 /**初始化 */
 Sprite_Timer.prototype.initialize = function() {
+    //精灵 初始化 呼叫(this)
     Sprite.prototype.initialize.call(this);
     this._seconds = 0;
     this.createBitmap();

@@ -14,6 +14,7 @@ Sprite_Enemy.prototype = Object.create(Sprite_Battler.prototype);
 Sprite_Enemy.prototype.constructor = Sprite_Enemy;
 /**初始化 */
 Sprite_Enemy.prototype.initialize = function(battler) {
+    //精灵战斗者 初始化 呼叫(this)
     Sprite_Battler.prototype.initialize.call(this, battler);
 };
 /**初始化成员 */

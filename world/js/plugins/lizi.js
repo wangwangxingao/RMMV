@@ -76,9 +76,6 @@ Lizi_Spriteset.prototype.dieout = function(lizi) {
             var name = lizi.name
             var container = this.getContainer(name)
             container.dieout(lizi)
-            if (container.length() <= 0) {
-                this.removeContainer(name)
-            }
         }
     }
 }

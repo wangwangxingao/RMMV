@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Sprite_Damage */
 /**精灵伤害 */
@@ -15,6 +14,7 @@ Sprite_Damage.prototype = Object.create(Sprite.prototype);
 Sprite_Damage.prototype.constructor = Sprite_Damage;
 /**初始化 */
 Sprite_Damage.prototype.initialize = function() {
+    //精灵 初始化 呼叫(this)
     Sprite.prototype.initialize.call(this);
     this._duration = 90;
     this._flashColor = [0, 0, 0, 0];

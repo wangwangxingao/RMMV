@@ -209,13 +209,13 @@ Sprite_Animation.prototype.loadBitmaps = function() {
     var name1 = this._animation.animation1Name;
     //名称2 = 动画 动画2名称
     var name2 = this._animation.animation2Name;
-    //色调1 = 动画 动画1色调
+    //色相1 = 动画 动画1色相
     var hue1 = this._animation.animation1Hue;
-    //色调2 = 动画 动画2色调
+    //色相2 = 动画 动画2色相
     var hue2 = this._animation.animation2Hue;
-    //图片1 = 图片管理器 读取动画(名称1 ,色调1)
+    //图片1 = 图片管理器 读取动画(名称1 ,色相1)
     this._bitmap1 = ImageManager.loadAnimation(name1, hue1);
-    //图片2 = 图片管理器 读取动画(名称2 ,色调2)
+    //图片2 = 图片管理器 读取动画(名称2 ,色相2)
     this._bitmap2 = ImageManager.loadAnimation(name2, hue2);
 };
 /**是准备好 */

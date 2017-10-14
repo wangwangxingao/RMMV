@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Sprite_Balloon */
 /** 精灵气球 */
@@ -15,6 +14,7 @@ Sprite_Balloon.prototype = Object.create(Sprite_Base.prototype);
 Sprite_Balloon.prototype.constructor = Sprite_Balloon;
 /**初始化 */
 Sprite_Balloon.prototype.initialize = function() {
+    ////精灵基础 初始化 呼叫(this)
     Sprite_Base.prototype.initialize.call(this);
     this.initMembers();
     this.loadBitmap();

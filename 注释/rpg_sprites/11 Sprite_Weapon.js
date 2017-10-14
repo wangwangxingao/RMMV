@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Sprite_Weapon */
 /** 精灵武器 */
@@ -15,6 +14,7 @@ Sprite_Weapon.prototype = Object.create(Sprite_Base.prototype);
 Sprite_Weapon.prototype.constructor = Sprite_Weapon;
 /**初始化 */
 Sprite_Weapon.prototype.initialize = function() {
+    //精灵基础 初始化 呼叫(this)
     Sprite_Base.prototype.initialize.call(this);
     this.initMembers();
 };

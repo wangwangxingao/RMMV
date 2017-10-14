@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Spriteset_Battle */
 /** 精灵组战斗 */
@@ -15,6 +14,7 @@ Spriteset_Battle.prototype = Object.create(Spriteset_Base.prototype);
 Spriteset_Battle.prototype.constructor = Spriteset_Battle;
 /**初始化 */
 Spriteset_Battle.prototype.initialize = function() {
+    //精灵组基础 初始化 呼叫(this)
     Spriteset_Base.prototype.initialize.call(this);
     this._battlebackLocated = false;
 };
@@ -143,57 +143,72 @@ Spriteset_Battle.prototype.overworldBattleback2Name = function() {
 /**正常战斗背景1名称 */
 Spriteset_Battle.prototype.normalBattleback1Name = function() {
     return (this.terrainBattleback1Name(this.autotileType(1)) ||
-            this.terrainBattleback1Name(this.autotileType(0)) ||
-            this.defaultBattleback1Name());
+        this.terrainBattleback1Name(this.autotileType(0)) ||
+        this.defaultBattleback1Name());
 };
 /**正常战斗背景2名称 */
 Spriteset_Battle.prototype.normalBattleback2Name = function() {
     return (this.terrainBattleback2Name(this.autotileType(1)) ||
-            this.terrainBattleback2Name(this.autotileType(0)) ||
-            this.defaultBattleback2Name());
+        this.terrainBattleback2Name(this.autotileType(0)) ||
+        this.defaultBattleback2Name());
 };
 /**范围战斗背景1名称  */
 Spriteset_Battle.prototype.terrainBattleback1Name = function(type) {
     switch (type) {
-    case 24: case 25:
-        return 'Wasteland';
-    case 26: case 27:
-        return 'DirtField';
-    case 32: case 33:
-        return 'Desert';
-    case 34:
-        return 'Lava1';
-    case 35:
-        return 'Lava2';
-    case 40: case 41:
-        return 'Snowfield';
-    case 42:
-        return 'Clouds';
-    case 4: case 5:
-        return 'PoisonSwamp';
-    default:
-        return null;
+        case 24:
+        case 25:
+            return 'Wasteland';
+        case 26:
+        case 27:
+            return 'DirtField';
+        case 32:
+        case 33:
+            return 'Desert';
+        case 34:
+            return 'Lava1';
+        case 35:
+            return 'Lava2';
+        case 40:
+        case 41:
+            return 'Snowfield';
+        case 42:
+            return 'Clouds';
+        case 4:
+        case 5:
+            return 'PoisonSwamp';
+        default:
+            return null;
     }
 };
 /**范围战斗背景2名称  */
 Spriteset_Battle.prototype.terrainBattleback2Name = function(type) {
     switch (type) {
-    case 20: case 21:
-        return 'Forest';
-    case 22: case 30: case 38:
-        return 'Cliff';
-    case 24: case 25: case 26: case 27:
-        return 'Wasteland';
-    case 32: case 33:
-        return 'Desert';
-    case 34: case 35:
-        return 'Lava';
-    case 40: case 41:
-        return 'Snowfield';
-    case 42:
-        return 'Clouds';
-    case 4: case 5:
-        return 'PoisonSwamp';
+        case 20:
+        case 21:
+            return 'Forest';
+        case 22:
+        case 30:
+        case 38:
+            return 'Cliff';
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+            return 'Wasteland';
+        case 32:
+        case 33:
+            return 'Desert';
+        case 34:
+        case 35:
+            return 'Lava';
+        case 40:
+        case 41:
+            return 'Snowfield';
+        case 42:
+            return 'Clouds';
+        case 4:
+        case 5:
+            return 'PoisonSwamp';
     }
 };
 /**默认战斗背景1名称 */

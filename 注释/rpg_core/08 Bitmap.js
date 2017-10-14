@@ -513,7 +513,7 @@ Bitmap.prototype.blt = function(source, sx, sy, sw, sh, dx, dy, dw, dh) {
 };
 
 /**块传输图像
- * 执行块传输，采用假设原始图像没有被修改（无色调）
+ * 执行块传输，采用假设原始图像没有被修改（无色相）
  * Performs a block transfer, using assumption that original image was not modified (no hue)
  *
  * @method blt

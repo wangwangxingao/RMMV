@@ -14,7 +14,7 @@ function ToneFilter() {
 ToneFilter.prototype = Object.create(PIXI.filters.ColorMatrixFilter.prototype);
 ToneFilter.prototype.constructor = ToneFilter;
  
-/**改变色调
+/**改变色相
  * Changes the hue.
  *
  * @method adjustHue

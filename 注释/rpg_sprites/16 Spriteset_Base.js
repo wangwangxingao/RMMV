@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Spriteset_Base */
 /** 精灵组基础 */
@@ -15,6 +14,7 @@ Spriteset_Base.prototype = Object.create(Sprite.prototype);
 Spriteset_Base.prototype.constructor = Spriteset_Base;
 /**初始化 */
 Spriteset_Base.prototype.initialize = function() {
+    //精灵 初始化 呼叫(this)
     Sprite.prototype.initialize.call(this);
     this.setFrame(0, 0, Graphics.width, Graphics.height);
     this._tone = [0, 0, 0, 0];
@@ -50,7 +50,7 @@ Spriteset_Base.prototype.createBaseSprite = function() {
     this.addChild(this._baseSprite);
     this._baseSprite.addChild(this._blackScreen);
 };
-/**创建颜色改变 */
+/**创建色调改变 */
 Spriteset_Base.prototype.createToneChanger = function() {
     if (Graphics.isWebGL()) {
         this.createWebGLToneChanger();
@@ -58,16 +58,17 @@ Spriteset_Base.prototype.createToneChanger = function() {
         this.createCanvasToneChanger();
     }
 };
-/**创建webgl 颜色改变 */
+/**创建webgl 色调改变 */
 Spriteset_Base.prototype.createWebGLToneChanger = function() {
     var margin = 48;
     var width = Graphics.width + margin * 2;
     var height = Graphics.height + margin * 2;
+    //色调滤镜 = 色调滤镜()
     this._toneFilter = new ToneFilter();
     this._baseSprite.filters = [this._toneFilter];
     this._baseSprite.filterArea = new Rectangle(-margin, -margin, width, height);
 };
-/**创建画布颜色改变 */
+/**创建画布色调改变 */
 Spriteset_Base.prototype.createCanvasToneChanger = function() {
     this._toneSprite = new ToneSprite();
     this.addChild(this._toneSprite);
@@ -104,26 +105,33 @@ Spriteset_Base.prototype.updateScreenSprites = function() {
     this._flashSprite.opacity = color[3];
     this._fadeSprite.opacity = 255 - $gameScreen.brightness();
 };
-/**更新颜色改变 */
+/**更新色调改变 */
 Spriteset_Base.prototype.updateToneChanger = function() {
     var tone = $gameScreen.tone();
     if (!this._tone.equals(tone)) {
         this._tone = tone.clone();
+        //如果(图像 是WebGL())
         if (Graphics.isWebGL()) {
+            //更新webgl色调改变()
             this.updateWebGLToneChanger();
         } else {
+            //更新画布色调改变()
             this.updateCanvasToneChanger();
         }
     }
 };
-/**更新webgl 颜色改变 */
+/**更新webgl色调改变 */
 Spriteset_Base.prototype.updateWebGLToneChanger = function() {
+    //色调 = 色调
     var tone = this._tone;
+    //色调滤镜 重设()
     this._toneFilter.reset();
+    //色调滤镜 改变色调(色调[0],色调[1],色调[2])
     this._toneFilter.adjustTone(tone[0], tone[1], tone[2]);
+    //色调滤镜 改变饱和度(-色调[3])
     this._toneFilter.adjustSaturation(-tone[3]);
 };
-/**更新画布颜色改变 */
+/**更新画布色调改变 */
 Spriteset_Base.prototype.updateCanvasToneChanger = function() {
     var tone = this._tone;
     this._toneSprite.setTone(tone[0], tone[1], tone[2], tone[3]);

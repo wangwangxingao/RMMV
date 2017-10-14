@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Sprite_Destination */
 /** 精灵目的地 */
@@ -15,6 +14,7 @@ Sprite_Destination.prototype = Object.create(Sprite.prototype);
 Sprite_Destination.prototype.constructor = Sprite_Destination;
 /**初始化 */
 Sprite_Destination.prototype.initialize = function() {
+    //精灵 初始化 呼叫(this)
     Sprite.prototype.initialize.call(this);
     this.createBitmap();
     this._frameCount = 0;
@@ -22,7 +22,7 @@ Sprite_Destination.prototype.initialize = function() {
 /**更新 */
 Sprite_Destination.prototype.update = function() {
     Sprite.prototype.update.call(this);
-    if ($gameTemp.isDestinationValid()){
+    if ($gameTemp.isDestinationValid()) {
         this.updatePosition();
         this.updateAnimation();
         this.visible = true;

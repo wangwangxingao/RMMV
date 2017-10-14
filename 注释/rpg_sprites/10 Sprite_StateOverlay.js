@@ -1,4 +1,3 @@
-
 /**----------------------------------------------------------------------------- */
 /** Sprite_StateOverlay */
 /** 精灵状态覆盖 */
@@ -13,8 +12,9 @@ function Sprite_StateOverlay() {
 Sprite_StateOverlay.prototype = Object.create(Sprite_Base.prototype);
 /**设置创造者 */
 Sprite_StateOverlay.prototype.constructor = Sprite_StateOverlay;
-/**/初始化 */
+/**初始化 */
 Sprite_StateOverlay.prototype.initialize = function() {
+    //精灵基础 初始化 呼叫(this)
     Sprite_Base.prototype.initialize.call(this);
     this.initMembers();
     this.loadBitmap();

@@ -162,9 +162,9 @@ Game_Enemy.prototype.battlerName = function() {
     //返回 敌人() 战斗者名称
     return this.enemy().battlerName;
 };
-/**战斗者色调*/
+/**战斗者色相*/
 Game_Enemy.prototype.battlerHue = function() {
-    //返回 敌人() 战斗者色调
+    //返回 敌人() 战斗者色相
     return this.enemy().battlerHue;
 };
 /**原始名称*/
