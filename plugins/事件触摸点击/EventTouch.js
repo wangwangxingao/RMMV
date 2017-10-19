@@ -78,18 +78,18 @@ Game_Event.prototype.updateTouch = function() {
         if (this._trigger === 0) {
             if (this._istouch == this._lasttouch) {} else {
                 if (this._istouch == 2) {
-                    if (this._label["touch"] >= 0) {
+                    if ("touch" in this._label) {
                         this.start()
                     }
                 } else if (this._istouch == 1) {
                     if (this._lasttouch == 0) {
-                        if (this._label["movein"] >= 0) {
+                        if ("movein" in this._label) {
                             this.start()
                         }
                     }
                 } else {
                     if (this._lasttouch) {
-                        if (this._label["moveout"] >= 0) {
+                        if ("moveout" in this._label) {
                             this.start()
                         }
                     }
