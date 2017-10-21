@@ -4,7 +4,7 @@
 
 /*:
  * @plugindesc  
- * Knapsack,背包 ,开关100号控制
+ * Knapsack,背包 , 
  * @author wangwang
  *   
  * @param  Knapsack
