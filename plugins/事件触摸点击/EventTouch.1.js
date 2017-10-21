@@ -2,19 +2,17 @@
 // EventTouch.js
 //=============================================================================
 /*:
- * @plugindesc 
- * EventTouch,事件点击触摸, 
+ * @plugindesc EventTouch,事件点击触摸
  * @author wangwang
  *
- * @param  EventTouch 
- * @desc 插件 事件点击触摸 ,作者:汪汪
- * @default  汪汪,TouchEx
+ * @param  EventTouch
+ * @desc 插件 事件点击触摸 ,作者:汪汪  
+ * @default 汪汪
+ * 
  * 
  * 
  * @help
  *  
- * 
- * 
  * 设置方法
  * 事件中使用插件方法: switch 
  * 使用标签来判断执行,
@@ -23,6 +21,21 @@
  *  
  *  
  */
+
+
+
+
+TouchInput._onMouseMove = function(event) {
+    //画布x
+    var x = Graphics.pageToCanvasX(event.pageX);
+    //画布y
+    var y = Graphics.pageToCanvasY(event.pageY);
+    //当移动(x,y)
+    this._onMove(x, y);
+};
+
+
+
 
 
 
@@ -127,8 +140,6 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
         }
     }
 };
-
-
 
 
 

@@ -5,6 +5,10 @@
  * @plugindesc MapParallaxs,地图多层远景图
  * @author wangwang
  *
+ * 
+ * @param  MapParallaxs 
+ * @desc 插件 地图多层远景图 ,作者:汪汪
+ * @default  汪汪
  *
  * @help
  *  
