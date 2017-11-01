@@ -103,7 +103,7 @@ Window_Message.prototype.windowHeight = function() {
 
 Window_Message.prototype.updatePlacement = function() {
     this._positionType = $gameMessage.positionType();
-    var x = (Graphics.boxWidth - width) / 2
+    var x = (Graphics.boxWidth - this.width) / 2
     var y = this._positionType * (Graphics.boxHeight - this.height) / 2;
     var pos = this._windowPSet[this._positionType]
     if (pos) {
