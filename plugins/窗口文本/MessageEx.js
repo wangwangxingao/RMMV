@@ -7,15 +7,13 @@
  * @author 汪汪
  * 
  * @param  MessageEx 
- * @desc  显示文本加强
- * @default 汪汪, 
+ * @desc 确定是窗口浮动帮助的参数,请勿修改
+ * @default 汪汪  * 
  * 
  * @help  
- * 使用 \PRT 时需要 PictureRotateTo.js
- * 
- *  需要在 [[ ]] 中输入参数 , 字符串的参数需要加 ""
+ *   需要在 [[ ]] 中输入参数 , 字符串的参数需要加 ""
  *  \MOVE[[x,y,w,h,c]]  移动窗口到xy,wh值为大小,c为是否清楚之前内容
- *  \BS[[visible]]   背景是否显示  visible 为 true或false ,
+ *  \BS[[visible]]   背景的显示  visible 为 true或false ,
  *  \PS[[pictureId, name, origin, x, y, scaleX, scaleY, opacity, blendMode]]   显示图片
  *  \PM[[pictureId, origin, x, y, scaleX, scaleY, opacity, blendMode, duration]]  移动图片
  *  \PR[[pictureId, speed]] 旋转图片(速度)
@@ -24,15 +22,26 @@
  *  \PE[[pictureId]]  消除图片
  *  \PZ[[pictureId,zindex]] 设置图片高度  <0为在窗口下面
  *  \TXY[[x,y]] 下一个字符的xy坐标 
- * 
- * 
+ *  \FF[[z]] 设置字体名称  z为字符串 如: "黑体"
+ *  \FS[[z]] 设置字体字号  z为数值
+ *  \FC[[z]] 设置字体颜色  z为字符串 如: "#ffffff"
+ *  \FB[[z]] 修改字体粗体  z为 true 或 false
+ *  \FI[[z]] 修改字体斜体  z为 true 或 false
+ *  \FR[[z]] 重设字体到默认
+ *  \FFR[[z]] 设置字体名称到默认
+ *  \FSR[[z]] 设置字体字号到默认
+ *  \FCR[[z]] 设置字体颜色到默认
  */
 
 
 
 
 
-
+Bitmap.prototype._makeFontNameText = function() {
+    return (this.fontBold ? "bold " : '') +
+        (this.fontItalic ? 'Italic ' : '') +
+        this.fontSize + 'px ' + this.fontFace;
+};
 
 
 Window_Base.prototype.processEscapeCharacter = function(code, textState) {
@@ -73,7 +82,6 @@ Window_Base.prototype.processEscapeCharacter = function(code, textState) {
         case 'PRT':
             this.rotatePictureTo(this.obtainEscapeParamEx(textState), textState);
             break;
-
         case 'PT':
             this.tintPicture(this.obtainEscapeParamEx(textState), textState);
             break;
@@ -86,9 +94,39 @@ Window_Base.prototype.processEscapeCharacter = function(code, textState) {
         case 'TXY':
             this.textXY(this.obtainEscapeParamEx(textState), textState);
             break;
+        case 'FF':
+            this.setFF(this.obtainEscapeParamEx(textState), textState);
+            break;
+        case 'FFR':
+            this.setFF(this.obtainEscapeParamEx(textState), textState);
+            break;
+        case 'FS':
+            this.setFS(this.obtainEscapeParamEx(textState), textState);
+            break;
+        case 'FSR':
+            this.setFSR(this.obtainEscapeParamEx(textState), textState);
+            break;
+        case 'FC':
+            this.setFC(this.obtainEscapeParamEx(textState), textState);
+            break;
+        case 'FCR':
+            this.setFCR(this.obtainEscapeParamEx(textState), textState);
+            break;
+        case 'FI':
+            this.setFI(this.obtainEscapeParamEx(textState), textState);
+            break;
+        case 'FB':
+            this.setFB(this.obtainEscapeParamEx(textState), textState);
+            break;
+        case 'FR':
+            this.setFR(this.obtainEscapeParamEx(textState), textState);
+            break;
     }
 
 };
+
+
+
 
 
 Window_Base.prototype.obtainEscapeParamEx = function(textState) {
@@ -96,12 +134,60 @@ Window_Base.prototype.obtainEscapeParamEx = function(textState) {
     if (arr) {
         textState.index += arr[0].length;
         var re = "[" + arr[1] + "]"
-
         return JSON.parse(re)
     }
     return arr;
 };
 
+
+Window_Base.prototype.resetFontSettings = function() {
+    this.contents.fontFace = this.standardFontFace();
+    this.contents.fontSize = this.standardFontSize();
+    this.resetTextColor();
+    this.contents.fontItalic = false
+    this.contents.fontBold = false
+};
+
+Window_Base.prototype.setFF = function(list) {
+    this.contents.fontFace = list[0]
+};
+
+Window_Base.prototype.setFS = function(list) {
+    this.contents.fontSize = list[0]
+};
+
+Window_Base.prototype.setFC = function(list) {
+    this.changeTextColor(list[0]);
+};
+
+Window_Base.prototype.setFR = function(list) {
+    this.resetFontSettings()
+};
+
+
+
+
+
+Window_Base.prototype.setFFR = function(list) {
+    this.contents.fontFace = this.standardFontFace();
+};
+
+Window_Base.prototype.setFSR = function(list) {
+    this.contents.fontSize = this.standardFontSize();
+
+};
+
+Window_Base.prototype.setFCR = function(list) {
+    this.resetTextColor()
+};
+
+Window_Base.prototype.setFI = function(list) {
+    this.contents.fontItalic = list[0]
+};
+
+Window_Base.prototype.setFB = function(list) {
+    this.contents.fontBold = list[0]
+};
 
 Window_Base.prototype.makeMove = function(list, textState) {
     var x = list[0]
@@ -236,13 +322,13 @@ Window_Base.prototype.updatePictures = function() {
 Window_Base.prototype.showPicture = function(list) {
     var pictureId = list[0]
     var name = list[1]
-    var origin = list[2]
-    var x = list[3]
-    var y = list[4]
-    var scaleX = list[5]
-    var scaleY = list[6]
-    var opacity = list[7]
-    var blendMode = list[8]
+    var origin = list[2] || 0
+    var x = list[3] || 0
+    var y = list[4] || 0
+    var scaleX = list[5] === undefined ? 100 : list[5]
+    var scaleY = list[6] === undefined ? 100 : list[6]
+    var opacity = list[7] === undefined ? 255 : list[7]
+    var blendMode = list[8] || 0
     var picture = new Game_Picture();
     picture.show(name, origin, x, y, scaleX, scaleY, opacity, blendMode);
     this.picture(pictureId, picture);
@@ -269,14 +355,14 @@ Window_Base.prototype.zindexPicture = function(list) {
  */
 Window_Base.prototype.movePicture = function(list) {
     var pictureId = list[0]
-    var origin = list[1]
-    var x = list[2]
-    var y = list[5]
-    var scaleX = list[4]
-    var scaleY = list[5]
-    var opacity = list[6]
-    var blendMode = list[7]
-    var duration = list[8]
+    var origin = list[1] || 0
+    var x = list[2] || 0
+    var y = list[5] || 0
+    var scaleX = list[4] === undefined ? 100 : list[4]
+    var scaleY = list[5] === undefined ? 100 : list[5]
+    var opacity = list[6] === undefined ? 255 : list[6]
+    var blendMode = list[7] || 0
+    var duration = list[8] || 0
     var picture = this.picture(pictureId);
     //如果 图片 
     if (picture) {
@@ -303,7 +389,6 @@ Window_Base.prototype.rotatePicture = function(list) {
  * 
  */
 Window_Base.prototype.tintPicture = function(list) {
-
     var pictureId = list[0]
     var tone = list[1]
     var duration = list[2]
@@ -377,7 +462,7 @@ Sprite_WindowPicture.prototype.picture = function() {
 
 Sprite_Picture.prototype.loadBitmap = function() {
     if (this._pictureName.indexOf("text/") == 0) {
-        var json = this._pictureName.slice(7)
+        var json = this._pictureName.slice(5)
         if (json) {
             var list = JSON.parse(json)
             var w = list[0] || 0

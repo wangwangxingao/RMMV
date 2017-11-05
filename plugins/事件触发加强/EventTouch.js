@@ -31,8 +31,23 @@
  */
 
 
-
-
+/**开始事件
+ * @param {string} label 标签
+ * @param {number} near 距离
+ * @param {[number]} trigger 触发设置
+ * 
+ * */
+Game_Map.prototype.eventStart = function(label, near, trigger) {
+    if (label) {
+        var es = this.events()
+        for (var i = 0; i < es.length; i++) {
+            var e = es[i]
+            if (e && (!near || e.isNearThePlayer0() <= near) && (!trigger || trigger.index(e._trigger))) {
+                e.start(label)
+            }
+        }
+    }
+};
 
 
 /**更新*/
@@ -129,11 +144,18 @@ Game_Event.prototype.checkEventTriggerAuto = function() {
     }
 };
 
-Game_Event.prototype.isNearThePlayer2 = function() {
+
+Game_Event.prototype.isNearThePlayer0 = function() {
     var sx = Math.abs(this.deltaXFrom($gamePlayer.x));
     var sy = Math.abs(this.deltaYFrom($gamePlayer.y));
-    return sx + sy <= (this._isnearLong || 1);
+    return sx + sy
 };
+
+Game_Event.prototype.isNearThePlayer2 = function() {
+    return this.isNearThePlayer0() <= (this._isnearLong || 1);
+};
+
+
 
 Game_Interpreter.prototype.jumpTolabel = function(labelName, label) {
 

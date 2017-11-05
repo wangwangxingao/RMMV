@@ -70,9 +70,9 @@
  * 
  * 调用默认的背包变量
  * 
- * Sprite_Knapsack.start(id , near)
+ * Sprite_Knapsack.start(id ,mustnear)
  * 使用后 会启用事件的 "item_" + id 的标签 (需要 EventTouch)
- *  near 距离 , 为0或未设置 时不判断, 不为0 时 判断x+y坐标的距离 是否小于 near
+ * mustnear 设置为 true 时只有附近的才触发
  * 
  * 
  * 调用方法
@@ -133,11 +133,11 @@ Sprite_Knapsack.prototype.constructor = Sprite_Knapsack;
 /**初始化 */
 Sprite_Knapsack.prototype.initialize = function(messageWindow) {
     Sprite.prototype.initialize.call(this);
-    this._messageWindow = messageWindow
     this.getInit()
     this.createAll()
     this.refreshNew()
-    this.close(256)
+    this.hide(256)
+    this._messageWindow = messageWindow
 };
 
 
@@ -187,17 +187,17 @@ Sprite_Knapsack.setVariable = function() {
 };
 
 /**触发  */
-Sprite_Knapsack.start = function(id, near) {
+Sprite_Knapsack.start = function(id, mustnear) {
     if ($gameMap && id) {
-        var es = $gameMap.events()
-        for (var i = 0; i < es.length; i++) {
-            var e = es[i]
-            if (e && (!near || e.isNearThePlayer0() <= near)) {
+        var e = $gameMap.events()
+        for (var i = 0; i < e.length; i++) {
+            if (!near || e._isnear) {
                 e.start(id)
             }
         }
     }
 };
+
 
 
 /**获取初始化值 */
@@ -421,54 +421,40 @@ Sprite_Knapsack.prototype.update = function() {
 
 };
 
-
-
-
-
-
 Sprite_Knapsack.prototype.start = function() {
     this.open()
 };
 
 
 
-Sprite_Knapsack.prototype.activate = function() {
-    this.active = true;
-};
-
-Sprite_Knapsack.prototype.deactivate = function() {
-    this.active = false;
-};
-
-
 /**隐藏 */
-Sprite_Knapsack.prototype.open = function(i) {
+Sprite_Knapsack.prototype.open = function() {
+    this.show()
+};
+
+
+Sprite_Knapsack.prototype.close = function() {
+    this.hide()
+};
+
+/**显示 */
+Sprite_Knapsack.prototype.show = function(i) {
     if (this._hideshow != "show" && this._hideshow != "showed") {
         this._hideshow = "show"
         this._hideshowAdd = i || this._hideshowAddSet[1]
         this.refreshNew()
-        this.show()
+        this.visible = true
     }
-};
-
-
-Sprite_Knapsack.prototype.close = function(i) {
-    if (this._hideshow != "hide" && this._hideshow != "hideed") {
-        this._hideshow = "hide"
-        this._hideshowAdd = i || this._hideshowAddSet[0]
-        this.deactivate()
-    }
-};
-
-/**显示 */
-Sprite_Knapsack.prototype.show = function() {
-    this.visible = true
 };
 
 
 /**隐藏 */
-Sprite_Knapsack.prototype.hide = function() {
-    this.visible = false
+Sprite_Knapsack.prototype.hide = function(i) {
+    if (this._hideshow != "hide" && this._hideshow != "hideed") {
+        this._hideshow = "hide"
+        this._hideshowAdd = i || this._hideshowAddSet[0]
+        this.active = false
+    }
 };
 
 
@@ -477,7 +463,7 @@ Sprite_Knapsack.prototype.hide = function() {
 Sprite_Knapsack.prototype.showed = function() {
     this._hideshow = "showed"
     this.opacity = 255
-    this.activate()
+    this.active = true
 };
 
 
@@ -485,7 +471,7 @@ Sprite_Knapsack.prototype.showed = function() {
 Sprite_Knapsack.prototype.hideed = function() {
     this._hideshow = "hideed"
     this.opacity = 0
-    this.hide()
+    this.visible = false
 };
 
 
@@ -742,8 +728,8 @@ Sprite_Knapsack.prototype.onOk = function(index) {
     if (!this.active) { return }
     //console.log("ok", index)
     //this.refreshIndex(index)
-    this.useItem(index);
-    //this.onItemOk(index)
+    //this.useItem(index);
+    this.onItemOk(index)
     this.playOk();
 }
 
@@ -780,18 +766,15 @@ Sprite_Knapsack.prototype.useItem = function(index) {
     var user = $gameParty.leader()
     var item = this.item(index)
     if (user && item && this.numItems(item) && this.canUse(item)) {
-        this.onItemCancel()
         var action = new Game_Action(user);
         action.setItemObject(item);
         action.apply(user);
-        action.applyGlobal();
-
         user.useItem(item)
-            /*if (this.hasItemChange(index)) {
-                this.refreshPage()
-            } else {
-                this.refreshItemNumber(index)
-            }*/
+        if (this.hasItemChange(index)) {
+            this.refreshPage()
+        } else {
+            this.refreshItemNumber(index)
+        }
         this.playOk();
     } else {
         this.playBuzzer();
