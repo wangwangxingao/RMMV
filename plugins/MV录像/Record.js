@@ -417,7 +417,6 @@ TouchInput.isReleased = function() {
 };
 Object.defineProperty(TouchInput, 'wheelX', {
     get: function() {
-        var re = this._wheelX
         return Record.value(this, "value", [this._wheelX, "TouchInput._wheelX"]);
     },
     configurable: true
