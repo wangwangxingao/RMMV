@@ -5,6 +5,7 @@ canPlayType()	检测浏览器是否能播放指定的音频/视频类型
 load()	重新加载音频/视频元素
 play()	开始播放音频/视频
 pause()	暂停当前播放的音频/视频
+
 HTML5 Audio/Video 属性
 属性	描述
 audioTracks	返回表示可用音轨的 AudioTrackList 对象
@@ -36,6 +37,7 @@ startDate	返回表示当前时间偏移的 Date 对象
 textTracks	返回表示可用文本轨道的 TextTrackList 对象
 videoTracks	返回表示可用视频轨道的 VideoTrackList 对象
 volume	设置或返回音频/视频的音量
+
 HTML5 Audio/Video 事件
 事件	描述
 abort	当音频/视频的加载已放弃时
@@ -60,100 +62,116 @@ suspend	当浏览器刻意不获取媒体数据时
 timeupdate	当目前的播放位置已更改时
 volumechange	当音量已更改时
 waiting	当视频由于需要缓冲下一帧而停止
+
+ 
+HTML5 中的新属性
+autoplay	autoplay	如果出现该属性，则视频在就绪后马上播放。
+controls	controls	如果出现该属性，则向用户显示控件，比如播放按钮。
+height	pixels	设置视频播放器的高度。
+loop	loop	如果出现该属性，则当媒介文件完成播放后再次开始播放。
+muted	muted	规定视频的音频输出应该被静音。
+poster	URL	规定视频下载时显示的图像，或者在用户点击播放按钮前显示的图像。
+preload	preload	
+如果出现该属性，则视频在页面加载时进行加载，并预备播放。
+如果使用 "autoplay"，则忽略该属性。
+src	url	要播放的视频的 URL。
+width	pixels	设置视频播放器的宽度。
+
 */
 
 /*
 v = Video.load("1")  
 s = v.sprite(816,624) ;SceneManager._scene.addChild(s)
+*/
 
-    */
+
+
+
+
 function Video() {
-    //初始化
     this.initialize.apply(this, arguments);
 }
-
-
-Video.prototype.sprite = function(w, h) {
-    this._texture = PIXI.VideoTexture.textureFromVideo(this._video);
-    this._spriteVideo = new PIXI.Sprite(this._texture);
-    this._spriteVideo.width = w;
-    this._spriteVideo.height = h;
-    return this._spriteVideo
-};
-
-Video.prototype.pauseVideo = function() {
-    this._video.pause();
-};
-
-Video.prototype.playVideo = function() {
-    this._video.play();
-};
-
-
-
+//初始化
 Video.prototype.initialize = function() {
     this._name = ""
-    this._posterName = "";
     this._video = document.createElement('video');
-    this._video.autoPlay = true;
-    this._video.loop = true;
-    this._video.muted = false;
-    this._video.poster = ''
 }
 
+
+/**获取精灵 */
 //PIXI.Texture.fromVideo
+//PIXI.VideoBaseTexture.fromVideo(this._video);
 Video.prototype.sprite = function(w, h) {
-    var texture = PIXI.VideoTexture.textureFromVideo(this._video);
-    var sprite = new PIXI.Sprite(texture);
+    var texture = PIXI.VideoBaseTexture.fromVideo(this._video);
+    var sprite = PIXI.Sprite.from(texture);
     sprite.video = this._video
     sprite.width = w
     sprite.height = h
+    console.log(sprite)
     return sprite;
 }
 
+/**视频元素 */
 Video.prototype.video = function() {
     return this._video;
 }
-Video.prototype.pauseVideo = function() {
+
+/**名称 */
+Video.prototype.name = function(r) {
+    if (r !== undefined) {
+        this._name = r
+    }
+    return this._name
+};
+
+
+
+/**暂停 */
+Video.prototype.pause = function() {
     this._video.pause();
 };
 
-Video.prototype.playVideo = function() {
+/**播放 */
+Video.prototype.play = function() {
     this._video.play();
 };
 
+/**设置属性 */
+Video.prototype.type = function(n, r) {
+    if (r !== undefined) {
+        this._video[n] = !!r
+    }
+    return this._video[n]
+};
+
+
+/**循环 */
 Video.prototype.loop = function(r) {
-    if (r === true) {
-        this._video.loop = true;
-    } else if (r === false) {
-        this._video.loop = false
+    if (r !== undefined) {
+        this._video.loop = !!r
     }
     return this._video.loop
 };
-//自动播放
-Video.prototype.autoPlay = function(r) {
-    if (r === true) {
-        this._video.autoPlay = true;
-    } else if (r === false) {
-        this._video.autoPlay = false
+/**自动播放 */
+Video.prototype.autoplay = function(r) {
+    if (r !== undefined) {
+        this._video.autoplay = !!r;
     }
-    return this._video.autoPlay
+    return this._video.autoplay
 };
-//静音
+
+/**静音 */
 Video.prototype.muted = function(r) {
-    if (r === true) {
-        this._video.muted = true;
-    } else if (r === false) {
-        this._video.muted = false
+    if (r !== undefined) {
+        this._video.muted = !!r;
     }
     return this._video.muted
 };
 
-
-Video.prototype.poster = function(url, cs) {
-    if (cs) {
-        this._posterName = url
-        this._video.poster = url
+/** */
+Video.prototype.poster = function(url) {
+    if (url !== undefined) {
+        this._video.poster = "" + url
     }
     return this._video.poster
 };
@@ -172,8 +190,26 @@ Video.prototype.load = function(url) {
 };
 
 
+Video.prototype.set = function(set) {
+    var set = set || {}
+    this.name(set.name)
+    this.muted(set.muted)
+    this.loop(set.loop)
+    this.autoplay(set.autoplay)
+    this.poster(set.poster)
+};
+
+
+
+
 Video.prototype._onVideoLoad = function() {
-    console.log(this._name)
+    //console.log(this._name) 
+    this._video.width = this._video.videoWidth;
+    this._video.height = this._video.videoHeight;
+    this._video.style.width = this._video.videoWidth;
+    this._video.style.height = this._video.videoHeight;
+    //this._video.style.width = 0;
+    //this._video.style.height = 0;
     this._video.play();
 };
 
@@ -182,16 +218,16 @@ Video.prototype._onVideoError = function() {};
 Video.prototype._onVideoEnd = function() {};
 
 
-Video.load = function(name, posterName) {
+Video.load = function(name, set) {
     var video = new Video()
-    video._name = name
-    if (posterName) {
-        video.poster(posterName, true)
-    }
+    var set = set || { name: name }
+
     var ext = this.videoFileExt();
     var url = 'movies/' + name + ext
     video.load(url)
-        //document.body.appendChild(video._video);
+    video.set(set)
+
+    //document.body.appendChild(video._video);
     return video
 }
 
@@ -207,18 +243,17 @@ Video.videoFileExt = function() {
 
 
 
-
 /* Overwritten Scene_Title methods */
 Scene_Title.prototype.create = function() {
 
     /* Prevent the video to be duplicated */
-
-    this.videoTitle = Video.load("1");
-    this.videoTitle.playVideo();
-    this.addChild(this.videoTitle.sprite(816, 624));
     this.createForeground();
     this.createWindowLayer();
     this.createCommandWindow();
+    this.videoTitle = Video.load("1");
+    //this.videoTitle.play();
+    this.videoSprite = this.videoTitle.sprite(816, 624)
+    this.addChild(this.videoSprite);
 };
 
 Scene_Title.prototype.start = function() {
@@ -229,6 +264,6 @@ Scene_Title.prototype.start = function() {
 
 Scene_Title.prototype.terminate = function() {
     Scene_Base.prototype.terminate.call(this);
-    this.videoTitle.pauseVideo();
+    this.videoTitle.pause();
     SceneManager.snapForBackground();
 };
