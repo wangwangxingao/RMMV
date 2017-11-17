@@ -122,10 +122,7 @@ Window_Base.prototype.processEscapeCharacter = function(code, textState) {
             this.setFR(this.obtainEscapeParamEx(textState), textState);
             break;
     }
-
 };
-
-
 
 
 
@@ -211,7 +208,6 @@ Window_Base.prototype.makeMove = function(list, textState) {
             this.contents = b
         }
     }
-
 };
 
 
@@ -426,7 +422,6 @@ Window_Base.prototype.rotatePictureTo = function(pictureId, rotation, duration) 
 Window_Base.prototype.textXY = function(list, textState) {
     textState.x = list[0]
     textState.y = list[1]
-
 };
 
 
@@ -437,13 +432,10 @@ function Sprite_WindowPicture() {
 }
 
 
-
 /**设置原形  */
 Sprite_WindowPicture.prototype = Object.create(Sprite_Picture.prototype);
 /**设置创造者 */
 Sprite_WindowPicture.prototype.constructor = Sprite_WindowPicture;
-
-
 
 
 Sprite_WindowPicture.prototype.setScreen = function(screen) {
