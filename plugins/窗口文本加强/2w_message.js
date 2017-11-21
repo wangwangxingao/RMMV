@@ -42,7 +42,7 @@
  *            当 大于10 时 前面为 锚点 后面为坐标  如 12 表示 以左下顶点为锚点 坐标为 message的下顶点 
  * \S[n] :设置每个字符之间间隔的时间,换页重置
  * \F[n name index] :
- *      在message 下显示name index的脸图, n位置 0 左 1 左 2 右
+ *      在message 下显示name index的脸图, n位置 1 左 2 右
  * \=  \=[z] 
  *     设置粗体 , 0 为 false  , 1 为true ,不填值为取现值的相反值
  * \/  \/[z] 
@@ -1456,7 +1456,7 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
                 this.setJiange(z)
             case "face":
                 var face = obj
-                this.showMessageFace(face.name, face.id, face.pos)
+                this.showMessageFace(face.name, face.id, face.pos, textState)
                 break
             case "pic":
                 var pos = obj.pos
@@ -1484,7 +1484,12 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
 
 Window_Message.prototype.updatePlacement2 = function() {
     var y = 2 * (Graphics.boxHeight - this.height) / 2;
-    var x = 0
+
+    if (!mapvar.value("cblopen")) {
+        var x = (Graphics.boxWidth - this.width) / 2;
+    } else {
+        var x = this.windowX()
+    }
     var w = this.windowWidth()
     var h = this.windowHeight()
     this.move(x, y, w, h);
@@ -1495,13 +1500,11 @@ Window_Message.prototype.updatePlacement = function() {
     var postype = $gameMessage.positionType();
     if (typeof(postype) == "number") {
         var y = postype * (Graphics.boxHeight - this.height) / 2;
-        /* if (!mapvar.value("cblopen")) {
-             var x = (Graphics.boxWidth - this.width) / 2;
-         } else {
-             var x = 242
-         }
-         */
-        var x = 0
+        if (!mapvar.value("cblopen")) {
+            var x = (Graphics.boxWidth - this.width) / 2;
+        } else {
+            var x = this.windowX()
+        }
         var w = this.windowWidth()
         var h = this.windowHeight()
 
@@ -1548,7 +1551,18 @@ Window_Message.prototype.updatePlacement = function() {
                 var rw = 1
                 var rh = 1
             }
-
+            if (type == 3) {
+                var rx = 0
+                var ry = 0
+                var rw = SceneManager._screenWidth
+                var rh = SceneManager._screenHeight
+                if (!mapvar.value("cblopen")) {
+                    var rx = 0;
+                } else {
+                    var rx = this.windowX()
+                    var rw = rw - rx
+                }
+            }
         } else {
 
             var actor
@@ -1710,12 +1724,25 @@ Window_Message.prototype.updatePlacement = function() {
         var x = rx + cex * rw - w * wex + wdx
         var y = ry + cey * rh - h * wey + wdx
     }
+
+    if (!mapvar.value("cblopen")) {
+        var zx = 0;
+    } else {
+        var zx = this.windowX()
+    }
+    var zy = 0
+    if (this._textState) {
+        var page = this._textState.page
+        if (page && page.set) {
+            zy = page.set.facepos ? 168 : 0
+        }
+    }
     var mx = SceneManager._screenWidth - w
     var my = SceneManager._screenHeight - h
     x = Math.min(x, mx)
-    x = Math.max(x, 0)
+    x = Math.max(x, zx)
     y = Math.min(y, my)
-    y = Math.max(y, 0)
+    y = Math.max(y, zy)
     this.move(x, y, w, h);
     this._goldWindow.y = this.y > 0 ? 0 : Graphics.boxHeight - this._goldWindow.height;
 };
@@ -1812,17 +1839,24 @@ Game_Message.prototype.setFaceImage = function(faceName, faceIndex, facepos) {
 };
 
 
+Game_Message.prototype.facePos = function() {
+    return this._facepos
+};
+
+
+
+
 /**进行普通文字处理2 */
 Window_Base.prototype.processNormalCharacter2 = function() {};
 
 /**窗口宽 */
 Window_Message.prototype.windowWidth = function() {
-    return 816
+    return 908
 };
 
 /**窗口x */
 Window_Message.prototype.windowX = function() {
-    return 240
+    return 242
 };
 
 
@@ -1837,9 +1871,11 @@ Window_Message.prototype.drawMessageFace = function() {};
 
 
 
-Window_Message.prototype.showMessageFace = function(face, id, pos) {
+Window_Message.prototype.showMessageFace = function(face, id, pos, textState) {
 
     var name = "face/" + '"' + face + '",' + id
+
+
     if (this.contentsHeight() >= 144) {
         var y = 0
     } else {
