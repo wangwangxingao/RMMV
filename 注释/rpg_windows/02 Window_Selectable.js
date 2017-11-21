@@ -780,11 +780,12 @@ Window_Selectable.prototype.setHelpWindowItem = function(item) {
 };
 /**是当前项目允许 */
 Window_Selectable.prototype.isCurrentItemEnabled = function() {
+    //返回 true
     return true;
 };
 /**绘制所有项目 */
 Window_Selectable.prototype.drawAllItems = function() {
-    //顶部项目
+    //topIndex = 顶部索引()
     var topIndex = this.topIndex();
     //循环从0到 最大页项目数
     for (var i = 0; i < this.maxPageItems(); i++) {
