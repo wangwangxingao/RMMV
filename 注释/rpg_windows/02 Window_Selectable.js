@@ -774,7 +774,7 @@ Window_Selectable.prototype.updateHelp = function() {
 Window_Selectable.prototype.setHelpWindowItem = function(item) {
     //如果帮助窗口
     if (this._helpWindow) {
-        //帮助窗口设置
+        //帮助窗口设置(项目)
         this._helpWindow.setItem(item);
     }
 };
