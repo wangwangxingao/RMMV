@@ -122,47 +122,52 @@ Window_Selectable.prototype.reselect = function() {
     //选择  _index
     this.select(this._index);
 };
-/**行  (从0开始) */
+/**行  (从0开始)
+ * @return {number}
+ *  */
 Window_Selectable.prototype.row = function() {
-    //索引/最大列数
+    //返回 数学 向下取整( 索引()/最大列数())
     return Math.floor(this.index() / this.maxCols());
 };
 /**顶部行 */
 Window_Selectable.prototype.topRow = function() {
-    //滚动y / 项目高
+    //返回 数学 向下取整(滚动y / 项目高())
     return Math.floor(this._scrollY / this.itemHeight());
 };
-/**最大顶部行 */
+/**最大顶部行 
+ * 
+ *  示意 : 最大行数 7 ,最大页行数 3 
+ * 0
+ * 1
+ * 2
+ * 3  
+ * 4  0 最大顶部行
+ * 5  0
+ * 6  0 
+ * 
+ * 
+ */
 Window_Selectable.prototype.maxTopRow = function() {
-    /*  示意 : 最大行数 7 ,最大页行数 3
-    0
-    1
-    2
-    3  
-    4  0 最大顶部行
-    5  0
-    6  0
-    */
-    // (0  , 最大行数 - 最大页行数)  中最大的
+    //返回  数学 较大值 (0  , 最大行数() - 最大页行数())  
     return Math.max(0, this.maxRows() - this.maxPageRows());
 };
 /**设置顶部行 */
 Window_Selectable.prototype.setTopRow = function(row) {
-    // scrollY =  row(0 - 最大顶部行)之间的 * 项目高
+    // 滚动y =  row(0 - 最大顶部行)之间的 * 项目高
     var scrollY = row.clamp(0, this.maxTopRow()) * this.itemHeight();
-    //如果  _scrollY  不等于 scrollY  
+    //如果  滚动y  !== 滚动y  
     if (this._scrollY !== scrollY) {
-        // _scrollY = scrollY
+        // 滚动y = 滚动y
         this._scrollY = scrollY;
-        //刷新
+        //刷新()
         this.refresh();
-        //更新光标
+        //更新光标()
         this.updateCursor();
     }
 };
 /**重新滚动 */
 Window_Selectable.prototype.resetScroll = function() {
-    //设置顶部行为0
+    //设置顶部行(0)
     this.setTopRow(0);
 };
 /**最大页行数 */
@@ -745,34 +750,34 @@ Window_Selectable.prototype.isCursorVisible = function() {
 };
 /**确定光标可见 */
 Window_Selectable.prototype.ensureCursorVisible = function() {
-    //行
+    //行 = 行()
     var row = this.row();
-    //如果 行<顶部行
+    //如果( 行<顶部行())
     if (row < this.topRow()) {
-        //设置顶部行
+        //设置顶部行(行)
         this.setTopRow(row);
-        //如果 行>底部行
+        //否则 如果( 行>底部行())
     } else if (row > this.bottomRow()) {
-        //设置底部行
+        //设置底部行(行)
         this.setBottomRow(row);
     }
 };
 /**呼叫 更新帮助 */
 Window_Selectable.prototype.callUpdateHelp = function() {
-    //如果 活动并且 帮助窗口
+    //如果( 活动 并且 帮助窗口)
     if (this.active && this._helpWindow) {
-        //更新帮助窗口
+        //更新帮助窗口()
         this.updateHelp();
     }
 };
 /**更新帮助 */
 Window_Selectable.prototype.updateHelp = function() {
-    //帮助窗口清除
+    //帮助窗口 清除()
     this._helpWindow.clear();
 };
 /**设置帮助窗口项目 */
 Window_Selectable.prototype.setHelpWindowItem = function(item) {
-    //如果帮助窗口
+    //如果(帮助窗口)
     if (this._helpWindow) {
         //帮助窗口设置(项目)
         this._helpWindow.setItem(item);
@@ -787,13 +792,13 @@ Window_Selectable.prototype.isCurrentItemEnabled = function() {
 Window_Selectable.prototype.drawAllItems = function() {
     //topIndex = 顶部索引()
     var topIndex = this.topIndex();
-    //循环从0到 最大页项目数
+    //循环 (开始时 i = 0 ; 当 i < 最大页项目数 ;每次 i++ )
     for (var i = 0; i < this.maxPageItems(); i++) {
-        //索引
+        //索引 = 头索引 + i
         var index = topIndex + i;
-        //如果索引小于最大项目
+        //如果(索引<最大项目数())
         if (index < this.maxItems()) {
-            //绘制项目
+            //绘制项目(索引)
             this.drawItem(index);
         }
     }
@@ -802,9 +807,9 @@ Window_Selectable.prototype.drawAllItems = function() {
 Window_Selectable.prototype.drawItem = function(index) {};
 /**清除项目 */
 Window_Selectable.prototype.clearItem = function(index) {
-    //区域=项目区域
+    //矩形 = 项目矩形(索引)
     var rect = this.itemRect(index);
-    //内容清除矩形
+    //内容 清除矩形(矩形 x ,矩形 y ,矩形 宽 , 矩形 高)
     this.contents.clearRect(rect.x, rect.y, rect.width, rect.height);
 };
 /**重绘项目 */
@@ -819,7 +824,7 @@ Window_Selectable.prototype.redrawItem = function(index) {
 };
 /**重绘当前项目 */
 Window_Selectable.prototype.redrawCurrentItem = function() {
-    //重绘项目( 索引)
+    //重绘项目( 索引() )
     this.redrawItem(this.index());
 };
 /**刷新 */
