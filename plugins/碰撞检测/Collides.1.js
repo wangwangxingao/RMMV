@@ -1,180 +1,3 @@
-Game_Map.prototype.setup = function(mapId) {
-    if (!$dataMap) {
-        throw new Error('The map data is not available');
-    }
-    this._mapId = mapId;
-    this._tilesetId = $dataMap.tilesetId;
-    this._displayX = 0;
-    this._displayY = 0;
-    this.refereshVehicles();
-    this.setupEvents();
-    this.setupScroll();
-    this.setupParallax();
-    this.setupBattleback();
-
-    this.setupFourTree()
-    this._needsRefresh = false;
-};
-
-Game_Map.prototype.setupFourTree = function() {
-    var w = this.width()
-    var h = this.height()
-    var area = new Area(-w, -h, w * 3, h * 3)
-    this._fourTree = new fourTree(area, 0)
-}
-
-Game_Map.prototype.collidesMoveDirD = function(obj, dir, d) {
-    if (this._fourTree) {
-        return this._fourTree.collidesMoveDirD(obj, dir, d)
-    }
-}
-
-
-
-Game_Map.prototype.addBody = function(obj) {
-    if (this._fourTree && obj) {
-        this._fourTree.add(obj)
-    }
-}
-
-
-Game_Map.prototype.bodyIn = function(obj) {
-    if (obj.body) {
-
-
-
-
-
-        Collides.aabbInAABB(obj.body, this.bounds)
-    }
-}
-
-
-Game_Map.prototype.addBody = function(obj) {
-    if (this._fourTree && obj) {
-        this._fourTree.add(obj)
-    }
-}
-
-
-
-
-
-
-Object.defineProperties(Game_CharacterBase.prototype, {
-    _realX: {
-        get: function() { return this.__realX; },
-        set: function(v) {
-            this.__realX = v;
-            this.refreshBody()
-        },
-        configurable: true
-    },
-    _realY: {
-        get: function() { return this.__realY; },
-        set: function(v) {
-            this.__realY = v;
-            this.refreshBody()
-        },
-        configurable: true
-    },
-})
-
-
-Game_CharacterBase.prototype.initialize = function() {
-    this.initMembers();
-    this.initBody();
-    this.initBattler();
-};
-
-/**初始化身体 */
-Game_CharacterBase.prototype.initBody = function() {
-    this.setBody(this.makeTile())
-};
-
-
-/**设置身体 */
-Game_CharacterBase.prototype.setBody = function(body) {
-    if (this.fourTree) {
-        this.fourTree.remove(this)
-    }
-    this.body = body
-    this.refreshBody()
-};
-
-/**刷新身体 */
-Game_CharacterBase.prototype.refreshBody = function() {
-    if (this.body) {
-        this.body.move(this._realX, this._realY)
-    }
-};
-
-
-Game_CharacterBase.prototype.makeTile = function() {
-    return Collides.makeTileBody()
-};
-
-
-Game_CharacterBase.prototype.canPass = function(x, y, d) {
-    var x2 = $gameMap.roundXWithDirection(x, d);
-    var y2 = $gameMap.roundYWithDirection(y, d);
-    if (!$gameMap.isValid(x2, y2)) {
-        return false;
-    }
-    if (this.isThrough() || this.isDebugThrough()) {
-        return true;
-    }
-    if (!this.isMapPassable(x, y, d)) {
-        return false;
-    }
-    if (this.isCollidedWithCharacters(x2, y2)) {
-        return false;
-    }
-
-    this.canPass2(d, 1)
-    return true;
-};
-
-
-Game_CharacterBase.prototype.canPass = function(x, y, d) {
-    var x2 = $gameMap.roundXWithDirection(x, d);
-    var y2 = $gameMap.roundYWithDirection(y, d);
-    if (!$gameMap.isValid(x2, y2)) {
-        return false;
-    }
-    if (this.isThrough() || this.isDebugThrough()) {
-        return true;
-    }
-    if (!this.isMapPassable(x, y, d)) {
-        return false;
-    }
-    if (this.isCollidedWithCharacters(x2, y2)) {
-        return false;
-    }
-    return true;
-};
-
-
-
-
-
-Game_CharacterBase.prototype.canPass2 = function(x, y) {
-
-
-    var list = Collides.tileFindMove(this.body, x, y)
-    if (this.body) {
-
-
-
-
-    }
-};
-
-
-
-
-
-
 function fourTree() {
     this.initialize.apply(this, arguments)
 }
@@ -200,26 +23,28 @@ fourTree.prototype.allObject = function() {
     return list
 }
 
+
 /**切割 */
 fourTree.prototype.split = function() {
     if (this.nodes.length) {
         return
     }
-    var w = this.bounds.width * 0.5
-    var h = this.bounds.height * 0.5
-    var x0 = this.bounds.x
-    var x0 = this.bounds.y
-    var x1 = x0 + w
-    var y1 = y0 + h
+    var w = this.bounds.w * 0.5
+    var h = this.bounds.h * 0.5
+    var x0 = this.bounds.x - w
+    var x0 = this.bounds.y - h
+    var x1 = this.bounds.x + w
+    var y1 = this.bounds.y + h
+
     this.nodes = [
         /**左上 */
-        new fourTree(new Area(x0, y0, w, h), this.level + 1, this.root),
+        new fourTree(Collides.body(x0, y0, w, h), this.level + 1, this.root),
         /**右上 */
-        new fourTree(new Area(x1, y0, w, h), this.level + 1, this.root),
+        new fourTree(Collides.body(x1, y0, w, h), this.level + 1, this.root),
         /**右下 */
-        new fourTree(new Area(x1, y1, w, h), this.level + 1, this.root),
+        new fourTree(Collides.body(x1, y1, w, h), this.level + 1, this.root),
         /**左下 */
-        new fourTree(new Area(x0, y1, w, h), this.level + 1, this.root)
+        new fourTree(Collides.body(x0, y1, w, h), this.level + 1, this.root)
     ]
 }
 
@@ -232,24 +57,30 @@ fourTree.prototype.split = function() {
 fourTree.prototype.getIndex = function(obj, checkIsInner) {
     var aabb1 = obj.body
     var aabb2 = this.bounds
-    var b1 = aabb1.boundingBox()
-    var b2 = aabb2.boundingBox()
-    var p1x = Collides.projectOffset(b1[0], aabb1.x)
-    var p2x = Collides.projectOffset(b2[0], aabb2.x)
-    var p1y = Collides.projectOffset(b1[1], aabb1.y)
-    var p2y = Collides.projectOffset(b2[1], aabb2.y)
+    var p1xx = aabb1.x - aabb1.w
+    var p1xy = aabb1.x + aabb1.w
+
+    var p2xx = aabb2.x - aabb2.w
+    var p2xy = aabb2.x + aabb2.w
+
+    var p1yx = aabb1.y - aabb1.h
+    var p1yy = aabb1.y + aabb1.h
+
+    var p2yx = aabb2.y - aabb2.h
+    var p2yy = aabb2.y + aabb2.h
+
     if (checkIsInner && (
-            (p1x.x < p2x.x || p1x.y > p2x.y) ||
-            (p1y.x < p2y.x || p1y.y > p2y.y))) {
+            (p1xx < p2xx || p1xy > p2xy) ||
+            (p1yx < p2yx || p1yy > p2yy))) {
         return -1
     }
-    var p20x = (p2x.x + p2x.y) * 0.5
-    var p20y = (p2y.x + p2y.y) * 0.5
+    var p20x = aabb2.x
+    var p20y = aabb2.y
 
-    var l = p1x.y < p20x
-    var r = p1x.x > p20x
-    var t = p1y.y < p20y
-    var b = p1y.x > p20y
+    var l = p1xy < p20x
+    var r = p1xx > p20x
+    var t = p1yy < p20y
+    var b = p1yx > p20y
 
     if (t) {
         if (l) { return 0 }
@@ -264,9 +95,10 @@ fourTree.prototype.getIndex = function(obj, checkIsInner) {
 
 /**是在之中 */
 fourTree.prototype.isIn = function(obj) {
-    //console.log(obj.body, this.bounds)
-    return Collides.aabbInAABB(obj.body, this.bounds)
+    //console.log(obj.body, this.bounds)  
+    return Collides.bodyInBody(obj.body, this.bounds)
 }
+
 
 /**添加 */
 fourTree.prototype.add = function(obj) {
@@ -341,7 +173,7 @@ fourTree.prototype.refresh = function(root) {
 
 fourTree.prototype.collidesWith = function(obj) {
     var result = []
-    if (Collides.aabbWithAABB(obj.body, this.bounds)) {
+    if (Collides.bodyInBody(obj.body, this.bounds)) {
         result = result.concat(this.objects)
         for (var i = 0; i < this.nodes.length; i++) {
             result = result.concat(this.nodes[i].collidesWith(rect))
@@ -351,10 +183,10 @@ fourTree.prototype.collidesWith = function(obj) {
 }
 
 
-fourTree.prototype.collidesMove = function(obj, dx, dy) {
+fourTree.prototype.collidesMove = function(obj, xd, yd) {
     var result = []
     var index
-    if (Collides.aabbMoveAABBxyIsIn(obj.body, this.bounds, dx, dy)) {
+    if (Collides.bodyMoveBodyIn(obj.body, this.bounds, dx, dy)) {
         result = result.concat(this.objects)
         for (var i = 0; i < this.nodes.length; i++) {
             result = result.concat(this.nodes[i].collidesWith(rect))
@@ -362,7 +194,6 @@ fourTree.prototype.collidesMove = function(obj, dx, dy) {
     }
     return result
 }
-
 
 
 fourTree.prototype.collidesFun = function(obj, fun) {
@@ -378,301 +209,286 @@ fourTree.prototype.collidesFun = function(obj, fun) {
 }
 
 
-function Collides() {}
-
-
-/**图块寻找 */
-Collides.tileFind = function(p) {
-    var itw = this.iTileWidth()
-    var ith = this.iTileHeight()
-    var b = p.boundingBox()
-    var px = b[0]
-    var py = b[1]
-    var p1x = px.x + p.x
-    var p2x = px.y + p.x
-    var p1y = py.x + p.y
-    var p2y = py.y + p.y
-    if (itw == 1 && ith == 1) {
-        var xs = Math.round(p1x)
-        var xe = Math.round(p2x)
-        var ys = Math.round(p1y)
-        var ye = Math.round(p2y)
-    } else {
-        var xs = Math.round(p1x * itw)
-        var xe = Math.round(p2x * itw)
-        var ys = Math.round(p1y * itw)
-        var ye = Math.round(p2y * itw)
-    }
-
-    return [xs, xe, ys, ye]
-}
-
-/**
- * 方向寻找图块
- * 
- */
-Collides.tileFindDir = function(p, dir, d) {
-    var itw = this.iTileWidth()
-    var ith = this.iTileHeight()
-    var b = p.boundingBox()
-    var px = b[0]
-    var py = b[1]
-    var p1x = px.x + p.x
-    var p2x = px.y + p.x
-    var p1y = py.x + p.y
-    var p2y = py.y + p.y
-    var mx = 0
-    var my = 0
-
-    if (dir == 8) {
-        var my = -d
-    } else if (dir == 2) {
-        var my = d
-    } else if (dir == 4) {
-        var mx = -d
-    } else if (dir == 6) {
-        var mx = d
-    } else if (dir == 1) {
-        var mx = -d * Math.SQRT1_2
-        var my = d * Math.SQRT1_2
-    } else if (dir == 3) {
-        var mx = d * Math.SQRT1_2
-        var my = d * Math.SQRT1_2
-    } else if (dir == 7) {
-        var mx = -d * Math.SQRT1_2
-        var my = -d * Math.SQRT1_2
-    } else if (dir == 9) {
-        var mx = d * Math.SQRT1_2
-        var my = -d * Math.SQRT1_2
-    }
-    if (mx < 0) {
-        p1x += mx
-    } else {
-        p2x += mx
-    }
-    if (my > 0) {
-        p2y += my
-    } else {
-        p1y += my
-    }
-    if (itw == 1 && ith == 1) {
-        var xs = Math.round(p1x)
-        var xe = Math.round(p2x)
-        var ys = Math.round(p1y)
-        var ye = Math.round(p2y)
-    } else {
-        var xs = Math.round(p1x * itw)
-        var xe = Math.round(p2x * itw)
-        var ys = Math.round(p1y * itw)
-        var ye = Math.round(p2y * itw)
-    }
-
-
-    return [xs, xe, ys, ye]
-}
-
-Collides.tileFindMove = function(p, mx, my) {
-    var itw = this.iTileWidth()
-    var ith = this.iTileHeight()
-    var b = p.boundingBox()
-    var px = b[0]
-    var py = b[1]
-    var p1x = px.x + p.x
-    var p2x = px.y + p.x
-    var p1y = py.x + p.y
-    var p2y = py.y + p.y
-    var mx = mx || 0
-    var my = my || 0
-    if (dx < 0) {
-        p1x += mx
-    } else {
-        p2x += mx
-    }
-    if (my > 0) {
-        p2y += my
-    } else {
-        p1y += my
-    }
-    if (itw == 1 && ith == 1) {
-        var xs = Math.round(p1x)
-        var xe = Math.round(p2x)
-        var ys = Math.round(p1y)
-        var ye = Math.round(p2y)
-    } else {
-        var xs = Math.round(p1x * itw)
-        var xe = Math.round(p2x * itw)
-        var ys = Math.round(p1y * itw)
-        var ye = Math.round(p2y * itw)
-    }
-
-    return [xs, xe, ys, ye]
-}
-
-/**
- * 轴寻找图块
- * 
- */
-Collides.tileFindAxie = function(p, axie, d) {
-    var itw = this.iTileWidth()
-    var ith = this.iTileHeight()
-    var b = p.boundingBox()
-    var px = b[0]
-    var py = b[1]
-
-    var p1x = px.x + p.x
-    var p2x = px.y + p.x
-    var p1y = py.x + p.y
-    var p2y = py.y + p.y
-
-    var mx = axie.x * d
-    var my = axie.y * d
-    if (mx < 0) {
-        p1x += mx
-    } else {
-        p2x += mx
-    }
-    if (my > 0) {
-        p1y += my
-    } else {
-        p2y += my
-    }
-    if (itw == 1 && ith == 1) {
-        var xs = Math.round(p1x)
-        var xe = Math.round(p2x)
-        var ys = Math.round(p1y)
-        var ye = Math.round(p2y)
-    } else {
-        var xs = Math.round(p1x * itw)
-        var xe = Math.round(p2x * itw)
-        var ys = Math.round(p1y * itw)
-        var ye = Math.round(p2y * itw)
-    }
-
-    return [xs, xe, ys, ye]
+Collides.bodyWithBody = function(body1, body2) {
+    return Collides.chMoveCh(
+        body1.x,
+        body1.y,
+        body1.w,
+        body1.h,
+        body2.x,
+        body2.y,
+        body2.w,
+        body2.h
+    )
 }
 
 
 
-/**
- * 制作图块
- * 
- */
-Collides._tileBodys = {}
-Collides.tileBody = function(x, y, type) {
-    if (type == 5) {
-        var itw = this.iTileWidth()
-        var ith = this.iTileHeight()
-        if (!this._tileBodys[5]) {
-            this._tileBodys[5] = new AABB(itw, ith, new Vector(0.5, 0.5))
-        }
-        var b = this._tileBodys[5]
-        b.x = x
-        b.y = y
-        return b
-    } else if (type == 4) {
-        var itw = this.iTileWidth()
-        if (!this._tileBodys[4]) {
+Collides.bodyInBody = function(body1, body2) {
+    return Collides.chInCh(
+        body1.x,
+        body1.y,
+        body1.w,
+        body1.h,
+        body2.x,
+        body2.y,
+        body2.w,
+        body2.h
+    )
+}
 
-            var ith = this.iTileHeight()
-            var itt = this.iTileTabble()
-            this._tileBodys[4] = new AABB(itt, ith - itt - itt, new Vector(1, 0.5))
-        }
-        var b = this._tileBodys[4]
-        b.x = x - itw * 0.5
-        b.y = y
-        return b
-    } else if (type == 6) {
-        var itw = this.iTileWidth()
-        if (!this._tileBodys[6]) {
-            var ith = this.iTileHeight()
-            var itt = this.iTileTabble()
-            this._tileBodys[6] = new AABB(itt, ith - itt - itt, new Vector(0, 0.5))
-        }
-        var b = this._tileBodys[6]
-        b.x = x + itw * 0.5
-        b.y = y
-        return b
-    } else if (type == 8) {
-        var ith = this.iTileHeight()
-        if (!this._tileBodys[8]) {
-            var itw = this.iTileWidth()
-            var itt = this.iTileTabble()
-            this._tileBodys[8] = new AABB(itw - itt - itt, itt, new Vector(0.5, 1))
-        }
-        var b = this._tileBodys[8]
-        b.x = x
-        b.y = y - ith * 0.5
-        return b
-    } else if (type == 2) {
-        var ith = this.iTileHeight()
-        if (!this._tileBodys[2]) {
-            var itw = this.iTileWidth()
-            var itt = this.iTileTabble()
-            this._tileBodys[2] = new AABB(itw - itt - itt, itt, new Vector(0.5, 0))
-        }
-        var b = this._tileBodys[2]
-        b.x = x
-        b.y = y + ith * 0.5
-        return b
+Collides.chWithCh = function(x, y, w, h, x1, y1, w1, h1) {
+    var xa = x1 - x
+    var ya = y1 - y
+    var w2 = w + w1
+    var h2 = h + h1
+    var xa0 = xa - w2
+    var xa1 = xa + w2
+    var ya0 = ya - h2
+    var ya1 = ya + h2
+    if (xa0 <= 0 && xa1 >= 0 && ya0 <= 0 && ya1 >= 0) {
+        return true
     } else {
         return false
     }
 }
 
+Collides.chInCh = function(x, y, w, h, x1, y1, w1, h1) {
+    var p1xx = x - w
+    var p1xy = x + w
 
+    var p2xx = x1 - w1
+    var p2xy = x1 + w1
 
+    var p1yx = y - h
+    var p1yy = y + h
 
+    var p2yx = y - h
+    var p2yy = y + h
 
-
-Collides.makeTileBody = function() {
-    var itw = this.iTileWidth()
-    var ith = this.iTileHeight()
-    var itt = this.iTileTabble()
-    return new AABB(itw - itt - itt, ith - itt - itt, new Vector(0.5, 0.5))
-}
-
-
-Collides.iTileWidth = function() {
-    return 1
-}
-
-Collides.iTileHeight = function() {
-    return 1
-}
-
-Collides.iTileTabble = function() {
-    return 0.021
+    if (p2xx <= p1xx && p2xy >= p1xy && p2yx <= p1yx && p2yy >= p1yy) {
+        return true
+    }
+    return false
 }
 
 
 
-Collides.inMapX = function(aabb, v, v0) {
-    var b = aabb.boundingBox()
-    var bx = b[0]
-    return bx.x >= (v0 || 0) && bx.y <= v
+Collides.bodyMoveBodyIn = function(body1, body2, xd, yd, type) {
+    var l = Collides.chMoveCh(
+        body1.x,
+        body1.y,
+        body1.w,
+        body1.h,
+        body2.x,
+        body2.y,
+        body2.w,
+        body2.h,
+        xd, yd, type
+    )
+    return l[0] == xd && l[1] == yd
+}
+
+Collides.bodyMoveBody = function(body1, body2, xd, yd, type) {
+    return Collides.chMoveCh(
+        body1.x,
+        body1.y,
+        body1.w,
+        body1.h,
+        body2.x,
+        body2.y,
+        body2.w,
+        body2.h,
+        xd, yd, type
+    )
 }
 
 
-Collides.inMapY = function(aabb, v, v0) {
-    var b = aabb.boundingBox()
-    var bx = b[1]
-    return bx.x >= (v0 || 0) && bx.y <= v
+Collides.chMoveCh = function(x, y, w, h, x1, y1, w1, h1, xd, yd, type) {
+    var xa = x1 - x
+    var ya = y1 - y
+    var w2 = w + w1
+    var h2 = h + h1
+    var xa0 = xa - w2
+    var xa1 = xa + w2
+    var ya0 = ya - h2
+    var ya1 = ya + h2
+    if (type == 2) {
+        ya0 = ya1
+    } else if (type == 8) {
+        ya1 = ya0
+    } else if (type == 4) {
+        xa1 = xa0
+    } else if (type == 6) {
+        xa0 = xa1
+    }
+
+    /**y方向不变 */
+    if (yd == 0) {
+        //y轴上重合
+        if (ya0 <= 0 && ya1 >= 0) {
+            var xd = Collides.moved(xd, xa0, xa1)
+        }
+    } else if (xd == 0) {
+        //y轴上重合
+        if (xa0 <= 0 && xa1 >= 0) {
+            var yd = Collides.moved(yd, ya0, ya1)
+        }
+    } else {
+        var k = xd / yd
+        var ya0 = k > 0 ? ya0 * k : ya1 * k
+        var ya1 = k > 0 ? ya1 * k : ya0 * k
+        if (ya1 >= xa0 && ya0 <= xa1) {
+            var da0 = ya0 > xa0 ? ya0 : xa0
+            var da1 = ya1 < xa1 ? ya1 : xa1
+            var d = Collides.moved(xd, da0, da1)
+            if (d != xd) {
+                var xd = d
+                var yd = d / k
+            }
+        }
+    }
+    return [xd, yd]
 }
 
 
-Collides.outMapX = function(aabb, v, v0) {
-    var b = aabb.boundingBox()
-    var bx = b[0]
-    return bx.y < (v0 || 0) && bx.x > v
+
+Collides.four = function(x, y, w, h, w1, h1, xd, yd, type) {
+    var x0 = x - w
+    var x1 = x + w
+    if (xd > 0) {
+        x1 += xd
+    } else {
+        x0 += xd
+    }
+    var y0 = y - h
+    var y1 = y + h
+    if (yd > 0) {
+        y1 += yd
+    } else {
+        y0 += yd
+    }
+
+    var z = 0
+    if ((type == 3 || type == 1) && (x0 < 0 && x1 > 0) || (x1 > w1 && x0 < w1)) {
+        z += 1
+    }
+    if ((type == 3 || type == 2) && (y0 < 0 && y1 > 0) || (y1 > h1 && y0 < h1)) {
+        z += 2
+    }
+    return z
 }
 
-Collides.outMapY = function(aabb, v, v0) {
-    var b = aabb.boundingBox()
-    var bx = b[1]
-    return bx.y < (v0 || 0) && bx.x > v
+
+
+Collides.body = function(x, y, w, h) {
+    return { x: x, y: y, w: w, h: h }
 }
 
 
+Collides.bodymove = function(obj, x, y) {
+    obj.x = x
+    obj.y = y
+}
+
+
+Collides.moveIn = function(x, w, xd) {
+    if (x + xd > w || x + xd < 0) {
+        return false
+    } else {
+        return true
+    }
+}
+
+
+
+
+Collides.moved = function(d, x, y) {
+    if (0 < x) {
+        if (d < 0) {
+            return d
+        } else {
+            if (d < x) {
+                return d
+            } else {
+                return x
+            }
+        }
+    } else if (0 > y) {
+        if (d > 0) {
+            return d
+        } else {
+            if (d < y) {
+                return y
+            } else {
+                return d
+            }
+        }
+    } else {
+        return 0
+    }
+}
+
+
+
+
+
+Game_CharacterBase.prototype.moveStraight = function(d) {
+    //设置移动成功( 能通过(x,y,d)  )
+    this.setMovementSuccess(this.canPass(this._x, this._y, d));
+    //如果( 是移动成功的() )
+    if (this.isMovementSucceeded()) {
+        //设置方向(d)
+        this.setDirection(d);
+        //x = 游戏地图 环x和方向(x,d)
+        this._x = $gameMap.roundXWithDirection(this._x, d);
+        //y = 游戏地图 环y和方向(y,d)
+        this._y = $gameMap.roundYWithDirection(this._y, d);
+        //真x = 游戏地图 x和方向(x, 相反方向(d)  )
+        this._realX = $gameMap.xWithDirection(this._x, this.reverseDir(d));
+        //真y = 游戏地图 y和方向(y, 相反方向(d)  )
+        this._realY = $gameMap.yWithDirection(this._y, this.reverseDir(d));
+        console.log(this._x, this._y, this._realX, this._realY)
+            //增加步数()
+        this.increaseSteps();
+        //否则
+    } else {
+        //设置方向(d)
+        this.setDirection(d);
+        //检查正面事件触摸触发(d)
+        this.checkEventTriggerTouchFront(d);
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function Collides() {}
 
 
 Collides.getAabbAxes = function() {
@@ -685,6 +501,7 @@ Collides.getAabbAxes = function() {
     return this._aabbaxes
 }
 
+
 Collides.getVectorId = function(p) {
     return "" + p.x + ":" + p.y
 }
@@ -693,6 +510,8 @@ Collides.getVectorId = function(p) {
 Collides.pointAbs = function(p1) {
     return new Vector(Math.abs(p1.x), Math.abs(p1.y))
 }
+
+
 
 /**点在x上 
  * 
@@ -772,6 +591,7 @@ Collides.pointDistancePoint2 = function(p1, p2) {
     return Math.pow(p1.x - point.x, 2) + Math.pow(p1.y - p2.y, 2)
 }
 
+
 /**两向量相减,得到边缘法向量 OA-OB = BA;*/
 /**后点到前点 
  * 点与点相减
@@ -787,6 +607,7 @@ Collides.pointFromPoint = function(p1, p2) {
         return new Vector(p1.x, p1.y)
     }
 }
+
 
 /**前点到后点
  *==
@@ -814,6 +635,8 @@ Collides.pointDot = function(p1, p2) {
     return p1.x * p2.x + p1.y * p2.y;
 }
 
+
+
 /**点与点的乘,得到一个向量
  * @param {Vector} p1 基础点 
  * @param {Vector} p2 目标点 
@@ -822,6 +645,7 @@ Collides.pointDot = function(p1, p2) {
 Collides.dotVector = function(p1, p2) {
     return new Vector(p1.x * p2.x, p1.y * p2.y);
 }
+
 
 /**向量的垂直向量 
  *  *== 
@@ -870,6 +694,8 @@ Collides.vectorVerticalNormal = function(p) {
     }
 }
 
+
+
 /** 方向向量倍增 p1.x * m, p1.y * m
  * @param {Vector} p1 基础点 
  * @param {number} m 长度 
@@ -902,6 +728,7 @@ Collides.vectorIsParallel = function(p1, p2) {
     return p1.y * p2.x - p2.y * p1.x;
 }
 
+
 /** 
  * 平移
  */
@@ -915,6 +742,7 @@ Collides.projectOffset = function(p, offset) {
 Collides.projectChange = function(x, y) {
     return x < y ? new Vector(x, y) : new Vector(y, x)
 }
+
 
 /** 
  * 制作相加
@@ -934,6 +762,10 @@ Collides.projectSub = function(p1, p2) {
     }
 }
 
+
+
+
+
 /**投影是否有重合,重叠返回true*/
 /**是否重合*/
 Collides.projectOverlaps = function(p1, p2) {
@@ -945,18 +777,11 @@ Collides.projectNotOverlaps = function(p1, p2) {
     return p1.y < p2.x || p2.y < p1.x;
 }
 
-
-Collides.projectIn = function(p1, p2) {
-    return p1.x > p2.x && p1.y < p2.y;
-}
-
-
-
-
 /**检测长度*/
 Collides.projectLong = function(p) {
     return p.y - p.x;
 }
+
 
 /**返回投影最大最小移动距离 */
 Collides.projectMove = function(p1, p2) {
@@ -989,6 +814,7 @@ Collides.collidesWith = function(p1, p2) {
     }
 }
 
+
 Collides.collidesMove = function(p1, p2, axie) {
     if (p1.type == "circle") {
         if (p2.type == "circle") {
@@ -1004,6 +830,7 @@ Collides.collidesMove = function(p1, p2, axie) {
         }
     }
 }
+
 
 /**圆形与圆形进行碰撞*/
 Collides.circleWithCircle = function(c1, c2) {
@@ -1029,6 +856,8 @@ Collides.circleWithPolygon = function(polygon, circle, c) {
     return this.collidesOnAxes(polygon, circle, axes, c);
 };
 
+
+
 /**<!-- 检测多边形与圆形之间的碰撞 -->*/
 /*
  *圆与多边形碰撞的原理：圆可以近似的看成一个有无数条边的正多边形，而我们不可能按照这些边一一进行投影测试，我们只需要将圆形投射到一条投影轴上即可，
@@ -1053,6 +882,7 @@ Collides.getPolygonPointClosestToCircle = function(polygon, circle) {
     return this.addVector(polygon, closestPoint);
 };
 
+
 /**
  * 多边形与多边形碰撞
  */
@@ -1063,19 +893,21 @@ Collides.polygonWithPolygon = function(shape1, shape2) {
     return this.collidesOnAxes(shape1, shape2, axes);
 }
 
+
+
 /**
  *  
  */
 Collides.aabbWithAABB = function(aabb1, aabb2) {
     var b1 = aabb1.boundingBox()
     var b2 = aabb2.boundingBox()
-    var p1x = Collides.projectOffset(b1[0], aabb1.x)
-    var p2x = Collides.projectOffset(b2[0], aabb2.x)
-    if (Collides.projectOverlaps(p1x, p2x)) {
-        var p1y = Collides.projectOffset(b1[1], aabb1.y)
-        var p2y = Collides.projectOffset(b2[1], aabb2.y)
-        if (Collides.projectOverlaps(p1y, p2y)) {
-            return true // { x: [p1x, p2x], y: [p1y, p2y], type: "aabb" }
+    var px1 = Collides.projectOffset(b1[0], aabb1.x)
+    var px2 = Collides.projectOffset(b2[0], aabb2.x)
+    if (Collides.projectOverlaps(px1, px2)) {
+        var py1 = Collides.projectOffset(b1[1], aabb1.y)
+        var py2 = Collides.projectOffset(b2[1], aabb2.y)
+        if (Collides.projectOverlaps(py1, py2)) {
+            return true // { x: [px1, px2], y: [py1, py2], type: "aabb" }
         }
     }
     return false
@@ -1083,20 +915,13 @@ Collides.aabbWithAABB = function(aabb1, aabb2) {
 
 
 
-Collides.aabbInAABB = function(aabb1, aabb2) {
-    var b1 = aabb1.boundingBox()
-    var b2 = aabb2.boundingBox()
-    var p1x = Collides.projectOffset(b1[0], aabb1.x)
-    var p2x = Collides.projectOffset(b2[0], aabb2.x)
-    if (Collides.projectIn(p1x, p2x)) {
-        var p1y = Collides.projectOffset(b1[1], aabb1.y)
-        var p2y = Collides.projectOffset(b2[1], aabb2.y)
-        if (Collides.projectIn(p1y, p2y)) {
-            return true // { x: [p1x, p2x], y: [p1y, p2y], type: "aabb" }
-        }
-    }
-    return false
-}
+
+
+
+
+
+
+
 
 
 /**
@@ -1134,18 +959,18 @@ Collides.collidesOnAxes = function(shape1, shape2, axes, c) {
     return true // { axesOverlap: axesOverlap, type: "ss" };
 }
 
+
+
+
 /**圆的移动距离 
  * 
  * 
  * 
  */
 Collides.pointCircleMoveList = function(c1, c2, r1, r2, axie) {
-
-    //console.log(c1, c2, r1, r2, axie)
     /**轴点  */
     var p1 = Collides.pointDot(axie, c1)
     var p2 = Collides.pointDot(axie, c2)
-        //console.log(p1, p2)
         /**轴距离 */
     var l = p2 - p1
     var l2 = Math.pow(l, 2)
@@ -1158,7 +983,6 @@ Collides.pointCircleMoveList = function(c1, c2, r1, r2, axie) {
         /**两球半径和 */
     var rl = r1 + r2
     var rl2 = Math.pow(rl, 2)
-        //console.log(h2, rl2)
         /**不相交 */
     if (h2 > rl2) {
         return []
@@ -1170,6 +994,7 @@ Collides.pointCircleMoveList = function(c1, c2, r1, r2, axie) {
         return [l]
     }
 }
+
 
 /**
  *  点与线段的距离
@@ -1186,7 +1011,7 @@ Collides.pointLineMoveList = function(p1, p2, p3, axie) {
     var v3 = Collides.pointFromPoint(p1, p3)
     var a = Collides.vectorIsParallel(axie, v2)
     var b = Collides.vectorIsParallel(axie, v3)
-    var l1 = Collides.pointDot(axie, p1)
+    var l1 = Collides.pointDot(axie, p2)
     if (a == 0 && b == 0) {
         var l2 = Collides.pointDot(axie, p2)
         var l3 = Collides.pointDot(axie, p3)
@@ -1209,6 +1034,8 @@ Collides.pointLineMoveList = function(p1, p2, p3, axie) {
     }
 }
 
+
+
 /**
  * 点在轴上到多边形的距离 
  *  
@@ -1216,18 +1043,14 @@ Collides.pointLineMoveList = function(p1, p2, p3, axie) {
 Collides.pointPointsMoveList = function(p1, ps, axie) {
     var list = []
     for (var i = 1; i < ps.length; i++) {
-        var p2 = ps[i - 1]
-        var p3 = ps[i]
+        var p1 = ps[i - 1]
+        var p2 = ps[i]
         var l = Collides.pointLineMoveList(p1, p2, p3, axie)
-        list = list.concat(l)
+        list.concat(l)
     }
-    var p2 = ps[i - 1]
-    var p3 = ps[0]
-    var l = Collides.pointLineMoveList(p1, p2, p3, axie)
-    list = list.concat(l)
-    console.log(ps, list)
     return list
 }
+
 
 /**
  * 点在轴上到矩形的距离
@@ -1236,7 +1059,7 @@ Collides.pointPointsMoveList = function(p1, ps, axie) {
  */
 Collides.pointLineCRMoveList = function(p1, p2, p3, r, axie) {
     var v1 = Collides.pointFromPoint(p2, p3)
-    var v2 = Collides.vectorVerticalNormal(v1)
+    var v2 = Collides.vectorVerticalNormal()
     if (r) {
         var xr = v2.x * r
         var yr = v2.y * r
@@ -1251,6 +1074,8 @@ Collides.pointLineCRMoveList = function(p1, p2, p3, r, axie) {
     }
 }
 
+
+
 /**
  * 点在轴上到多边形圆矩形的距离
  * 
@@ -1259,18 +1084,19 @@ Collides.pointLineCRMoveList = function(p1, p2, p3, r, axie) {
 Collides.pointPointsCRMoveList = function(p1, ps, r, axie) {
     var list = []
     for (var i = 1; i < ps.length; i++) {
-        var p2 = ps[i - 1]
-        var p3 = ps[i]
+        var p1 = ps[i - 1]
+        var p2 = ps[i]
         var l = Collides.pointLineCRMoveList(p1, p2, p3, r, axie)
-        list = list.concat(l)
+        list.concat(l)
     }
-    var p2 = ps[i - 1]
-    var p3 = ps[0]
+    var p1 = ps[i - 1]
+    var p2 = ps[0]
     var l = Collides.pointLineCRMoveList(p1, p2, p3, r, axie)
-    list = list.concat(l)
-    console.log(list)
+    list.concat(l)
     return list
 }
+
+
 
 /**
  * 
@@ -1279,15 +1105,13 @@ Collides.pointPointsCRMoveList = function(p1, ps, r, axie) {
 Collides.pointPointsCMoveList = function(p1, ps, r, axie) {
     var list = []
     for (var i = 0; i < ps.length; i++) {
-        var p2 = ps[i]
-        console.log(ps, r)
+        var p1 = ps[i]
         var l = Collides.pointCircleMoveList(p1, p2, 0, r, axie)
-        console.log(l)
-        list = list.concat(l)
-        console.log(list)
+        list.concat(l)
     }
     return list
 }
+
 
 /**
  * 圆在轴上到多边形的距离列表
@@ -1298,15 +1122,16 @@ Collides.circlePointsMoveList = function(p1, ps, r, axie) {
     if (r) {
         var list = []
         var l = Collides.pointPointsCMoveList(p1, ps, r, axie)
-        list = list.concat(l)
+        list.concat(l)
         var l = Collides.pointPointsCRMoveList(p1, ps, r, axie)
-        list = list.concat(l)
-        console.log(list)
+        list.concat(l)
         return list
     } else {
         return Collides.pointPointsMoveList(p1, ps, axie)
     }
 }
+
+
 
 /**
  * 圆与圆距离
@@ -1324,6 +1149,7 @@ Collides.circleMoveCircle = function(s1, s2, axie) {
     }
 }
 
+
 /**
  * 圆与多边形距离
  * @param {Vector} p1 圆心
@@ -1338,9 +1164,7 @@ Collides.circleMovePolygon = function(s1, s2, axie, cs) {
     var p2 = s2
     var r = s1.radius || 0
     var ps = s2.points || []
-
     var p = Collides.pointFromPoint(p1, p2)
-    console.log(p)
     var list = Collides.circlePointsMoveList(p, ps, r, axie)
     if (list.length) {
         if (cs) {
@@ -1353,6 +1177,7 @@ Collides.circleMovePolygon = function(s1, s2, axie, cs) {
     }
 }
 
+
 /**
  * 多边形与圆距离
  * @param {Polygon}  s2
@@ -1364,6 +1189,7 @@ Collides.polygonMoveCircle = function(s2, s1, axie) {
     return Collides.circleMovePolygon(s1, s2, axie, true)
 }
 
+
 /**
  * 多边形与多边形距离
  */
@@ -1373,107 +1199,6 @@ Collides.polygonMovePolygon = function(shape1, shape2, axie) {
     /**返回在任何一个投影轴上的投影是否有重合*/
     return this.onAxesMove(shape1, shape2, axes, axie);
 }
-
-
-
-
-
-
-/**
- * 多边形与多边形距离
- */
-
-Collides.aabbMoveAABBxyIsIn = function(aabb1, aabb2, dx, dy) {
-    var l = this.aabbMoveAABBxyIn(aabb1, aabb2, dx, dy)
-    if (l[0] == dx && l[1] == dy) {
-        return false
-    } else {
-        return true
-    }
-}
-
-
-
-Collides.aabbMoveAABBxyIn = function(aabb1, aabb2, dx, dy) {
-    var move = this.aabbMoveAABBxy(aabb1, aabb2, dx, dy)
-    if (dx == 0) {
-        var dy = Collides.moved(dy, move.x, move.y)
-    } else if (dy == 0) {
-        var dx = Collides.moved(dx, move.x, move.y)
-    } else {
-        var d = Collides.moved(dx, move.x, move.y)
-        var dy = (d / dx) * dy
-        var dx = d
-    }
-    return [dx, dy]
-}
-
-
-Collides.moved = function(d, x, y) {
-    if (0 < x) {
-        if (d < 0) {
-            return d
-        } else {
-            if (d < x) {
-                return d
-            } else {
-                return x
-            }
-        }
-    } else if (0 > y) {
-        if (d > 0) {
-            return d
-        } else {
-            if (d < y) {
-                return y
-            } else {
-                return d
-            }
-        }
-    } else {
-        return 0
-    }
-}
-
-
-Collides.aabbMoveAABBxy = function(aabb1, aabb2, dx, dy) {
-    var b1 = aabb1.boundingBox()
-    var b2 = aabb2.boundingBox()
-    var p1x = Collides.projectOffset(b1[0], aabb1.x)
-    var p2x = Collides.projectOffset(b2[0], aabb2.x)
-    var p1y = Collides.projectOffset(b1[1], aabb1.y)
-    var p2y = Collides.projectOffset(b2[1], aabb2.y)
-    if (dx == 0) {
-        if (Collides.projectOverlaps(p1x, p2x)) {
-            return Collides.projectMove(p1y, p2y)
-        } else {
-            return false
-        }
-    } else if (dy == 0) {
-        if (Collides.projectOverlaps(p1y, p2y)) {
-            return Collides.projectMove(p1x, p2x)
-        } else {
-            return false
-        }
-    } else {
-        var xmove = Collides.projectMove(p1y, p2y)
-        var ymove = Collides.projectMove(p1x, p2x)
-        var k = dx / dy
-        var ymove = Collides.vectorNormalDistance(ymove, k)
-        var move = Collides.projectSub(xmove, ymove)
-        if (move) {
-            return move
-        } else {
-            return move
-        }
-    }
-}
-
-
-
-
-
-
 
 
 
@@ -1512,6 +1237,7 @@ Collides.onAxesMove = function(shape1, shape2, axes, axie) {
     return ps ? p : false
 }
 
+
 /**
  * 轴上分离
  */
@@ -1527,6 +1253,8 @@ Collides.axesAxieMove = function(move, a1, a2) {
         }
     }
 }
+
+
 
 Collides.makeOBB = function(width, height, vector, scale) {
     var x0 = (vector.x == 0)
@@ -1551,6 +1279,9 @@ Collides.makeOBB = function(width, height, vector, scale) {
     }
 }
 
+
+
+
 /**<!-- Vector对象 向量对象 -->*/
 /**坐标系中的向量，以0，0出发，到点x,y，为一个向量，向量长度方向相同为同一个向量
  * 
@@ -1563,10 +1294,13 @@ function Vector(x, y) {
     this.y = y;
 };
 
+
+
 /**<!-- Shape对象 -->*/
 function Shape() {
     this.initialize.apply(this, arguments);
 };
+
 Shape.prototype = Object.create(Vector.prototype);
 Shape.prototype.constructor = Shape;
 
@@ -1575,6 +1309,7 @@ Shape.prototype.initialize = function() {
     this.y = 0
     this.type = "shape"
 };
+
 
 /**返回投影的最大值与最小值*/
 Shape.prototype.project = function(axis) {
@@ -1603,13 +1338,10 @@ Shape.prototype.move = function(dx, dy) {
 
 /**移动 */
 Shape.prototype.move = function(dx, dy) {
-    this.x = dx
-    this.y = dy
-    return this
-
-}
-
-/**接触*/
+        this.x = dx
+        this.y = dy
+    }
+    /**接触*/
 Shape.prototype.collidesWith = function(p) {
     return Collides.collidesWith(this, p)
 }
@@ -1628,6 +1360,8 @@ function Circle() {
 Circle.prototype = Object.create(Shape.prototype);
 Circle.prototype.constructor = Circle;
 
+
+
 /**初始化*/
 Circle.prototype.initialize = function(radius) {
     Shape.prototype.initialize.call(this)
@@ -1637,6 +1371,7 @@ Circle.prototype.initialize = function(radius) {
 /**设置 */
 Circle.prototype.set = function(radius) {
     this.radius = radius;
+    this.big = this.small = radius
     this._projectHash = new Vector(-radius, radius)
     this.makeAxes()
     this.makeBoundingBox()
@@ -1664,13 +1399,16 @@ Circle.prototype.makeBoundingBox = function() {
     this._boundingBox = [v, v]
 }
 
+
 /**<!-- Polygon对象 多边形对象  -->*/
 function Polygon() {
     this.initialize.apply(this, arguments);
 };
 
+
 Polygon.prototype = Object.create(Shape.prototype);
 Polygon.prototype.constructor = Polygon;
+
 
 Polygon.prototype.initialize = function(point) {
     Shape.prototype.initialize.call(this)
@@ -1745,6 +1483,7 @@ Polygon.prototype.makeAxes = function() {
     this._axes = axes
 };
 
+
 /**得到多边形各个点在某一条投影轴上投影，并得到投影两端点值，传递给投影对象project返回投影对象*/
 Polygon.prototype.project = function(axis) {
     //获取本质投影
@@ -1753,7 +1492,6 @@ Polygon.prototype.project = function(axis) {
     var offset = Collides.pointDot(this, axis)
     return Collides.projectOffset(project, offset)
 };
-
 
 /**制作投影 */
 Polygon.prototype.makeProjec = function(axis) {
@@ -1775,6 +1513,7 @@ Polygon.prototype.makeProjec = function(axis) {
     return this._projectHash[id]
 }
 
+
 /**得到多边形的最左最上，最下最右的点*/
 Polygon.prototype.makeBoundingBox = function() {
     var xs = []
@@ -1792,23 +1531,34 @@ Polygon.prototype.makeBoundingBox = function() {
 
 
 
+
 /**AABB */
 function AABB() {
     this.initialize.apply(this, arguments);
+    this.set(width, height, scale)
 }
 
 AABB.prototype = Object.create(Polygon.prototype);
 AABB.prototype.constructor = AABB;
 
-AABB.prototype.initialize = function(width, height, scale) {
+AABB.prototype.initialize = function() {
     Shape.prototype.initialize.call(this)
     this.set(width, height, scale)
 };
+
+
 
 AABB.prototype.set = function(width, height, scale) {
     this.width = width
     this.height = height
     this.scale = scale || new Vector(1, 1)
+    if (this.width > this.height) {
+        this.big = width
+        this.small = height
+    } else {
+        this.big = height
+        this.small = width
+    }
     this.makePoints()
     this.makeAxes()
     this.makeBoundingBox()
@@ -1834,7 +1584,6 @@ AABB.prototype.makePoints = function() {
     this.points.push(new Vector(w1, h2))
 }
 
-/*
 AABB.prototype.makeBoundingBox = function() {
     var p2 = this.points[0]
     var p1 = this.points[2]
@@ -1842,26 +1591,6 @@ AABB.prototype.makeBoundingBox = function() {
     var y = new Vector(p2.y, p1.y)
     this._boundingBox = [x, y]
 }
-*/
-
-
-function Area() {
-    this.initialize.apply(this, arguments);
-}
-
-Area.prototype = Object.create(AABB.prototype);
-Area.prototype.constructor = AABB;
-
-Area.prototype.initialize = function(x, y, width, height) {
-    Shape.prototype.initialize.call(this)
-    this.set(x, y, width, height)
-};
-
-Area.prototype.set = function(x, y, width, height) {
-    AABB.prototype.set.call(this, width, height)
-    this.move(x, y)
-}
-
 
 
 
@@ -1884,6 +1613,13 @@ OBB.prototype.set = function(width, height, axis, scale) {
     this.scale = scale || new Vector(0.5, 0.5)
     this.axis = Collides.vectorNormal(axis)
     this.axis2 = Collides.vectorVertical(this.axis)
+    if (this.width > this.height) {
+        this.big = width
+        this.small = height
+    } else {
+        this.big = height
+        this.small = width
+    }
     this.makePoints()
     this.makeAxes()
     this.makeBoundingBox()
@@ -1938,6 +1674,7 @@ Collides.getMinimumTranslationVector = function(axis, overlap) {
     return { axis: axis /**表示平移的方向*/ , overlap: overlap /**表示平移的长度*/ }
 }
 
+
 /**物体在 轴上 到另一个物体的方向,距离 */
 Collides.minimumTranslationVector = function(shape1, shape2, axes) {
     var minmumOverlap = 100000;
@@ -1975,6 +1712,8 @@ Collides.minimumTranslationVector = function(shape1, shape2, axes) {
         overlap: minmumOverlap /**碰撞的平移向量的长度*/
     }
 }
+
+
 
 /**线段到线段的距离 */
 Collides.collidesDistanceLine = function(point1, point2, point3, point4) {
