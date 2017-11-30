@@ -31,20 +31,8 @@ Game_Map.prototype.collidesMoveDirD = function(obj, dir, d) {
 
 
 
-Game_Map.prototype.addBody = function(obj) {
-    if (this._fourTree && obj) {
-        this._fourTree.add(obj)
-    }
-}
-
-
 Game_Map.prototype.bodyIn = function(obj) {
     if (obj.body) {
-
-
-
-
-
         Collides.aabbInAABB(obj.body, this.bounds)
     }
 }
@@ -92,6 +80,10 @@ Game_CharacterBase.prototype.initBody = function() {
     this.setBody(this.makeTile())
 };
 
+/**初始化战斗者 */
+Game_CharacterBase.prototype.initBattler = function() {
+    this.setBody(this.makeTile())
+};
 
 /**设置身体 */
 Game_CharacterBase.prototype.setBody = function(body) {
@@ -109,7 +101,7 @@ Game_CharacterBase.prototype.refreshBody = function() {
     }
 };
 
-
+/**制作图块 */
 Game_CharacterBase.prototype.makeTile = function() {
     return Collides.makeTileBody()
 };
@@ -157,21 +149,36 @@ Game_CharacterBase.prototype.canPass = function(x, y, d) {
 
 
 
-
-Game_CharacterBase.prototype.canPass2 = function(x, y) {
-
-
-    var list = Collides.tileFindMove(this.body, x, y)
-    if (this.body) {
-
-
-
-
+/**图块方向 */
+Game_CharacterBase.prototype.tileAxieD = function(axie, d) {
+    if (this.body && d) {
+        //获取方向上的图块
+        var list = Collides.tileFindAxie(this.body, axie, d)
+        for (var i = 0; i < list.length; i += 2) {
+            var ix = list[i]
+            var iy = list[i + 1]
+            l = $gameMap.getTileType(ix, iy)
+            for (var li = 0; li < l.length; li++) {
+                var t = Collides.tileBody(ix, iy, l[i])
+                var d = Collides.collidesMoveDistance(this.body, t, axie, d)
+                if (d == 0) {
+                    return d
+                }
+            }
+        }
     }
+    return d
 };
 
 
 
+
+
+
+
+Game_Map.prototype.getTileType = function(x, y) {
+    return [1]
+}
 
 
 
@@ -624,6 +631,7 @@ Collides.tileBody = function(x, y, type) {
 
 
 
+
 Collides.makeTileBody = function() {
     var itw = this.iTileWidth()
     var ith = this.iTileHeight()
@@ -857,6 +865,21 @@ Collides.vectorNormal = function(p) {
     }
 }
 
+
+
+Collides.axied = function(x, y) {
+    var m = this.pointDistance(new Vector(x, y))
+    if (m == 0) {
+        return [new Vector(0, 0), d]
+    } else { /**避免向量为0*/
+        return [new Vector(p.x / m, p.y / m), m]
+    }
+}
+
+
+
+
+
 /**
  * 垂直单位向量
  */
@@ -1004,6 +1027,33 @@ Collides.collidesMove = function(p1, p2, axie) {
         }
     }
 }
+
+
+
+/**
+ * 移动距离
+ * 
+ */
+Collides.collidesMoveDistance = function(p1, p2, axie, d) {
+    var move = this.collidesMove(p1, p2, axie)
+    return Collides.moveDistance(move, d)
+}
+
+
+/**
+ * 可以移动的距离数
+ * 
+ */
+Collides.collidesMovePro = function(p1, p2, axie, d) {
+    var move = this.collidesMove(p1, p2, axie)
+    return Collides.movePro(move, d)
+}
+
+
+
+
+
+
 
 /**圆形与圆形进行碰撞*/
 Collides.circleWithCircle = function(c1, c2) {
@@ -1430,6 +1480,44 @@ Collides.moved = function(d, x, y) {
                 return d
             }
         }
+    } else {
+        return 0
+    }
+}
+
+
+Collides.moveDistance = function(move, d) {
+    if (0 < move.x) {
+        if (d < 0) {
+            return d
+        } else {
+            if (d < move.x) {
+                return d
+            } else {
+                return move.x
+            }
+        }
+    } else if (0 > move.y) {
+        if (d > 0) {
+            return d
+        } else {
+            if (d < move.y) {
+                return move.y
+            } else {
+                return d
+            }
+        }
+    } else {
+        return 0
+    }
+}
+
+
+Collides.movePro = function(move, d) {
+    if (0 < move.x) {
+        return new Vector(-Infinity, move.x)
+    } else if (0 > move.y) {
+        return new Vector(move.y, Infinity)
     } else {
         return 0
     }
