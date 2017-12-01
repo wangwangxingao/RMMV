@@ -1,4 +1,3 @@
-
 /**-----------------------------------------------------------------------------*/
 /** Game_CharacterBase*/
 /** 游戏人物基础*/
@@ -11,21 +10,25 @@ function Game_CharacterBase() {
 }
 
 Object.defineProperties(Game_CharacterBase.prototype, {
-    x: { 
-	//获得 x    返回 x  可设置 true
-    get: function() { return this._x; }, configurable: true },
-    y: { 
-	//获得 y   返回 x  可设置 true
-    get: function() { return this._y; }, configurable: true }
+    x: {
+        //获得 x    返回 x  可设置 true
+        get: function() { return this._x; },
+        configurable: true
+    },
+    y: {
+        //获得 y   返回 x  可设置 true
+        get: function() { return this._y; },
+        configurable: true
+    }
 });
 /**初始化*/
 Game_CharacterBase.prototype.initialize = function() {
-	//初始化成员
+    //初始化成员
     this.initMembers();
 };
 /**初始化成员*/
 Game_CharacterBase.prototype.initMembers = function() {
-	//x = 0
+    //x = 0
     this._x = 0;
     //y = 0
     this._y = 0;
@@ -88,7 +91,7 @@ Game_CharacterBase.prototype.initMembers = function() {
 };
 /**位于*/
 Game_CharacterBase.prototype.pos = function(x, y) {
-	//返回 x === x 并且  y === y 
+    //返回 x === x 并且  y === y 
     return this._x === x && this._y === y;
 };
 /**位于无穿越*/
@@ -99,111 +102,111 @@ Game_CharacterBase.prototype.posNt = function(x, y) {
 };
 /**移动速度*/
 Game_CharacterBase.prototype.moveSpeed = function() {
-	//返回 移动速度
+    //返回 移动速度
     return this._moveSpeed;
 };
 /**设置移动速度*/
 Game_CharacterBase.prototype.setMoveSpeed = function(moveSpeed) {
-	//移动速度 = moveSpeed//移动速度
+    //移动速度 = moveSpeed//移动速度
     this._moveSpeed = moveSpeed;
 };
 /**移动频率*/
 Game_CharacterBase.prototype.moveFrequency = function() {
-	//返回 移动频率
+    //返回 移动频率
     return this._moveFrequency;
 };
 /**设置移动频率*/
 Game_CharacterBase.prototype.setMoveFrequency = function(moveFrequency) {
-	//移动频率  =  moveFrequency//移动频率
+    //移动频率  =  moveFrequency//移动频率
     this._moveFrequency = moveFrequency;
 };
 /**不透明度*/
 Game_CharacterBase.prototype.opacity = function() {
-	//返回 不透明度
+    //返回 不透明度
     return this._opacity;
 };
 /**设置不透明度*/
 Game_CharacterBase.prototype.setOpacity = function(opacity) {
-	//不透明度 = opacity//不透明度
+    //不透明度 = opacity//不透明度
     this._opacity = opacity;
 };
 /**混合模式*/
 Game_CharacterBase.prototype.blendMode = function() {
-	//返回 混合模式
+    //返回 混合模式
     return this._blendMode;
 };
 /**设置混合模式*/
 Game_CharacterBase.prototype.setBlendMode = function(blendMode) {
-	//混合模式 =  blendMode//混合模式
+    //混合模式 =  blendMode//混合模式
     this._blendMode = blendMode;
 };
 /**是正常优先级*/
 Game_CharacterBase.prototype.isNormalPriority = function() {
-	//返回 优先级 === 1
+    //返回 优先级 === 1
     return this._priorityType === 1;
 };
 /**设置优先级*/
 Game_CharacterBase.prototype.setPriorityType = function(priorityType) {
-	//优先级 = priorityType//优先级 
+    //优先级 = priorityType//优先级 
     this._priorityType = priorityType;
 };
 /**是移动中*/
 Game_CharacterBase.prototype.isMoving = function() {
-	//返回 真x !== x 或者 真y !== y
+    //返回 真x !== x 或者 真y !== y
     return this._realX !== this._x || this._realY !== this._y;
 };
 /**是跳跃*/
 Game_CharacterBase.prototype.isJumping = function() {
-	//返回 跳跃计数 > 0
+    //返回 跳跃计数 > 0
     return this._jumpCount > 0;
 };
 /**跳跃高*/
 Game_CharacterBase.prototype.jumpHeight = function() {
-	//返回 ( 跳跃波峰 *  跳跃波峰 -   数学 幂(数学 绝对值(跳跃计数 - 跳跃波峰) ,2 )) / 2
-	// (h^2 - ( t-h )^2 ) / 2 
+    //返回 ( 跳跃波峰 *  跳跃波峰 -   数学 幂(数学 绝对值(跳跃计数 - 跳跃波峰) ,2 )) / 2
+    // (h^2 - ( t-h )^2 ) / 2 
     return (this._jumpPeak * this._jumpPeak -
-            Math.pow(Math.abs(this._jumpCount - this._jumpPeak), 2)) / 2;
+        Math.pow(Math.abs(this._jumpCount - this._jumpPeak), 2)) / 2;
 };
 /**是停止*/
 Game_CharacterBase.prototype.isStopping = function() {
-	//返回 不是 是移动中() 并且 不是 是跳跃()
+    //返回 不是 是移动中() 并且 不是 是跳跃()
     return !this.isMoving() && !this.isJumping();
 };
 /**检查停止*/
 Game_CharacterBase.prototype.checkStop = function(threshold) {
-	//返回 停止计数 > threshold//临界值
+    //返回 停止计数 > threshold//临界值
     return this._stopCount > threshold;
 };
 /**重设停止计数*/
 Game_CharacterBase.prototype.resetStopCount = function() {
-	//停止计数 = 0
+    //停止计数 = 0
     this._stopCount = 0;
 };
 /**真实移动速度*/
 Game_CharacterBase.prototype.realMoveSpeed = function() {
-	//返回 移动速度 + ( 是猛冲中() ? 1 : 0 )
+    //返回 移动速度 + ( 是猛冲中() ? 1 : 0 )
     return this._moveSpeed + (this.isDashing() ? 1 : 0);
 };
 /**距离根据帧*/
 Game_CharacterBase.prototype.distancePerFrame = function() {
-	//返回 数学 幂(2 , 真实移动速度) / 256
+    //返回 数学 幂(2 , 真实移动速度) / 256
     return Math.pow(2, this.realMoveSpeed()) / 256;
 };
 /**是猛冲中*/
 Game_CharacterBase.prototype.isDashing = function() {
-	//返回 false
+    //返回 false
     return false;
 };
 /**是除错穿越*/
 Game_CharacterBase.prototype.isDebugThrough = function() {
-	//返回 false
+    //返回 false
     return false;
 };
 /**改正*/
 Game_CharacterBase.prototype.straighten = function() {
-	//如果( 有行走动画() 或者 有踏步动画()  )
+    //如果( 有行走动画() 或者 有踏步动画()  )
     if (this.hasWalkAnime() || this.hasStepAnime()) {
-	    //图案 = 1
+        //图案 = 1
         this._pattern = 1;
     }
     //动画计数 = 0
@@ -211,7 +214,7 @@ Game_CharacterBase.prototype.straighten = function() {
 };
 /**相反方向*/
 Game_CharacterBase.prototype.reverseDir = function(d) {
-	//返回 10 - d 
+    //返回 10 - d 
     return 10 - d;
 };
 /**能通过
@@ -219,30 +222,30 @@ Game_CharacterBase.prototype.reverseDir = function(d) {
  * @param {number} y 人物y
  * @param {number} d 人物方向
  * @return {boolean} 
-*/
+ */
 Game_CharacterBase.prototype.canPass = function(x, y, d) {
-	//x2 = 游戏地图 环x和方向(x,d)
+    //x2 = 游戏地图 环x和方向(x,d)
     var x2 = $gameMap.roundXWithDirection(x, d);
     //y2 = 游戏地图 环y和方向(y,d)
     var y2 = $gameMap.roundYWithDirection(y, d);
     //如果( 不是 游戏地图 是有效的(x2,y2) )
     if (!$gameMap.isValid(x2, y2)) {
-	    //返回 false
+        //返回 false
         return false;
     }
     //如果(  是穿越() 或者 是除错穿越() )
     if (this.isThrough() || this.isDebugThrough()) {
-	    //返回 true
+        //返回 true
         return true;
     }
     //如果( 不是 是地图可通行(x,y,d) )
     if (!this.isMapPassable(x, y, d)) {
-	    //返回 false
+        //返回 false
         return false;
     }
     //如果( 是和人物碰撞(x2,y2) )
     if (this.isCollidedWithCharacters(x2, y2)) {
-	    //返回 false
+        //返回 false
         return false;
     }
     //返回 true
@@ -250,26 +253,26 @@ Game_CharacterBase.prototype.canPass = function(x, y, d) {
 };
 /**能通过对角*/
 Game_CharacterBase.prototype.canPassDiagonally = function(x, y, horz, vert) {
-	//x2 = 游戏地图 环x和方向(x,horz//水平)
+    //x2 = 游戏地图 环x和方向(x,horz//水平)
     var x2 = $gameMap.roundXWithDirection(x, horz);
     //y2 = 游戏地图 环y和方向(y,vert//垂直)
     var y2 = $gameMap.roundYWithDirection(y, vert);
     //如果(  能通过(x,y,垂直)  并且  能通过(x,y2,水平) )
     if (this.canPass(x, y, vert) && this.canPass(x, y2, horz)) {
-    	//返回 true
+        //返回 true
         return true;
     }
     //如果(  能通过(x,y,水平)  并且  能通过(x2,y,垂直) )
     if (this.canPass(x, y, horz) && this.canPass(x2, y, vert)) {
-    	//返回 true
+        //返回 true
         return true;
     }
-	//返回 false
+    //返回 false
     return false;
 };
 /**是地图可通行*/
-Game_CharacterBase.prototype.isMapPassable = function(x, y, d) { 
-	//x2 = 游戏地图 环x和方向(x,d)
+Game_CharacterBase.prototype.isMapPassable = function(x, y, d) {
+    //x2 = 游戏地图 环x和方向(x,d)
     var x2 = $gameMap.roundXWithDirection(x, d);
     //y2 = 游戏地图 环y和方向(y,d)
     var y2 = $gameMap.roundYWithDirection(y, d);
@@ -280,27 +283,27 @@ Game_CharacterBase.prototype.isMapPassable = function(x, y, d) {
 };
 /**是和人物碰撞*/
 Game_CharacterBase.prototype.isCollidedWithCharacters = function(x, y) {
-	//返回 是和事件碰撞(x,y) 或者 是和交通工具碰撞(x,y)
+    //返回 是和事件碰撞(x,y) 或者 是和交通工具碰撞(x,y)
     return this.isCollidedWithEvents(x, y) || this.isCollidedWithVehicles(x, y);
 };
 /**是和事件碰撞*/
 Game_CharacterBase.prototype.isCollidedWithEvents = function(x, y) {
-	//事件组 = 游戏地图 xy处事件无穿越(x,y)
+    //事件组 = 游戏地图 xy处事件无穿越(x,y)
     var events = $gameMap.eventsXyNt(x, y);
     //返回 事件组 一些 方法(事件)
     return events.some(function(event) {
-	    //返回 事件 是正常优先级()
+        //返回 事件 是正常优先级()
         return event.isNormalPriority();
     });
 };
 /**是和交通工具碰撞*/
 Game_CharacterBase.prototype.isCollidedWithVehicles = function(x, y) {
-	//返回 游戏地图 小船() 位于无穿越(x,y)  或者  游戏地图 帆船() 位于无穿越(x,y)
+    //返回 游戏地图 小船() 位于无穿越(x,y)  或者  游戏地图 帆船() 位于无穿越(x,y)
     return $gameMap.boat().posNt(x, y) || $gameMap.ship().posNt(x, y);
 };
 /**设置位置*/
 Game_CharacterBase.prototype.setPosition = function(x, y) {
-	//x = 数学 四舍五入(x)
+    //x = 数学 四舍五入(x)
     this._x = Math.round(x);
     //y = 数学 四舍五入(y)
     this._y = Math.round(y);
@@ -311,9 +314,9 @@ Game_CharacterBase.prototype.setPosition = function(x, y) {
 };
 /**复制位置*/
 Game_CharacterBase.prototype.copyPosition = function(character) {
-	//x = 人物 x 
+    //x = 人物 x 
     this._x = character._x;
-	//y = 人物 y 
+    //y = 人物 y 
     this._y = character._y;
     //真x = 人物 真x
     this._realX = character._realX;
@@ -324,7 +327,7 @@ Game_CharacterBase.prototype.copyPosition = function(character) {
 };
 /**设于*/
 Game_CharacterBase.prototype.locate = function(x, y) {
-	//设置位置(x,y)
+    //设置位置(x,y)
     this.setPosition(x, y);
     //改正()
     this.straighten();
@@ -333,14 +336,14 @@ Game_CharacterBase.prototype.locate = function(x, y) {
 };
 /**方向*/
 Game_CharacterBase.prototype.direction = function() {
-	//返回 方向
+    //返回 方向
     return this._direction;
 };
 /**设置方向*/
 Game_CharacterBase.prototype.setDirection = function(d) {
-	//如果(不是 是方向固定() 并且 d )
+    //如果(不是 是方向固定() 并且 d )
     if (!this.isDirectionFixed() && d) {
-	    //方向 = d 
+        //方向 = d 
         this._direction = d;
     }
     //重设停止计数()
@@ -348,58 +351,58 @@ Game_CharacterBase.prototype.setDirection = function(d) {
 };
 /**是图块*/
 Game_CharacterBase.prototype.isTile = function() {
-	//返回 图块id > 0 并且 优先级 === 0 
+    //返回 图块id > 0 并且 优先级 === 0 
     return this._tileId > 0 && this._priorityType === 0;
 };
 /**是物体特征*/
 Game_CharacterBase.prototype.isObjectCharacter = function() {
-	//返回 是物体特征
+    //返回 是物体特征
     return this._isObjectCharacter;
 };
 /**转换y*/
 Game_CharacterBase.prototype.shiftY = function() {
-	//返回 是物体特征() ? 0 : 6
+    //返回 是物体特征() ? 0 : 6
     return this.isObjectCharacter() ? 0 : 6;
 };
 /**滚动x*/
 Game_CharacterBase.prototype.scrolledX = function() {
-	//返回 游戏地图 校正x(真x)
+    //返回 游戏地图 校正x(真x)
     return $gameMap.adjustX(this._realX);
 };
 /**滚动y*/
 Game_CharacterBase.prototype.scrolledY = function() {
-	//返回 游戏地图 校正y(真y)
+    //返回 游戏地图 校正y(真y)
     return $gameMap.adjustY(this._realY);
 };
 /**画面x*/
 Game_CharacterBase.prototype.screenX = function() {
-	//图块宽 = 游戏地图 图块宽()
+    //图块宽 = 游戏地图 图块宽()
     var tw = $gameMap.tileWidth();
     //返回 数学 四舍五入( 滚动x() * 图块宽 + 图块宽 / 2 )
     return Math.round(this.scrolledX() * tw + tw / 2);
 };
 /**画面y*/
 Game_CharacterBase.prototype.screenY = function() {
-	//图块高 = 游戏地图 图块高()
+    //图块高 = 游戏地图 图块高()
     var th = $gameMap.tileHeight();
     //返回 数学 四舍五入( 滚动y() * 图块高 + 图块高 - 转换y() -  跳跃高()  )
     return Math.round(this.scrolledY() * th + th -
-                      this.shiftY() - this.jumpHeight());
+        this.shiftY() - this.jumpHeight());
 };
 /**画面z*/
 Game_CharacterBase.prototype.screenZ = function() {
-	//返回 优先级 * 2 + 1 
+    //返回 优先级 * 2 + 1 
     return this._priorityType * 2 + 1;
 };
 /**是画面附近*/
 Game_CharacterBase.prototype.isNearTheScreen = function() {
-	//图形宽 = 图形 宽
+    //图形宽 = 图形 宽
     var gw = Graphics.width;
-	//图形高 = 图形 高
+    //图形高 = 图形 高
     var gh = Graphics.height;
-	//图块宽 = 游戏地图 图块宽()
+    //图块宽 = 游戏地图 图块宽()
     var tw = $gameMap.tileWidth();
-	//图块高 = 游戏地图 图块高()
+    //图块高 = 游戏地图 图块高()
     var th = $gameMap.tileHeight();
     //位置x = 滚动x() * 图块宽 + 图块宽/2 - 图形宽 / 2 
     var px = this.scrolledX() * tw + tw / 2 - gw / 2;
@@ -410,16 +413,16 @@ Game_CharacterBase.prototype.isNearTheScreen = function() {
 };
 /**更新*/
 Game_CharacterBase.prototype.update = function() {
-	//如果( 是停止() )
+    //如果( 是停止() )
     if (this.isStopping()) {
         //更新停止
         this.updateStop();
     }
-	//如果( 是跳跃() )
+    //如果( 是跳跃() )
     if (this.isJumping()) {
         //更新跳跃
         this.updateJump();
-    //否则 如果( 是移动中() )
+        //否则 如果( 是移动中() )
     } else if (this.isMoving()) {
         //更新移动
         this.updateMove();
@@ -434,7 +437,7 @@ Game_CharacterBase.prototype.updateStop = function() {
 };
 /**更新跳跃*/
 Game_CharacterBase.prototype.updateJump = function() {
-	//跳跃计数--
+    //跳跃计数--
     this._jumpCount--;
     //真x = (真x * 跳跃计数 + x) / (跳跃计数 + 1.0) 
     this._realX = (this._realX * this._jumpCount + this._x) / (this._jumpCount + 1.0);
@@ -444,7 +447,7 @@ Game_CharacterBase.prototype.updateJump = function() {
     this.refreshBushDepth();
     //如果 跳跃计数 === 0
     if (this._jumpCount === 0) {
-	    //真x = x = 游戏地图 环x(x)
+        //真x = x = 游戏地图 环x(x)
         this._realX = this._x = $gameMap.roundX(this._x);
         //真y = y = 游戏地图 环y(y)
         this._realY = this._y = $gameMap.roundY(this._y);
@@ -501,7 +504,7 @@ Game_CharacterBase.prototype.updateAnimationCount = function() {
     if (this.isMoving() && this.hasWalkAnime()) {
         //动画计数 += 1.5 
         this._animationCount += 1.5;
-    //否则 如果( 有踏步动画() 并且 不是 是最初图案()  )
+        //否则 如果( 有踏步动画() 并且 不是 是最初图案()  )
     } else if (this.hasStepAnime() || !this.isOriginalPattern()) {
         //动画计数++
         this._animationCount++;
@@ -513,7 +516,7 @@ Game_CharacterBase.prototype.updatePattern = function() {
     if (!this.hasStepAnime() && this._stopCount > 0) {
         //重设图案()
         this.resetPattern();
-    //否则 
+        //否则 
     } else {
         //图案 = (图案 + 1 ) % 最大图案()
         this._pattern = (this._pattern + 1) % this.maxPattern();
@@ -548,13 +551,13 @@ Game_CharacterBase.prototype.resetPattern = function() {
 Game_CharacterBase.prototype.refreshBushDepth = function() {
     //如果( 是正常优先级() 并且 不是 是物体特征() 并且 是在灌木丛() 并且 不是 是跳跃() )
     if (this.isNormalPriority() && !this.isObjectCharacter() &&
-            this.isOnBush() && !this.isJumping()) {
+        this.isOnBush() && !this.isJumping()) {
         //如果(不是 是移动中() )
         if (!this.isMoving()) {
             //灌木丛深度 = 12 
             this._bushDepth = 12;
         }
-    //否则 
+        //否则 
     } else {
         //灌木丛深度 = 0
         this._bushDepth = 0;
@@ -671,7 +674,7 @@ Game_CharacterBase.prototype.moveStraight = function(d) {
         this._realY = $gameMap.yWithDirection(this._y, this.reverseDir(d));
         //增加步数()
         this.increaseSteps();
-    //否则
+        //否则
     } else {
         //设置方向(d)
         this.setDirection(d);
@@ -709,18 +712,18 @@ Game_CharacterBase.prototype.moveDiagonally = function(horz, vert) {
 };
 /**跳跃*/
 Game_CharacterBase.prototype.jump = function(xPlus, yPlus) {
-	//如果 数学 绝对值 (x增量) > 数学 绝对值 (y增量) 
+    //如果 数学 绝对值 (x增量) > 数学 绝对值 (y增量) 
     if (Math.abs(xPlus) > Math.abs(yPlus)) {
-	    //如果 x增量 !== 0 
+        //如果 x增量 !== 0 
         if (xPlus !== 0) {
-	        //设置方向( x增量 < 0 ? 4 : 6 )
+            //设置方向( x增量 < 0 ? 4 : 6 )
             this.setDirection(xPlus < 0 ? 4 : 6);
         }
-    //否则 
+        //否则 
     } else {
-	    //如果 y增量 !== 0 
+        //如果 y增量 !== 0 
         if (yPlus !== 0) {
-	        //设置方向( x增量 < 0 ? 4 : 6 )
+            //设置方向( x增量 < 0 ? 4 : 6 )
             this.setDirection(yPlus < 0 ? 8 : 2);
         }
     }

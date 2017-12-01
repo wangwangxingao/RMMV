@@ -1,4 +1,3 @@
-
 /**-----------------------------------------------------------------------------*/
 /** Game_Map*/
 /** 游戏地图     $gameMap*/
@@ -11,7 +10,7 @@ function Game_Map() {
 }
 /**初始化*/
 Game_Map.prototype.initialize = function() {
-	//事件解释器 = 新 游戏事件解释器()
+    //事件解释器 = 新 游戏事件解释器()
     this._interpreter = new Game_Interpreter();
     //地图id = 0 
     this._mapId = 0;
@@ -183,18 +182,18 @@ Game_Map.prototype.vehicles = function() {
 /**交通工具*/
 Game_Map.prototype.vehicle = function(type) {
     //如果(种类 === 0 或者 种类 === "boat"//小船 )
-    if (type ===  0 || type === 'boat') {
+    if (type === 0 || type === 'boat') {
         //返回 小船()
         return this.boat();
-    //否则 如果(种类 === 1 或者 种类 === "ship"//帆船 )
-    } else if (type ===  1 || type === 'ship') {
+        //否则 如果(种类 === 1 或者 种类 === "ship"//帆船 )
+    } else if (type === 1 || type === 'ship') {
         //返回 帆船()
         return this.ship();
-    //否则 如果(种类 === 2 或者 种类 === "airship"//天空船 )
-    } else if (type ===  2 || type === 'airship') {
+        //否则 如果(种类 === 2 或者 种类 === "airship"//天空船 )
+    } else if (type === 2 || type === 'airship') {
         //返回 天空船()
         return this.airship();
-    //否则
+        //否则
     } else {
         //返回 null
         return null;
@@ -297,7 +296,7 @@ Game_Map.prototype.setupBattleback = function() {
         this._battleback1Name = $dataMap.battleback1Name;
         //战斗背景2名称 = 数据地图 战斗背景2名称
         this._battleback2Name = $dataMap.battleback2Name;
-    //否则
+        //否则
     } else {
         //战斗背景1名称 = null
         this._battleback1Name = null;
@@ -313,7 +312,7 @@ Game_Map.prototype.setDisplayPos = function(x, y) {
         this._displayX = x.mod(this.width());
         //远景图x = x
         this._parallaxX = x;
-    //否则
+        //否则
     } else {
         //结束x = 宽() - 画面显示图块x()
         var endX = this.width() - this.screenTileX();
@@ -343,11 +342,11 @@ Game_Map.prototype.parallaxOx = function() {
     if (this._parallaxZero) {
         //返回 远景图x * 图块宽()
         return this._parallaxX * this.tileWidth();
-    //否则 如果 ( 远景图循环x )
+        //否则 如果 ( 远景图循环x )
     } else if (this._parallaxLoopX) {
         //返回 远景图x * 图块宽() / 2 
         return this._parallaxX * this.tileWidth() / 2;
-    //否则 
+        //否则 
     } else {
         //返回 0 
         return 0;
@@ -359,11 +358,11 @@ Game_Map.prototype.parallaxOy = function() {
     if (this._parallaxZero) {
         //返回 远景图y * 图块高()
         return this._parallaxY * this.tileHeight();
-    //否则 如果 ( 远景图循环y )
+        //否则 如果 ( 远景图循环y )
     } else if (this._parallaxLoopY) {
         //返回 远景图y * 图块高() / 2 
         return this._parallaxY * this.tileHeight() / 2;
-    //否则 
+        //否则 
     } else {
         //返回 0 
         return 0;
@@ -382,7 +381,7 @@ Game_Map.prototype.tilesetFlags = function() {
     if (tileset) {
         //返回 图块设置 标志组
         return tileset.flags;
-    //否则 
+        //否则 
     } else {
         //返回 []
         return [];
@@ -450,27 +449,27 @@ Game_Map.prototype.screenTileY = function() {
 };
 /**校正x(显示区域的x)*/
 Game_Map.prototype.adjustX = function(x) {
-	//如果( 是横向循环() 并且 x < 显示x - ( ( 宽() - 画面显示图块x() ) / 2 )      )
+    //如果( 是横向循环() 并且 x < 显示x - ( ( 宽() - 画面显示图块x() ) / 2 )      )
     if (this.isLoopHorizontal() && x < this._displayX -
-            (this.width() - this.screenTileX()) / 2) {
-	    //返回 x - 显示x + 数据地图 宽
+        (this.width() - this.screenTileX()) / 2) {
+        //返回 x - 显示x + 数据地图 宽
         return x - this._displayX + $dataMap.width;
-    //否则
+        //否则
     } else {
-	    //返回 x - 显示x  
+        //返回 x - 显示x  
         return x - this._displayX;
     }
 };
 /**校正y(显示区域的y)*/
 Game_Map.prototype.adjustY = function(y) {
-	//如果( 是纵向循环() 并且 y < 显示y - ( ( 高() - 画面显示图块y() ) / 2  )    )
+    //如果( 是纵向循环() 并且 y < 显示y - ( ( 高() - 画面显示图块y() ) / 2  )    )
     if (this.isLoopVertical() && y < this._displayY -
-            (this.height() - this.screenTileY()) / 2) {
-	    //返回 y - 显示y + 数据地图 高
+        (this.height() - this.screenTileY()) / 2) {
+        //返回 y - 显示y + 数据地图 高
         return y - this._displayY + $dataMap.height;
-    //否则
+        //否则
     } else {
-	    //返回 y - 显示y  
+        //返回 y - 显示y  
         return y - this._displayY;
     }
 };
@@ -514,7 +513,7 @@ Game_Map.prototype.deltaX = function(x1, x2) {
         if (result < 0) {
             //结果 += 宽()
             result += this.width();
-        //否则
+            //否则
         } else {
             //结果 -= 宽()
             result -= this.width();
@@ -533,7 +532,7 @@ Game_Map.prototype.deltaY = function(y1, y2) {
         if (result < 0) {
             //结果 += 高()
             result += this.height();
-        //否则
+            //否则
         } else {
             //结果 -= 高()
             result -= this.height();
@@ -659,7 +658,7 @@ Game_Map.prototype.scrollDown = function(distance) {
             //远景图y += 距离
             this._parallaxY += distance;
         }
-    //否则 如果( 高 >= 画面显示图块y() )
+        //否则 如果( 高 >= 画面显示图块y() )
     } else if (this.height() >= this.screenTileY()) {
         //最后y = 显示y
         var lastY = this._displayY;
@@ -683,7 +682,7 @@ Game_Map.prototype.scrollLeft = function(distance) {
             //远景图x -= 距离
             this._parallaxX -= distance;
         }
-    //否则 如果( 宽() >= 画面显示图块x() )
+        //否则 如果( 宽() >= 画面显示图块x() )
     } else if (this.width() >= this.screenTileX()) {
         //最后x = 显示x 
         var lastX = this._displayX;
@@ -706,7 +705,7 @@ Game_Map.prototype.scrollRight = function(distance) {
             //远景图x += 距离
             this._parallaxX += distance;
         }
-    //否则 如果( 宽() >= 画面显示图块x() )
+        //否则 如果( 宽() >= 画面显示图块x() )
     } else if (this.width() >= this.screenTileX()) {
         //最后x = 显示x 
         var lastX = this._displayX;
@@ -722,7 +721,7 @@ Game_Map.prototype.scrollUp = function(distance) {
     //如果( 是纵向循环() )
     if (this.isLoopVertical()) {
         //显示y += 数据地图 高 -  距离
-        this._displayY += $dataMap.height - distance; 
+        this._displayY += $dataMap.height - distance;
         //显示y %= 数据地图 高  
         this._displayY %= $dataMap.height;
         //如果(远景图循环y )
@@ -730,7 +729,7 @@ Game_Map.prototype.scrollUp = function(distance) {
             //远景图y -= 距离
             this._parallaxY -= distance;
         }
-    //否则 如果( 高 >= 画面显示图块y() )
+        //否则 如果( 高 >= 画面显示图块y() )
     } else if (this.height() >= this.screenTileY()) {
         //最后y = 显示y
         var lastY = this._displayY;
@@ -747,25 +746,25 @@ Game_Map.prototype.isValid = function(x, y) {
 };
 /**检查通道*/
 Game_Map.prototype.checkPassage = function(x, y, bit) {
-	//标志组 = 图块设置标志组()
+    //标志组 = 图块设置标志组()
     var flags = this.tilesetFlags();
     //图块组 = 所有图块组(x,y)
     var tiles = this.allTiles(x, y);
     //循环 开始时 i=0 ; 当 i < 图块组 长度 ; 每一次 i++
     for (var i = 0; i < tiles.length; i++) {
-	    //标志  = 标志组 [ 图块组[i]]
+        //标志  = 标志组 [ 图块组[i]]
         var flag = flags[tiles[i]];
         //如果 ( 标志 & 0x10//10000  !=== 0 ) //不影响通行
-        if ((flag & 0x10) !== 0)  // [*] No effect on passage'
-        	//下一个
+        if ((flag & 0x10) !== 0) // [*] No effect on passage'
+        //下一个
             continue;
         //如果(  (标志 & 比特) === 0 )//通过
-        if ((flag & bit) === 0)   // [o] Passable
-        	//返回 true
+        if ((flag & bit) === 0) // [o] Passable
+        //返回 true
             return true;
         //如果(  (标志 & 比特) === 比特 )//不能通过
         if ((flag & bit) === bit) // [x] Impassable
-        	//返回 false
+        //返回 false
             return false;
     }
     //返回 false
@@ -811,22 +810,22 @@ Game_Map.prototype.autotileType = function(x, y, z) {
 };
 /**是可通行的*/
 Game_Map.prototype.isPassable = function(x, y, d) {
-	//返回 检查通道(x,y, ( 1<<(d/2-1)) //2的(d/2-1)次方  & 0x0f //1111  )
+    //返回 检查通道(x,y, ( 1<<(d/2-1)) //2的(d/2-1)次方  & 0x0f //1111  )
     return this.checkPassage(x, y, (1 << (d / 2 - 1)) & 0x0f);
 };
 /**是小船可通行的*/
 Game_Map.prototype.isBoatPassable = function(x, y) {
-	//返回 检查通道(x,y, 0x0200 //1000000000  )
+    //返回 检查通道(x,y, 0x0200 //1000000000  )
     return this.checkPassage(x, y, 0x0200);
 };
 /**是帆船可通行的*/
 Game_Map.prototype.isShipPassable = function(x, y) {
-	//返回 检查通道(x,y, 0x0400 //10000000000  )
+    //返回 检查通道(x,y, 0x0400 //10000000000  )
     return this.checkPassage(x, y, 0x0400);
 };
 /**是天空船陆地可以*/
 Game_Map.prototype.isAirshipLandOk = function(x, y) {
-	//返回 检查通道(x,y, 0x0800 //100000000000  ) 并且 检查通道(x, y,  0x0f //1111 )
+    //返回 检查通道(x,y, 0x0800 //100000000000  ) 并且 检查通道(x, y,  0x0f //1111 )
     return this.checkPassage(x, y, 0x0800) && this.checkPassage(x, y, 0x0f);
 };
 /**检查层图块标志*/
@@ -863,7 +862,7 @@ Game_Map.prototype.isDamageFloor = function(x, y) {
 Game_Map.prototype.terrainTag = function(x, y) {
     //如果( 是有效的(x,y) )
     if (this.isValid(x, y)) {
-    //标志组 = 图块设置标志组()
+        //标志组 = 图块设置标志组()
         var flags = this.tilesetFlags();
         //图块组 = 层图块组(x,y)
         var tiles = this.layeredTiles(x, y);
@@ -888,7 +887,7 @@ Game_Map.prototype.regionId = function(x, y) {
 /**开始滚动*/
 Game_Map.prototype.startScroll = function(direction, distance, speed) {
     //滚动方向 = 方向
-    this._scrollDirection = direction; 
+    this._scrollDirection = direction;
     //滚动剩余 = 剩余
     this._scrollRest = distance;
     //滚动速度 = 速度
@@ -931,7 +930,7 @@ Game_Map.prototype.updateScroll = function() {
         if (this._displayX === lastX && this._displayY === lastY) {
             //滚动剩余 = 0 
             this._scrollRest = 0;
-        //否则
+            //否则
         } else {
             //滚动剩余 -= 滚动距离
             this._scrollRest -= this.scrollDistance();
@@ -947,27 +946,27 @@ Game_Map.prototype.scrollDistance = function() {
 Game_Map.prototype.doScroll = function(direction, distance) {
     //检查 (方向)
     switch (direction) {
-    //当 2 : 
-    case 2:
-        //滚动向下(距离)
-        this.scrollDown(distance);
-        //中断
-        break;
-    case 4:
-        //滚动向左(距离)
-        this.scrollLeft(distance);
-        //中断
-        break;
-    case 6:
-        //滚动向右(距离)
-        this.scrollRight(distance);
-        //中断
-        break;
-    case 8:
-        //滚动向上(距离)
-        this.scrollUp(distance);
-        //中断
-        break;
+        //当 2 : 
+        case 2:
+            //滚动向下(距离)
+            this.scrollDown(distance);
+            //中断
+            break;
+        case 4:
+            //滚动向左(距离)
+            this.scrollLeft(distance);
+            //中断
+            break;
+        case 6:
+            //滚动向右(距离)
+            this.scrollRight(distance);
+            //中断
+            break;
+        case 8:
+            //滚动向上(距离)
+            this.scrollUp(distance);
+            //中断
+            break;
     }
 };
 /**更新事件组*/
@@ -1047,7 +1046,7 @@ Game_Map.prototype.changeParallax = function(name, loopX, loopY, sx, sy) {
 Game_Map.prototype.updateInterpreter = function() {
     //循环(;;)
     for (;;) {
-                
+
         /** 2w: 
          * 
          * 当事件解释器 不运转时

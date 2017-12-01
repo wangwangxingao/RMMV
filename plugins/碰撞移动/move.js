@@ -1,19 +1,51 @@
-Game_CharacterBase.prototype.moveXY = function(mx, my) {
+Game_CharacterBase.prototype.moveStraight2 = function(d) {
+    this.setMovementSuccess(this.canPass(this._x, this._y, d));
+    //如果( 是移动成功的() )
+    if (this.isMovementSucceeded()) {
+        this.setDirection(d);
+        this._x = $gameMap.roundXWithDirection(this._x, d);
+        this._y = $gameMap.roundYWithDirection(this._y, d);
+        this._realX = $gameMap.xWithDirection(this._x, this.reverseDir(d));
+        this._realY = $gameMap.yWithDirection(this._y, this.reverseDir(d));
+        this.increaseSteps();
+        //否则
+    } else {
+        //设置方向(d)
+        this.setDirection(d);
+        //检查正面事件触摸触发(d)
+        this.checkEventTriggerTouchFront(d);
+    }
+};
+
+
+Game_CharacterBase.prototype.moveTo = function(mx, my) {
+    this._toX = mx
+    this._toY = my
+}
+
+
+
+Game_CharacterBase.prototype.isMoving = function() {
+    return this._realX !== this._x || this._realY !== this._y;
+};
+
+
+
+
+Game_CharacterBase.prototype.canMoveY = function(mx, my) {
     if (!mx && !my) { return }
     if (Math.abs(mx) > Math.abs(my)) {
-        var rx = this.moveX(mx)
+        var rx = this.canMoveX(mx)
         if (rx) {
-            this._realX = this.moveFloor(this._realX + rx)
-            this._x = Math.round(this._realX)
+            this.moveX(rx)
             mx = this.moveFloor(mx - rx)
         } else {
             mx = 0
         }
     } else {
-        var ry = this.moveY(my)
+        var ry = this.canMoveY(my)
         if (ry) {
-            this._realY = this.moveFloor(this._realY + ry)
-            this._y = Math.round(this._realX)
+            this.moveY(ry)
             my = this.moveFloor(my - ry)
         } else {
             my = 0
@@ -23,7 +55,27 @@ Game_CharacterBase.prototype.moveXY = function(mx, my) {
 }
 
 
-Game_CharacterBase.prototype.moveX = function(mx) {
+Game_CharacterBase.prototype.moveX = function(rx) {
+    this._realX = this.moveFloor(this._realX + rx)
+    var x = this._x
+    this._x = Math.round(this._realX)
+    if (x != this._x) {
+        this.increaseSteps()
+    }
+}
+
+Game_CharacterBase.prototype.moveY = function(ry) {
+    this._realY = this.moveFloor(this._realY + ry)
+
+    var y = this._y
+    this._y = Math.round(this._realX)
+    if (y != this._y) {
+        this.increaseSteps()
+    }
+}
+
+
+Game_CharacterBase.prototype.canMoveX = function(mx) {
     if (!mx) { return 0 }
     var rx = this._realX
     var ry = this._realY
@@ -91,12 +143,13 @@ Game_CharacterBase.prototype.moveX = function(mx) {
             }
         }
     }
+    mx = this.isCollidedWithX(mx)
     return mx
 }
 
 
 
-Game_CharacterBase.prototype.moveY = function(my) {
+Game_CharacterBase.prototype.canMoveY = function(my) {
     if (!my) { return }
     var rx = this._realX
     var ry = this._realY
@@ -164,10 +217,9 @@ Game_CharacterBase.prototype.moveY = function(my) {
             }
         }
     }
+    my = this.isCollidedWithY(my)
     return my
 }
-
-
 
 
 
@@ -185,58 +237,85 @@ Game_CharacterBase.prototype.moveFloor = function(mx) {
 
 
 
-
-/**能通过
- * @param {number} x 人物x
- * @param {number} y 人物y
- * @param {number} d 人物方向
- * @return {boolean} 
- */
-Game_CharacterBase.prototype.canMovePass = function(x, y, d) {
-    //x2 = 游戏地图 环x和方向(x,d)
-    var x2 = $gameMap.roundXWithDirection(x, d);
-    //y2 = 游戏地图 环y和方向(y,d)
-    var y2 = $gameMap.roundYWithDirection(y, d);
-    //如果( 不是 游戏地图 是有效的(x2,y2) )
-    if (!$gameMap.isValid(x2, y2)) {
-        //返回 false
-        return false;
+Game_CharacterBase.prototype.isCollidedWithX = function(mx) {
+    if (!mx) { return 0 }
+    var x = this._realX
+    var y = this._realY
+    var es = $gameMap.events()
+    for (var i = 0; i < es.length; i++) {
+        var event = es[i]
+        if (event && event.isNormalPriority()) {
+            mx = this.isCollidedWithXY(x, y, event._realX, event._realY, mx)
+            if (!mx) {
+                return 0
+            }
+        }
     }
-    //如果(  是穿越() 或者 是除错穿越() )
-    if (this.isThrough() || this.isDebugThrough()) {
-        //返回 true
-        return true;
+    mx = this.isCollidedWithXY(x, y, $gameMap.boat()._realX, $gameMap.boat()._realY, mx)
+    if (!mx) {
+        return 0
     }
-    //如果( 不是 是地图可通行(x,y,d) )
-    if (!this.isMapPassable(x, y, d)) {
-        //返回 false
-        return false;
+    mx = this.isCollidedWithXY(x, y, $gameMap.ship()._realX, $gameMap.ship()._realY, mx)
+    if (!mx) {
+        return 0
     }
-    //返回 true
-    return true;
 };
 
 
 
-Game_CharacterBase.prototype.isCollidedWithCharactersX = function(x, y) {
-    //返回 是和事件碰撞(x,y) 或者 是和交通工具碰撞(x,y)
-    return this.isCollidedWithEventsX(x, y) || this.isCollidedWithVehicles(x, y);
-};
-/**是和事件碰撞*/
-Game_CharacterBase.prototype.isCollidedWithEventsX = function(x, y) {
-    //事件组 = 游戏地图 xy处事件无穿越(x,y)
-    var events = $gameMap.eventsXyNt(x, y);
-    //返回 事件组 一些 方法(事件)
-    return events.some(function(event) {
-        //返回 事件 是正常优先级()
-        return event.isNormalPriority();
-    });
-};
-Game_CharacterBase.prototype.isCollidedWithVehiclesX = function(x) {
+Game_CharacterBase.prototype.isCollidedWithY = function(mx) {
+    if (!mx) { return 0 }
+    var x = this._realX
+    var y = this._realY
+    var es = $gameMap.events()
 
-    var rx = this._realX
-    var ry = this._realY
-    var rd
-    if (this)
-        $gameMap.boat()._realX || $gameMap.ship()._realX;
+    var dx
+    var l
+    var e
+    for (var i = 0; i < es.length; i++) {
+        var event = es[i]
+        if (event && event.isNormalPriority()) {
+            dx = this.isCollidedWithXY(y, x, event._realY, event._realX, mx)
+            if (dx != mx) {
+                l.push(l)
+                e.push(event)
+            }
+        }
+    }
+    mx = this.isCollidedWithXY(y, x, $gameMap.boat()._realY, $gameMap.boat()._realX, mx)
+    if (!mx) {
+        return 0
+    }
+    mx = this.isCollidedWithXY(y, x, $gameMap.ship()._realY, $gameMap.ship()._realX, mx)
+    if (!mx) {
+        return 0
+    }
+};
+
+
+
+Game_CharacterBase.prototype.isCollidedWithXY = function(x, y, rx, ry, mx) {
+    if (Math.abs(ry - y) < 1) {
+        var dx = rx - x
+        if (mx > 0) {
+            if (dx + 1 <= 0 || dx - 1 >= mx) {} else if (dx - 1 <= mx && dx - 1 >= 0) {
+                mx = dx - 1
+            } else {
+                return 0
+            }
+            if (mx <= 0) {
+                return 0
+            }
+        } else {
+            if (dx - 1 >= 0 || dx - 1 >= mx) {} else if (dx + 1 >= mx && dx + 1 <= 0) {
+                mx = dx - 1
+            } else {
+                return 0
+            }
+            if (mx >= 0) {
+                return 0
+            }
+        }
+    }
+    return mx
 };
