@@ -1,4 +1,3 @@
-
 /**-----------------------------------------------------------------------------*/
 /** Game_Player*/
 /** 游戏游戏者     $gamePlayer*/
@@ -16,14 +15,14 @@ Game_Player.prototype = Object.create(Game_Character.prototype);
 Game_Player.prototype.constructor = Game_Player;
 /**初始化*/
 Game_Player.prototype.initialize = function() {
-	//游戏角色 初始化 呼叫(this)
+    //游戏角色 初始化 呼叫(this)
     Game_Character.prototype.initialize.call(this);
     //设置透明(数据系统 开始透明)
     this.setTransparent($dataSystem.optTransparent);
 };
 /**初始化成员*/
 Game_Player.prototype.initMembers = function() {
-	//游戏角色 初始化成员 呼叫(this)
+    //游戏角色 初始化成员 呼叫(this)
     Game_Character.prototype.initMembers.call(this);
     //交通工具种类 = "walk" //步行
     this._vehicleType = 'walk';
@@ -72,7 +71,7 @@ Game_Player.prototype.followers = function() {
 };
 /**刷新*/
 Game_Player.prototype.refresh = function() {
-	//角色 = 游戏队伍 领导者
+    //角色 = 游戏队伍 领导者
     var actor = $gameParty.leader();
     //行走图名称 = 角色 ?  角色 行走图名称 :  ""
     var characterName = actor ? actor.characterName() : '';
@@ -85,9 +84,9 @@ Game_Player.prototype.refresh = function() {
 };
 /**是停止*/
 Game_Player.prototype.isStopping = function() {
-	//如果 交通工具上中 或者 交通工具下中
+    //如果 交通工具上中 或者 交通工具下中
     if (this._vehicleGettingOn || this._vehicleGettingOff) {
-	    //返回 false 
+        //返回 false 
         return false;
     }
     //返回 游戏角色 是停止 呼叫(this)
@@ -95,7 +94,7 @@ Game_Player.prototype.isStopping = function() {
 };
 /**预约传送*/
 Game_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType) {
-	//传送中 = true
+    //传送中 = true
     this._transferring = true;
     //新地图id = mapId
     this._newMapId = mapId;
@@ -110,33 +109,33 @@ Game_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType) {
 };
 /**请求地图重装*/
 Game_Player.prototype.requestMapReload = function() {
-	//需要地图重装 = true
+    //需要地图重装 = true
     this._needsMapReload = true;
 };
 /**是传送中*/
 Game_Player.prototype.isTransferring = function() {
-	//返回 传送中
+    //返回 传送中
     return this._transferring;
 };
 /**新地图id*/
 Game_Player.prototype.newMapId = function() {
-	//返回 新地图id
+    //返回 新地图id
     return this._newMapId;
 };
 /**淡入种类*/
 Game_Player.prototype.fadeType = function() {
-	//返回 淡入种类
+    //返回 淡入种类
     return this._fadeType;
 };
 /**表现传送*/
 Game_Player.prototype.performTransfer = function() {
-	//如果 是传送中
+    //如果 是传送中
     if (this.isTransferring()) {
-	    //设置方向(新方向)
+        //设置方向(新方向)
         this.setDirection(this._newDirection);
         //如果( 新地图id !== 游戏地图 地图id) 或者  (需要地图重装 )
         if (this._newMapId !== $gameMap.mapId() || this._needsMapReload) {
-	        //游戏地图 安装 (新地图id)
+            //游戏地图 安装 (新地图id)
             $gameMap.setup(this._newMapId);
             //需要地图重装 = false
             this._needsMapReload = false;
@@ -151,55 +150,55 @@ Game_Player.prototype.performTransfer = function() {
 };
 /**是地图可通行*/
 Game_Player.prototype.isMapPassable = function(x, y, d) {
-	//交通工具 
+    //交通工具 
     var vehicle = this.vehicle();
     //如果 交通工具
     if (vehicle) {
-	    //返回 交通工具 是地图可通行(x,y,d)
+        //返回 交通工具 是地图可通行(x,y,d)
         return vehicle.isMapPassable(x, y, d);
     } else {
-	    //返回 游戏角色 是地图可通行 呼叫(this)
+        //返回 游戏角色 是地图可通行 呼叫(this)
         return Game_Character.prototype.isMapPassable.call(this, x, y, d);
     }
 };
 /**交通工具*/
 Game_Player.prototype.vehicle = function() {
-	//返回 游戏地图 交通工具[交通工具种类]
+    //返回 游戏地图 交通工具[交通工具种类]
     return $gameMap.vehicle(this._vehicleType);
 };
 /**是在小船*/
 Game_Player.prototype.isInBoat = function() {
-	//返回 交通工具种类 === 'boat'  //小船
+    //返回 交通工具种类 === 'boat'  //小船
     return this._vehicleType === 'boat';
 };
 /**是在帆船*/
 Game_Player.prototype.isInShip = function() {
-	//返回 交通工具种类 === 'ship'  //帆船
+    //返回 交通工具种类 === 'ship'  //帆船
     return this._vehicleType === 'ship';
 };
 /**是在天空船*/
 Game_Player.prototype.isInAirship = function() {
-	//返回 交通工具种类 === 'airship' //天空船
+    //返回 交通工具种类 === 'airship' //天空船
     return this._vehicleType === 'airship';
 };
 /**是在交通工具*/
 Game_Player.prototype.isInVehicle = function() {
-	//返回 是在帆船() 或者 是在帆船() 或者 是在天空船()
+    //返回 是在帆船() 或者 是在帆船() 或者 是在天空船()
     return this.isInBoat() || this.isInShip() || this.isInAirship();
 };
 /**是普通*/
 Game_Player.prototype.isNormal = function() {
-	//返回 交通工具种类 === 'walk'  并且  不是 是强制移动路线()
+    //返回 交通工具种类 === 'walk'  并且  不是 是强制移动路线()
     return this._vehicleType === 'walk' && !this.isMoveRouteForcing();
 };
 /**是猛冲中*/
 Game_Player.prototype.isDashing = function() {
-	//返回 猛冲中
+    //返回 猛冲中
     return this._dashing;
 };
 /**是除错通行*/
 Game_Player.prototype.isDebugThrough = function() {
-	//返回 输入 是按下('control') 并且 游戏临时 是游戏测试()
+    //返回 输入 是按下('control') 并且 游戏临时 是游戏测试()
     return Input.isPressed('control') && $gameTemp.isPlaytest();
 };
 /**是碰撞*/
@@ -208,7 +207,7 @@ Game_Player.prototype.isCollided = function(x, y) {
     if (this.isThrough()) {
         //返回 false
         return false;
-    //否则 
+        //否则 
     } else {
         //返回 位于(x,y) 或者 从者组 是有人碰撞(x,y)
         return this.pos(x, y) || this._followers.isSomeoneCollided(x, y);
@@ -277,7 +276,7 @@ Game_Player.prototype.makeEncounterTroopId = function() {
             //宽总数 += 遭遇 宽
             weightSum += encounter.weight;
         }
-    // , this)
+        // , this)
     }, this);
     //如果(宽总数 > 0 )
     if (weightSum > 0) {
@@ -301,7 +300,7 @@ Game_Player.prototype.makeEncounterTroopId = function() {
 Game_Player.prototype.meetsEncounterConditions = function(encounter) {
     //返回 ( 遭遇 条件组 长度  === 0 或者 遭遇 条件组 包含( 区域id()  )   )
     return (encounter.regionSet.length === 0 ||
-            encounter.regionSet.contains(this.regionId()));
+        encounter.regionSet.contains(this.regionId()));
 };
 /**执行遭遇*/
 Game_Player.prototype.executeEncounter = function() {
@@ -319,12 +318,12 @@ Game_Player.prototype.executeEncounter = function() {
             BattleManager.onEncounter();
             //返回 true
             return true;
-        //否则
+            //否则
         } else {
             //返回 false
             return false;
         }
-    //否则 
+        //否则 
     } else {
         //返回 false
         return false;
@@ -354,8 +353,8 @@ Game_Player.prototype.moveByInput = function() {
         if (direction > 0) {
             //游戏临时 清除()
             $gameTemp.clearDestination();
-        //否则 如果 ( 游戏临时 是有效目的地() )
-        } else if ($gameTemp.isDestinationValid()){
+            //否则 如果 ( 游戏临时 是有效目的地() )
+        } else if ($gameTemp.isDestinationValid()) {
             //x = 游戏临时 目的地x()
             var x = $gameTemp.destinationX();
             //y = 游戏临时 目的地y()
@@ -444,8 +443,8 @@ Game_Player.prototype.updateDashing = function() {
     //如果( 能移动() 并且 不是 是在交通工具() 并且 不是 游戏地图 是奔跑禁止() )
     if (this.canMove() && !this.isInVehicle() && !$gameMap.isDashDisabled()) {
         //猛冲 =  是猛冲按键按下 或者 游戏临时 是有效目的地()   
-        this._dashing =  this.isDashButtonPressed() || $gameTemp.isDestinationValid();   // || $gameTemp.isDestinationValid();
-    //否则
+        this._dashing = this.isDashButtonPressed() || $gameTemp.isDestinationValid(); // || $gameTemp.isDestinationValid();
+        //否则
     } else {
         //猛冲 = false
         this._dashing = false;
@@ -459,7 +458,7 @@ Game_Player.prototype.isDashButtonPressed = function() {
     if (ConfigManager.alwaysDash) {
         //返回 不是 shift 
         return !shift;
-    //否则
+        //否则
     } else {
         //返回 shift
         return shift;
@@ -504,11 +503,11 @@ Game_Player.prototype.updateVehicle = function() {
         if (this._vehicleGettingOn) {
             //更新交通工具上()
             this.updateVehicleGetOn();
-        //如果( 交通工具下中() )
+            //如果( 交通工具下中() )
         } else if (this._vehicleGettingOff) {
             //更新交通工具下()
             this.updateVehicleGetOff();
-        //否则
+            //否则
         } else {
             //交通工具() 同步的和游戏者() 
             this.vehicle().syncWithPlayer();
@@ -556,7 +555,7 @@ Game_Player.prototype.updateNonmoving = function(wasMoving) {
         if (wasMoving) {
             //游戏队伍 当游戏者行走
             $gameParty.onPlayerWalk();
-            
+
             /**
              * 2w:
              * 检查游戏者位置是否有 
@@ -567,7 +566,7 @@ Game_Player.prototype.updateNonmoving = function(wasMoving) {
              **/
 
             //检查事件触发这里( [1,2] )
-            this.checkEventTriggerHere([1,2]);
+            this.checkEventTriggerHere([1, 2]);
             //如果(游戏地图 安装开始事件() )
             if ($gameMap.setupStartingEvent()) {
                 //返回 
@@ -583,7 +582,7 @@ Game_Player.prototype.updateNonmoving = function(wasMoving) {
         if (wasMoving) {
             //更新遭遇计数()
             this.updateEncounterCount();
-        //否则
+            //否则
         } else {
             //游戏临时 清除目的地()
             $gameTemp.clearDestination();
@@ -625,7 +624,7 @@ Game_Player.prototype.triggerButtonAction = function() {
             return true;
         }
         //检查事件触发那里([0,1,2])
-        this.checkEventTriggerThere([0,1,2]);
+        this.checkEventTriggerThere([0, 1, 2]);
         //如果(游戏地图 安装开始事件() )
         if ($gameMap.setupStartingEvent()) {
             //返回 true
@@ -637,7 +636,7 @@ Game_Player.prototype.triggerButtonAction = function() {
 /**触发触摸动作*/
 Game_Player.prototype.triggerTouchAction = function() {
     //如果(游戏临时 是有效目的地() )
-    if ($gameTemp.isDestinationValid()){
+    if ($gameTemp.isDestinationValid()) {
         //方向 = 方向
         var direction = this.direction();
         //x1 = x
@@ -660,11 +659,11 @@ Game_Player.prototype.triggerTouchAction = function() {
         if (destX === x1 && destY === y1) {
             //返回 触发触摸动作d1(x1,y1)
             return this.triggerTouchActionD1(x1, y1);
-        //否则 如果(目的地x == x2 并且 目的地y == y2)
+            //否则 如果(目的地x == x2 并且 目的地y == y2)
         } else if (destX === x2 && destY === y2) {
             //返回 触发触摸动作d2(x2,y2)
             return this.triggerTouchActionD2(x2, y2);
-        //否则 如果(目的地x == x3 并且 目的地y == y3)
+            //否则 如果(目的地x == x3 并且 目的地y == y3)
         } else if (destX === x3 && destY === y3) {
             //返回 触发触摸动作d3(x2,y2)
             return this.triggerTouchActionD3(x2, y2);
@@ -707,7 +706,7 @@ Game_Player.prototype.triggerTouchActionD2 = function(x2, y2) {
         }
     }
     //检查事件触发那里([0,1,2])
-    this.checkEventTriggerThere([0,1,2]);
+    this.checkEventTriggerThere([0, 1, 2]);
     //返回 游戏地图 安装开始事件()
     return $gameMap.setupStartingEvent();
 };
@@ -716,7 +715,7 @@ Game_Player.prototype.triggerTouchActionD3 = function(x2, y2) {
     //如果 (游戏地图 是柜台(x2,y2))
     if ($gameMap.isCounter(x2, y2)) {
         //检查事件触发那里([0,1,2])
-        this.checkEventTriggerThere([0,1,2]);
+        this.checkEventTriggerThere([0, 1, 2]);
     }
     //返回 游戏地图 安装开始事件()
     return $gameMap.setupStartingEvent();
@@ -733,7 +732,7 @@ Game_Player.prototype.updateEncounterCount = function() {
 Game_Player.prototype.canEncounter = function() {
     //返回 (不是 游戏队伍 有无遭遇() 并且 游戏系统 是启用遭遇() 并且 不是 是在天空船() 并且 不是 是强制移动路线 并且 不是 是除错通行() )
     return (!$gameParty.hasEncounterNone() && $gameSystem.isEncounterEnabled() &&
-            !this.isInAirship() && !this.isMoveRouteForcing() && !this.isDebugThrough());
+        !this.isInAirship() && !this.isMoveRouteForcing() && !this.isDebugThrough());
 };
 /**遭遇进度值*/
 Game_Player.prototype.encounterProgressValue = function() {
@@ -789,10 +788,10 @@ Game_Player.prototype.checkEventTriggerThere = function(triggers) {
 };
 /**检查事件触发触摸*/
 Game_Player.prototype.checkEventTriggerTouch = function(x, y) {
-	//如果( 能开始局部事件() )
+    //如果( 能开始局部事件() )
     if (this.canStartLocalEvents()) {
         //开始地图事件( x,y ,[1,2] , true )
-        this.startMapEvent(x, y, [1,2], true);
+        this.startMapEvent(x, y, [1, 2], true);
     }
 };
 /**能开始局部事件*/
@@ -806,7 +805,7 @@ Game_Player.prototype.getOnOffVehicle = function() {
     if (this.isInVehicle()) {
         //返回 下交通工具()
         return this.getOffVehicle();
-    //否则
+        //否则
     } else {
         //返回 上交通工具()
         return this.getOnVehicle();
@@ -814,25 +813,25 @@ Game_Player.prototype.getOnOffVehicle = function() {
 };
 /**上交通工具*/
 Game_Player.prototype.getOnVehicle = function() {
-        //方向 = 方向()
+    //方向 = 方向()
     var direction = this.direction();
-        //x1 = x
+    //x1 = x
     var x1 = this.x;
-        //y1 = y
+    //y1 = y
     var y1 = this.y;
-        //x2 = 游戏地图 环x和方向(x1 , 方向 )
+    //x2 = 游戏地图 环x和方向(x1 , 方向 )
     var x2 = $gameMap.roundXWithDirection(x1, direction);
-        //y2 = 游戏地图 环y和方向(y1 , 方向 )
+    //y2 = 游戏地图 环y和方向(y1 , 方向 )
     var y2 = $gameMap.roundYWithDirection(y1, direction);
     //如果(游戏地图 天空船() 位于(x1,y1) )
     if ($gameMap.airship().pos(x1, y1)) {
         //交通工具种类 = "airship" //天空船
         this._vehicleType = 'airship';
-    //否则 如果(游戏地图 帆船() 位于(x2,y2) )
+        //否则 如果(游戏地图 帆船() 位于(x2,y2) )
     } else if ($gameMap.ship().pos(x2, y2)) {
         //交通工具种类 = "ship" //帆船
         this._vehicleType = 'ship';
-    //否则 如果(游戏地图 小船() 位于(x2,y2) )
+        //否则 如果(游戏地图 小船() 位于(x2,y2) )
     } else if ($gameMap.boat().pos(x2, y2)) {
         //交通工具种类 = "boat" //小船
         this._vehicleType = 'boat';
