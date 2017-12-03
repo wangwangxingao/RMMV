@@ -367,7 +367,6 @@ Sprite.prototype.updateNotPressed = function(label) {
     if (label.haveTouchMove()) {
         if (TouchInput.isMoved()) {
             var touch = this.checkTouch()
-
             if (touch) {
                 if (label.stuteCheck("movein", true)) {
                     label.startTouch("touchMoveIn")
@@ -589,7 +588,6 @@ Game_Label.prototype.haveNear = function() {
 Game_Label.prototype.startNear = function(x, y) {
     var t = this.stuteCheck("x", x)
     t = this.stuteCheck("y", y) || t
-    console.log(x, y, t)
     if (t && this.near) {
         for (var i = 0; i < this.near.length; i++) {
             var o = this.near[i]
