@@ -26,6 +26,10 @@
  * @desc  墙壁的判断,将要碰到墙壁时,x方向会停止移动,但y方向依然会运动(上升下落),和其他不同,墙壁是一个预判断,
  * @default  [18]
  * 
+ * @param  kong 
+ * @desc  空的判断, 在区域内 行走时,如果碰到只有空的时候会掉下去,
+ * @default  [17]
+ * 
  * @param  psid 
  * @desc  角色落地时会把该id开关打开,这样可以触发公共事件了,('_')
  * @default  10
@@ -47,23 +51,32 @@
  * $gamePlayer.isJumpingE()
  * 返回现在是否在一个跳跃平台事件上,如果在 返回结果为 这个事件
  * 
- * 移动区域 
+ * 
+ * 平台区域 
  * 事件注释为 
  * base 
  * pt
- * qb
  * sz 
- * 之一时,为移动区域,判断同上
- * 落在移动区域上的人物会跟随移动区域来移动,
+ * kong
+ * qb
+ * 之一时,为平台区域,判断同上
+ * 
+ * 
+ * $gamePlayer.setJumpEOn()
+ * 强行把角色放到平台上,角色的移动范围由平台决定(平台包括区域和事件),不由地图决定
+ * $gamePlayer.setJumpEOut()
+ * 强行把角色移出平台,角色移动范围由默认地图决定//相当于$gamePlayer.setJumpE(null)
+ * 
+ *    
+ * 落在平台区域上的人物会根据平台区域(不能移动到墙,可以移动到空,到空时下落)来移动,
  * 使用 $gamePlayer.setJumpE(null)可解除这种绑定
- * 与这些区域绑定时有如下效果 
- * 如果行走方向有另一个(base,pt,sz之中)移动区域,则可以行走,否则会跳跃,
- * 当为上下时,跳跃默认为掠过该位置,往下一平台..
- * (该事件为base平台时无效,请注意不要让这些平台与base重合,否则一直下落不要怪我...)
+ * 
+ * 与这些区域绑定时有如下效果
+ * 如果行走方向有另一个(base,pt,sz,kong 之中)的移动区域,则可以行走,
+ * 行走方向 kong 时,跳跃默认为掠过该位置,往下一平台. 
  * 
  * 角色在跳跃时会触发
- * 经过的 
- * 优先级和角色相同 的
+ * 经过的  
  * 启动方式为 决定键,玩家接触,事件接触 的
  * 事件,
  * 但不保证完美运行...建议只使用比较简单的事件.
@@ -118,7 +131,8 @@ ww_JumpPt = function() {
     j["pt"] = getValue(p, "pt") || []
     j["sz"] = getValue(p, "sz") || []
     j["qb"] = getValue(p, "qb") || []
-    ww_JumpPt.jumpTypes = j
+    j["kong"] = getValue(p, "kong") || []
+    ww_JumpPt.ptTypes = j
     ww_JumpPt.playJumpEndSId = getValue(p, "psid") || 0
 }
 ww_JumpPt()
@@ -133,6 +147,14 @@ Game_CharacterBase.prototype.jumpNum = function() {
 }
 
 
+
+Game_CharacterBase.prototype.setPtType = function(type) {
+    if (this._ptType) {
+        $gameMap.removeJumpEvents(this._ptType, this)
+    }
+    this._ptType = $gameMap.addJumpEvents(type, this)
+    return this._ptType
+}
 
 
 
@@ -151,7 +173,7 @@ Game_CharacterBase.prototype.jumpUpSwitch = function(i) {
 
 ww_JumpPt._Game_CharacterBase_prototype_isJumping = Game_CharacterBase.prototype.isJumping
 Game_CharacterBase.prototype.isJumping = function() {
-    return ww_JumpPt._Game_CharacterBase_prototype_isJumping.call(this) || this.isJumpingV() || this.isJumpingE();
+    return ww_JumpPt._Game_CharacterBase_prototype_isJumping.call(this) || this.isJumpingV() //|| this.isJumpingE();
 };
 
 
@@ -167,56 +189,86 @@ Game_CharacterBase.prototype.isJumpingE = function() {
 
 
 
-Game_CharacterBase.prototype.isJumpOn = function(type, x, y) {
+Game_CharacterBase.prototype.isJumpOn = function(x, y, types) {
     var id = $gameMap.regionId(x, y)
-    var jumptypes = ww_JumpPt.jumpTypes
-    if (jumptypes && jumptypes[type] && jumptypes[type].indexOf(id) >= 0) {
-        return true
-    } else {
-        return false
+    var ptTypes = ww_JumpPt.ptTypes
+    for (var i = 0; i < types.length; i++) {
+        var type = types[i]
+        if (ptTypes && ptTypes[type] && ptTypes[type].indexOf(id) >= 0) {
+            return type
+        }
     }
+    return false
 }
 
 
 Game_CharacterBase.prototype.isJumpOnBase = function(x, y) {
-    return this.isJumpOn("base", x, y)
+    return this.isJumpOn(x, y, ["base"])
 }
 
 Game_CharacterBase.prototype.isJumpOnPt = function(x, y) {
-    return this.isJumpOn("pt", x, y)
+    return this.isJumpOn(x, y, ["pt"])
 }
 
 Game_CharacterBase.prototype.isJumpOnSz = function(x, y) {
-    return this.isJumpOn("sz", x, y)
+    return this.isJumpOn(x, y, ["sz"])
 }
 
 Game_CharacterBase.prototype.isJumpOnQb = function(x, y) {
-    return this.isJumpOn("qb", x, y) || !(x >= 0 && x < $gameMap.width())
+    return this.isJumpOn(x, y, ["qb"]) || !(x >= 0 && x < $gameMap.width())
 }
 
 
+Game_CharacterBase.prototype.isJumpOnKong = function(x, y) {
+    return this.isJumpOn(x, y, ["kong"])
+}
 
 ww_JumpPt._Game_Map_prototype_setupEvents = Game_Map.prototype.setupEvents
 Game_Map.prototype.setupEvents = function() {
     ww_JumpPt._Game_Map_prototype_setupEvents.call(this)
     var es = this.events()
-    var types = {
+    this._jumpEvents = {
         base: [],
         pt: [],
         sz: [],
-        qd: []
+        qd: [],
+        kong: []
     }
     for (var i = 0; i < es.length; i++) {
         var e = es[i]
         if (e && e.event()) {
             var name = e.event().note
-            if (types[name]) {
-                types[name].push(e)
+            e.setPtType(name)
+        }
+    }
+};
+
+
+Game_Map.prototype.addJumpEvents = function(type, event) {
+    if (type && this._jumpEvents) {
+        var l = this._jumpEvents[type]
+        if (l) {
+            var i = l.indexOf(event)
+            if (i < 0) {
+                l.push(event)
+            }
+            return type
+        }
+    }
+    return false
+}
+
+Game_Map.prototype.removeJumpEvents = function(type, event) {
+    if (type && this._jumpEvents) {
+        var l = this._jumpEvents[type]
+        if (l) {
+            var i = l.indexOf(event)
+            if (i >= 0) {
+                l.splice(i, 1)
             }
         }
     }
-    this._jumpEvents = types
-};
+}
 
 
 Game_Map.prototype.jumpEvents = function(types) {
@@ -233,15 +285,15 @@ Game_Map.prototype.jumpEvents = function(types) {
 }
 
 Game_CharacterBase.prototype.isJumpOnEvent = function(x, y, type) {
-    if (this.canStartLocalEvents()) {
-        var es = $gameMap.jumpEvents(type)
-        for (var i = 0; i < es.length; i++) {
-            var e = es[i]
-            if (e && e.pos(x, y)) {
-                return e
-            }
+    // if (this.canStartLocalEvents()) {
+    var es = $gameMap.jumpEvents(type)
+    for (var i = 0; i < es.length; i++) {
+        var e = es[i]
+        if (e && e.pos(x, y)) {
+            return e
         }
     }
+    // }
     return false
 }
 
@@ -305,9 +357,7 @@ Game_CharacterBase.prototype.jumpV = function(x, y, g, list) {
 
 ww_JumpPt._Game_CharacterBase_prototype_updateJump = Game_CharacterBase.prototype.updateJump
 Game_CharacterBase.prototype.updateJump = function() {
-    if (this.isJumpingE()) {
-        this.updateJumpE()
-    } else if (this.isJumpingV()) {
+    if (this.isJumpingV()) {
         this.updateJumpV();
         //this._x = $gameMap.roundX(Math.round(this._realX))
         //this._y = $gameMap.roundX(Math.round(this._realY))
@@ -316,114 +366,15 @@ Game_CharacterBase.prototype.updateJump = function() {
     }
 };
 
-/**设置跳跃事件 */
-Game_CharacterBase.prototype.setJumpE = function(e) {
-    this._jumpMoveEvent = e
-    if (e) {
-        this._jumpMoveEventLx = e._x
-        this._jumpMoveEventLy = e._y
-        this._jumpMoveEventRx = e._realX
-        this._jumpMoveEventRy = e._realY
-    }
-}
-
-/**移动跟着 */
-Game_CharacterBase.prototype.moveByJumpE = function() {
-    var e = this._jumpMoveEvent
-    if (e) {
-        var dx = e._x - this._jumpMoveEventLx
-        var dy = e._y - this._jumpMoveEventLy
-        var rx = e._realX - this._jumpMoveEventRx
-        var ry = e._realY - this._jumpMoveEventRy
-        this._x += dx
-        this._y += dy
-        this._realX += rx
-        this._realY += rx
-        if (this.onJumpEMove()) {
-            if (e._realX < this._realX) {
-                this._realX = Math.max(this._realX - this.distancePerFrame(), e._realX);
-            }
-            if (e._realX > this._realX) {
-                this._realX = Math.min(this._realX + this.distancePerFrame(), e._realX);
-            }
-            if (this._y < this._realY) {
-                this._realY = Math.max(this._realY - this.distancePerFrame(), e._realY);
-            }
-            if (this._y > this._realY) {
-                this._realY = Math.min(this._realY + this.distancePerFrame(), e._realY);
-            }
-
-        }
-        this.setJumpE(e)
-    }
-}
-
-Game_CharacterBase.prototype.onJumpEMove = function() {
-    var e = this._jumpMoveEvent
-    if (e) {
-        return this._realX != e._realX || this._realY != e._realY
-    }
-}
-
-
-Game_CharacterBase.prototype.updateAnimationCountE = function() {
-    if (this.onJumpEMove() && this.hasWalkAnime()) {
-        this._animationCount += 1.5;
-    }
-};
-
-
-
-Game_CharacterBase.prototype.updateJumpE = function() {
-    this.moveByJumpE()
-    if (this.onJumpEMove()) {
-        this.updateAnimationCountE()
-    } else {
-        this.updateJumpEInput()
-    }
-};
-
-
-
 Game_CharacterBase.prototype.updateJumpEInput = function() {}
 
 
-
+/*
 ww_JumpPt._Game_Player_prototype_canMove = Game_Player.prototype.canMove
 Game_Player.prototype.canMove = function() {
     return ww_JumpPt._Game_Player_prototype_canMove.call(this) && !this.isJumping();
 };
-
-
-Game_Player.prototype.updateJumpEInput = function() {
-    var direction = this.getInputDirection();
-    if (direction > 0) {
-        $gameTemp.clearDestination();
-    }
-    if (direction > 0) {
-        var d = direction
-        this.setDirection(d)
-        var x2 = $gameMap.roundXWithDirection(this._x, d);
-        var y2 = $gameMap.roundYWithDirection(this._y, d);
-        var e = this.isJumpOnEvent(x2, y2, ["sz", "pt", "base"])
-        if (e) {
-            this.setJumpE(e)
-            this._x = x2
-            this._y = y2
-        } else {
-            var e = this.isJumpingE()
-            if (e) {
-                if (e.event().note == "base") {
-
-                } else {
-                    this.jumpV(x2 - this._x, this._y - y2, 15, [this._x, this._y])
-                }
-            }
-        }
-    }
-}
-
-
+*/
 
 
 
@@ -439,20 +390,22 @@ Game_CharacterBase.prototype.updateJumpV = function() {
     var rx1 = this._realX = rx0 + moveX
     var ry1 = this._realY = ry0 + moveY
 
-    var x0 = $gameMap.roundX(Math.round(rx0))
-    var x1 = $gameMap.roundX(Math.round(rx1))
-    var x01 = $gameMap.roundX(rx1)
+    var x0 = Math.round(rx0)
+    var x1 = Math.round(rx1)
 
-    var y0 = $gameMap.roundX(Math.round(ry0))
-    var y10 = $gameMap.roundX(ry0)
-    var y1 = $gameMap.roundX(Math.round(ry1))
-        //console.log(x0, x1, x01, y0, y1, y10) 
+    var y0 = Math.round(ry0)
+    var y1 = Math.round(ry1)
+
+    var xc = moveX > 0 ? x1 != x0 || (rx0 <= x0 && rx1 >= x1) : x1 != x0 || (rx0 >= x0 && rx1 <= x1)
+    var yc = moveY < 0 ? y0 != y1 || (ry0 <= y0 && ry1 >= y0) : y0 != y1 || (ry0 <= y0 && ry1 >= y0)
         //右跳
+    var y0z = $gameMap.roundY(y0)
     if (moveX > 0) {
-        if (x01 > x1) {
+        if (xc || yc) {
             for (var xi = x0; xi <= x1; xi++) {
-                if (this.isJumpOnQb(xi + 1, y0) || this.isJumpOnEvent(xi + 1, y0, ["qb"])) {
-                    this.jumpXEnd(xi)
+                var xiz = $gameMap.roundX(xi)
+                if (this.isJumpOnQb(xiz + 1, y0z) || this.isJumpOnEvent(xiz + 1, y0z, ["qb"])) {
+                    this.jumpXEnd(xiz)
                     x1 = xi
                     break
                 }
@@ -460,10 +413,11 @@ Game_CharacterBase.prototype.updateJumpV = function() {
         }
         //左跳
     } else if (moveX < 0) {
-        if (x01 < x1) {
+        if (xc || yc) {
             for (var xi = x0; xi >= x1; xi--) {
-                if (this.isJumpOnQb(xi - 1, y0) || this.isJumpOnEvent(xi - 1, y0, ["qb"])) {
-                    this.jumpXEnd(xi)
+                var xiz = $gameMap.roundX(xi)
+                if (this.isJumpOnQb(xiz - 1, y0z) || this.isJumpOnEvent(xiz - 1, y0z, ["qb"])) {
+                    this.jumpXEnd(xiz)
                     x1 = xi
                     break
                 }
@@ -472,29 +426,35 @@ Game_CharacterBase.prototype.updateJumpV = function() {
     }
     /**上跳 */
     if (moveY < 0) {
-        if (y10 <= y0) {
+        if (xc || yc) {
             for (var yi = y0; yi >= y1; yi--) {
+                var yiz = $gameMap.roundY(yi)
                 if (moveX > 0) {
                     for (var xi = x0; xi <= x1; xi++) {
-                        if (this.touchJump(xi, yi, 1)) { return }
+                        var xiz = $gameMap.roundX(xi)
+                        if (this.touchJump(xiz, yiz, 1)) { return }
                     }
                 } else {
                     for (var xi = x0; xi >= x1; xi--) {
-                        if (this.touchJump(xi, yi, 1)) { return }
+                        var xiz = $gameMap.roundX(xi)
+                        if (this.touchJump(xiz, yiz, 1)) { return }
                     }
                 }
             }
         }
     } else {
-        if (y10 >= y0) {
+        if (xc || yc) {
             for (var yi = y0; yi <= y1; yi++) {
+                var yiz = $gameMap.roundY(yi)
                 if (moveX > 0) {
                     for (var xi = x0; xi <= x1; xi++) {
+                        var xiz = $gameMap.roundX(xi)
                         if (this.touchJump(xi, yi, 2)) { return }
                     }
                 } else {
                     for (var xi = x0; xi >= x1; xi--) {
-                        if (this.touchJump(xi, yi, 2)) { return }
+                        var xiz = $gameMap.roundX(xi)
+                        if (this.touchJump(xiz, yiz, 2)) { return }
                     }
                 }
             }
@@ -506,8 +466,8 @@ Game_CharacterBase.prototype.updateJumpV = function() {
 };
 
 
-
 Game_CharacterBase.prototype.touchJump = function(x, y, type) {
+    console.log(x, y)
     var have = this.getJumpTouchEnd(x, y)
     if (have == type || have == 3) {
         return false
@@ -564,8 +524,22 @@ Game_CharacterBase.prototype.touchJump = function(x, y, type) {
 Game_CharacterBase.prototype.touchEvent = function(x, y) {}
 
 Game_Player.prototype.touchEvent = function(x, y) {
-    this.startJumpEvent(x, y)
+    if (this.canStartLocalEvents()) {
+        this.startJumpMapEvent(x, y, [0, 1, 2]);
+    }
 }
+
+
+Game_CharacterBase.prototype.startJumpMapEvent = function(x, y, triggers) {
+    if (!$gameMap.isEventRunning()) {
+        $gameMap.eventsXy(x, y).forEach(function(event) {
+            if (event.isTriggerIn(triggers)) {
+                event.start();
+            }
+        });
+    }
+};
+
 
 
 Game_CharacterBase.prototype.jumpXEnd = function(x, y) {
@@ -583,12 +557,12 @@ Game_CharacterBase.prototype.jumpEnd = function(x, y) {
     this._g = 0
     this._jumpCount = 0
     this._jumpNum = 0
-
     if (this.getJumpEndSid()) {
         $gameSwitches.setValue(this.getJumpEndSid(), true)
     }
-
 }
+
+
 
 Game_CharacterBase.prototype.setJumpEndSid = function(i) {
     this._jumpEndSId = i
@@ -652,9 +626,323 @@ Game_Player.prototype.updateJump = function() {
 };
 
 
-Game_CharacterBase.prototype.startJumpEvent = function(x, y) {
-    if (this.canStartLocalEvents()) {
-        //开始地图事件(x,y,触发组 ,false)
-        this.startMapEvent(x, y, [0, 1, 2], true);
+
+/**设置跳跃事件 */
+Game_CharacterBase.prototype.setJumpE = function(e, x, y) {
+    //console.log(e, x, y)
+    this._jumpMoveEvent = e
+    if (e) {
+        this._jumpMoveEventLx = e._x
+        this._jumpMoveEventLy = e._y
+        this._jumpMoveEventRx = e._realX
+        this._jumpMoveEventRy = e._realY
+        this._jumpMoveEventOx = x || 0
+        this._jumpMoveEventOy = y || 0
     }
 }
+
+/**移动跟着 */
+Game_CharacterBase.prototype.moveByJumpE = function() {
+    var e = this._jumpMoveEvent
+    if (e) {
+        var dmx = e._x - this._jumpMoveEventLx
+        var dmy = e._y - this._jumpMoveEventLy
+
+
+        if (dmx || dmy) {
+            this._x += dmx
+            this._y += dmy
+            this.touchEvent(this._x, this._y)
+        }
+        var rmx = e._realX - this._jumpMoveEventRx
+        var rmy = e._realY - this._jumpMoveEventRy
+            //console.log(dmx, dmy, rmx, rmy)
+
+        this._realX += rmx
+        this._realY += rmy
+        this.setJumpE(e, this._jumpMoveEventOx, this._jumpMoveEventOy)
+    }
+}
+
+Game_CharacterBase.prototype.isJumpEMoving = function() {
+    var e = this._jumpMoveEvent
+    if (e) {
+        var erx = e._realX - this._jumpMoveEventOx
+        var ery = e._realY - this._jumpMoveEventOy
+        return erx !== this._realX || ery !== this._realY
+    }
+}
+
+
+
+ww_JumpPt._Game_CharacterBase_prototype_update = Game_CharacterBase.prototype.update
+Game_CharacterBase.prototype.update = function() {
+    if (this.isJumpingE()) {
+        this.moveByJumpE()
+    }
+    ww_JumpPt._Game_CharacterBase_prototype_update.call(this)
+};
+
+
+
+
+
+Game_Player.prototype.update = function(sceneActive) {
+    if (this.isJumpingE()) {
+        this.moveByJumpE()
+    }
+    var lastScrolledX = this.scrolledX();
+    var lastScrolledY = this.scrolledY();
+    var wasMoving = this.isMoving();
+    this.updateDashing();
+    if (sceneActive) {
+        this.moveByInput();
+    }
+    Game_Character.prototype.update.call(this);
+    this.updateScroll(lastScrolledX, lastScrolledY);
+    this.updateVehicle();
+    if (!this.isMoving()) {
+        this.updateNonmoving(wasMoving);
+    }
+    this._followers.update();
+};
+
+
+
+
+
+
+
+ww_JumpPt._Game_CharacterBase_prototype_isMoving = Game_CharacterBase.prototype.isMoving
+Game_CharacterBase.prototype.isMoving = function() {
+    if (this.isJumpingE()) {
+        return this.isJumpEMoving()
+    } else {
+        return ww_JumpPt._Game_CharacterBase_prototype_isMoving.call(this)
+    }
+};
+
+
+
+
+ww_JumpPt._Game_CharacterBase_prototype_updateMove = Game_CharacterBase.prototype.updateMove
+Game_CharacterBase.prototype.updateMove = function() {
+    if (this.isJumpingE()) {
+        //console.log("move")
+        this.updateJumpEMove()
+    } else {
+        return ww_JumpPt._Game_CharacterBase_prototype_updateMove.call(this)
+    }
+};
+
+/*
+Game_CharacterBase.prototype.updateAnimationCountE = function() {
+    if (this.isJumpEMoving() && this.hasWalkAnime()) {
+        this._animationCount += 1.5;
+    }
+};*/
+
+/*
+Game_CharacterBase.prototype.updateJumpEStop = function() {
+    this.moveByJumpE()
+    this._stopCount++;
+};
+
+*/
+Game_CharacterBase.prototype.updateJumpEMove = function() {
+    //this.moveByJumpE()
+
+    e = this._jumpMoveEvent
+    var erx = e._realX - this._jumpMoveEventOx
+    var ery = e._realY - this._jumpMoveEventOy
+    if (erx < this._realX) {
+        this._realX = Math.max(this._realX - this.distancePerFrame(), erx);
+    }
+    if (erx > this._realX) {
+        this._realX = Math.min(this._realX + this.distancePerFrame(), erx);
+    }
+    if (ery < this._realY) {
+        this._realY = Math.max(this._realY - this.distancePerFrame(), ery);
+    }
+    if (ery > this._realY) {
+        this._realY = Math.min(this._realY + this.distancePerFrame(), ery);
+    }
+    /*
+        if (!this.isMoving()) {
+            //刷新灌木丛深度()
+            this.refreshBushDepth();
+        }*/
+};
+
+/*
+ww_JumpPt._Game_CharacterBase_prototype_updateStop = Game_CharacterBase.prototype.updateStop
+
+Game_CharacterBase.prototype.updateStop = function() {
+    if (this.isJumpingE()) {
+        console.log("stop")
+        this.updateJumpEStop()
+    } else {
+        ww_JumpPt._Game_CharacterBase_prototype_updateStop.call(this)
+    }
+};
+
+*/
+Game_CharacterBase.prototype.setJumpEOut = function() {
+    this.setJumpE(null)
+}
+
+
+Game_CharacterBase.prototype.setJumpEOn = function() {
+    var passe = this.canPassE(this._x - 1, this._y, 6)
+    if (passe) {
+        if (passe._ptType == "kong") {
+            var x = passe._x - this._x
+            var h = this._y - passe._y
+            if (h > 0) {
+                this.jumpV(x, h, 15)
+            } else {
+                this.jumpV(x, h, 15, [this._x, this._y, passe._x, passe._y])
+            }
+            this.increaseSteps();
+        } else {
+            this.setJumpE(passe)
+            this._x = passe._x
+            this._y = passe._y
+            this.increaseSteps();
+        }
+        return true
+    } else {
+        return false
+    }
+}
+
+Game_CharacterBase.prototype.tileJumpE = function(x, y, e) {
+    return { _x: x, _y: y, _realX: x, _realY: y, _ptType: e, tile: true }
+}
+
+Game_CharacterBase.prototype.canPassE = function(x, y, d) {
+    var x2 = $gameMap.roundXWithDirection(x, d);
+    var y2 = $gameMap.roundYWithDirection(y, d);
+    if (!$gameMap.isValid(x2, y2)) {
+        return false;
+    }
+    if (this.isJumpOnEvent(x2, y2, ["qb"])) {
+        return false
+    }
+    if (this.isJumpOn(x2, y2, ["qb"])) {
+        return false
+    }
+    var e = this.isJumpOnEvent(x2, y2, ["base", "pt", "sz"])
+        //console.log(e)
+    if (e) {
+        return e
+    }
+    var e = this.isJumpOn(x2, y2, ["base", "pt", "sz"])
+        //console.log(e)
+    if (e) {
+        return this.tileJumpE(x2, y2, e)
+    }
+    var e = this.isJumpOnEvent(x2, y2, ["kong"])
+        //console.log(e)
+    if (e) {
+        return e
+    }
+    var e = this.isJumpOn(x2, y2, ["kong"])
+        //console.log(e)
+    if (e) {
+        return this.tileJumpE(x2, y2, e)
+    }
+    return false //this.tileJumpE(x2, y2, "kong")
+}
+
+ww_JumpPt._Game_CharacterBase_prototype_moveStraight = Game_CharacterBase.prototype.moveStraight
+Game_CharacterBase.prototype.moveStraight = function(d) {
+    if (this.isJumpingE()) {
+        //console.log(this._realX - this._x) 
+        var passe = this.canPassE(this._x, this._y, d)
+            //console.log(passe, this._x, this._y, d)
+        this.setMovementSuccess(!!passe);
+        if (this.isMovementSucceeded()) {
+            this.setDirection(d);
+            if (passe._ptType == "kong") {
+                var x = passe._x - this._x
+                var h = this._y - passe._y
+                if (h > 0) {
+                    this.jumpV(x, h, 15)
+                } else {
+                    this.jumpV(x, h, 15, [this._x, this._y, passe._x, passe._y])
+                }
+                //this.setJumpE(passe)
+                // this._x = passe._x
+                //this._y = passe._y
+                this.increaseSteps();
+            } else {
+                this.setJumpE(passe)
+                this._x = passe._x
+                this._y = passe._y
+                this.increaseSteps();
+            }
+            //if (passe.tile) { this.setJumpE(null) }
+            //否则
+        } else {
+            //设置方向(d)
+            this.setDirection(d);
+            //检查正面事件触摸触发(d)
+            this.checkEventTriggerTouchFront(d);
+        }
+    } else {
+        ww_JumpPt._Game_CharacterBase_prototype_moveStraight.call(this, d)
+    }
+}
+
+Game_CharacterBase.prototype.canPassDiagonallyE = function(x, y, horz, vert) {
+    var x2 = $gameMap.roundXWithDirection(x, horz);
+    var y2 = $gameMap.roundYWithDirection(y, vert);
+    var e1 = this.canPassE(x, y, vert)
+    var e2 = this.canPassE(x, y2, horz)
+    if (e1 && e2) {
+        return e2;
+    }
+    var e3 = this.canPassE(x, y, horz)
+    var e4 = this.canPassE(x2, y, vert)
+    if (e3 && e4) {
+        return e4;
+    }
+    return false;
+};
+
+
+
+/**移动对角*/
+ww_JumpPt._Game_CharacterBase_prototype_moveDiagonally = Game_CharacterBase.prototype.moveDiagonally
+Game_CharacterBase.prototype.moveDiagonally = function(horz, vert) {
+    if (this.isJumpingE()) {
+        var passe = this.canPassDiagonallyE(this._x, this._y, horz, vert)
+        this.setMovementSuccess(!!passe);
+        if (this.isMovementSucceeded()) {
+            if (passe._ptType == "kong") {
+                var x = passe._x - this._x
+                var h = this._y - passe._y
+                if (h > 0) {
+                    this.jumpV(x, h, 15)
+                } else {
+                    this.jumpV(x, h, 15, [this._x, this._y, passe._x, passe._y])
+                }
+                this.increaseSteps();
+            } else {
+                this.setJumpE(passe)
+                this._x = passe._x
+                this._y = passe._y
+                this.increaseSteps();
+            }
+        }
+        if (this._direction === this.reverseDir(horz)) {
+            this.setDirection(horz);
+        }
+        if (this._direction === this.reverseDir(vert)) {
+            this.setDirection(vert);
+        }
+    } else {
+        ww_JumpPt._Game_CharacterBase_prototype_moveDiagonally.call(this, horz, vert)
+    }
+};
