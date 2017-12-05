@@ -44,9 +44,6 @@ Game_CharacterHZ.prototype.initMembers = function() {
 };
 
 
-Game_CharacterHZ.prototype.setThat = function(that) {
-    this._that = that
-};
 
 Game_CharacterHZ.prototype.setDirectionType = function(z) {
     this._directionType = z || 0
@@ -75,15 +72,15 @@ Game_CharacterHZ.prototype.setZIndexD = function(d, z) {
 
 
 /**更新 */
-Game_CharacterHZ.prototype.update = function() {
-    if (this._that) {
+Game_CharacterHZ.prototype.update = function(that) {
+    if (that) {
         if (this._patternType) {
             this.updateAnimation()
         } else {
-            this._pattern = this._that._pattern
+            this._pattern = that._pattern
         }
 
-        var d = this._that._direction
+        var d = that._direction
         if (this._directionType) {} else {
             this._direction = d
         }
@@ -93,7 +90,7 @@ Game_CharacterHZ.prototype.update = function() {
         } else {
             this._screenZ = this._zIndexHash[d] || 0
         }
-        console.log(d, this._screenZ, this._zIndexHash)
+        // console.log(d, this._screenZ, this._zIndexHash)
     } else {
         this._transparent = true
     }
@@ -175,7 +172,7 @@ Game_CharacterBase.prototype.updateHZ = function() {
     if (this._characterHZs) {
         for (var i in this._characterHZs) {
             var hz = this._characterHZs[i]
-            hz && hz.update && hz.update()
+            hz && hz.update && hz.update(this)
         }
     }
 }
