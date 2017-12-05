@@ -130,7 +130,6 @@ Game_CharacterBase.prototype.setCharacterHZs = function(name, hz) {
 
 Game_CharacterBase.prototype.makeCharacterHz = function(cm, ci, zs, dt, pt) {
     var hz = new Game_CharacterHZ()
-    hz.setThat(this)
     hz.setImage(cm, ci)
     hz.setZIndexHash(zs)
     hz.setDirectionType(dt)
