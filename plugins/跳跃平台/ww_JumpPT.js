@@ -665,10 +665,9 @@ Game_CharacterBase.prototype.setJumpE = function(e, x, y) {
 /**移动跟着 */
 Game_CharacterBase.prototype.moveByJumpE = function() {
     var e = this._jumpMoveEvent
-    if (e) {
+    if (e && !e.tile) {
         var dmx = e._x - this._jumpMoveEventLx
         var dmy = e._y - this._jumpMoveEventLy
-
 
         if (dmx || dmy) {
             this._x += dmx
@@ -693,6 +692,30 @@ Game_CharacterBase.prototype.isJumpEMoving = function() {
         return erx !== this._realX || ery !== this._realY
     }
 }
+
+
+
+ww_JumpPt._Game_CharacterBase_prototype_setPosition = Game_CharacterBase.prototype.setPosition
+Game_CharacterBase.prototype.setPosition = function(x, y) {
+    ww_JumpPt._Game_CharacterBase_prototype_setPosition.call(this, x, y)
+    this.setJumpEOn()
+};
+
+
+Game_CharacterBase.prototype.jumpD = function(x, t) {
+    if (this.isJumpingV()) {
+        if (t) {
+            var vx = x / t
+            this._jumpVx = vx
+        }
+
+        if (vx > 0) {
+            this.setDirection(6)
+        } else if (vx < 0) {
+            this.setDirection(4)
+        }
+    }
+};
 
 
 
@@ -786,11 +809,10 @@ Game_CharacterBase.prototype.updateJumpEMove = function() {
     if (ery > this._realY) {
         this._realY = Math.min(this._realY + this.distancePerFrame(), ery);
     }
-    /*
-        if (!this.isMoving()) {
-            //刷新灌木丛深度()
-            this.refreshBushDepth();
-        }*/
+    if (!this.isMoving()) {
+        //刷新灌木丛深度()
+        this.refreshBushDepth();
+    }
 };
 
 Game_CharacterBase.prototype.setJumpEOut = function() {
