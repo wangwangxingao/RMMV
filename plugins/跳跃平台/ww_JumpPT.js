@@ -30,6 +30,11 @@
  * @desc  空的判断, 在区域内 行走时,如果碰到只有空的时候会掉下去,
  * @default  [17]
  * 
+ * @param  hz 
+ * @desc  后缀  actor1__base  actor1__sz actor1__pt actor1__kong actor1__
+ * @default  {"base":"base","sz":"sz","pt":"pt","kong":"kong","undefined":""}
+ * 
+ * 
  * @param  psid 
  * @desc  角色落地时会把该id开关打开,这样可以触发公共事件了,('_')
  * @default  10
@@ -132,6 +137,7 @@ ww_JumpPt = function() {
     j["sz"] = getValue(p, "sz") || []
     j["qb"] = getValue(p, "qb") || []
     j["kong"] = getValue(p, "kong") || []
+    ww_JumpPt.hz = getValue(p, "hz") || {}
     ww_JumpPt.ptTypes = j
     ww_JumpPt.playJumpEndSId = getValue(p, "psid") || 0
 }
@@ -652,6 +658,7 @@ Game_Player.prototype.updateJump = function() {
 Game_CharacterBase.prototype.setJumpE = function(e, x, y) {
     //console.log(e, x, y)
     this._jumpMoveEvent = e
+    this.setJumpImage(e)
     if (e) {
         this._jumpMoveEventLx = e._x
         this._jumpMoveEventLy = e._y
@@ -976,4 +983,20 @@ Game_CharacterBase.prototype.getXyE = function(x, y) {
         return this.tileJumpE(x, y, e)
     }
     return false //this.tileJumpE(x, y, "kong")
+}
+
+
+
+
+
+Game_CharacterBase.prototype.setJumpImage = function(passe) {
+    var name = this._characterName
+    if (name) {
+        var list = name.splice("__")
+        if (list.length > 1) {
+            var type = (passe && passe._ptType) || "undefined"
+            var n = list[0] + "__" + ww_JumpPt.hz[type]
+            this.setImage(n, this._characterIndex)
+        }
+    }
 }
