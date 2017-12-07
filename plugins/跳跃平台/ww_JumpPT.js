@@ -657,8 +657,8 @@ Game_Player.prototype.updateJump = function() {
 /**设置跳跃事件 */
 Game_CharacterBase.prototype.setJumpE = function(e, x, y) {
     //console.log(e, x, y)
-    this._jumpMoveEvent = e
     this.setJumpImage(e)
+    this._jumpMoveEvent = e
     if (e) {
         this._jumpMoveEventLx = e._x
         this._jumpMoveEventLy = e._y
@@ -702,9 +702,9 @@ Game_CharacterBase.prototype.isJumpEMoving = function() {
 
 
 
-ww_JumpPt._Game_CharacterBase_prototype_setPosition = Game_CharacterBase.prototype.setPosition
-Game_CharacterBase.prototype.setPosition = function(x, y) {
-    ww_JumpPt._Game_CharacterBase_prototype_setPosition.call(this, x, y)
+ww_JumpPt._Game_Player_prototype_setPosition = Game_Player.prototype.setPosition
+Game_Player.prototype.setPosition = function(x, y) {
+    ww_JumpPt._Game_Player_prototype_setPosition.call(this, x, y)
     this.setJumpEOn()
 };
 
@@ -990,9 +990,20 @@ Game_CharacterBase.prototype.getXyE = function(x, y) {
 
 
 Game_CharacterBase.prototype.setJumpImage = function(passe) {
+    if (this._jumpEvents && passe) {
+        if (this._jumpEvents._ptType != passe._ptType) {
+            this.changeJumpImage(passe)
+        }
+    } else if (this._jumpEvents || passe) {
+        this.changeJumpImage(passe)
+    }
+
+}
+
+Game_CharacterBase.prototype.changeJumpImage = function(passe) {
     var name = this._characterName
     if (name) {
-        var list = name.splice("__")
+        var list = (name).split("__")
         if (list.length > 1) {
             var type = (passe && passe._ptType) || "undefined"
             var n = list[0] + "__" + ww_JumpPt.hz[type]
