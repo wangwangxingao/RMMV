@@ -552,15 +552,15 @@ Game_CharacterBase.prototype.touchEvent = function(x, y) {}
 
 Game_Player.prototype.touchEvent = function(x, y) {
     if (this.canStartLocalEvents()) {
-        this.startJumpMapEvent(x, y, [0, 1, 2]);
+        this.startJumpMapEvent(x, y, [0, 1, 2], false);
     }
 }
 
 
-Game_CharacterBase.prototype.startJumpMapEvent = function(x, y, triggers) {
+Game_CharacterBase.prototype.startJumpMapEvent = function(x, y, triggers, normal) {
     if (!$gameMap.isEventRunning()) {
         $gameMap.eventsXy(x, y).forEach(function(event) {
-            if (event.isTriggerIn(triggers)) {
+            if (event.isTriggerIn(triggers) && event.isNormalPriority() === normal) {
                 event.start();
             }
         });
@@ -738,28 +738,13 @@ Game_CharacterBase.prototype.update = function() {
 
 
 
+ww_JumpPt._Game_Player_prototype_update = Game_Player.prototype.update
 Game_Player.prototype.update = function(sceneActive) {
     if (this.isJumpingE()) {
         this.moveByJumpE()
     }
-    var lastScrolledX = this.scrolledX();
-    var lastScrolledY = this.scrolledY();
-    var wasMoving = this.isMoving();
-    this.updateDashing();
-    if (sceneActive) {
-        this.moveByInput();
-    }
-    Game_Character.prototype.update.call(this);
-    this.updateScroll(lastScrolledX, lastScrolledY);
-    this.updateVehicle();
-    if (!this.isMoving()) {
-        this.updateNonmoving(wasMoving);
-    }
-    this._followers.update();
+    ww_JumpPt._Game_Player_prototype_update.call(this, sceneActive)
 };
-
-
-
 
 
 
@@ -786,20 +771,7 @@ Game_CharacterBase.prototype.updateMove = function() {
     }
 };
 
-/*
-Game_CharacterBase.prototype.updateAnimationCountE = function() {
-    if (this.isJumpEMoving() && this.hasWalkAnime()) {
-        this._animationCount += 1.5;
-    }
-};*/
 
-/*
-Game_CharacterBase.prototype.updateJumpEStop = function() {
-    this.moveByJumpE()
-    this._stopCount++;
-};
-
-*/
 Game_CharacterBase.prototype.updateJumpEMove = function() {
     e = this._jumpMoveEvent
     var erx = e._realX - this._jumpMoveEventOx
@@ -846,15 +818,16 @@ Game_CharacterBase.prototype.tileJumpE = function(x, y, e) {
 Game_CharacterBase.prototype.canPassE = function(x, y, d) {
     var x2 = $gameMap.roundXWithDirection(x, d);
     var y2 = $gameMap.roundYWithDirection(y, d);
+    if (this.isCollidedWithCharacters(x2, y2)) {
+        return false;
+    }
     return this.getXyE(x2, y2) //this.tileJumpE(x2, y2, "kong")
 }
 
 ww_JumpPt._Game_CharacterBase_prototype_moveStraight = Game_CharacterBase.prototype.moveStraight
 Game_CharacterBase.prototype.moveStraight = function(d) {
     if (this.isJumpingE()) {
-        //console.log(this._realX - this._x) 
         var passe = this.canPassE(this._x, this._y, d)
-            //console.log(passe, this._x, this._y, d)
         this.setMovementSuccess(!!passe);
         if (this.isMovementSucceeded()) {
             this.setDirection(d);
