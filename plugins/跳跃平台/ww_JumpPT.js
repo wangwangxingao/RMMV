@@ -828,7 +828,7 @@ Game_CharacterBase.prototype.setJumpEOut = function() {
 
 
 Game_CharacterBase.prototype.setJumpEOn = function() {
-    var passe = this.canPassE(this._x - 1, this._y, 6)
+    var passe = this.getXyE(this._x, this._y)
     if (passe) {
         this.moveToE(passe)
         return true
@@ -947,7 +947,7 @@ Game_CharacterBase.prototype.moveToE = function(passe) {
 
 
 Game_CharacterBase.prototype.getXyE = function(x, y) {
-    if (!$gameMap.isValid(x, y)) {
+    if (!$gameMap || !$gameMap.isValid(x, y)) {
         return false;
     }
     if (this.isJumpOnEvent(x, y, ["qb"])) {
