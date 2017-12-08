@@ -60,16 +60,15 @@
  * $gamePlayer.isJumpingE()
  * 返回现在是否在一个跳跃平台事件上,如果在 返回结果为 这个事件
  * 
+ * $gamePlayer.getOnJump()
+ * 把队伍聚集并绑定角色
+ * $gamePlayer.getOffJump()
+ * 把队伍聚集并解除绑定角色
  * 
  * 平台区域 
  * 事件注释为 
- * base 
- * pt
- * sz 
- * kong
- * qb
- * 之一时,为平台区域,判断同上
- * 
+ * <qyid:19> 
+ * qyid为上面使用过的区域编号,  
  * 
  * $gamePlayer.setJumpEOn()
  * 强行把角色放到平台上,角色的移动范围由平台决定(平台包括区域和事件),不由地图决定
@@ -502,7 +501,7 @@ Game_CharacterBase.prototype.touchJump = function(x, y, type) {
 
 
 Game_CharacterBase.prototype.touchJumpOnQb = function(x, y) {
-    var e = this.isJumpOnEvent(x, y, ["qb"])
+    var e = this.isJumpOnQb(x, y)
     if (e) {
         return true
     }
@@ -684,9 +683,9 @@ Game_Player.prototype.updateJump = function() {
 
 
 /**设置跳跃事件 */
-Game_CharacterBase.prototype.setJumpE = function(e, x, y) {
+Game_CharacterBase.prototype.setJumpE = function(e, x, y, v) {
     //console.log(e, x, y)
-    this.setJumpESwitch(e)
+    v || this.setJumpESwitch(e)
     this._jumpMoveEvent = e
     if (e) {
         this._jumpMoveEventLx = e._x
@@ -701,7 +700,7 @@ Game_CharacterBase.prototype.setJumpE = function(e, x, y) {
 /**移动跟着 */
 Game_CharacterBase.prototype.moveByJumpE = function() {
     var e = this._jumpMoveEvent
-    if (e && !e.tile) {
+    if (e && e.isJumpingE) {
         var dmx = e._x - this._jumpMoveEventLx
         var dmy = e._y - this._jumpMoveEventLy
 
@@ -713,10 +712,11 @@ Game_CharacterBase.prototype.moveByJumpE = function() {
         var rmx = e._realX - this._jumpMoveEventRx
         var rmy = e._realY - this._jumpMoveEventRy
             //console.log(dmx, dmy, rmx, rmy)
-
-        this._realX += rmx
-        this._realY += rmy
-        this.setJumpE(e, this._jumpMoveEventOx, this._jumpMoveEventOy)
+        if (rmx || rmy) {
+            this._realX += rmx
+            this._realY += rmy
+        }
+        (dmx || dmy || rmy || rmx) && this.setJumpE(e, this._jumpMoveEventOx, this._jumpMoveEventOy, 1)
     }
 }
 
@@ -841,7 +841,7 @@ Game_CharacterBase.prototype.setJumpEOn = function() {
 
 
 Game_CharacterBase.prototype.tileJumpE = function(x, y, e) {
-    return { _x: x, _y: y, _realX: x, _realY: y, _ptType: e.ptType, tile: true, _qyid: e.qyid }
+    return { _x: x, _y: y, _realX: x, _realY: y, _ptType: e.ptType, _qyid: e.qyid }
 }
 
 Game_CharacterBase.prototype.canPassE = function(x, y, d) {
@@ -930,7 +930,7 @@ Game_CharacterBase.prototype.moveToE = function(passe) {
             }
             this.increaseSteps();
         } else {
-            if (!passe.tile && passe._ptType == "pt") {
+            if (passe.event && passe._ptType == "pt") {
                 this.setJumpE(passe, 0, 1)
                 this._x = passe._x
                 this._y = passe._y - 1
@@ -941,7 +941,6 @@ Game_CharacterBase.prototype.moveToE = function(passe) {
             }
             this.increaseSteps();
         }
-        //if (passe.tile) { this.setJumpE(null) }
     }
 }
 
@@ -1045,48 +1044,8 @@ Game_Player.prototype.changeJumpOnId = function(v) {
 
 
 Game_Player.prototype.jumpV = function(x, y, g, list) {
-
     this.getOnJump()
     Game_CharacterBase.prototype.jumpV.call(this, x, y, g, list)
-}
-
-
-Game_Player.prototype.getOnJump = function() {
-    if (!this.isJumping()) {
-        this._followers.gather()
-    }
-};
-
-
-Game_Player.prototype.getOffJump = function() {
-    this.forEach(function(follower) {
-        return follower.setJumpE(null);
-    }, this)
-    this._jumpVall = false
-    this._followers.synchronize(this.x, this.y, this.direction());
-};
-
-
-Game_Player.prototype.jumpEnd = function(x, y) {
-    Game_CharacterBase.prototype.jumpEnd.call(this, x, y)
-    if (ww_JumpPt.playJumpEndSId) {
-        $gameSwitches.setValue(ww_JumpPt.playJumpEndSId, true)
-    }
-    this.getOffJump()
-}
-
-Game_Followers.prototype.jumpVall = function() {
-    if (!this._jumpVall) {
-        this.forEach(function(follower) {
-            return follower.setJumpE($gamePlayer);
-        }, this)
-        this._jumpVall = true
-    }
-    return this._jumpVall
-};
-
-Game_Followers.prototype.canPass = function() {
-    return true
 }
 
 
@@ -1109,10 +1068,64 @@ Game_Player.prototype.moveDiagonally = function(horz, vert) {
 
 
 
-Game_Player.prototype.updateJumpV = function() {
-    if (!this._followers.areGathering()) {
+
+Game_Player.prototype.jumpEnd = function(x, y) {
+    Game_CharacterBase.prototype.jumpEnd.call(this, x, y)
+    if (ww_JumpPt.playJumpEndSId) {
+        $gameSwitches.setValue(ww_JumpPt.playJumpEndSId, true)
+    }
+    this.getOffJump()
+}
+
+
+
+Game_Player.prototype.getOnJump = function() {
+    if (!this.isJumping()) {
+        this._followers.synchronize(this._realX, this._realY, this.direction())
         this._followers.jumpVall()
-        Game_Character.prototype.updateJumpV.call(this);
+    }
+};
+
+Game_Player.prototype.getOffJump = function() {
+    this._followers.synchronize(this._realX, this._realY, this.direction())
+    this._followers.jumpVallEnd()
+};
+
+
+Game_Followers.prototype.jumpVall = function() {
+    this.forEach(function(follower) {
+        return follower.setJumpE($gamePlayer);
+    }, this)
+};
+
+
+Game_Followers.prototype.jumpVallEnd = function() {
+    this.forEach(function(follower) {
+        return follower.setJumpE(false);
+    }, this)
+};
+
+
+
+Game_Follower.prototype.canPass = function() {
+    return true
+}
+
+
+Game_Follower.prototype.setJumpE = function(e, x, y) {
+    if (e === false || e == $gamePlayer) {
+        Game_CharacterBase.prototype.setJumpE.call(this, e, x, y)
+    }
+}
+
+
+ww_JumpPt._Game_Follower_prototype_chaseCharacter = Game_Follower.prototype.chaseCharacter
+Game_Follower.prototype.chaseCharacter = function(character) {
+    if (this.isJumpingE()) {
+        this.setDirection($gamePlayer.direction())
+    } else {
+
+        ww_JumpPt._Game_Follower_prototype_chaseCharacter.call(this, character)
     }
 
 };
