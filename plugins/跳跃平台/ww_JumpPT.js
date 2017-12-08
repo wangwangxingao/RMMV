@@ -20,7 +20,7 @@
  * 
  * @param  sz 
  * @desc  绳子的判断, 遇到绳子时,会停在绳子上(当然也可以修改下...)
- * @default  [18]
+ * @default  [16]
  * 
  * @param  qb 
  * @desc  墙壁的判断,将要碰到墙壁时,x方向会停止移动,但y方向依然会运动(上升下落),和其他不同,墙壁是一个预判断,
@@ -29,15 +29,19 @@
  * @param  kong 
  * @desc  空的判断, 在区域内 行走时,如果碰到只有空的时候会掉下去,
  * @default  [17]
- * 
- * @param  hz 
- * @desc  后缀  actor1__base  actor1__sz actor1__pt actor1__kong actor1__
- * @default  {"base":"base","sz":"sz","pt":"pt","kong":"kong","undefined":""}
- * 
- * 
+ *   
  * @param  psid 
  * @desc  角色落地时会把该id开关打开,这样可以触发公共事件了,('_')
  * @default  10
+ * 
+ * @param  typeswitch 
+ * @desc  角色落地时到特定区域会把该id开关打开,这样可以触发公共事件了,('_')
+ * @default  {"base":0,"sz":0,"pt":0,"kong":0,"":15}
+ * 
+ * @param  qyswitch 
+ * @desc  角色落地时到特定区域的区域id会把该id开关打开,这样可以触发公共事件了,('_')
+ * @default  {"19":12,"20":0,"18":0 }
+ * 
  * 
  * @help 
  * 
@@ -137,7 +141,9 @@ ww_JumpPt = function() {
     j["sz"] = getValue(p, "sz") || []
     j["qb"] = getValue(p, "qb") || []
     j["kong"] = getValue(p, "kong") || []
-    ww_JumpPt.hz = getValue(p, "hz") || {}
+    ww_JumpPt.typeswitch = getValue(p, "typeswitch") || {}
+    ww_JumpPt.qyswitch = getValue(p, "qyswitch") || {}
+
     ww_JumpPt.ptTypes = j
     ww_JumpPt.playJumpEndSId = getValue(p, "psid") || 0
 }
@@ -154,12 +160,21 @@ Game_CharacterBase.prototype.jumpNum = function() {
 
 
 
-Game_CharacterBase.prototype.setPtType = function(type) {
-    if (this._ptType) {
-        $gameMap.removeJumpEvents(this._ptType, this)
+Game_CharacterBase.prototype.setPtType = function(id) {
+    if (id) {
+        var id = id * 1
+        for (var type in ww_JumpPt.ptTypes) {
+            var l = ww_JumpPt.ptTypes[type]
+            if (l && l.indexOf(id) >= 0) {
+                if (this._ptType) {
+                    $gameMap.removeJumpEvents(this._ptType, this)
+                }
+                this._ptType = $gameMap.addJumpEvents(type, this)
+                this._qyid = id
+                return
+            }
+        }
     }
-    this._ptType = $gameMap.addJumpEvents(type, this)
-    return this._ptType
 }
 
 
@@ -201,7 +216,7 @@ Game_CharacterBase.prototype.isJumpOn = function(x, y, types) {
     for (var i = 0; i < types.length; i++) {
         var type = types[i]
         if (ptTypes && ptTypes[type] && ptTypes[type].indexOf(id) >= 0) {
-            return type
+            return { ptType: type, qyid: id }
         }
     }
     return false
@@ -221,7 +236,7 @@ Game_CharacterBase.prototype.isJumpOnSz = function(x, y) {
 }
 
 Game_CharacterBase.prototype.isJumpOnQb = function(x, y) {
-    return this.isJumpOn(x, y, ["qb"]) || !(x >= 0 && x < $gameMap.width())
+    return this.isJumpOn(x, y, ["qb"]) || !$gameMap.isValid(x, y)
 }
 
 
@@ -243,8 +258,8 @@ Game_Map.prototype.setupEvents = function() {
     for (var i = 0; i < es.length; i++) {
         var e = es[i]
         if (e && e.event()) {
-            var name = e.event().note
-            e.setPtType(name)
+            var qyid = e.event().meta.qyid
+            e.setPtType(qyid)
         }
     }
 };
@@ -400,7 +415,7 @@ Game_CharacterBase.prototype.updateJumpV = function() {
         if (xc || yc) {
             for (var xi = x0; xi <= x1; xi++) {
                 var xiz = $gameMap.roundX(xi)
-                if (this.isJumpOnQb(xiz + 1, y0z) || this.isJumpOnEvent(xiz + 1, y0z, ["qb"])) {
+                if (this.touchJumpOnQb(xiz + 1, y0z)) {
                     this.jumpXEnd(xiz)
                     x1 = xi
                     break
@@ -412,7 +427,7 @@ Game_CharacterBase.prototype.updateJumpV = function() {
         if (xc || yc) {
             for (var xi = x0; xi >= x1; xi--) {
                 var xiz = $gameMap.roundX(xi)
-                if (this.isJumpOnQb(xiz - 1, y0z) || this.isJumpOnEvent(xiz - 1, y0z, ["qb"])) {
+                if (this.touchJumpOnQb(xiz - 1, y0z)) {
                     this.jumpXEnd(xiz)
                     x1 = xi
                     break
@@ -468,31 +483,50 @@ Game_CharacterBase.prototype.touchJump = function(x, y, type) {
         return false
     }
     this.touchEvent(x, y)
+    if (this.touchJumpOnSz(x, y)) {
+        return true
+    }
     if (type == 2) {
         if (this.touchJumpOnBase(x, y) || this._jumpDown || this.touchJumpOnPt(x, y)) {
             return true
         }
-    }
-
-    if (this.touchJumpOnSz(x, y)) {
-        return
+    } else {
+        if (this.touchJumpOnQb(x, y)) {
+            this._jumpVy = 0
+            return true
+        }
     }
     this.setJumpTouchEnd(x, y, type)
     return false
 }
 
 
+Game_CharacterBase.prototype.touchJumpOnQb = function(x, y) {
+    var e = this.isJumpOnEvent(x, y, ["qb"])
+    if (e) {
+        return true
+    }
+    var e = this.isJumpOn(x, y, ["qb"])
+    if (e) {
+        return true
+    }
+    return false
+}
+
+
+
+
 Game_CharacterBase.prototype.touchJumpOnBase = function(x, y) {
     var e = this.isJumpOnEvent(x, y, ["base"])
     if (e) {
-        this.setJumpE(e)
         this.jumpEnd(x, y)
+        this.setJumpE(e)
         return true
     }
     var e = this.isJumpOn(x, y, ["base"])
     if (e) {
-        this.setJumpT(x, y, e)
         this.jumpEnd(x, y)
+        this.setJumpT(x, y, e)
         return true
     }
     return false
@@ -503,14 +537,14 @@ Game_CharacterBase.prototype.touchJumpOnPt = function(x, y) {
 
     var e = this.isJumpOnEvent(x, y + 1, ["pt"])
     if (e) {
-        this.setJumpE(e, 0, 1)
         this.jumpEnd(x, y)
+        this.setJumpE(e, 0, 1)
         return true
     }
     var e = this.isJumpOn(x, y, ["pt"])
     if (e) {
-        this.setJumpT(x, y, e)
         this.jumpEnd(x, y)
+        this.setJumpT(x, y, e)
         return true
     }
     return false
@@ -524,14 +558,14 @@ Game_CharacterBase.prototype.touchJumpOnSz = function(x, y) {
     //绳子判断
     var e = this.isJumpOnEvent(x, y, ["sz"])
     if (e) {
-        this.setJumpE(e)
         this.jumpEnd(x, y)
+        this.setJumpE(e)
         return true
     }
     var e = this.isJumpOn(x, y, ["sz"])
     if (e) {
-        this.setJumpT(x, y, e)
         this.jumpEnd(x, y)
+        this.setJumpT(x, y, e)
         return true
     }
     return false
@@ -598,12 +632,7 @@ Game_CharacterBase.prototype.getJumpEndSid = function() {
     return this._jumpEndSId
 }
 
-Game_Player.prototype.jumpEnd = function(x, y) {
-    Game_CharacterBase.prototype.jumpEnd.call(this, x, y)
-    if (ww_JumpPt.playJumpEndSId) {
-        $gameSwitches.setValue(ww_JumpPt.playJumpEndSId, true)
-    }
-}
+
 
 ww_JumpPt._Game_CharacterBase_prototype_jumpHeight = Game_CharacterBase.prototype.jumpHeight
 Game_CharacterBase.prototype.jumpHeight = function() {
@@ -657,7 +686,7 @@ Game_Player.prototype.updateJump = function() {
 /**设置跳跃事件 */
 Game_CharacterBase.prototype.setJumpE = function(e, x, y) {
     //console.log(e, x, y)
-    this.setJumpImage(e)
+    this.setJumpESwitch(e)
     this._jumpMoveEvent = e
     if (e) {
         this._jumpMoveEventLx = e._x
@@ -812,7 +841,7 @@ Game_CharacterBase.prototype.setJumpEOn = function() {
 
 
 Game_CharacterBase.prototype.tileJumpE = function(x, y, e) {
-    return { _x: x, _y: y, _realX: x, _realY: y, _ptType: e, tile: true }
+    return { _x: x, _y: y, _realX: x, _realY: y, _ptType: e.ptType, tile: true, _qyid: e.qyid }
 }
 
 Game_CharacterBase.prototype.canPassE = function(x, y, d) {
@@ -960,27 +989,91 @@ Game_CharacterBase.prototype.getXyE = function(x, y) {
 
 
 
-
-
-Game_CharacterBase.prototype.setJumpImage = function(passe) {
-    if (this._jumpEvents && passe) {
-        if (this._jumpEvents._ptType != passe._ptType) {
-            this.changeJumpImage(passe)
-        }
-    } else if (this._jumpEvents || passe) {
-        this.changeJumpImage(passe)
+Game_CharacterBase.prototype.setJumpESwitch = function(passe) {
+    var type = passe ? passe._ptType : ""
+    if (this.jumpOnType() != type) {
+        this.changeJumpOnType(type)
     }
-
+    var id = passe ? passe._qyid : 0
+    if (this.jumpOnId() != id) {
+        this.changeJumpOnId(id)
+    }
 }
 
-Game_CharacterBase.prototype.changeJumpImage = function(passe) {
-    var name = this._characterName
-    if (name) {
-        var list = (name).split("__")
-        if (list.length > 1) {
-            var type = (passe && passe._ptType) || "undefined"
-            var n = list[0] + "__" + ww_JumpPt.hz[type]
-            this.setImage(n, this._characterIndex)
+
+Game_CharacterBase.prototype.jumpOnType = function() {
+    return this._jumpOnType
+}
+
+
+Game_CharacterBase.prototype.jumpOnId = function() {
+    return this._jumpOnId
+}
+
+
+Game_CharacterBase.prototype.changeJumpOnType = function(v) {
+    this._jumpOnType = v
+}
+
+
+Game_CharacterBase.prototype.changeJumpOnId = function(v) {
+    this._jumpOnId = v
+}
+
+
+Game_Player.prototype.changeJumpOnType = function(v) {
+    if (ww_JumpPt.typeswitch) {
+        var id = ww_JumpPt.typeswitch[v]
+        if (id) {
+            $gameSwitches.setValue(id, true)
         }
     }
+    Game_CharacterBase.prototype.changeJumpOnType.call(this, v)
+}
+
+
+Game_Player.prototype.changeJumpOnId = function(v) {
+    if (ww_JumpPt.qyswitch) {
+        var id = ww_JumpPt.qyswitch[v]
+        if (id) {
+            $gameSwitches.setValue(id, true)
+        }
+    }
+    Game_CharacterBase.prototype.changeJumpOnId.call(this, v)
+}
+
+
+Game_Player.prototype.synchronizeNow = function() {
+    this._followers.synchronize(this.x, this.y, this.direction())
+}
+
+
+Game_Player.prototype.jumpV = function(x, y, g, list) {
+    this.getOnJump()
+    Game_CharacterBase.prototype.jumpV.call(this, x, y, g, list)
+}
+
+
+Game_Player.prototype.getOnJump = function() {
+    this._lastFsV = this._lastFsV || this._followers.isVisible()
+    this._followers.hide()
+    this._followers.refresh()
+};
+/**下交通工具*/
+Game_Player.prototype.getOffJump = function() {
+    this._followers.synchronize(this.x, this.y, this.direction());
+    if (this._lastFsV) {
+        this._followers.show()
+    }
+    this._followers.refresh()
+    this._lastFsV = false
+};
+
+
+Game_Player.prototype.jumpEnd = function(x, y) {
+    Game_CharacterBase.prototype.jumpEnd.call(this, x, y)
+    if (ww_JumpPt.playJumpEndSId) {
+        $gameSwitches.setValue(ww_JumpPt.playJumpEndSId, true)
+    }
+    this.getOffJump()
 }
