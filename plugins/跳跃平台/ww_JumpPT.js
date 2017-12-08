@@ -1043,30 +1043,27 @@ Game_Player.prototype.changeJumpOnId = function(v) {
 }
 
 
-Game_Player.prototype.synchronizeNow = function() {
-    this._followers.synchronize(this.x, this.y, this.direction())
-}
-
 
 Game_Player.prototype.jumpV = function(x, y, g, list) {
+
     this.getOnJump()
     Game_CharacterBase.prototype.jumpV.call(this, x, y, g, list)
 }
 
 
 Game_Player.prototype.getOnJump = function() {
-    this._lastFsV = this._lastFsV || this._followers.isVisible()
-    this._followers.hide()
-    this._followers.refresh()
-};
-/**下交通工具*/
-Game_Player.prototype.getOffJump = function() {
-    this._followers.synchronize(this.x, this.y, this.direction());
-    if (this._lastFsV) {
-        this._followers.show()
+    if (!this.isJumping()) {
+        this._followers.gather()
     }
-    this._followers.refresh()
-    this._lastFsV = false
+};
+
+
+Game_Player.prototype.getOffJump = function() {
+    this.forEach(function(follower) {
+        return follower.setJumpE(null);
+    }, this)
+    this._jumpVall = false
+    this._followers.synchronize(this.x, this.y, this.direction());
 };
 
 
@@ -1077,3 +1074,45 @@ Game_Player.prototype.jumpEnd = function(x, y) {
     }
     this.getOffJump()
 }
+
+Game_Followers.prototype.jumpVall = function() {
+    if (!this._jumpVall) {
+        this.forEach(function(follower) {
+            return follower.setJumpE($gamePlayer);
+        }, this)
+        this._jumpVall = true
+    }
+    return this._jumpVall
+};
+
+Game_Followers.prototype.canPass = function() {
+    return true
+}
+
+
+
+/**移动直线*/
+Game_Player.prototype.moveStraight = function(d) {
+    //if (this.canPass(this.x, this.y, d)) { 
+    this._followers.updateMove();
+    //} 
+    Game_Character.prototype.moveStraight.call(this, d);
+};
+/**移动对角*/
+Game_Player.prototype.moveDiagonally = function(horz, vert) {
+    //if (this.canPassDiagonally(this.x, this.y, horz, vert)) { 
+    this._followers.updateMove();
+    //} 
+    Game_Character.prototype.moveDiagonally.call(this, horz, vert);
+};
+
+
+
+
+Game_Player.prototype.updateJumpV = function() {
+    if (!this._followers.areGathering()) {
+        this._followers.jumpVall()
+        Game_Character.prototype.updateJumpV.call(this);
+    }
+
+};
