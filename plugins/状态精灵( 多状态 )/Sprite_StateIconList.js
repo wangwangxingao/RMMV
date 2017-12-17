@@ -113,11 +113,16 @@ Sprite_StateIconList.prototype.loadBitmap = function() {
 };
 /**安装 */
 Sprite_StateIconList.prototype.setup = function(battler) {
-    this._battler = battler;
+    if (this._battler != battler) {
+        this._battler = battler;
+        this._animationIndex = 0
+        this.updateIcon()
+    }
 };
 /**更新 */
 Sprite_StateIconList.prototype.update = function() {
     Sprite.prototype.update.call(this);
+    if (!this._battler) { return }
     this._animationCount++;
     if (this._animationCount >= this.animationWait()) {
         this.updateIcon();
@@ -132,6 +137,7 @@ Sprite_StateIconList.prototype.animationWait = function() {
 Sprite_StateIconList.prototype.animationAdd = function() {
     return this._iconSprites.length;
 };
+
 /**更新图标 */
 Sprite_StateIconList.prototype.updateIcon = function() {
     var icons = [];
