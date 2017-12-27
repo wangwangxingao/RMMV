@@ -1313,7 +1313,6 @@ Window_Message.prototype.tslPushHear2 = function(textState) {
 Window_Message.prototype.tslPushFaceParam = function(textState) {
     var page = textState.page
     var arr = this.tslPushEscapeParamEx(textState)
-
     if (arr) {
         var pos = arr[0] * 1
         var name = arr[1]
@@ -1412,6 +1411,18 @@ Window_Message.prototype.tslPushEscapeCharacter = function(textState, code) {
 };
 
 
+
+Window_Message.prototype.clearSkipFlags = function() {
+    this._showFast = false;
+    this._pauseSkip = false;
+};
+
+Window_Message.prototype.clearlineShowFast = function() {
+    this._lineShowFast = false;
+};
+
+
+
 /**进行绘制普通 */
 Window_Message.prototype.processDrawCharacter = function(textState) {
     var obj = this.needsCharacter(textState)
@@ -1421,7 +1432,7 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
                 this.rejiange()
                 this.clearFace()
                 this.resetFontSettings();
-                this.clearFlags();
+                this.clearlineShowFast();
             case "addpage":
                 textState.page = obj;
                 var page = obj
@@ -1432,7 +1443,7 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
                         this.updatePlacement();
                     }
                 }
-                this._pauseSkip = false;
+                this.clearSkipFlags()
                 break
             case "gold":
                 this._goldWindow.open();
@@ -1476,6 +1487,7 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
                 var opacity = 255
                 var blendMode = 0
                 this.showPicture([0, name, origin, x, y, scaleX, scaleY, opacity, blendMode])
+                this.zindexPicture([0, -1])
                 break
             default:
                 Window_Base.prototype.processDrawCharacter.call(this, textState)
@@ -1760,6 +1772,18 @@ Window_Message.prototype.startMessage = function() {
     this.open();
 };
 
+Window_Message.prototype.updateWait = function() {
+    if (this._waitCount > 0) {
+        this._waitCount--;
+        this.updateShowFast();
+        if (this._showFast) {
+            this._waitCount = 0
+        }
+        return true;
+    } else {
+        return false;
+    }
+};
 
 
 /**更新信息 */
@@ -1772,11 +1796,18 @@ Window_Message.prototype.updateMessage = function() {
                 if (this.needsNewPage(this._textState)) {
                     this.newPage(this._textState);
                 }
-            if (!this._showFast && !this._lineShowFast) {
-                break;
-            }
-            if (this.pause || this._waitCount > 0) {
-                break;
+            if (this._showFast) {
+                if (this.pause) {
+                    this._showFast = false
+                    break
+                }
+            } else {
+                if (!this._lineShowFast) {
+                    break
+                }
+                if (this.pause || this._waitCount > 0) {
+                    break;
+                }
             }
         }
         if (this.isEndOfText(this._textState)) {
@@ -1787,6 +1818,9 @@ Window_Message.prototype.updateMessage = function() {
         return false;
     }
 };
+
+
+
 
 /**新页 */
 Window_Message.prototype.newPage = function(textState, cs) {
@@ -1875,8 +1909,6 @@ Window_Message.prototype.drawMessageFace = function() {};
 Window_Message.prototype.showMessageFace = function(face, id, pos, textState) {
 
     var name = "face/" + '"' + face + '",' + id
-
-
     if (this.contentsHeight() >= 144) {
         var y = 0
     } else {
@@ -2210,46 +2242,52 @@ Sprite_WindowPicture.prototype.picture = function() {
 
 
 Sprite_Picture.prototype.loadBitmap = function() {
-    if (this._pictureName.indexOf("text/") == 0) {
-        var json = this._pictureName.slice(5)
-        if (json) {
-            var list = JSON.parse("[" + json + "]")
-            var w = list[0] || 0
-            var h = list[1] || 0
-            var text = list[2] || ""
-            var wb = new Window_Base(0, 0, 1, 1)
-            wb.contents = new Bitmap(w, h)
-            wb.drawTextEx(text, 0, 0)
-            this.bitmap = wb.contents
-            wb.contents = new Bitmap(0, 0)
-            wb = null
+    if (this._pictureName) {
+        console.log(this._pictureName)
+
+        if (this._pictureName.indexOf("text/") == 0) {
+            var json = this._pictureName.slice(5)
+            if (json) {
+                var list = JSON.parse("[" + json + "]")
+                var w = list[0] || 0
+                var h = list[1] || 0
+                var text = list[2] || ""
+                var wb = new Window_Base(0, 0, 1, 1)
+                wb.contents = new Bitmap(w, h)
+                wb.drawTextEx(text, 0, 0)
+                this.bitmap = wb.contents
+                wb.contents = new Bitmap(0, 0)
+                wb = null
+            } else {
+                this.bitmap = new Bitmap()
+            }
+        } else if (this._pictureName.indexOf("face/") == 0) {
+            var json = this._pictureName.slice(5)
+            if (json) {
+                var list = JSON.parse("[" + json + "]")
+                var faceName = list[0] || ""
+                var faceIndex = list[1] || 0
+                this.bitmap = ImageManager.loadFace(faceName);
+                var that = this
+                this.bitmap.addLoadListener(
+                    function() {
+                        var pw = Window_Base._faceWidth;
+                        var ph = Window_Base._faceHeight;
+                        var sw = pw
+                        var sh = ph
+                        var sx = faceIndex % 4 * pw + (pw - sw) / 2;
+                        var sy = Math.floor(faceIndex / 4) * ph + (ph - sh) / 2;
+                        that.setFrame(sx, sy, sw, sh);
+                    }
+                )
+            } else {
+                this.bitmap = new Bitmap()
+            }
         } else {
-            this.bitmap = new Bitmap()
-        }
-    } else if (this._pictureName.indexOf("face/") == 0) {
-        var json = this._pictureName.slice(5)
-        if (json) {
-            var list = JSON.parse("[" + json + "]")
-            var faceName = list[0] || ""
-            var faceIndex = list[1] || 0
-            this.bitmap = ImageManager.loadFace(faceName);
-            var that = this
-            this.bitmap.addLoadListener(
-                function() {
-                    var pw = Window_Base._faceWidth;
-                    var ph = Window_Base._faceHeight;
-                    var sw = pw
-                    var sh = ph
-                    var sx = faceIndex % 4 * pw + (pw - sw) / 2;
-                    var sy = Math.floor(faceIndex / 4) * ph + (ph - sh) / 2;
-                    that.setFrame(sx, sy, sw, sh);
-                }
-            )
-        } else {
-            this.bitmap = new Bitmap()
+            this.bitmap = ImageManager.loadPicture(this._pictureName);
         }
     } else {
-        this.bitmap = ImageManager.loadPicture(this._pictureName);
+        this.bitmap = ImageManager.loadPicture("");
     }
 }
 
