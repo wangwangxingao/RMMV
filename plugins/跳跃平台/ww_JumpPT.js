@@ -26,6 +26,22 @@
  * @desc  墙壁的判断,将要碰到墙壁时,x方向会停止移动,但y方向依然会运动(上升下落),和其他不同,墙壁是一个预判断,
  * @default  [18]
  * 
+ * @param  qb2
+ * @desc  向下墙壁的判断,只用于行走
+ * @default  [18]
+ * 
+ * @param  qb4
+ * @desc  向左墙壁的判断,只用于行走,
+ * @default  [18]
+ * 
+ * @param  qb6
+ * @desc  向右墙壁的判断,只用于行走,如果它在右面,无法往右走,但不影响跳跃
+ * @default  [18]
+ * 
+ * @param  qb8
+ * @desc  向上墙壁的判断,只用于行走,如果它在上面,无法往上走,但不影响跳跃
+ * @default  [30]
+ * 
  * @param  kong 
  * @desc  空的判断, 在区域内 行走时,如果碰到只有空的时候会掉下去,
  * @default  [17]
@@ -36,11 +52,11 @@
  * 
  * @param  typeswitch 
  * @desc  角色落地时到特定区域会把该id开关打开,这样可以触发公共事件了,('_')
- * @default  {"base":0,"sz":0,"pt":0,"kong":0,"":15}
+ * @default  {"base":0,"sz":0,"pt":0,"kong":0,"":0}
  * 
  * @param  qyswitch 
  * @desc  角色落地时到特定区域的区域id会把该id开关打开,这样可以触发公共事件了,('_')
- * @default  {"19":12,"20":0,"18":0 }
+ * @default  {"19":0,"20":0,"18":0 }
  * 
  * 
  * @help 
@@ -139,6 +155,10 @@ ww_JumpPt = function() {
     j["pt"] = getValue(p, "pt") || []
     j["sz"] = getValue(p, "sz") || []
     j["qb"] = getValue(p, "qb") || []
+    j["qb2"] = getValue(p, "qb2") || []
+    j["qb4"] = getValue(p, "qb4") || []
+    j["qb6"] = getValue(p, "qb6") || []
+    j["qb8"] = getValue(p, "qb8") || []
     j["kong"] = getValue(p, "kong") || []
     ww_JumpPt.typeswitch = getValue(p, "typeswitch") || {}
     ww_JumpPt.qyswitch = getValue(p, "qyswitch") || {}
@@ -247,12 +267,10 @@ ww_JumpPt._Game_Map_prototype_setupEvents = Game_Map.prototype.setupEvents
 Game_Map.prototype.setupEvents = function() {
     ww_JumpPt._Game_Map_prototype_setupEvents.call(this)
     var es = this.events()
-    this._jumpEvents = {
-        base: [],
-        pt: [],
-        sz: [],
-        qd: [],
-        kong: []
+
+    this._jumpEvents = {}
+    for (var i in ww_JumpPt.ptTypes) {
+        this._jumpEvents[i] = []
     }
     for (var i = 0; i < es.length; i++) {
         var e = es[i]
@@ -850,7 +868,7 @@ Game_CharacterBase.prototype.canPassE = function(x, y, d) {
     if (this.isCollidedWithCharacters(x2, y2)) {
         return false;
     }
-    return this.getXyE(x2, y2) //this.tileJumpE(x2, y2, "kong")
+    return this.getXyE(x2, y2, d) //this.tileJumpE(x2, y2, "kong")
 }
 
 ww_JumpPt._Game_CharacterBase_prototype_moveStraight = Game_CharacterBase.prototype.moveStraight
@@ -947,14 +965,18 @@ Game_CharacterBase.prototype.moveToE = function(passe) {
 
 
 
-Game_CharacterBase.prototype.getXyE = function(x, y) {
+Game_CharacterBase.prototype.getXyE = function(x, y, d) {
     if (!$gameMap || !$gameMap.isValid(x, y)) {
         return false;
     }
-    if (this.isJumpOnEvent(x, y, ["qb"])) {
+    var qb = ["qb"]
+    if (d) {
+        var qb = ["qb", "qb" + d]
+    }
+    if (this.isJumpOnEvent(x, y, qb)) {
         return false
     }
-    if (this.isJumpOn(x, y, ["qb"])) {
+    if (this.isJumpOn(x, y, qb)) {
         return false
     }
     var e = this.isJumpOnEvent(x, y, ["base", "sz"])
