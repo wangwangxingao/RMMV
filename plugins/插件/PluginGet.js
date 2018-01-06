@@ -22,51 +22,22 @@
  * */
 
 
-
-PluginManager.find = function(name) {
-    var name = name || ""
-    var pm = name.toLowerCase()
-    var parameters = PluginManager._parameters[pm];
-    if (parameters) {} else {
-        var pls = PluginManager._parameters
-        for (var n in pls) {
-            if (pls[n] && (name in pls[n])) {
-                parameters = pls[n]
-            }
-        }
-    }
-    return parameters || {}
+PluginManager.find = function(n) {
+    var l = PluginManager._parameters;
+    var p = l[(n || "").toLowerCase()];
+    if (!p) { for (var m in l) { if (l[m] && (n in l[m])) { p = l[n]; } } }
+    return p || {}
 }
 
-
-PluginManager.parse = function(i, type) {
-    try {
-        if (type) {
-            return i
-        }
-        return JSON.parse(i)
-    } catch (e) {
-        return i
-    }
+PluginManager.parse = function(i) {
+    try { return JSON.parse(i) } catch (e) { return i }
 }
 
-PluginManager.get = function(p, n, unde) {
-    try {
-        var i = p[n]
-    } catch (e) {
-        var i = unde
-    }
-    return i === undefined ? unde : i
+PluginManager.get = function(p, n, u) {
+    try { var i = p[n] } catch (e) { var i = u }
+    return i === void 0 ? u : i
 }
 
-PluginManager.getValue = function(p, n, unde, type) {
-    var i = this.get(p, n, unde)
-    try {
-        if (type) {
-            return i
-        }
-        return JSON.parse(i)
-    } catch (e) {
-        return i
-    }
+PluginManager.getValue = function(p, n, u) {
+    return this.parse(this.get(p, n, u))
 }

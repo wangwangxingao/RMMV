@@ -97,22 +97,22 @@ Window_BattleLog.prototype.isBusy = function() {
 Window_BattleLog.prototype.update = function() {
     //如果 不是 更新等待
     if (!this.updateWait()) {
-        //呼叫下一个方法
+        //呼叫下一个方法()
         this.callNextMethod();
     }
 };
 /**更新等待 */
 Window_BattleLog.prototype.updateWait = function() {
-    //返回 更新等待计数 或者 更新等待模式
+    //返回 更新等待计数() 或者 更新等待模式()
     return this.updateWaitCount() || this.updateWaitMode();
 };
 /**更新等待计数 */
 Window_BattleLog.prototype.updateWaitCount = function() {
-    //如果 等待计数 > 0
+    //如果( 等待计数 > 0)
     if (this._waitCount > 0) {
         //等待计数 -= 是快发送?  3 : 1
         this._waitCount -= this.isFastForward() ? 3 : 1;
-        //如果 等待计数 < 0
+        //如果( 等待计数 < 0)
         if (this._waitCount < 0) {
             //等待计数 = 0
             this._waitCount = 0;
