@@ -171,13 +171,19 @@ Window_BattleLog.prototype.callNextMethod = function() {
         }
     }
 };
-/**是快发送 */
+/**是快发送 
+ * @return {blooean}
+ */
 Window_BattleLog.prototype.isFastForward = function() {
-    //返回 输入 是长按下(ok)  或者 输入 是按下(shift) 或者 触摸输入 是长按下
+    //返回 输入 是长按下(ok)  或者 输入 是按下(shift) 或者 触摸输入 是长按下()
     return (Input.isLongPressed('ok') || Input.isPressed('shift') ||
         TouchInput.isLongPressed());
 };
-/**添加 */
+/**添加 
+ * @param {string} methodName
+ * @description 
+ * 添加基础名称和参数到方法组中,准备调用
+ */
 Window_BattleLog.prototype.push = function(methodName) {
     //方法参数 = 数组 切割 呼叫 (参数,1)
     var methodArgs = Array.prototype.slice.call(arguments, 1);
@@ -232,7 +238,9 @@ Window_BattleLog.prototype.popBaseLine = function() {
         this._lines.pop();
     }
 };
-/**等待为新行 */
+/**
+ * 
+ */
 Window_BattleLog.prototype.waitForNewLine = function() {
     //基础行 = 0
     var baseLine = 0;
@@ -243,7 +251,7 @@ Window_BattleLog.prototype.waitForNewLine = function() {
     }
     //如果( 行长度 > 基础行)
     if (this._lines.length > baseLine) {
-        //等待
+        //等待()
         this.wait();
     }
 };
@@ -302,7 +310,10 @@ Window_BattleLog.prototype.performReflection = function(target) {
     //目标 表现反射()
     target.performReflection();
 };
-/**表现替代 */
+/**表现替代
+ * @param {Game_Battler} substitute 替代者
+ * @param {Game_Battler} target 目标
+ *  */
 Window_BattleLog.prototype.performSubstitute = function(substitute, target) {
     //替代者 表现替代(目标)
     substitute.performSubstitute(target);
@@ -320,11 +331,14 @@ Window_BattleLog.prototype.showAnimation = function(subject, targets, animationI
         this.showAttackAnimation(subject, targets);
         //否则
     } else {
-        //显示正常动画
+        //显示正常动画(目标组,动画id)
         this.showNormalAnimation(targets, animationId);
     }
 };
-/**显示攻击动画 */
+/**显示攻击动画
+ * @param {Game_Battler} subject 主体
+ * @param {[Game_Battler]} targets 目标组
+ *  */
 Window_BattleLog.prototype.showAttackAnimation = function(subject, targets) {
     //如果 ( 主体 是角色() )
     if (subject.isActor()) {
@@ -337,8 +351,8 @@ Window_BattleLog.prototype.showAttackAnimation = function(subject, targets) {
     }
 };
 /**显示角色攻击动画
- * @param {Game_Battler} subject
- * @param {[Game_Battler]} targets
+ * @param {Game_Battler} subject 主体
+ * @param {[Game_Battler]} targets 目标组
  * 
  * 
  */
@@ -355,9 +369,9 @@ Window_BattleLog.prototype.showEnemyAttackAnimation = function(subject, targets)
 };
 /**
  * 显示正常动画 
- * @param {[Game_Battler]} targets
- * @param {number} animationId
- * @param {boolean} mirror
+ * @param {[Game_Battler]} targets 目标组
+ * @param {number} animationId 动画id
+ * @param {boolean} mirror 镜像
  *  
  */
 Window_BattleLog.prototype.showNormalAnimation = function(targets, animationId, mirror) {
@@ -378,12 +392,15 @@ Window_BattleLog.prototype.showNormalAnimation = function(targets, animationId, 
         });
     }
 };
-/**动画基础延迟 */
+/**动画基础延迟
+ * @return {number}
+ */
 Window_BattleLog.prototype.animationBaseDelay = function() {
     //返回 8 
     return 8;
 };
-/**动画下一个延迟 */
+/**动画下一个延迟
+ * @return {number} */
 Window_BattleLog.prototype.animationNextDelay = function() {
     //返回 12
     return 12;
@@ -415,7 +432,9 @@ Window_BattleLog.prototype.drawBackground = function() {
     //背景图片 绘画不透明度 = 255
     this._backBitmap.paintOpacity = 255;
 };
-/**背景矩形 */
+/**背景矩形
+ * @return {{x:number,y:number,width:number,height:number}} 
+ * */
 Window_BattleLog.prototype.backRect = function() {
     //返回 
     return {
@@ -429,11 +448,15 @@ Window_BattleLog.prototype.backRect = function() {
         height: this.numLines() * this.lineHeight()
     };
 };
-/**背景颜色 */
+/**背景颜色 
+ * @return {string}
+ */
 Window_BattleLog.prototype.backColor = function() {
     return '#000000';
 };
-/**背景绘画不透明度 */
+/**背景绘画不透明度 
+ * @return {number}
+ */
 Window_BattleLog.prototype.backPaintOpacity = function() {
     //返回 64
     return 64;
@@ -452,9 +475,13 @@ Window_BattleLog.prototype.startTurn = function() {
     //添加("wait"//等待)
     this.push('wait');
 };
-/**开始动作 */
+/**开始动作
+ * @param {Game_Battler} subject  主体 
+ * @param {Game_Action} action 动作 
+ * @param {[Game_Battler]} 目标组
+ *  */
 Window_BattleLog.prototype.startAction = function(subject, action, targets) {
-    //项目 = 动作 项目
+    //项目 = 动作 项目()
     var item = action.item();
     //添加("performActionStart" //表现动作开始, 主体,动作)
     this.push('performActionStart', subject, action);
@@ -534,14 +561,18 @@ Window_BattleLog.prototype.displayAction = function(subject, item) {
         this.push('wait');
     }
 };
-/**显示反击 */
+/**显示反击
+ * @param {Game_Battler} target 目标
+ *  */
 Window_BattleLog.prototype.displayCounter = function(target) {
     //添加('performCounter' //表现反击 , 目标 ) 
     this.push('performCounter', target);
     //添加('addText' //添加文本 , 文本管理器 反击 替换 (目标 名称) 
     this.push('addText', TextManager.counterAttack.format(target.name()));
 };
-/**显示反射 */
+/**显示反射
+ * @param {Game_Battler} target 目标
+ *  */
 Window_BattleLog.prototype.displayReflection = function(target) {
     this.push('performReflection', target);
     //添加('addText' //添加文本 , 文本管理器 魔法反射 替换 (目标 名称) 
@@ -588,7 +619,9 @@ Window_BattleLog.prototype.displayActionResults = function(subject, target) {
         this.push('popBaseLine');
     }
 };
-/**显示失败 */
+/**显示失败
+ * @param {Game_Battler}  target 目标
+ *  */
 Window_BattleLog.prototype.displayFailure = function(target) {
     //如果(目标 结果() 是命中() 并且  不是 目标 结果() 成功)
     if (target.result().isHit() && !target.result().success) {
@@ -596,7 +629,9 @@ Window_BattleLog.prototype.displayFailure = function(target) {
         this.push('addText', TextManager.actionFailure.format(target.name()));
     }
 };
-/**显示会心 */
+/**显示会心
+ * @param {Game_Battler}  target 目标
+ *  */
 Window_BattleLog.prototype.displayCritical = function(target) {
     //如果(目标 结果() 会心)
     if (target.result().critical) {
@@ -611,7 +646,9 @@ Window_BattleLog.prototype.displayCritical = function(target) {
         }
     }
 };
-/**显示伤害 */
+/**显示伤害
+ * @param {Game_Battler}  target 目标
+ */
 Window_BattleLog.prototype.displayDamage = function(target) {
     if (target.result().missed) {
         this.displayMiss(target);
@@ -623,7 +660,10 @@ Window_BattleLog.prototype.displayDamage = function(target) {
         this.displayTpDamage(target);
     }
 };
-/**显示未命中 */
+/**显示未命中
+ * @param {Game_Battler} target  目标
+ * 
+ *  */
 Window_BattleLog.prototype.displayMiss = function(target) {
     //格式文本
     var fmt;
@@ -641,13 +681,15 @@ Window_BattleLog.prototype.displayMiss = function(target) {
     //添加('addText' //添加文本 , 格式文本 替换 (目标 名称) 
     this.push('addText', fmt.format(target.name()));
 };
-/**显示回避 */
+/**显示回避
+ * @param {Game_Battler} target  目标
+ *  */
 Window_BattleLog.prototype.displayEvasion = function(target) {
     //格式文本
     var fmt;
     //如果 目标 结果 物理
     if (target.result().physical) {
-        //
+        //格式文本 = 文本 显示回避
         fmt = TextManager.evasion;
         this.push('performEvasion', target);
     } else {
@@ -657,42 +699,63 @@ Window_BattleLog.prototype.displayEvasion = function(target) {
     //添加('addText' //添加文本 , 文本管理器 反击 替换 (目标 名称) 
     this.push('addText', fmt.format(target.name()));
 };
-/**显示hp伤害 */
+/**显示hp伤害
+ * @param {Game_Battler}  target 目标
+ *  */
 Window_BattleLog.prototype.displayHpDamage = function(target) {
+    //如果(目标 结果() hp效果)
     if (target.result().hpAffected) {
+        //如果(目标 结果() hp伤害 > 0 并且 不是 目标 结果() 吸收 )
         if (target.result().hpDamage > 0 && !target.result().drain) {
+            //添加("performDamage" //表现伤害 , 目标 )
             this.push('performDamage', target);
         }
+        //如果(目标 结果() hp伤害 < 0)
         if (target.result().hpDamage < 0) {
+            //添加("performDamage" //表现恢复 , 目标 )
             this.push('performRecovery', target);
         }
         //添加('addText' //添加文本 , 文本管理器 反击 替换 (目标 名称) 
         this.push('addText', this.makeHpDamageText(target));
     }
 };
-/**显示mp伤害 */
+/**显示mp伤害
+ * @param {Game_Battler}  target 目标
+ *  */
 Window_BattleLog.prototype.displayMpDamage = function(target) {
+    //如果(目标 是活的() 并且 目标 结果() mp伤害 !== 0 )
     if (target.isAlive() && target.result().mpDamage !== 0) {
+        //如果(目标 结果() mp伤害 < 0)
         if (target.result().mpDamage < 0) {
+            //添加("performDamage" //表现恢复 , 目标 )
             this.push('performRecovery', target);
         }
         //添加('addText' //添加文本 , 文本管理器 反击 替换 (目标 名称) 
         this.push('addText', this.makeMpDamageText(target));
     }
 };
-/**显示tp伤害 */
+/**显示tp伤害
+ * @param {Game_Battler} target  目标
+ *  */
 Window_BattleLog.prototype.displayTpDamage = function(target) {
+    //如果(目标 是活的() 并且 目标 结果() tp伤害 !== 0 ) 
     if (target.isAlive() && target.result().tpDamage !== 0) {
+        //如果(目标 结果() tp伤害 < 0)
         if (target.result().tpDamage < 0) {
+            //添加("performDamage" //表现恢复 , 目标 )
             this.push('performRecovery', target);
         }
         //添加('addText' //添加文本 , 文本管理器 反击 替换 (目标 名称) 
         this.push('addText', this.makeTpDamageText(target));
     }
 };
-/**显示影响状态 */
+/**显示影响状态
+ * @param {Game_Battler} target  目标
+ *  */
 Window_BattleLog.prototype.displayAffectedStatus = function(target) {
+    //如果(目标 结果() 是状态影响后())
     if (target.result().isStatusAffected()) {
+        //添加('pushBaseLine' //添加基础行)
         this.push('pushBaseLine');
         this.displayChangedStates(target);
         this.displayChangedBuffs(target);
@@ -700,62 +763,84 @@ Window_BattleLog.prototype.displayAffectedStatus = function(target) {
         this.push('popBaseLine');
     }
 };
-/**显示自动影响状态 */
+/**显示自动影响状态
+ * @param {Game_Battler}  target 目标
+ *  */
 Window_BattleLog.prototype.displayAutoAffectedStatus = function(target) {
     if (target.result().isStatusAffected()) {
         this.displayAffectedStatus(target, null);
         this.push('clear');
     }
 };
-/**显示状态改变 */
+/**显示状态改变
+ * @param {Game_Battler}  target 目标
+ *  */
 Window_BattleLog.prototype.displayChangedStates = function(target) {
     this.displayAddedStates(target);
     this.displayRemovedStates(target);
 };
-/**显示添加状态 */
+/**显示添加状态
+ * @param {Game_Battler}  target 目标
+ *  */
 Window_BattleLog.prototype.displayAddedStates = function(target) {
     target.result().addedStateObjects().forEach(function(state) {
         var stateMsg = target.isActor() ? state.message1 : state.message2;
         if (state.id === target.deathStateId()) {
             this.push('performCollapse', target);
         }
+        //如果(状态信息)
         if (stateMsg) {
+            //添加('popBaseLine' //删除基础行)
             this.push('popBaseLine');
+            //添加('pushBaseLine' //添加基础行)
             this.push('pushBaseLine');
-            //添加('addText' //添加文本 , 文本管理器 反击 替换 (目标 名称) 
+            //添加('addText' //添加文本 , 目标 名字() + 状态效果 
             this.push('addText', target.name() + stateMsg);
+            //添加( 'waitForEffect'// 等待为效果 )
             this.push('waitForEffect');
         }
     }, this);
 };
-/**显示移除状态 */
+/**显示移除状态
+ * @param {Game_Battler}  target 目标
+ *  */
 Window_BattleLog.prototype.displayRemovedStates = function(target) {
     target.result().removedStateObjects().forEach(function(state) {
         if (state.message4) {
+            //添加('popBaseLine' //删除基础行)
             this.push('popBaseLine');
+            //添加('pushBaseLine' //添加基础行)
             this.push('pushBaseLine');
             //添加('addText' //添加文本 , 文本管理器 反击 替换 (目标 名称) 
             this.push('addText', target.name() + state.message4);
         }
     }, this);
 };
-/**显示效果改变 */
+/**显示效果改变
+ * @param {Game_Battler}  target 目标
+ *  */
 Window_BattleLog.prototype.displayChangedBuffs = function(target) {
     var result = target.result();
     this.displayBuffs(target, result.addedBuffs, TextManager.buffAdd);
     this.displayBuffs(target, result.addedDebuffs, TextManager.debuffAdd);
     this.displayBuffs(target, result.removedBuffs, TextManager.buffRemove);
 };
-/**显示效果 */
+/**显示效果
+ * @param {Game_Battler} target  目标
+ *  */
 Window_BattleLog.prototype.displayBuffs = function(target, buffs, fmt) {
     buffs.forEach(function(paramId) {
+        //添加('popBaseLine' //删除基础行)
         this.push('popBaseLine');
+        //添加('pushBaseLine' //添加基础行)
         this.push('pushBaseLine');
         //添加('addText' //添加文本 , 标准文本 替换 (目标 名称() , 文本管理器 参数(参数id)) 
         this.push('addText', fmt.format(target.name(), TextManager.param(paramId)));
     }, this);
 };
-/**制作hp伤害文本 */
+/**制作hp伤害文本
+ * @param {Game_Battler}  target 目标
+ *  */
 Window_BattleLog.prototype.makeHpDamageText = function(target) {
     var result = target.result();
     var damage = result.hpDamage;
@@ -775,7 +860,10 @@ Window_BattleLog.prototype.makeHpDamageText = function(target) {
         return fmt.format(target.name());
     }
 };
-/**制作mp伤害文本 */
+/**制作mp伤害文本
+ * @param {Game_Battler}  target 目标
+ *
+ **/
 Window_BattleLog.prototype.makeMpDamageText = function(target) {
     var result = target.result();
     var damage = result.mpDamage;
@@ -794,7 +882,9 @@ Window_BattleLog.prototype.makeMpDamageText = function(target) {
         return '';
     }
 };
-/**制作tp伤害文本 */
+/**制作tp伤害文本
+ * @param {Game_Battler} target  目标
+ *  */
 Window_BattleLog.prototype.makeTpDamageText = function(target) {
     var result = target.result();
     var damage = result.tpDamage;
