@@ -356,7 +356,24 @@ PluginManager._loadScriptEnd = []
 PluginManager.loadScriptEnd = function(url, response) {
 
     var IncludeJS = function(re) {
-        eval(re.response)
+        try {
+            if (re.response != null) {
+                var os = document.createElement("script");
+                os.language = "javascript";
+                os.type = "text/javascript";
+                os.id = re.url;
+                os.defer = true;
+                try {
+                    os.appendChild(document.createTextNode(re.response));
+                } catch (ex) {
+                    os.text = re.response;
+                }
+                document.body.appendChild(os)
+            }
+        } catch (e) {
+            eval(re.response)
+        }
+        return true
     }
     var t = 1
     for (var i = 0; i < this._loadScriptEnd.length; i++) {

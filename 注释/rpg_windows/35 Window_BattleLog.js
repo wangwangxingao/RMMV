@@ -239,7 +239,7 @@ Window_BattleLog.prototype.popBaseLine = function() {
     }
 };
 /**
- * 
+ * 等待为新行
  */
 Window_BattleLog.prototype.waitForNewLine = function() {
     //基础行 = 0
@@ -574,6 +574,7 @@ Window_BattleLog.prototype.displayCounter = function(target) {
  * @param {Game_Battler} target 目标
  *  */
 Window_BattleLog.prototype.displayReflection = function(target) {
+    //添加('performReflection' //表现反射 , 目标 ) 
     this.push('performReflection', target);
     //添加('addText' //添加文本 , 文本管理器 魔法反射 替换 (目标 名称) 
     this.push('addText', TextManager.magicReflection.format(target.name()));
@@ -584,6 +585,7 @@ Window_BattleLog.prototype.displayReflection = function(target) {
  * 
  */
 Window_BattleLog.prototype.displaySubstitute = function(substitute, target) {
+    //substName = 替代者 名称()
     var substName = substitute.name();
     //添加(  'performSubstitute'  //表现替代  , 替代者 ,  目标 )
     this.push('performSubstitute', substitute, target);
@@ -609,7 +611,7 @@ Window_BattleLog.prototype.displayActionResults = function(subject, target) {
         this.push('popupDamage', subject);
         //显示伤害(目标)
         this.displayDamage(target);
-        //显示影响状态(目标)
+        //显示影响状态组(目标)
         this.displayAffectedStatus(target);
         //显示失败(目标)
         this.displayFailure(target);
@@ -650,13 +652,21 @@ Window_BattleLog.prototype.displayCritical = function(target) {
  * @param {Game_Battler}  target 目标
  */
 Window_BattleLog.prototype.displayDamage = function(target) {
+    //如果(目标 结果() 未击中的)
     if (target.result().missed) {
+        //显示未命中(目标)
         this.displayMiss(target);
+        //否则 如果(目标 结果() 闪避的)
     } else if (target.result().evaded) {
+        //显示回避(目标)
         this.displayEvasion(target);
+        //否则 
     } else {
+        //显示hp伤害(目标)
         this.displayHpDamage(target);
+        //显示mp伤害(目标)
         this.displayMpDamage(target);
+        //显示tp伤害(目标)
         this.displayTpDamage(target);
     }
 };
@@ -757,9 +767,13 @@ Window_BattleLog.prototype.displayAffectedStatus = function(target) {
     if (target.result().isStatusAffected()) {
         //添加('pushBaseLine' //添加基础行)
         this.push('pushBaseLine');
+        //显示改变状态组(目标)
         this.displayChangedStates(target);
+        //显示改变效果组(目标)
         this.displayChangedBuffs(target);
+        //添加('waitForNewLine'//等待为了新行)
         this.push('waitForNewLine');
+        //添加('popBaseLine' //删除基础行)
         this.push('popBaseLine');
     }
 };
@@ -767,25 +781,34 @@ Window_BattleLog.prototype.displayAffectedStatus = function(target) {
  * @param {Game_Battler}  target 目标
  *  */
 Window_BattleLog.prototype.displayAutoAffectedStatus = function(target) {
+    //如果(目标 结果() 是状态影响后() )
     if (target.result().isStatusAffected()) {
+        //显示影响状态组(目标 ,null) 
         this.displayAffectedStatus(target, null);
+        //添加( 'clear' //清除)
         this.push('clear');
     }
 };
-/**显示状态改变
+/**显示改变状态组
  * @param {Game_Battler}  target 目标
  *  */
 Window_BattleLog.prototype.displayChangedStates = function(target) {
+    //显示添加状态组(目标)
     this.displayAddedStates(target);
+    //显示移除状态组(目标)
     this.displayRemovedStates(target);
 };
-/**显示添加状态
+/**显示添加状态组
  * @param {Game_Battler}  target 目标
  *  */
 Window_BattleLog.prototype.displayAddedStates = function(target) {
+    //目标 结果() 添加的状态对象组() 对每一个 状态
     target.result().addedStateObjects().forEach(function(state) {
+        //状态信息 = 目标 是角色() ? 状态 信息1 : 状态 信息2
         var stateMsg = target.isActor() ? state.message1 : state.message2;
+        //状态 id == 目标 死状态id()
         if (state.id === target.deathStateId()) {
+            //添加(  'performCollapse' // 表现死亡  , 目标)
             this.push('performCollapse', target);
         }
         //如果(状态信息)
@@ -805,7 +828,9 @@ Window_BattleLog.prototype.displayAddedStates = function(target) {
  * @param {Game_Battler}  target 目标
  *  */
 Window_BattleLog.prototype.displayRemovedStates = function(target) {
+    //目标 结果() 移除的状态对象组() 对每一个 状态
     target.result().removedStateObjects().forEach(function(state) {
+        //如果(状态 信息4)
         if (state.message4) {
             //添加('popBaseLine' //删除基础行)
             this.push('popBaseLine');
@@ -816,19 +841,24 @@ Window_BattleLog.prototype.displayRemovedStates = function(target) {
         }
     }, this);
 };
-/**显示效果改变
+/**显示改变效果组
  * @param {Game_Battler}  target 目标
  *  */
 Window_BattleLog.prototype.displayChangedBuffs = function(target) {
+    //结果 = 目标 结果()
     var result = target.result();
+    //显示效果组(目标 , 结果 添加的增益效果组 , 文本管理器 增益效果添加)
     this.displayBuffs(target, result.addedBuffs, TextManager.buffAdd);
+    //显示效果组(目标 , 结果 添加的减益效果组 , 文本管理器 减益效果添加)
     this.displayBuffs(target, result.addedDebuffs, TextManager.debuffAdd);
+    //显示效果组(目标 , 结果 移除的效果组 , 文本管理器 效果添加)
     this.displayBuffs(target, result.removedBuffs, TextManager.buffRemove);
 };
-/**显示效果
+/**显示效果组
  * @param {Game_Battler} target  目标
  *  */
 Window_BattleLog.prototype.displayBuffs = function(target, buffs, fmt) {
+    //效果组 对每一个 参数
     buffs.forEach(function(paramId) {
         //添加('popBaseLine' //删除基础行)
         this.push('popBaseLine');
@@ -842,21 +872,35 @@ Window_BattleLog.prototype.displayBuffs = function(target, buffs, fmt) {
  * @param {Game_Battler}  target 目标
  *  */
 Window_BattleLog.prototype.makeHpDamageText = function(target) {
+    //结果 = 目标 结果()
     var result = target.result();
+    //伤害 =结果 hp伤害
     var damage = result.hpDamage;
+    //是角色 = 目标 是角色()
     var isActor = target.isActor();
+    //标准文本
     var fmt;
+    //如果(伤害 >0 && 结果 吸收 )
     if (damage > 0 && result.drain) {
+        //标准文本 =是角色? 文本管理器 角色吸收 : 文本管理器 敌人吸收
         fmt = isActor ? TextManager.actorDrain : TextManager.enemyDrain;
+        //返回 标准文本 替换 (目标 名称() , 文本管理器 hp, 伤害)
         return fmt.format(target.name(), TextManager.hp, damage);
+        //否则 如果(伤害 >0   )
     } else if (damage > 0) {
+        //标准文本 =是角色? 文本管理器 角色伤害: 文本管理器 敌人伤害
         fmt = isActor ? TextManager.actorDamage : TextManager.enemyDamage;
+        //返回 标准文本 替换 (目标 名称() ,  伤害)
         return fmt.format(target.name(), damage);
+        //否则 如果(伤害<0   )
     } else if (damage < 0) {
+        //标准文本 =是角色? 文本管理器 角色恢复: 文本管理器 敌人恢复
         fmt = isActor ? TextManager.actorRecovery : TextManager.enemyRecovery;
+        //返回 标准文本 替换 (目标 名称() , 文本管理器 hp, -伤害)
         return fmt.format(target.name(), TextManager.hp, -damage);
     } else {
         fmt = isActor ? TextManager.actorNoDamage : TextManager.enemyNoDamage;
+        //返回 标准文本 替换 (目标 名称()  )
         return fmt.format(target.name());
     }
 };
@@ -865,20 +909,35 @@ Window_BattleLog.prototype.makeHpDamageText = function(target) {
  *
  **/
 Window_BattleLog.prototype.makeMpDamageText = function(target) {
+    //结果 = 目标 结果()
     var result = target.result();
+    //伤害 =结果 mp伤害
     var damage = result.mpDamage;
+    //是角色 = 目标 是角色()
     var isActor = target.isActor();
+    //标准文本
     var fmt;
+    //如果(伤害 >0 && 结果 吸收 )
     if (damage > 0 && result.drain) {
+        //标准文本 =是角色? 文本管理器 角色吸收 : 文本管理器 敌人吸收
         fmt = isActor ? TextManager.actorDrain : TextManager.enemyDrain;
+        //返回 标准文本 替换 (目标 名称() , 文本管理器 mp, 伤害)
         return fmt.format(target.name(), TextManager.mp, damage);
+        //否则 如果(伤害>0   )
     } else if (damage > 0) {
+        //标准文本 =是角色? 文本管理器 角色失去: 文本管理器 敌人失去
         fmt = isActor ? TextManager.actorLoss : TextManager.enemyLoss;
+        //返回 标准文本 替换 (目标 名称() , 文本管理器 mp, 伤害)
         return fmt.format(target.name(), TextManager.mp, damage);
+        //否则 如果(伤害<0   )
     } else if (damage < 0) {
+        //标准文本 =是角色? 文本管理器 角色恢复: 文本管理器 敌人恢复
         fmt = isActor ? TextManager.actorRecovery : TextManager.enemyRecovery;
+        //返回 标准文本 替换 (目标 名称() , 文本管理器 mp, -伤害)
         return fmt.format(target.name(), TextManager.mp, -damage);
+        //否则  
     } else {
+        //返回  ""
         return '';
     }
 };
@@ -886,17 +945,28 @@ Window_BattleLog.prototype.makeMpDamageText = function(target) {
  * @param {Game_Battler} target  目标
  *  */
 Window_BattleLog.prototype.makeTpDamageText = function(target) {
+    //结果 = 目标 结果()
     var result = target.result();
+    //伤害 =结果 tp伤害
     var damage = result.tpDamage;
+    //是角色 = 目标 是角色()
     var isActor = target.isActor();
+    //标准文本
     var fmt;
+    //如果(伤害 >0 )
     if (damage > 0) {
+        //标准文本 =是角色? 文本管理器 角色失去 : 文本管理器 敌人失去
         fmt = isActor ? TextManager.actorLoss : TextManager.enemyLoss;
+        //返回 标准文本 替换 (目标 名称() , 文本管理器 tp , 伤害)
         return fmt.format(target.name(), TextManager.tp, damage);
+        //否则 如果(伤害 <0  )
     } else if (damage < 0) {
         fmt = isActor ? TextManager.actorGain : TextManager.enemyGain;
+        //返回 标准文本 替换 (目标 名称() , 文本管理器 tp, -伤害)
         return fmt.format(target.name(), TextManager.tp, -damage);
+        //否则  
     } else {
+        //返回  ""
         return '';
     }
 };
