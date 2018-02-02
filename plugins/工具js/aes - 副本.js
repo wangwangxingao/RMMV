@@ -176,26 +176,6 @@ Aes.rCon = [
 
 Aes.Ctr = {}; // Aes.Ctr namespace: a subclass or extension of Aes
 
-
-Aes.Ctr.getKeySchedule = function(password, nBits) {
-    var st = typeof(password) == "string"
-    password = st ? Utf8.encode(password) : password;
-    var charCodeAt = st ? function(id) { return password.charCodeAt(id) } : function(id) { return password[id] }
-
-    var nBytes = nBits / 8; // no bytes in key (16/24/32)
-    var pwBytes = new Array(nBytes);
-    for (var i = 0; i < nBytes; i++) { // use 1st 16/24/32 chars of password for key
-        pwBytes[i] = isNaN(charCodeAt(i)) ? 0 : charCodeAt(i) || 0;
-    }
-    var key = Aes.cipher(pwBytes, Aes.keyExpansion(pwBytes)); // gives us 16-byte key
-    key = key.concat(key.slice(0, nBytes - 16)); // expand key to 16/24/32 bytes long
-
-    var keySchedule = Aes.keyExpansion(key);
-    return keySchedule
-}
-
-
-
 /** 
  * Encrypt a text using AES encryption in Counter mode of operation
  *
@@ -206,19 +186,22 @@ Aes.Ctr.getKeySchedule = function(password, nBits) {
  * @param {Number} nBits     Number of bits to be used in the key (128, 192, or 256)
  * @returns {string}         Encrypted text
  */
-Aes.Ctr.encrypt = function(plaintext, password, nBits, to) {
+Aes.Ctr.encrypt = function(plaintext, password, nBits) {
     var blockSize = 16; // block size fixed at 16 bytes / 128 bits (Nb=4) for AES
     if (!(nBits == 128 || nBits == 192 || nBits == 256)) return ''; // standard allows 128/192/256 bit keys
-
-    var st = typeof(plaintext) == "string"
-    plaintext = st ? Utf8.encode(plaintext) : plaintext;
+    plaintext = Utf8.encode(plaintext);
+    password = Utf8.encode(password);
     //var t = new Date();  // timer
-
-    var charCodeAt = st ? function(id) { return plaintext.charCodeAt(id) } : function(id) { return plaintext[id] }
-    var fromCharCode = !to ? function(id) { return String.fromCharCode(id) } : function(id) { return id }
 
     // use AES itself to encrypt password to get cipher key (using plain password as source for key 
     // expansion) - gives us well encrypted key (though hashed key might be preferred for prod'n use)
+    var nBytes = nBits / 8; // no bytes in key (16/24/32)
+    var pwBytes = new Array(nBytes);
+    for (var i = 0; i < nBytes; i++) { // use 1st 16/24/32 chars of password for key
+        pwBytes[i] = isNaN(password.charCodeAt(i)) ? 0 : password.charCodeAt(i);
+    }
+    var key = Aes.cipher(pwBytes, Aes.keyExpansion(pwBytes)); // gives us 16-byte key
+    key = key.concat(key.slice(0, nBytes - 16)); // expand key to 16/24/32 bytes long
 
     // initialise 1st 8 bytes of counter block with nonce (NIST SP800-38A §B.2): [0-1] = millisec, 
     // [2-3] = random, [4-7] = seconds, together giving full sub-millisec uniqueness up to Feb 2106
@@ -234,18 +217,14 @@ Aes.Ctr.encrypt = function(plaintext, password, nBits, to) {
     for (var i = 0; i < 4; i++) counterBlock[i + 4] = (nonceSec >>> i * 8) & 0xff;
 
     // and convert it to a string to go on the front of the ciphertext
-
-    var pl = plaintext.length || plaintext.byteLength || 0
-    var ciphertxt = (!to || to == 1) ? new Array(pl + 8) : new Uint8Array(pl + 8)
-        //var ctrTxt = '';
-    for (var i = 0, ti = 0; i < 8; i++, ti++) ciphertxt[ti] = fromCharCode(counterBlock[i]);
+    var ctrTxt = '';
+    for (var i = 0; i < 8; i++) ctrTxt += String.fromCharCode(counterBlock[i]);
 
     // generate key schedule - an expansion of the key into distinct Key Rounds for each round
-    var keySchedule = this.getKeySchedule(password, nBits);
+    var keySchedule = Aes.keyExpansion(key);
 
-    var blockCount = Math.ceil(pl / blockSize);
-
-    //var ciphertxt = new Array(blockCount); // ciphertext as array of strings
+    var blockCount = Math.ceil(plaintext.length / blockSize);
+    var ciphertxt = new Array(blockCount); // ciphertext as array of strings
 
     for (var b = 0; b < blockCount; b++) {
         // set counter (block #) in last 8 bytes of counter block (leaving nonce in 1st 8 bytes)
@@ -257,15 +236,18 @@ Aes.Ctr.encrypt = function(plaintext, password, nBits, to) {
 
         // block size is reduced on final block
         var blockLength = b < blockCount - 1 ? blockSize : (plaintext.length - 1) % blockSize + 1;
-        //var cipherChar = new Array(blockLength);
+        var cipherChar = new Array(blockLength);
 
-        for (var i = 0; i < blockLength; i++, ti++) { // -- xor plaintext with ciphered counter char-by-char -
-            ciphertxt[ti] = fromCharCode(cipherCntr[i] ^ charCodeAt(b * blockSize + i));
+        for (var i = 0; i < blockLength; i++) { // -- xor plaintext with ciphered counter char-by-char --
+            cipherChar[i] = cipherCntr[i] ^ plaintext.charCodeAt(b * blockSize + i);
+            cipherChar[i] = String.fromCharCode(cipherChar[i]);
         }
+        ciphertxt[b] = cipherChar.join('');
     }
 
     // Array.join is more efficient than repeated string concatenation in IE
-    var ciphertext = !to ? ciphertxt.join('') : ciphertxt
+    var ciphertext = ctrTxt + ciphertxt.join('');
+    ciphertext = Base64.encode(ciphertext); // encode in base64
 
     //alert((new Date()) - t);
     return ciphertext;
@@ -279,56 +261,62 @@ Aes.Ctr.encrypt = function(plaintext, password, nBits, to) {
  * @param {Number} nBits      Number of bits to be used in the key (128, 192, or 256)
  * @returns {String}          Decrypted text
  */
-Aes.Ctr.decrypt = function(ciphertext, password, nBits, to) {
+Aes.Ctr.decrypt = function(ciphertext, password, nBits) {
     var blockSize = 16; // block size fixed at 16 bytes / 128 bits (Nb=4) for AES
     if (!(nBits == 128 || nBits == 192 || nBits == 256)) return ''; // standard allows 128/192/256 bit keys
-    var st = typeof(ciphertext) == "string"
-        //var t = new Date();  // timer
+    ciphertext = Base64.decode(ciphertext);
+    password = Utf8.encode(password);
+    //var t = new Date();  // timer
 
-    var charCodeAt = st ? function(id) { return ciphertext.charCodeAt(id) } : function(id) { return ciphertext[id] }
-    var fromCharCode = !to ? function(id) { return String.fromCharCode(id) } : function(id) { return id }
+    // use AES to encrypt password (mirroring encrypt routine)
+    var nBytes = nBits / 8; // no bytes in key
+    var pwBytes = new Array(nBytes);
+    for (var i = 0; i < nBytes; i++) {
+        pwBytes[i] = isNaN(password.charCodeAt(i)) ? 0 : password.charCodeAt(i);
+    }
+    var key = Aes.cipher(pwBytes, Aes.keyExpansion(pwBytes));
+    key = key.concat(key.slice(0, nBytes - 16)); // expand key to 16/24/32 bytes long
 
     // recover nonce from 1st 8 bytes of ciphertext
     var counterBlock = new Array(8);
-    for (var i = 0; i < 8; i++) counterBlock[i] = charCodeAt(i);
+    ctrTxt = ciphertext.slice(0, 8);
+    for (var i = 0; i < 8; i++) counterBlock[i] = ctrTxt.charCodeAt(i);
 
     // generate key schedule
-    var keySchedule = this.getKeySchedule(password, nBits);
-
-    // ciphertext is now array of block-length strings
-    var cl = ciphertext.length || ciphertext.byteLength || 0
-    var plaintxt = (!to || to == 1) ? new Array(cl - 8) : new Uint8Array(cl - 8)
+    var keySchedule = Aes.keyExpansion(key);
 
     // separate ciphertext into blocks (skipping past initial 8 bytes)
-    var nBlocks = Math.ceil((cl - 8) / blockSize);
+    var nBlocks = Math.ceil((ciphertext.length - 8) / blockSize);
     var ct = new Array(nBlocks);
-    for (var b = 0; b < nBlocks - 1; b++) {
-        ct[b] = blockSize
-    };
-    ct[b] = (cl - 8) - b * blockSize
+    for (var b = 0; b < nBlocks; b++) ct[b] = ciphertext.slice(8 + b * blockSize, 8 + b * blockSize + blockSize);
+    ciphertext = ct; // ciphertext is now array of block-length strings
 
-    // plaintext will get generated block-by-block into array of block-length strings 
-    for (var b = 0, ti = 0, ti2 = 8; b < nBlocks; b++) {
+    // plaintext will get generated block-by-block into array of block-length strings
+    var plaintxt = new Array(ciphertext.length);
+
+    for (var b = 0; b < nBlocks; b++) {
         // set counter (block #) in last 8 bytes of counter block (leaving nonce in 1st 8 bytes)
         for (var c = 0; c < 4; c++) counterBlock[15 - c] = ((b) >>> c * 8) & 0xff;
         for (var c = 0; c < 4; c++) counterBlock[15 - c - 4] = (((b + 1) / 0x100000000 - 1) >>> c * 8) & 0xff;
 
-        var cipherCntr = Aes.cipher(counterBlock, keySchedule); // encrypt counter block 
-        for (var i = 0; i < ct[b]; i++, ti++, ti2++) {
-            // -- xor plaintxt with ciphered counter byte-by-byte -- 
-            plaintxt[ti] = fromCharCode(cipherCntr[i] ^ charCodeAt(ti2));
+        var cipherCntr = Aes.cipher(counterBlock, keySchedule); // encrypt counter block
+
+        var plaintxtByte = new Array(ciphertext[b].length);
+        for (var i = 0; i < ciphertext[b].length; i++) {
+            // -- xor plaintxt with ciphered counter byte-by-byte --
+            plaintxtByte[i] = cipherCntr[i] ^ ciphertext[b].charCodeAt(i);
+            plaintxtByte[i] = String.fromCharCode(plaintxtByte[i]);
         }
+        plaintxt[b] = plaintxtByte.join('');
     }
+
     // join array of blocks into single plaintext string
-    var plaintext = !to ? Utf8.decode(plaintxt.join('')) : plaintxt; // decode from UTF8 back to Unicode multi-byte chars
+    var plaintext = plaintxt.join('');
+    plaintext = Utf8.decode(plaintext); // decode from UTF8 back to Unicode multi-byte chars
 
     //alert((new Date()) - t);
     return plaintext;
 }
-
-
-
-
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
