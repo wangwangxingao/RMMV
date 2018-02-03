@@ -27,8 +27,8 @@
  * @default 测试
  *   
  * @param mode
- * @desc 模式: "header","mv","ex","aes","zlib","lzma" 
- * @default ["header","aes","zlib"]
+ * @desc 模式(mv原版加密)
+ * @default ['base','zlib']
  * 
  * @param dir
  * @desc 保存位置
@@ -36,7 +36,7 @@
  * 
  * @param encryptList
  * @desc 加密列表,如 : ["img","data","audio","js","js/plugins"]
- * @default   ["img","audio","data"]
+ * @default   ["img","audio","data","js/plugins"]
  * 
  * @param encryptExt
  * @desc 加密种类
@@ -48,7 +48,7 @@
  * 
  * @param plugins
  * @desc 加密插件组
- * @default  
+ * @default plugins.js
  * 
  * @param ignoreList
  * @desc 忽略列表
@@ -56,7 +56,7 @@
  * 
  * @param weburl
  * @desc 游戏更新网站
- * @default 
+ * @default https://raw.githubusercontent.com/wangwangxingao/world/master
  * 
  * @param listname
  * @desc 更新列表名称
@@ -64,94 +64,15 @@
  * 
  *
  * @help 
- * 
- * 使用:
- * 加入本插件,并设置为on
- * 进入游戏,f8,使用Decrypter.startEncrypt() 生成加密文件夹,
- * 
- * 
- * 发布时,
- * 将本插件设置为off,将DecrypterPlayer插件(可以改名)加入并设置为on,
- * 将本插件从游戏文件中删除,将已经加密的文件从游戏文件中删除
- * 此时依然可以游戏,
- * 
- * 
- * mode 模式: 
- *  "header" 头        
- *  "mv" mv原版加密 
- *  "ex" 加强原版加密  
- *  "aes"aes加密 ,需要aes.js
- *  "zlib" zlib压缩,需要zlib.js
- *  "lzma" lzma压缩,需要lzma.js
- * 使用时类似 ["header","mv"] ,可以为空(然而好像没有意义..)
- * 
- * 
- * 
  * 生成加密文件
- * Decrypter.startEncrypt()  
+ * Decrypter.startEncrypt()
  * 开始更新
  * Decrypter.startUpdate()
- * 
- * 
- * 
- * 
- * 
  * 
  *
  */
 
 
-var MD5 = function(e) {
-    function g(a, b) {
-        var c, d, e, f;
-        e = a & 2147483648;
-        f = b & 2147483648;
-        c = a & 1073741824;
-        d = b & 1073741824;
-        a = (a & 1073741823) + (b & 1073741823);
-        return c & d ? a ^ 2147483648 ^ e ^ f : c | d ? a & 1073741824 ? a ^ 3221225472 ^ e ^ f : a ^ 1073741824 ^ e ^ f : a ^ e ^ f
-    }
-
-    function h(a, b, c, d, e, f, n) { a = g(a, g(g(b & c | ~b & d, e), n)); return g(a << f | a >>> 32 - f, b) }
-
-    function k(a, b, c, d, e, f, n) { a = g(a, g(g(b & d | c & ~d, e), n)); return g(a << f | a >>> 32 - f, b) }
-
-    function l(a, b, d, c, e, f, n) { a = g(a, g(g(b ^ d ^ c, e), n)); return g(a << f | a >>> 32 - f, b) }
-
-    function m(a, b, d, c, e, f, n) { a = g(a, g(g(d ^ (b | ~c), e), n)); return g(a << f | a >>> 32 - f, b) }
-
-    function p(a) {
-        var b = "",
-            d, c;
-        for (c = 0; 3 >= c; c++) d = a >>> 8 * c & 255, d = "0" + d.toString(16), b += d.substr(d.length - 2, 2);
-        return b
-    }
-    var f = [],
-        q, r, t, u, a, b, c, d;
-    e = function(a) {
-        a = a.replace(/\r\n/g, "\n");
-        for (var b = "", d = 0; d < a.length; d++) {
-            var c = a.charCodeAt(d);
-            128 > c ? b += String.fromCharCode(c) : (127 < c && 2048 > c ? b += String.fromCharCode(c >> 6 | 192) : (b += String.fromCharCode(c >> 12 | 224), b += String.fromCharCode(c >> 6 & 63 | 128)), b += String.fromCharCode(c & 63 | 128))
-        }
-        return b
-    }(e);
-    f = function(a) {
-        var b, c = a.length;
-        b = c + 8;
-        for (var d = 16 * ((b - b % 64) / 64 + 1), e = Array(d - 1), f, g = 0; g < c;) b = (g - g % 4) / 4, f = g % 4 * 8, e[b] |= a.charCodeAt(g) << f, g++;
-        e[(g - g % 4) / 4] |= 128 << g % 4 * 8;
-        e[d - 2] = c << 3;
-        e[d - 1] = c >>> 29;
-        return e
-    }(e);
-    a = 1732584193;
-    b = 4023233417;
-    c = 2562383102;
-    d = 271733878;
-    for (e = 0; e < f.length; e += 16) q = a, r = b, t = c, u = d, a = h(a, b, c, d, f[e + 0], 7, 3614090360), d = h(d, a, b, c, f[e + 1], 12, 3905402710), c = h(c, d, a, b, f[e + 2], 17, 606105819), b = h(b, c, d, a, f[e + 3], 22, 3250441966), a = h(a, b, c, d, f[e + 4], 7, 4118548399), d = h(d, a, b, c, f[e + 5], 12, 1200080426), c = h(c, d, a, b, f[e + 6], 17, 2821735955), b = h(b, c, d, a, f[e + 7], 22, 4249261313), a = h(a, b, c, d, f[e + 8], 7, 1770035416), d = h(d, a, b, c, f[e + 9], 12, 2336552879), c = h(c, d, a, b, f[e + 10], 17, 4294925233), b = h(b, c, d, a, f[e + 11], 22, 2304563134), a = h(a, b, c, d, f[e + 12], 7, 1804603682), d = h(d, a, b, c, f[e + 13], 12, 4254626195), c = h(c, d, a, b, f[e + 14], 17, 2792965006), b = h(b, c, d, a, f[e + 15], 22, 1236535329), a = k(a, b, c, d, f[e + 1], 5, 4129170786), d = k(d, a, b, c, f[e + 6], 9, 3225465664), c = k(c, d, a, b, f[e + 11], 14, 643717713), b = k(b, c, d, a, f[e + 0], 20, 3921069994), a = k(a, b, c, d, f[e + 5], 5, 3593408605), d = k(d, a, b, c, f[e + 10], 9, 38016083), c = k(c, d, a, b, f[e + 15], 14, 3634488961), b = k(b, c, d, a, f[e + 4], 20, 3889429448), a = k(a, b, c, d, f[e + 9], 5, 568446438), d = k(d, a, b, c, f[e + 14], 9, 3275163606), c = k(c, d, a, b, f[e + 3], 14, 4107603335), b = k(b, c, d, a, f[e + 8], 20, 1163531501), a = k(a, b, c, d, f[e + 13], 5, 2850285829), d = k(d, a, b, c, f[e + 2], 9, 4243563512), c = k(c, d, a, b, f[e + 7], 14, 1735328473), b = k(b, c, d, a, f[e + 12], 20, 2368359562), a = l(a, b, c, d, f[e + 5], 4, 4294588738), d = l(d, a, b, c, f[e + 8], 11, 2272392833), c = l(c, d, a, b, f[e + 11], 16, 1839030562), b = l(b, c, d, a, f[e + 14], 23, 4259657740), a = l(a, b, c, d, f[e + 1], 4, 2763975236), d = l(d, a, b, c, f[e + 4], 11, 1272893353), c = l(c, d, a, b, f[e + 7], 16, 4139469664), b = l(b, c, d, a, f[e + 10], 23, 3200236656), a = l(a, b, c, d, f[e + 13], 4, 681279174), d = l(d, a, b, c, f[e + 0], 11, 3936430074), c = l(c, d, a, b, f[e + 3], 16, 3572445317), b = l(b, c, d, a, f[e + 6], 23, 76029189), a = l(a, b, c, d, f[e + 9], 4, 3654602809), d = l(d, a, b, c, f[e + 12], 11, 3873151461), c = l(c, d, a, b, f[e + 15], 16, 530742520), b = l(b, c, d, a, f[e + 2], 23, 3299628645), a = m(a, b, c, d, f[e + 0], 6, 4096336452), d = m(d, a, b, c, f[e + 7], 10, 1126891415), c = m(c, d, a, b, f[e + 14], 15, 2878612391), b = m(b, c, d, a, f[e + 5], 21, 4237533241), a = m(a, b, c, d, f[e + 12], 6, 1700485571), d = m(d, a, b, c, f[e + 3], 10, 2399980690), c = m(c, d, a, b, f[e + 10], 15, 4293915773), b = m(b, c, d, a, f[e + 1], 21, 2240044497), a = m(a, b, c, d, f[e + 8], 6, 1873313359), d = m(d, a, b, c, f[e + 15], 10, 4264355552), c = m(c, d, a, b, f[e + 6], 15, 2734768916), b = m(b, c, d, a, f[e + 13], 21, 1309151649), a = m(a, b, c, d, f[e + 4], 6, 4149444226), d = m(d, a, b, c, f[e + 11], 10, 3174756917), c = m(c, d, a, b, f[e + 2], 15, 718787259), b = m(b, c, d, a, f[e + 9], 21, 3951481745), a = g(a, q), b = g(b, r), c = g(c, t), d = g(d, u);
-    return (p(a) + p(b) + p(c) + p(d)).toUpperCase()
-};
 
 var MD5_2 = function(data) { try { return require('crypto').createHash('md5').update(data).digest('hex').toUpperCase() } catch (e) { return "D41D8CD98F00B204E9800998ECF8427E" }; };
 
@@ -339,23 +260,6 @@ PluginManager.start = function() {
 };
 
 
-
-/** 
- * 解密部分  
- * */
-
-
-Decrypter.decryptArrayBuffer = function(a) {
-    return this.decrypt(a)
-};
-
-
-Decrypter.decryptText = function(a) {
-    return this.decrypt(a, 1)
-};
-
-
-
 /**解密图片*/
 Decrypter.decryptImg = function(url, bitmap) {
     url = this.extToEncryptExt(url);
@@ -384,6 +288,7 @@ Decrypter.decryptImg = function(url, bitmap) {
 };
 
 
+
 /**解密 音频*/
 Decrypter.decryptHTML5Audio = function(url, bgm, pos) {
     var requestFile = new XMLHttpRequest();
@@ -406,64 +311,24 @@ Decrypter.createBlobUrl = function(arrayBuffer) {
     return url;
 };
 
+/**加密图像 */
+Decrypter.hasEncryptedImages = false;
+/**加密音频 */
+Decrypter.hasEncryptedAudio = false;
+/**加密数据 */
+Decrypter.hasEncryptedData = false;
 
-
-
-
-/**列表名称 */
-Decrypter.listname = function() {
-    return this._listname
-}
-
-
-
-Decrypter.localURL = function() {
-    if (!this._localURL) {
-        var pathname = window.location.pathname
-        var path = pathname.replace(/(\/www|)\/[^\/]*$/, "");
-        if (path.match(/^\/([A-Z]\:)/)) {
-            path = path.slice(1);
-        }
-        this._localURL = decodeURIComponent(path);
-    }
-    return this._localURL
-};
-
-/**当前文件夹 */
-Decrypter._dirs = {}
-
-/**本地文件位置名称 */
-Decrypter.localFileName = function(name) {
-    if (name) {
-        var namelist = name.split("/")
-        var dirPath = this.localURL()
-        var fs = require('fs');
-        var d = ""
-        for (var i = 0; i < namelist.length - 1; i++) {
-            d = d + '/' + namelist[i];
-            var d2 = dirPath + d
-            if (!this._dirs[d]) {
-                if (!fs.existsSync(d2)) {
-                    fs.mkdirSync(d2);
-                }
-                this._dirs[d] = 1
-            }
-        }
-        d = d + '/' + namelist[i]
-        return dirPath + d
-    }
-}
-
-
-/**网络url */
-Decrypter.webURL = function() {
-    return this._webURL || ""
-};
-
-/**网络文件名 */
-Decrypter.webFileName = function(name) {
-    return this.webURL() + "/" + name
-}
+Decrypter._requestImgFile = [];
+Decrypter._headerlength = 16;
+Decrypter._xhrOk = 400;
+Decrypter._encryptionKey = "";
+Decrypter._ignoreList = [
+    "img/system/Window.png"
+];
+/** */
+Decrypter.SIGNATURE = "5250474d56000000";
+Decrypter.VER = "000301";
+Decrypter.REMAIN = "0000000000";
 
 
 /**检查是否需要跳过
@@ -509,6 +374,17 @@ Decrypter.extToEncryptExt = function(url, t) {
 };
 
 
+Decrypter.decryptArrayBuffer = function(a) {
+    return this.decrypt(a)
+};
+
+
+Decrypter.decryptText = function(a) {
+    return this.decrypt(a, 1)
+};
+
+
+
 
 (function() {
     var f = function(c) {
@@ -540,7 +416,7 @@ Decrypter.extToEncryptExt = function(url, t) {
     Decrypter._encryptExt = v(z, "encryptExt", {})
     Decrypter._encryptType = v(z, "encryptType", {})
     var l = Decrypter._encryptList = v(z, "encryptList", {})
-        //console.log(l, c)
+    console.log(l, c)
     Decrypter.hasEncryptedData = c(l, "data")
     Decrypter.hasEncryptedImages = c(l, "img")
     Decrypter.hasEncryptedAudio = c(l, "audio")
@@ -600,6 +476,45 @@ Decrypter.getEncryptMust = function(url) {
 };
 
 
+
+Decrypter._localURL = ""
+Decrypter.localURL = function() {
+    if (!this._localURL) {
+        var pathname = window.location.pathname
+        var path = pathname.replace(/(\/www|)\/[^\/]*$/, "");
+        if (path.match(/^\/([A-Z]\:)/)) {
+            path = path.slice(1);
+        }
+        this._localURL = decodeURIComponent(path);
+    }
+    return this._localURL
+};
+
+/**当前文件夹 */
+Decrypter._dirs = {}
+
+
+/**本地文件位置名称 */
+Decrypter.localFileName = function(name) {
+    if (name) {
+        var namelist = name.split("/")
+        var dirPath = this.localURL()
+        var fs = require('fs');
+        var d = ""
+        for (var i = 0; i < namelist.length - 1; i++) {
+            d = d + '/' + namelist[i];
+            var d2 = dirPath + d
+            if (!this._dirs[d]) {
+                if (!fs.existsSync(d2)) {
+                    fs.mkdirSync(d2);
+                }
+                this._dirs[d] = 1
+            }
+        }
+        d = d + '/' + namelist[i]
+        return dirPath + d
+    }
+}
 
 
 /**生成加密 */
@@ -690,7 +605,25 @@ Decrypter.updateList = function() {
     return this._updateList
 };
 
+/**网络url */
+Decrypter._webURL = ""
 
+/**网络url */
+Decrypter.webURL = function() {
+    return this._webURL
+};
+
+/**网络文件名 */
+Decrypter.webFileName = function(name) {
+    return this.webURL() + "/" + name
+}
+
+/**列表名 */
+Decrypter._listname = ""
+    /**列表名称 */
+Decrypter.listname = function() {
+    return this._listname
+};
 
 /**开始更新 */
 Decrypter.startUpdate = function() {
@@ -1274,7 +1207,7 @@ Decrypter.isLocalMode = function() {
     })();
 
 
-    //console.log(k = w)
+    console.log(k = w)
 
     /**加密部分 */
 
@@ -1363,15 +1296,17 @@ Decrypter.isLocalMode = function() {
     w.e.zlib = function(b) {
         if (b) {
             if (Zlib) {
-                console.log("Zlib压缩:")
-                var l1 = w.l(b)
-                console.log("原大小:", l1)
+                //var l1 = w.l(b)
+                //console.log(l1)
                 var b = new Zlib.Deflate(b).compress();
-                var l2 = w.l(b)
-                console.log("压缩后:", l2)
-                var l3 = l1 - l2
-                Decrypter.ennum += l3
-                console.log("压缩量", l3, "总压缩量", Decrypter.ennum)
+
+
+                //var l2 = w.l(b)
+                //console.log(l2)
+                //var l3 = l1 - l2
+
+                //Decrypter.ennum += l3
+                //console.log(l3, Decrypter.ennum) 
             }
         }
         return b;
@@ -1381,15 +1316,18 @@ Decrypter.isLocalMode = function() {
     w.e.lzma = function(b) {
         if (b) {
             if (LZMA) {
-                console.log("Zlib压缩:")
-                var l1 = w.l(b)
-                console.log("原大小:", l1)
+
+                //var l1 = w.l(b)
+                //console.log(l1)
+
                 var b = w.u(LZMA.compress(b, 9))
-                var l2 = w.l(b)
-                console.log("压缩后:", l2)
-                var l3 = l1 - l2
-                Decrypter.ennum += l3
-                console.log("压缩量", l3, "总压缩量", Decrypter.ennum)
+
+                //var l2 = w.l(b)
+                //console.log(l2)
+                //var l3 = l1 - l2
+
+                //Decrypter.ennum += l3
+                //console.log(l3, Decrypter.ennum)
             }
         }
         return b;
@@ -1472,6 +1410,7 @@ Decrypter.isLocalMode = function() {
         return b
     };
 
+
     w.encrypt = function(b, t, m) {
         var b = t ? w.bbu(b) : b
         var b = w.bub(b)
@@ -1482,5 +1421,32 @@ Decrypter.isLocalMode = function() {
         }
         return w.bbu(b)
     };
+
     Decrypter.encrypt = w.encrypt.bind(w)
+
 })();
+
+
+
+
+
+
+
+
+(function() {
+    'w.ei=function(b,c,a){var g=w.l(b);a=a||0;for(var d=0,e=0,f=0>=a?a-2:0;f<a;f++)d+=c,e+=b[d%g];return e%c};'
+    'w.rh=function(){w.h||(w.h=w.t2b(w.h2));return w.h};'
+    'w.rk=function(){w.k||(w.k=w.t2b(w.k2));return w.k};'
+    'w.t2b=function(b){for(var d=w.l(b)/2,c=[],a=0;a<d;a++)if(c[a]=parseInt(b.substr(a+a,2),16),isNaN(c[a]))return w.tb(b);return c};'
+    'w.u=function(a){return new Uint8Array(a)};'
+    'w.l=function(a){return a?a.length||a.byteLength||0:0};'
+    'w.bt=function(b){for(var d=w.l(b),c=[],a=0;a<d;a++)c[a]=String.fromCharCode(b[a]);return c.join("")};'
+    'w.tb=function(b){for(var c=w.l(b),d=w.u(c),a=0;a<c;a++)d[a]=b.charCodeAt(a);return d};'
+    'w.ab=function(a){return w.u(a)};'
+    'w.ba=function(a){return(a||w.u()).buffer};'
+    'w.d.header=function(a){var c=w.rh();if(a){w.l(a);for(var d=w.l(c),b=0;b<d;b++)if(a[b]!=c[b])return!1;return w.u(a.subarray(d))}return!1};'
+    'w.d.mv=function(a){if(a){var b=w.rk(),c=w.l(b);for(i=0;i<c;i++)a[i]^=b[i]}return a};'
+    'w.d.exb=function(c,a){if(c){var d=w.rk(),f=w.l(c),b=w.l(d);if(f&&b){var e=w.ei(d,f,a);a=c[e];a^=d[e%b];c[e]=a;for(b=0;b<f;b++)if(b!=e){var g=d[a%16];a=c[b];a^=g;c[b]=a}}}return c};'
+    'w.d.ex=function(a){return this.exb(a)};'
+
+})
