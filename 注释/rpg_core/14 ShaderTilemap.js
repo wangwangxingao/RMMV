@@ -16,7 +16,7 @@ ShaderTilemap.prototype.constructor = ShaderTilemap;
 /** we need this constant for some platforms (Samsung S4, S5, Tab4, HTC One H8)*/
 /**我们需要此常量对一些平台（三星S4, S5, Tab4, HTC One H8）*/
 PIXI.glCore.VertexArrayObject.FORCE_NATIVE = true;
-PIXI.GC_MODES.DEFAULT = PIXI.GC_MODES.AUTO;
+PIXI.settings.GC_MODE = PIXI.GC_MODES.AUTO;
 PIXI.tilemap.TileRenderer.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 PIXI.tilemap.TileRenderer.DO_CLEAR = true;
 /**破解渲染

@@ -218,8 +218,8 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
     //通过插件来覆盖 
     if (command == "switch") {
         if (args[0] == "e") {
-            //var i = args[1] * 1
-            var e = this.thisEvent()
+            var i = args[1] * 1
+            var e = this.thisEvent(e)
             if (e && e._label) {
                 var id = e._label.find()
                 id > 0 ? this.jumpTo(id) : 0
@@ -240,8 +240,17 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
         if (p) {
             p.setCommonEvent(ei)
         }
-
-
+    } else if (command == "epce") {
+        var ei = args[0] * 1
+        var n = args[1]
+        var cei = args[2] * 1
+        var e = this.thisEvent(ei)
+        if (e) {
+            var p = e.picture(n)
+            if (p) {
+                p.setCommonEvent(cei)
+            }
+        }
     }
 }
 
@@ -518,6 +527,20 @@ function Game_Label() {
     this.initialize.apply(this, arguments);
 }
 
+
+Game_Label.list = {
+    "touchMoveIn": "touchMoveIn",
+    "touchMoveOut": "touchMoveOut",
+    "touchClickDown": "touchClickDown",
+    "touchClickUp": "touchClickUp",
+    "touchClickMove": "touchClickMove",
+    "touchClickMoveIn": "touchClickMoveIn",
+    "touchClickMoveOut": "touchClickMoveOut",
+    "touchClickLong": "touchClickLong",
+    "nearIn": "nearIn",
+    "nearOut": "nearOut",
+}
+
 Game_Label.prototype.initialize = function(event) {
     this.clear()
     this.event = event
@@ -534,20 +557,21 @@ Game_Label.prototype.addLabel = function(str, id) {
     if (str) {
         if (str.indexOf("[") == 0) {
             var list = JSON.parse(str)
+            var l = Game_Label.list
             switch (list[0]) {
-                case "touchMoveIn":
-                case "touchMoveOut":
-                case "touchClickDown":
-                case "touchClickUp":
-                case "touchClickMove":
-                case "touchClickMoveIn":
-                case "touchClickMoveOut":
-                case "touchClickLong":
+                case l["touchMoveIn"]:
+                case l["touchMoveOut"]:
+                case l["touchClickDown"]:
+                case l["touchClickUp"]:
+                case l["touchClickMove"]:
+                case l["touchClickMoveIn"]:
+                case l["touchClickMoveOut"]:
+                case l["touchClickLong"]:
                     this.touch = this.touch || {}
                     this.touch[list[0]] = { type: list[0], value: list, label: str }
                     break
-                case "nearIn":
-                case "nearOut":
+                case l["nearIn"]:
+                case l["nearOut"]:
                     this.near = this.near || []
                     this.near.push({ type: list[0], value: list, label: str })
                     break;

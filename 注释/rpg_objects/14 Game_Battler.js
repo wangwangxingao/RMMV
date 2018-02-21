@@ -620,10 +620,12 @@ Game_Battler.prototype.onTurnEnd = function() {
     this.clearResult();
     //恢复所有
     this.regenerateAll();
-    //更新状态回合
-    this.updateStateTurns();
-    //更新效果回合
-    this.updateBuffTurns();
+    if (!BattleManager.isForcedTurn()) {
+        //更新状态回合
+        this.updateStateTurns();
+        //更新效果回合
+        this.updateBuffTurns();
+    } 
     //移除状态自动( 2 //时机2 )
     this.removeStatesAuto(2);
 };

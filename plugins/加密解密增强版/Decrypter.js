@@ -11,7 +11,7 @@
  * 
  * @param SIGNATURE
  * @desc 游戏签名:
- * @default RMMV
+ * @default RMMV游戏
  * 
  * @param VER
  * @desc 游戏版本:
@@ -28,7 +28,7 @@
  *   
  * @param mode
  * @desc 模式: "header","mv","ex","aes","zlib","lzma" 
- * @default ["header","aes","zlib"]
+ * @default {"b":["header","ex"],"t":["header","ex"]}
  * 
  * @param dir
  * @desc 保存位置
@@ -67,13 +67,18 @@
  * 
  * 使用:
  * 加入本插件,并设置为on
- * 进入游戏,f8,使用Decrypter.startEncrypt() 生成加密文件夹,
+ * 进入游戏,f8,使用 Decrypter.startEncrypt() 生成加密文件夹,
+ * 使用 Decrypter.saveMY("test","miyao")  //参数可更改
+ * 即可生成 以"test"加密的miyao.js
  * 
  * 
  * 发布时,
- * 将本插件设置为off,将DecrypterPlayer插件(可以改名)加入并设置为on,
+ * 将本插件删除,
+ * 将DecrypterPlayer插件(可以改名)加入并设置好
+ * 将上面生成的miyao插件加入
  * 将本插件从游戏文件中删除,将已经加密的文件从游戏文件中删除
- * 此时依然可以游戏,
+ * 进入游戏时将提示输入密钥,如上例则输入 test 
+ * 即可进入游戏,
  * 
  * 
  * mode 模式: 
@@ -83,7 +88,8 @@
  *  "aes"aes加密 ,需要aes.js
  *  "zlib" zlib压缩,需要zlib.js
  *  "lzma" lzma压缩,需要lzma.js
- * 使用时类似 ["header","mv"] ,可以为空(然而好像没有意义..)
+ * 使用时类似 ["header","ex"] ,可以为空(然而好像没有意义..) 
+ * mv原版加密加密对文本无效的样子..
  * 
  * 
  * 
@@ -346,12 +352,12 @@ PluginManager.start = function() {
 
 
 Decrypter.decryptArrayBuffer = function(a) {
-    return this.decrypt(a)
+    return this.decrypt(a, 0, "b")
 };
 
 
 Decrypter.decryptText = function(a) {
-    return this.decrypt(a, 1)
+    return this.decrypt(a, 1, "t")
 };
 
 
@@ -560,15 +566,29 @@ Decrypter.extToEncryptExt = function(url, t) {
  * 加密部分
  * ===============================================================================
  */
+/**保存文件 */
+Decrypter.saveFile = function(n, t) {
+    var fs = require('fs');
+    var filePath = this.extToEncryptExt(n)
+    fs.writeFileSync(filePath, t);
+};
+
+/**删除文件 */
+Decrypter.delFile = function(n) {
+    var fs = require('fs');
+    var filePath = this.extToEncryptExt(n)
+    fs.unlinkSync(filePath);
+};
+
 
 /**加密Buffer */
 Decrypter.encryptBuffer = function(a) {
-    return this.encrypt(a)
+    return this.encrypt(a, 0, "b")
 }
 
 /**加密文本 */
 Decrypter.encryptText = function(data) {
-    return this.encrypt(data)
+    return this.encrypt(data, 0, "t")
 }
 
 
@@ -611,6 +631,8 @@ Decrypter.startEncrypt = function() {
     var o = {}
     var o2 = {}
 
+    var nt = Date.now()
+    console.log(nt)
     var pro = 0
     Decrypter.ennum = 0
 
@@ -641,32 +663,46 @@ Decrypter.startEncrypt = function() {
         get(d)
     }
     var proall = pro
+    var nt2 = Date.now()
+    console.log("读取列表时间", nt2 - nt)
     console.log(o, pro, list)
     pro = 0
     for (var n in o) {
+        var nt2 = Date.now()
         console.log(n)
         var v = o[n]
         var url = this.localFileName(n)
 
         var data = fs.readFileSync(url)
-        var buffer = this.encryptBuffer(data)
+        if (v == "t") {
+            var buffer = this.encryptBuffer(data)
+        } else {
+            var buffer = this.encryptText(data)
+        }
         var md5 = MD5_2(buffer)
         o2[n] = md5
-        var url = this.extToEncryptExt(n)
-        fs.writeFileSync(url, buffer)
+
+        Decrypter.saveFile(n, buffer)
         console.log(n, v, url, md5)
         pro++
         console.log(pro, "/", proall, Math.floor((pro / proall) * 100) + "%")
+
+        var nt3 = Date.now()
+        console.log(n, "使用时间", nt3 - nt2)
     }
     var data = JSON.stringify(o2)
     var buffer = this.encryptText(data)
     var n = this.listname()
-    var url = this.extToEncryptExt(n)
     if (n) {
-        fs.writeFileSync(url, buffer)
+        Decrypter.saveFile(n, buffer)
     }
-    console.log(o2, n, url)
-    console.log("完成")
+    console.log(o2, n)
+
+    var nt3 = Date.now()
+    console.log("完成", "使用时间", nt3 - nt)
+
+
+    //this.saveMY()
     return o2
 }
 
@@ -949,19 +985,7 @@ Decrypter.delweb = function(n) {
     this.updateUL(n, "end")
 };
 
-/**保存文件 */
-Decrypter.saveFile = function(n, t) {
-    var fs = require('fs');
-    var filePath = this.extToEncryptExt(n)
-    fs.writeFileSync(filePath, t);
-};
 
-/**删除文件 */
-Decrypter.delFile = function(n) {
-    var fs = require('fs');
-    var filePath = this.extToEncryptExt(n)
-    fs.unlinkSync(filePath);
-};
 
 /**是本地 */
 Decrypter.isLocalMode = function() {
@@ -998,22 +1022,23 @@ Decrypter.isLocalMode = function() {
     };
 
 
-    w.rh = function() {
-        if (!w.h) {
-            w.h = w.t2b(w.h2)
-        }
-        return w.h
+
+    w.rm = function(m) {
+        return typeof(m) == "string" ? w.m[m] || w.m : m || w.m
+    };
+
+
+
+    w.rh = function(h) {
+        return h || w.h
     };
 
 
     /**读取加密键
      * @return  {[]}
      */
-    w.rk = function() {
-        if (!w.k) {
-            w.k = w.t2b(w.k2)
-        }
-        return w.k
+    w.rk = function(k) {
+        return k || w.k
     };
 
 
@@ -1057,6 +1082,7 @@ Decrypter.isLocalMode = function() {
         }
         return t.join("");
     };
+
     /**
      * 文本转数组
      * 
@@ -1091,8 +1117,8 @@ Decrypter.isLocalMode = function() {
 
 
     /**解密 头 */
-    w.d.header = function(a) {
-        var b = w.rh()
+    w.d.header = function(a, k, h) {
+        var b = w.rh(k)
         if (a) {
             var c = w.l(a)
             var d = w.l(b)
@@ -1104,9 +1130,9 @@ Decrypter.isLocalMode = function() {
         return false
     };
 
-    w.d.mv = function(b) {
+    w.d.mv = function(b, k, h) {
         if (b) {
-            var k = w.rk();
+            var k = w.rk(k);
             var l = w.l(k)
             for (i = 0; i < l; i++) {
                 b[i] = k[i] ^ b[i]
@@ -1115,9 +1141,9 @@ Decrypter.isLocalMode = function() {
         return b;
     };
 
-    w.d.exb = function(b, t) {
+    w.d.exb = function(b, k, h, t) {
         if (b) {
-            var k = w.rk();
+            var k = w.rk(k);
             var l = w.l(b)
             var e = w.l(k)
             if (l && e) {
@@ -1128,7 +1154,7 @@ Decrypter.isLocalMode = function() {
                 b[n] = d = t
                 for (var i = 0; i < l; i++) {
                     if (i == n) {} else {
-                        var v = k[d % 16]
+                        var v = k[d % e]
                         var c = b[i]
                         var t = v ^ c
                         b[i] = d = t
@@ -1139,12 +1165,12 @@ Decrypter.isLocalMode = function() {
         return b;
     };
 
-    w.d.ex = function(b) {
-        return this.exb(b)
+    w.d.ex = function(b, k, h) {
+        return this.exb(b, k, h)
     };
 
 
-    w.d.zlib = function(b) {
+    w.d.zlib = function(b, k, h) {
         if (b) {
             if (Zlib) {
                 var b = new Zlib.Inflate(b).decompress();
@@ -1154,7 +1180,7 @@ Decrypter.isLocalMode = function() {
     };
 
 
-    w.d.lzma = function(b) {
+    w.d.lzma = function(b, k, h) {
         if (b) {
             if (LZMA) {
                 var b = w.u(LZMA.decompress(b))
@@ -1164,10 +1190,10 @@ Decrypter.isLocalMode = function() {
     };
 
 
-    w.d.aes = function(b) {
+    w.d.aes = function(b, k, h) {
         if (b) {
             if (Aes) {
-                var b = Aes.Ctr.decrypt(b, w.rk(), 256, 2)
+                var b = Aes.Ctr.decrypt(b, w.rk(k), 256, 2)
             }
         }
         return b;
@@ -1175,7 +1201,7 @@ Decrypter.isLocalMode = function() {
 
 
 
-    w.d.tl64 = function(t) {
+    w.d.tl64 = function(t, k, h) {
         return LZString.decompressFromBase64(t);
     };
 
@@ -1183,14 +1209,14 @@ Decrypter.isLocalMode = function() {
     /**
      * 用LZ加密文字
      */
-    w.d.tl = function(t) {
+    w.d.tl = function(t, k, h) {
         return LZString.compress(t);
     };
 
-    w.d.taes = function(t) {
+    w.d.taes = function(t, k, h) {
         if (t) {
             if (Aes) {
-                var t = Aes.Ctr.decrypt(t, w.rk(), 256, 0)
+                var t = Aes.Ctr.decrypt(t, w.rk(k), 256, 0)
             }
         }
         return t;
@@ -1199,7 +1225,7 @@ Decrypter.isLocalMode = function() {
 
 
     /**解密文字到utf8 */
-    w.d.tu = function(t) {
+    w.d.tu = function(t, k, h) {
         if (Utf8) {
             t = Utf8.decode(t)
         }
@@ -1207,7 +1233,7 @@ Decrypter.isLocalMode = function() {
     };
 
     /**解密文字到base64 */
-    w.d.t64 = function(t) {
+    w.d.t64 = function(t, k, h) {
         if (t) {
             t = Base64.decode(t)
         }
@@ -1215,11 +1241,11 @@ Decrypter.isLocalMode = function() {
     };
 
 
-    w.d.use = function(b, a) {
-        var l = w.l(a)
+    w.d.use = function(b, m, k, h) {
+        var l = w.l(m)
         for (var i = 0; i < l; i++) {
             if (!b) { return false }
-            var b = !!this[a[i]] && this[a[i]](b)
+            var b = !!this[m[i]] && this[m[i]](b, k, h)
         }
         return b
     };
@@ -1231,22 +1257,50 @@ Decrypter.isLocalMode = function() {
      * @param {Boolean} t 种类
      * @param {[]} m 加密方法
      */
-    w.decrypt = function(a, t, m) {
+    w.decrypt = function(a, t, m, k, h) {
         if (!a) { return null }
-        var m = m || w.m
+        var m = w.rm(m)
         var b = w.ab(a)
         if (m) {
-            b = w.d.use(b, m)
+            b = w.d.use(b, m, k, h)
             if (!b) { throw new Error("Decrypt is wrong"); return null }
         }
         return t ? t == 1 ? w.d.tu(w.bt(b)) : b : w.ba(b)
     };
 
+
+    w.load = function() {
+        console.log(w)
+        w.m = JSON.parse(w.m2)
+        w.h = w.t2b(w.h2)
+        w.k = w.t2b(w.k2)
+    }
+
     Decrypter.decrypt = w.decrypt.bind(w);
 
 
 
-    (function() {
+
+    w.loadMY = function(v) {
+        return false
+        var k = v || window.prompt("输入", "");
+        var r = w.s.data
+            //console.log(r, k)
+        var d = w.decrypt(r, 1, ["ex"], w.t2b(k), [])
+            //console.log(d)
+        var l = JSON.parse(d)
+        w.m2 = l[0]
+        w.k2 = l[1]
+        w.h2 = l[2]
+        w.load()
+
+        return true
+            //console.log(w.m2, w.h2, w.k2)
+    };
+
+
+    w.loadMY() || (function() {
+        //w.loadMY()
         var f = function(c) {
             c = c || "";
             var d = c.toLowerCase(),
@@ -1267,11 +1321,15 @@ Decrypter.isLocalMode = function() {
         var v = function(a, b, c) { return p(g(a, b)) || c }
 
         var z = f("Decrypter")
-        w.m = v(z, "mode", [])
+        w.m2 = g(z, "mode")
         w.k2 = MD5(g(z, "miyao"))
         w.h2 = g(z, "SIGNATURE") + g(z, "VER") + g(z, "REMAIN")
 
+        w.load()
+            //console.log(w)
     })();
+
+
 
 
     //console.log(k = w)
@@ -1297,8 +1355,8 @@ Decrypter.isLocalMode = function() {
     /**
      * 加密 加头
      */
-    w.e.header = function(a) {
-        var b = w.rh()
+    w.e.header = function(a, k, h) {
+        var b = w.rh(h)
         var c = w.l(a)
         var d = w.l(b)
         var r = w.u(c + d)
@@ -1311,9 +1369,9 @@ Decrypter.isLocalMode = function() {
     /**
      * 用mv加密byteArray
      */
-    w.e.mv = function(b) {
+    w.e.mv = function(b, k, h) {
         if (b) {
-            var k = w.rk()
+            var k = w.rk(k)
             var l = w.l(k)
             for (i = 0; i < l; i++) {
                 b[i] = k[i] ^ b[i]
@@ -1327,9 +1385,9 @@ Decrypter.isLocalMode = function() {
     /**
      * 用ex加密byteArray
      */
-    w.e.exb = function(b, t) {
+    w.e.exb = function(b, k, h, t) {
         if (b) {
-            var k = w.rk()
+            var k = w.rk(k)
             var l = w.l(b)
             var e = w.l(k)
             if (l && e) {
@@ -1353,14 +1411,14 @@ Decrypter.isLocalMode = function() {
     /**
      * 用ex加密byteArray
      */
-    w.e.ex = function(b) {
-        return this.exb(b)
+    w.e.ex = function(b, k, h) {
+        return this.exb(b, k, h)
     };
 
     /**
      * 用zlib加密byteArry
      */
-    w.e.zlib = function(b) {
+    w.e.zlib = function(b, k, h) {
         if (b) {
             if (Zlib) {
                 console.log("Zlib压缩:")
@@ -1378,10 +1436,10 @@ Decrypter.isLocalMode = function() {
     };
 
 
-    w.e.lzma = function(b) {
+    w.e.lzma = function(b, k, h) {
         if (b) {
             if (LZMA) {
-                console.log("Zlib压缩:")
+                console.log("lzma压缩:")
                 var l1 = w.l(b)
                 console.log("原大小:", l1)
                 var b = w.u(LZMA.compress(b, 9))
@@ -1399,23 +1457,28 @@ Decrypter.isLocalMode = function() {
     /**
      * 用aes加密byteArry
      */
-    w.e.aes = function(b) {
+    w.e.aes = function(b, k, h) {
         if (b) {
             if (Aes) {
-                var keys = w.rk();
-                var b = Aes.Ctr.encrypt(b, keys, 256, 2)
+                console.log("aes加密:")
+                var l1 = w.l(b)
+                console.log("原大小:", l1)
+                var b = Aes.Ctr.encrypt(b, w.rk(k), 256, 2)
+                var l2 = w.l(b)
+                console.log("压缩后:", l2)
+                var l3 = l1 - l2
+                Decrypter.ennum += l3
+                console.log("压缩量", l3, "总压缩量", Decrypter.ennum)
             }
         }
         return b;
     };
 
 
-
-
     /**
      * 用base64加密文字
      */
-    w.e.tl64 = function(t) {
+    w.e.tl64 = function(t, k, h) {
         return LZString.compressToBase64(t);
     };
 
@@ -1423,7 +1486,7 @@ Decrypter.isLocalMode = function() {
     /**
      * 用base64加密文字
      */
-    w.e.tl = function(t) {
+    w.e.tl = function(t, k, h) {
         return LZString.compress(t);
     };
 
@@ -1432,10 +1495,10 @@ Decrypter.isLocalMode = function() {
     /**
      * 用aes加密文字
      */
-    w.e.taes = function(t) {
+    w.e.taes = function(t, k, h) {
         if (t) {
             if (Aes) {
-                var t = Aes.Ctr.encrypt(t, w.rk(), 256, 0)
+                var t = Aes.Ctr.encrypt(t, w.rk(k), 256, 0)
             }
         }
         return t;
@@ -1445,7 +1508,7 @@ Decrypter.isLocalMode = function() {
     /**
      * UTF加密文本
      */
-    w.e.tu = function(t) {
+    w.e.tu = function(t, k, h) {
         if (Utf8) {
             var t = Utf8.encode(t || "")
         }
@@ -1455,7 +1518,7 @@ Decrypter.isLocalMode = function() {
     /**
      * base64加密文本
      */
-    w.e.t64 = function(t) {
+    w.e.t64 = function(t, k, h) {
         if (Base64) {
             var t = Base64.encode(t || "")
         }
@@ -1463,24 +1526,49 @@ Decrypter.isLocalMode = function() {
     };
 
     /**使用各种加密手段 */
-    w.e.use = function(b, a) {
-        var l = w.l(a)
+    w.e.use = function(b, m, k, h) {
+        var l = w.l(m)
         for (var i = l - 1; i >= 0; i--) {
             if (!b) { return false }
-            var b = !!this[a[i]] && this[a[i]](b)
+            var b = !!this[m[i]] && this[m[i]](b, k, h)
         }
         return b
     };
 
-    w.encrypt = function(b, t, m) {
-        var b = t ? w.bbu(b) : b
+    w.encrypt = function(b, f, m, k, h) {
+        var b = f ? w.bbu(b) : b
         var b = w.bub(b)
-        var m = m || w.m
+        var m = w.rm(m)
         if (m) {
-            b = w.e.use(b, m)
+            b = w.e.use(b, m, k, h)
             if (!b) { throw new Error("Encrypt is wrong"); return null }
         }
         return w.bbu(b)
     };
+
+
+    w.saveMY = function(k, n) {
+        var k = k || window.prompt("输入", "");
+        var t = w.e.tl64(JSON.stringify([w.m2, w.k2, w.h2]))
+        var t2 = w.encrypt(t, 1, ["ex"], w.t2b(k), [])
+        var t2 = JSON.stringify(t2)
+
+        var t1 = '(function(){var b={d:{},e:{},ei:function(a,d,c){var e=b.l(a);c=c||0;for(var g=0,f=0,h=0>=c?c-2:0;h<c;h++)g+=d,f+=a[g%e];return f%d},rm:function(a){return"string"==typeof a?b.m[a]||b.m:a||b.m},rk:function(a){return a||b.k},rh:function(a){return a||b.h},t2b:function(a){for(var d=b.l(a)/2,c=[],e=0;e<d;e++)if(c[e]=parseInt(a.substr(e+e,2),16),isNaN(c[e]))return b.tb(a);return c},u:function(a){return new Uint8Array(a)},l:function(a){return a?a.length||a.byteLength||0:0},bt:function(a){for(var d=b.l(a),c=[],e=0;e<d;e++)c[e]=String.fromCharCode(a[e]);return c.join("")},tb:function(a){for(var d=b.l(a),c=b.u(d),e=0;e<d;e++)c[e]=a.charCodeAt(e);return c},ab:function(a){return b.u(a)},ba:function(a){return(a||b.u()).buffer}};b.d.header=function(a,d,c){d=b.rh(d);if(a){b.l(a);c=b.l(d);for(var e=0;e<c;e++)if(a[e]!=d[e])return!1;return b.u(a.subarray(c))}return!1};b.d.mv=function(a,d,c){if(a)for(d=b.rk(d),c=b.l(d),i=0;i<c;i++)a[i]^=d[i];return a};b.d.exb=function(a,d,c,e){if(a){d=b.rk(d);c=b.l(a);var g=b.l(d);if(c&&g){var f=b.ei(d,c,e);e=a[f];e^=d[f%g];a[f]=e;for(var h=0;h<c;h++)if(h!=f){var k=d[e%g];e=a[h];e^=k;a[h]=e}}}return a};b.d.ex=function(a,b,c){return this.exb(a,b,c)};b.d.zlib=function(a,b,c){a&&Zlib&&(a=(new Zlib.Inflate(a)).decompress());return a};b.d.lzma=function(a,d,c){a&&LZMA&&(a=b.u(LZMA.decompress(a)));return a};b.d.aes=function(a,d,c){a&&Aes&&(a=Aes.Ctr.decrypt(a,b.rk(d),256,2));return a};b.d.tl64=function(a,b,c){return LZString.decompressFromBase64(a)};b.d.tl=function(a,b,c){return LZString.compress(a)};b.d.taes=function(a,d,c){a&&Aes&&(a=Aes.Ctr.decrypt(a,b.rk(d),256,0));return a};b.d.tu=function(a,b,c){Utf8&&(a=Utf8.decode(a));return a};b.d.t64=function(a,b,c){a&&(a=Base64.decode(a));return a};b.d.use=function(a,d,c,e){for(var g=b.l(d),f=0;f<g;f++){if(!a)return!1;a=!!this[d[f]]&&this[d[f]](a,c,e)}return a};b.decrypt=function(a,d,c,e,g){if(!a)return null;c=b.rm(c);a=b.ab(a);if(c&&(a=b.d.use(a,c,e,g),!a))throw Error("Decrypt is wrong");return d?1==d?b.d.tu(b.bt(a)):a:b.ba(a)};b.load=function(){b.m=JSON.parse(b.m2);b.h=b.t2b(b.h2);b.k=b.t2b(b.k2)};Decrypter.decrypt=b.decrypt.bind(b);b.s='
+
+        var t3 = ';b.loadMY=function(a){a=a||window.prompt("\u8f93\u5165","");a=b.decrypt(b.s.data,1,["ex"],b.t2b(a),[]);a=b.d.tl64(a);a=JSON.parse(a);b.m2=a[0];b.k2=a[1];b.h2=a[2];b.load()};b.loadMY()})();'
+        console.log(t1, t2, t3)
+        console.log(t1 + t2 + t3)
+
+        var n = n || window.prompt("输入", "") || "miyao"
+        var n = Decrypter.localFileName("js/plugins/" + n + ".js")
+        var fs = require('fs');
+        fs.writeFileSync(n, t1 + t2 + t3);
+    }
+
+    console.log(encrypt = w)
+
     Decrypter.encrypt = w.encrypt.bind(w)
+    Decrypter.saveMY = w.saveMY.bind(w)
+
+
 })();

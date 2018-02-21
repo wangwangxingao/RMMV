@@ -479,7 +479,7 @@ Sprite.prototype._renderWebGL = function(renderer) {
         //拷贝pixi-v4的内部代码
         this.calculateVertices();
 
-        if (this._isPicture) {
+        if (this.pluginName === 'sprite' && this._isPicture) {
             // use heavy renderer, which reduces artifacts and applies corrent blendMode,
             //使用笨重渲染器，从而降低了失真和运用先进混合模式
             // but does not use multitexture optimization
@@ -490,8 +490,8 @@ Sprite.prototype._renderWebGL = function(renderer) {
         } else {
             // use pixi super-speed renderer
             //使用Pixi的超高速渲染
-            renderer.setObjectRenderer(renderer.plugins.sprite);
-            renderer.plugins.sprite.render(this);
+            renderer.setObjectRenderer(renderer.plugins[this.pluginName]);
+			renderer.plugins[this.pluginName].render(this);
         }
     }
 };

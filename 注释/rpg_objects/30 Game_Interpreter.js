@@ -944,16 +944,23 @@ Game_Interpreter.prototype.command413 = function () {
 
 /** Break Loop 断开循环*/
 Game_Interpreter.prototype.command113 = function () {
+    var depth = 0;
     //当(索引 < 列表 长度 - 1 )
     while (this._index < this._list.length - 1) {
         //索引++
         this._index++;
         //命令 = 当前命令()
         var command = this.currentCommand();
+        if (command.code === 112){
+            depth++;
+        }
         //如果 (命令 编码 === 413 并且 命令 缩进 < 缩进 )
         if (command.code === 413 && command.indent < this._indent) {
-            //中断
-            break;
+            if (depth > 0) {
+                depth--;
+            } else {
+                break; 
+            } 
         }
     }
     //返回 true 
@@ -1073,7 +1080,11 @@ Game_Interpreter.prototype.command122 = function () {
         //当 2
         case 2:  // Random 随机数
             //值 = 参数组[4] + 数学 随机整数 (参数组[5] - 参数组[4] +1 )
-            value = this._params[4] + Math.randomInt(this._params[5] - this._params[4] + 1);
+            value = this._params[5] - this._params[4] + 1;
+            for (var i = this._params[0]; i <= this._params[1]; i++) {
+                this.operateVariable(i, this._params[2], this._params[4] + Math.randomInt(value));
+            }
+            return true; 
             //中断
             break;
         //当 2
@@ -2048,18 +2059,18 @@ Game_Interpreter.prototype.command281 = function () {
 Game_Interpreter.prototype.command282 = function () {
     //图块设置 = 数据图块设置[参数组[0]]
     var tileset = $dataTilesets[this._params[0]];
-    if(!this._imageReservationId){
+    if (!this._imageReservationId) {
         this._imageReservationId = Utils.generateRuntimeId();
     }
-    var allReady = tileset.tilesetNames.map(function(tilesetName) {
+    var allReady = tileset.tilesetNames.map(function (tilesetName) {
         return ImageManager.reserveTileset(tilesetName, 0, this._imageReservationId);
-    }, this).every(function(bitmap) {return bitmap.isReady();});
+    }, this).every(function (bitmap) { return bitmap.isReady(); });
 
     if (allReady) {
         $gameMap.changeTileset(this._params[0]);
         ImageManager.releaseReservation(this._imageReservationId);
         this._imageReservationId = null;
-      //返回 true
+        //返回 true
         return true;
         //否则
     } else {
@@ -2607,9 +2618,9 @@ Game_Interpreter.prototype.command337 = function () {
                 //敌人 开始动画( 参数组[1] , false , 0)
                 enemy.startAnimation(this._params[1], false, 0);
             }
-        //绑定(this))
-        }.bind(this)); 
-    //否则
+            //绑定(this))
+        }.bind(this));
+        //否则
     } else {
         //迭代敌人索引( 参数组[0],方法(敌人)
         this.iterateEnemyIndex(this._params[0], function (enemy) {
@@ -2725,12 +2736,12 @@ Game_Interpreter.prototype.pluginCommand = function (command, args) {
     //通过插件来覆盖
 };
 
-Game_Interpreter.requestImages = function(list, commonList){
-    if(!list) return;
+Game_Interpreter.requestImages = function (list, commonList) {
+    if (!list) return;
 
-    list.forEach(function(command){
+    list.forEach(function (command) {
         var params = command.parameters;
-        switch(command.code){
+        switch (command.code) {
             // Show Text
             case 101:
                 ImageManager.requestFace(params[0]);
@@ -2761,10 +2772,10 @@ Game_Interpreter.requestImages = function(list, commonList){
 
             // Set Movement Route
             case 205:
-                if(params[1]){
-                    params[1].list.forEach(function(command){
+                if (params[1]) {
+                    params[1].list.forEach(function (command) {
                         var params = command.parameters;
-                        if(command.code === Game_Character.ROUTE_CHANGE_IMAGE){
+                        if (command.code === Game_Character.ROUTE_CHANGE_IMAGE) {
                             ImageManager.requestCharacter(params[0]);
                         }
                     });
@@ -2773,7 +2784,7 @@ Game_Interpreter.requestImages = function(list, commonList){
 
             // Show Animation, Show Battle Animation
             case 212: case 337:
-                if(params[1]) {
+                if (params[1]) {
                     var animation = $dataAnimations[params[1]];
                     var name1 = animation.animation1Name;
                     var name2 = animation.animation2Name;
@@ -2787,7 +2798,7 @@ Game_Interpreter.requestImages = function(list, commonList){
             // Change Player Followers
             case 216:
                 if (params[0] === 0) {
-                    $gamePlayer.followers().forEach(function(follower) {
+                    $gamePlayer.followers().forEach(function (follower) {
                         var name = follower.characterName();
                         ImageManager.requestCharacter(name);
                     });
@@ -2802,7 +2813,7 @@ Game_Interpreter.requestImages = function(list, commonList){
             // Change Tileset
             case 282:
                 var tileset = $dataTilesets[params[0]];
-                tileset.tilesetNames.forEach(function(tilesetName){
+                tileset.tilesetNames.forEach(function (tilesetName) {
                     ImageManager.requestTileset(tilesetName);
                 });
                 break;
@@ -2832,7 +2843,7 @@ Game_Interpreter.requestImages = function(list, commonList){
             // Change Vehicle Image
             case 323:
                 var vehicle = $gameMap.vehicle(params[0]);
-                if(vehicle){
+                if (vehicle) {
                     ImageManager.requestCharacter(params[1]);
                 }
                 break;

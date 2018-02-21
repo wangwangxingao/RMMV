@@ -29,7 +29,7 @@ Utils.RPGMAKER_NAME = 'MV';
  * @final
  */
 /** RPGMaker版本 = "1.5.0"*/
-Utils.RPGMAKER_VERSION = "1.5.0";
+Utils.RPGMAKER_VERSION = "1.6.0";
 
 
 /**是选项有效检查 项目URL字符串是否有(name) 测试游戏时会带
@@ -48,8 +48,10 @@ Utils.isOptionValid = function(name) {
 	//location.search.slice(1).split('&')会返回你的项目名
 	//contains是对原生对象string与array的扩展,
 	//功能是对输入的参数进行比较 , 返回 是否存在输入的参数 
-    return location.search.slice(1).split('&').contains(name);
-};
+    if (location.search.slice(1).split('&').contains(name)) {return 1;};
+    if (typeof nw !== "undefined" && nw.App.argv.length > 0 && nw.App.argv[0].split('&').contains(name)) {return 1;};
+    return 0;
+}
 
 /**是nwjs
  * 检查是不是nw.js平台

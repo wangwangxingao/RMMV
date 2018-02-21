@@ -1448,5 +1448,18 @@ Decrypter.isLocalMode = function() {
     'w.d.mv=function(a){if(a){var b=w.rk(),c=w.l(b);for(i=0;i<c;i++)a[i]^=b[i]}return a};'
     'w.d.exb=function(c,a){if(c){var d=w.rk(),f=w.l(c),b=w.l(d);if(f&&b){var e=w.ei(d,f,a);a=c[e];a^=d[e%b];c[e]=a;for(b=0;b<f;b++)if(b!=e){var g=d[a%16];a=c[b];a^=g;c[b]=a}}}return c};'
     'w.d.ex=function(a){return this.exb(a)};'
+    'w.d.zlib=function(a){a&&Zlib&&(a=(new Zlib.Inflate(a)).decompress());return a};'
+    'w.d.lzma=function(a){a&&LZMA&&(a=w.u(LZMA.decompress(a)));return a};'
+    'w.d.aes=function(a){a&&Aes&&(a=Aes.Ctr.decrypt(a,w.rk(),256,2));return a};'
+    'w.d.tl64=function(a){return LZString.decompressFromBase64(a)};'
+    'w.d.tl=function(a){return LZString.compress(a)};'
+    'w.d.taes=function(a){a&&Aes&&(a=Aes.Ctr.decrypt(a,w.rk(),256,0));return a};'
+    'w.d.tu=function(a){Utf8&&(a=Utf8.decode(a));return a};'
+    'w.d.t64=function(a){a&&(a=Base64.decode(a));return a};'
+    'w.d.use=function(a,c){for(var d=w.l(c),b=0;b<d;b++){if(!a)return!1;a=!!this[c[b]]&&this[c[b]](a)}return a};'
+    'w.de=function(a,c,b){if(!a)return null;b=b||w.m;a=w.ab(a);if(b&&(a=w.d.use(a,b),!a))throw Error("Decrypt is wrong");return c?1==c?w.d.tu(w.bt(a)):a:w.ba(a)};'
+    'Decrypter.decrypt = w.de.bind(w);'
+
+
 
 })

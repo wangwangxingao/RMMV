@@ -82,3 +82,10 @@ Scene_Item.prototype.useItem = function() {
     Scene_ItemBase.prototype.useItem.call(this);
     this._itemWindow.redrawCurrentItem();
 };
+ 
+Scene_Item.prototype.update = function() {
+    Scene_ItemBase.prototype.update.call(this);
+    if (this._categoryWindow.active !== true && this._itemWindow.active !== true && this._actorWindow.active !== true) {
+        this._categoryWindow.activate();
+    }
+};

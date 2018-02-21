@@ -68,6 +68,8 @@ BattleManager.initMembers = function() {
     this._escaped = false;
     //奖励 = {}
     this._rewards = {};
+    
+    this._turnForced = false;
 };
 /**是战斗测试 */
 BattleManager.isBattleTest = function() {
@@ -223,7 +225,7 @@ BattleManager.updateEvent = function() {
             }
     }
     //返回 检查中止()
-    return this.checkAbort2();
+    return this.checkAbort();
 };
 /**更新事件主要 */
 BattleManager.updateEventMain = function() {
@@ -505,6 +507,13 @@ BattleManager.endTurn = function() {
         //日志窗口 显示恢复(主体)
         this._logWindow.displayRegeneration(battler);
     }, this);
+    if (this.isForcedTurn()) {
+        this._turnForced = false;
+    }
+};
+
+BattleManager.isForcedTurn = function () {
+    return this._turnForced;
 };
 /**更新回合结束 */
 BattleManager.updateTurnEnd = function() {
@@ -727,6 +736,7 @@ BattleManager.forceAction = function(battler) {
 BattleManager.processForcedAction = function() {
     //如果 动作强制战斗者 (动作强制战斗者 存在)
     if (this._actionForcedBattler) {
+        this._turnForced = true;
         //主体 = 动作强制战斗者
         this._subject = this._actionForcedBattler;
         //动作强制战斗者 = null
@@ -768,20 +778,7 @@ BattleManager.checkBattleEnd = function() {
     return false;
 };
 /**检查中止 */
-BattleManager.checkAbort = function() {
-    //如果 (游戏队伍 是空的() 或者 是中止() ) 
-    if ($gameParty.isEmpty() || this.isAborting()) {
-        //进行中止()
-        this.processAbort();
-        //返回 true
-        return true;
-    }
-    //返回 false 
-    return false;
-};
-
-/**检查中止2 */
-BattleManager.checkAbort2 = function() {
+BattleManager.checkAbort = function() { 
     //如果 (游戏队伍 是空的() 或者 是中止() ) 
     if ($gameParty.isEmpty() || this.isAborting()) {
         //声音管理器 播放逃跑()

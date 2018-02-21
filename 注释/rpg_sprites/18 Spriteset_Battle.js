@@ -126,6 +126,7 @@ Spriteset_Battle.prototype.battleback2Name = function() {
 };
 /**上层世界战斗背景1名称 */
 Spriteset_Battle.prototype.overworldBattleback1Name = function() {
+    if ($gameMap.battleback1Name() === '') return '';
     if ($gamePlayer.isInVehicle()) {
         return this.shipBattleback1Name();
     } else {
@@ -134,6 +135,7 @@ Spriteset_Battle.prototype.overworldBattleback1Name = function() {
 };
 /**上层世界战斗背景2名称 */
 Spriteset_Battle.prototype.overworldBattleback2Name = function() {
+    if ($gameMap.battleback2Name() === '') return '';
     if ($gamePlayer.isInVehicle()) {
         return this.shipBattleback2Name();
     } else {
