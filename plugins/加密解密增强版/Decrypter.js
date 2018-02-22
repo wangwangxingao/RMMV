@@ -425,12 +425,17 @@ Decrypter.listname = function() {
 
 Decrypter.localURL = function() {
     if (!this._localURL) {
-        var pathname = window.location.pathname
-        var path = pathname.replace(/(\/www|)\/[^\/]*$/, "");
-        if (path.match(/^\/([A-Z]\:)/)) {
-            path = path.slice(1);
-        }
-        this._localURL = decodeURIComponent(path);
+        var path = null// require &&typeof(require) =="function" && require('path');  
+        if(path ){
+            this._localURL  = path.dirname(process.mainModule.filename) 
+        }else{ 
+            var pathname = window.location.pathname
+            var path = pathname.replace(/(\/www|)\/[^\/]*$/, "");
+            if (path.match(/^\/([A-Z]\:)/)) {
+                path = path.slice(1);
+            }
+            this._localURL = decodeURIComponent(path);
+        } 
     }
     return this._localURL
 };
@@ -639,6 +644,7 @@ Decrypter.startEncrypt = function() {
     var list = Decrypter._encryptList
     var dir = Decrypter.localURL()
     var fs = require('fs');
+    console.log(list)
     var get = function(f) {
         var p = f ? dir + "/" + f : dir
         if (fs.existsSync(p)) {

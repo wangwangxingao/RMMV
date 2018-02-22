@@ -74,40 +74,56 @@ var PIXI;
             };
             CompositeRectTileLayer.prototype.addFrame = function (texture_, x, y, animX, animY) {
                 var texture;
-                if (typeof texture_ === "string") {
+                var layer = null, ind = 0;
+                var children = this.children;
+                if (typeof texture_ === "number") {
+                    var childIndex = texture_ / this.texPerChild >> 0;
+                    layer = children[childIndex];
+                    if (!layer) {
+                        layer = children[0];
+                        if (!layer) {
+                            return false;
+                        }
+                        ind = 0;
+                    }
+                    else {
+                        ind = texture_ % this.texPerChild;
+                    }
+                    texture = layer.textures[ind];
+                }
+                else if (typeof texture_ === "string") {
                     texture = PIXI.Texture.fromImage(texture_);
                 }
                 else {
                     texture = texture_;
-                }
-                var children = this.children;
-                var layer = null, ind = 0;
-                for (var i = 0; i < children.length; i++) {
-                    var child = children[i];
-                    var tex = child.textures;
-                    for (var j = 0; j < tex.length; j++) {
-                        if (tex[j].baseTexture == texture.baseTexture) {
-                            layer = child;
-                            ind = j;
+                    for (var i = 0; i < children.length; i++) {
+                        var child = children[i];
+                        var tex = child.textures;
+                        for (var j = 0; j < tex.length; j++) {
+                            if (tex[j].baseTexture == texture.baseTexture) {
+                                layer = child;
+                                ind = j;
+                                break;
+                            }
+                        }
+                        if (layer) {
                             break;
                         }
                     }
-                    if (layer) {
-                        break;
-                    }
-                }
-                if (!layer) {
-                    for (i = 0; i < children.length; i++) {
-                        var child = children[i];
-                        if (child.textures.length < 16) {
-                            layer = child;
-                            ind = child.textures.length;
-                            child.textures.push(texture);
-                        }
-                    }
                     if (!layer) {
-                        children.push(layer = new tilemap.RectTileLayer(this.zIndex, texture));
-                        ind = 0;
+                        for (i = 0; i < children.length; i++) {
+                            var child = children[i];
+                            if (child.textures.length < this.texPerChild) {
+                                layer = child;
+                                ind = child.textures.length;
+                                child.textures.push(texture);
+                                break;
+                            }
+                        }
+                        if (!layer) {
+                            children.push(layer = new tilemap.RectTileLayer(this.zIndex, texture));
+                            ind = 0;
+                        }
                     }
                 }
                 layer.addRect(ind, texture.frame.x, texture.frame.y, x, y, texture.frame.width, texture.frame.height, animX, animY);
@@ -660,7 +676,7 @@ var PIXI;
                 var glts = this.glTextures;
                 var len = textures.length;
                 var maxTextures = this.maxTextures;
-                if (len >= 4 * maxTextures) {
+                if (len > 4 * maxTextures) {
                     return;
                 }
                 var doClear = TileRenderer.DO_CLEAR;
