@@ -107,7 +107,7 @@
  */
 
 
-var MD5 = function(e) {
+var MD5 = function (e) {
     function g(a, b) {
         var c, d, e, f;
         e = a & 2147483648;
@@ -134,7 +134,7 @@ var MD5 = function(e) {
     }
     var f = [],
         q, r, t, u, a, b, c, d;
-    e = function(a) {
+    e = function (a) {
         a = a.replace(/\r\n/g, "\n");
         for (var b = "", d = 0; d < a.length; d++) {
             var c = a.charCodeAt(d);
@@ -142,7 +142,7 @@ var MD5 = function(e) {
         }
         return b
     }(e);
-    f = function(a) {
+    f = function (a) {
         var b, c = a.length;
         b = c + 8;
         for (var d = 16 * ((b - b % 64) / 64 + 1), e = Array(d - 1), f, g = 0; g < c;) b = (g - g % 4) / 4, f = g % 4 * 8, e[b] |= a.charCodeAt(g) << f, g++;
@@ -159,7 +159,7 @@ var MD5 = function(e) {
     return (p(a) + p(b) + p(c) + p(d)).toUpperCase()
 };
 
-var MD5_2 = function(data) { try { return require('crypto').createHash('md5').update(data).digest('hex').toUpperCase() } catch (e) { return "D41D8CD98F00B204E9800998ECF8427E" }; };
+var MD5_2 = function (data) { try { return require('crypto').createHash('md5').update(data).digest('hex').toUpperCase() } catch (e) { return "D41D8CD98F00B204E9800998ECF8427E" }; };
 
 
 /**
@@ -167,14 +167,14 @@ var MD5_2 = function(data) { try { return require('crypto').createHash('md5').up
  * @param {string} name 名称
  * @param {string} src 地址
  */
-DataManager.loadDataFile = function(name, src) {
+DataManager.loadDataFile = function (name, src) {
     var xhr = new XMLHttpRequest();
     var url = 'data/' + src;
     if (Decrypter.hasEncryptedData && !Decrypter.checkImgIgnore(url)) {
         var url = Decrypter.extToEncryptExt(url)
         xhr.open('GET', url);
         xhr.responseType = "arraybuffer"
-        xhr.onload = function() {
+        xhr.onload = function () {
             if (xhr.status < 400) {
                 window[name] = JSON.parse(Decrypter.decryptText(xhr.response));
                 DataManager.onLoad(window[name]);
@@ -183,14 +183,14 @@ DataManager.loadDataFile = function(name, src) {
     } else {
         xhr.open('GET', url);
         xhr.overrideMimeType('application/json');
-        xhr.onload = function() {
+        xhr.onload = function () {
             if (xhr.status < 400) {
                 window[name] = JSON.parse(xhr.responseText);
                 DataManager.onLoad(window[name]);
             }
         };
     }
-    xhr.onerror = function() {
+    xhr.onerror = function () {
         DataManager._errorUrl = DataManager._errorUrl || url;
     };
     window[name] = null;
@@ -201,7 +201,7 @@ DataManager.loadDataFile = function(name, src) {
  * 读取
  * @param {{}} object 对象
  */
-DataManager.onLoad = function(object) {
+DataManager.onLoad = function (object) {
     var array;
     if (object === $dataMap) {
         this.extractMetadata(object);
@@ -223,13 +223,13 @@ DataManager.onLoad = function(object) {
 };
 
 
-Graphics._playVideo = function(src) {
+Graphics._playVideo = function (src) {
     if (Decrypter.hasEncryptedVideo && !Decrypter.checkImgIgnore(src)) {
         var requestFile = new XMLHttpRequest();
         requestFile.open("GET", src);
         requestFile.responseType = "arraybuffer";
         requestFile.send();
-        requestFile.onload = function() {
+        requestFile.onload = function () {
             if (this.status < Decrypter._xhrOk) {
                 var arrayBuffer = Decrypter.decryptArrayBuffer(requestFile.response);
                 var url = Decrypter.createBlobUrl(arrayBuffer);
@@ -240,7 +240,7 @@ Graphics._playVideo = function(src) {
         this._playVideo2(url)
     }
 };
-Graphics._playVideo2 = function(url) {
+Graphics._playVideo2 = function (url) {
     this._video.onloadeddata = this._onVideoLoad.bind(this);
     this._video.onerror = this._videoLoader;
     this._video.onended = this._onVideoEnd.bind(this);
@@ -250,9 +250,9 @@ Graphics._playVideo2 = function(url) {
 };
 
 PluginManager._loadScriptEnd = []
-PluginManager.loadScriptEnd = function(url, response) {
+PluginManager.loadScriptEnd = function (url, response) {
 
-    var IncludeJS = function(re) {
+    var IncludeJS = function (re) {
         try {
             if (re.response != null) {
                 var os = document.createElement("script");
@@ -290,7 +290,7 @@ PluginManager.loadScriptEnd = function(url, response) {
 }
 
 /**读取脚本2 */
-PluginManager.loadScript2 = function(src, path) {
+PluginManager.loadScript2 = function (src, path) {
     if (Decrypter.hasEncryptedJS) {
         var xhr = new XMLHttpRequest();
         var url = path ? 'js/' + src : PluginManager._path + src;
@@ -298,20 +298,20 @@ PluginManager.loadScript2 = function(src, path) {
         if (!Decrypter.checkImgIgnore(url)) {
             url2 = Decrypter.extToEncryptExt(url)
             xhr.responseType = "arraybuffer"
-            xhr.onload = function() {
+            xhr.onload = function () {
                 if (xhr.status < 400) {
                     PluginManager.loadScriptEnd(url, Decrypter.decryptText(xhr.response))
                 }
             };
         } else {
             xhr.overrideMimeType('application/json');
-            xhr.onload = function() {
+            xhr.onload = function () {
                 if (xhr.status < 400) {
                     PluginManager.loadScriptEnd(url, xhr.responseText)
                 }
             };
         }
-        xhr.onerror = function() {
+        xhr.onerror = function () {
             DataManager._errorUrl = DataManager._errorUrl || url;
         };
         this._loadScriptEnd.push({ url: url, response: false })
@@ -321,9 +321,9 @@ PluginManager.loadScript2 = function(src, path) {
 }
 
 
-PluginManager.setup2 = function(plugins) {
+PluginManager.setup2 = function (plugins) {
     //插件组 对每一个 方法(插件)
-    plugins.forEach(function(plugin) {
+    plugins.forEach(function (plugin) {
         //如果 (插件 状态 并且 不是 脚本组 包含 (插件 名称) )
         if (plugin.status && !this._scripts.contains(plugin.name)) {
             //设置参数组(插件 名称 , 插件 参数组)
@@ -338,7 +338,7 @@ PluginManager.setup2 = function(plugins) {
 
 };
 
-PluginManager.start = function() {
+PluginManager.start = function () {
     if (Decrypter._plugins) {
         PluginManager.loadScript2(Decrypter._plugins)
     }
@@ -351,19 +351,19 @@ PluginManager.start = function() {
  * */
 
 
-Decrypter.decryptArrayBuffer = function(a) {
+Decrypter.decryptArrayBuffer = function (a) {
     return this.decrypt(a, 0, "b")
 };
 
 
-Decrypter.decryptText = function(a) {
+Decrypter.decryptText = function (a) {
     return this.decrypt(a, 1, "t")
 };
 
 
 
 /**解密图片*/
-Decrypter.decryptImg = function(url, bitmap) {
+Decrypter.decryptImg = function (url, bitmap) {
     url = this.extToEncryptExt(url);
 
     var requestFile = new XMLHttpRequest();
@@ -371,7 +371,7 @@ Decrypter.decryptImg = function(url, bitmap) {
     requestFile.responseType = "arraybuffer";
     requestFile.send();
 
-    requestFile.onload = function() {
+    requestFile.onload = function () {
         if (this.status < Decrypter._xhrOk) {
             var arrayBuffer = Decrypter.decryptArrayBuffer(requestFile.response);
             bitmap._image.src = Decrypter.createBlobUrl(arrayBuffer);
@@ -380,7 +380,7 @@ Decrypter.decryptImg = function(url, bitmap) {
         }
     };
 
-    requestFile.onerror = function() {
+    requestFile.onerror = function () {
         if (bitmap._loader) {
             bitmap._loader();
         } else {
@@ -391,12 +391,12 @@ Decrypter.decryptImg = function(url, bitmap) {
 
 
 /**解密 音频*/
-Decrypter.decryptHTML5Audio = function(url, bgm, pos) {
+Decrypter.decryptHTML5Audio = function (url, bgm, pos) {
     var requestFile = new XMLHttpRequest();
     requestFile.open("GET", url);
     requestFile.responseType = "arraybuffer";
     requestFile.send();
-    requestFile.onload = function() {
+    requestFile.onload = function () {
         if (this.status < Decrypter._xhrOk) {
             var arrayBuffer = Decrypter.decryptArrayBuffer(requestFile.response);
             var url = Decrypter.createBlobUrl(arrayBuffer);
@@ -406,7 +406,7 @@ Decrypter.decryptHTML5Audio = function(url, bgm, pos) {
 };
 
 /**创建 blob url地址*/
-Decrypter.createBlobUrl = function(arrayBuffer) {
+Decrypter.createBlobUrl = function (arrayBuffer) {
     var blob = new Blob([arrayBuffer]);
     var url = window.URL.createObjectURL(blob)
     return url;
@@ -417,25 +417,25 @@ Decrypter.createBlobUrl = function(arrayBuffer) {
 
 
 /**列表名称 */
-Decrypter.listname = function() {
+Decrypter.listname = function () {
     return this._listname
 }
 
 
 
-Decrypter.localURL = function() {
+Decrypter.localURL = function () {
     if (!this._localURL) {
         var path = null// require &&typeof(require) =="function" && require('path');  
-        if(path ){
-            this._localURL  = path.dirname(process.mainModule.filename) 
-        }else{ 
+        if (path) {
+            this._localURL = path.dirname(process.mainModule.filename)
+        } else {
             var pathname = window.location.pathname
             var path = pathname.replace(/(\/www|)\/[^\/]*$/, "");
             if (path.match(/^\/([A-Z]\:)/)) {
                 path = path.slice(1);
             }
             this._localURL = decodeURIComponent(path);
-        } 
+        }
     }
     return this._localURL
 };
@@ -444,14 +444,14 @@ Decrypter.localURL = function() {
 Decrypter._dirs = {}
 
 /**本地文件位置名称 */
-Decrypter.localFileName = function(name) {
+Decrypter.localFileName = function (name) {
     if (name) {
         var namelist = name.split("/")
         var dirPath = this.localURL()
         var fs = require('fs');
         var d = ""
         for (var i = 0; i < namelist.length - 1; i++) {
-            d = d + '/' + namelist[i];
+            d = d + ((d || dirPath) ? '/' : "") + namelist[i];
             var d2 = dirPath + d
             if (!this._dirs[d]) {
                 if (!fs.existsSync(d2)) {
@@ -460,19 +460,19 @@ Decrypter.localFileName = function(name) {
                 this._dirs[d] = 1
             }
         }
-        d = d + '/' + namelist[i]
+        d = d + ((d || dirPath) ? '/' : "") + namelist[i];
         return dirPath + d
     }
 }
 
 
 /**网络url */
-Decrypter.webURL = function() {
+Decrypter.webURL = function () {
     return this._webURL || ""
 };
 
 /**网络文件名 */
-Decrypter.webFileName = function(name) {
+Decrypter.webFileName = function (name) {
     return this.webURL() + "/" + name
 }
 
@@ -481,7 +481,7 @@ Decrypter.webFileName = function(name) {
  * @param {string} url 地址
  * 
  */
-Decrypter.checkImgIgnore = function(url) {
+Decrypter.checkImgIgnore = function (url) {
     for (var cnt = 0; cnt < this._ignoreList.length; cnt++) {
         if (url === this._ignoreList[cnt]) return true;
     }
@@ -490,7 +490,7 @@ Decrypter.checkImgIgnore = function(url) {
 
 /**后缀 到 加密后缀 */
 Decrypter._extToEncryptExt = {};
-Decrypter.extToEncryptExt = function(url, t) {
+Decrypter.extToEncryptExt = function (url, t) {
     var t = t ? "1" : "0"
     var n = t + url
     if (this._extToEncryptExt[n]) {
@@ -521,8 +521,8 @@ Decrypter.extToEncryptExt = function(url, t) {
 
 
 
-(function() {
-    var f = function(c) {
+(function () {
+    var f = function (c) {
         c = c || "";
         var d = c.toLowerCase(),
             e = PluginManager._parameters[d];
@@ -537,10 +537,10 @@ Decrypter.extToEncryptExt = function(url, t) {
         }
         return e || {}
     };
-    var p = function(a, b) { try { return b ? a : JSON.parse(a) } catch (c) { return a } }
-    var g = function(a, b, c) { try { var d = a[b] } catch (e) { d = c } return void 0 === d ? c : d }
-    var v = function(a, b, c) { return p(g(a, b)) || c }
-    var c = function(a, b) { return a.contains(b) }
+    var p = function (a, b) { try { return b ? a : JSON.parse(a) } catch (c) { return a } }
+    var g = function (a, b, c) { try { var d = a[b] } catch (e) { d = c } return void 0 === d ? c : d }
+    var v = function (a, b, c) { return p(g(a, b)) || c }
+    var c = function (a, b) { return a.contains(b) }
     var z = f("Decrypter")
     Decrypter._dir = g(z, "dir")
     Decrypter._webURL = g(z, "weburl")
@@ -551,7 +551,7 @@ Decrypter.extToEncryptExt = function(url, t) {
     Decrypter._encryptExt = v(z, "encryptExt", {})
     Decrypter._encryptType = v(z, "encryptType", {})
     var l = Decrypter._encryptList = v(z, "encryptList", {})
-        //console.log(l, c)
+    //console.log(l, c)
     Decrypter.hasEncryptedData = c(l, "data")
     Decrypter.hasEncryptedImages = c(l, "img")
     Decrypter.hasEncryptedAudio = c(l, "audio")
@@ -560,7 +560,7 @@ Decrypter.extToEncryptExt = function(url, t) {
 
     try {
         PluginManager.start()
-    } catch (error) {}
+    } catch (error) { }
 })();
 
 
@@ -572,14 +572,14 @@ Decrypter.extToEncryptExt = function(url, t) {
  * ===============================================================================
  */
 /**保存文件 */
-Decrypter.saveFile = function(n, t) {
+Decrypter.saveFile = function (n, t) {
     var fs = require('fs');
     var filePath = this.extToEncryptExt(n)
     fs.writeFileSync(filePath, t);
 };
 
 /**删除文件 */
-Decrypter.delFile = function(n) {
+Decrypter.delFile = function (n) {
     var fs = require('fs');
     var filePath = this.extToEncryptExt(n)
     fs.unlinkSync(filePath);
@@ -587,17 +587,17 @@ Decrypter.delFile = function(n) {
 
 
 /**加密Buffer */
-Decrypter.encryptBuffer = function(a) {
+Decrypter.encryptBuffer = function (a) {
     return this.encrypt(a, 0, "b")
 }
 
 /**加密文本 */
-Decrypter.encryptText = function(data) {
+Decrypter.encryptText = function (data) {
     return this.encrypt(data, 0, "t")
 }
 
 
-Decrypter.getEncryptMust = function(url) {
+Decrypter.getEncryptMust = function (url) {
     if (this.checkImgIgnore(url)) {
         return null
     }
@@ -628,7 +628,7 @@ Decrypter.getEncryptMust = function(url) {
 
 
 /**生成加密 */
-Decrypter.startEncrypt = function() {
+Decrypter.startEncrypt = function () {
     if (!Utils.isNwjs()) {
         console.log("not is Nwjs")
         return {}
@@ -642,16 +642,14 @@ Decrypter.startEncrypt = function() {
     Decrypter.ennum = 0
 
     var list = Decrypter._encryptList
-    var dir = Decrypter.localURL()
     var fs = require('fs');
-    console.log(list)
-    var get = function(f) {
-        var p = f ? dir + "/" + f : dir
+    var get = function (f) {
+        var p = Decrypter.localFileName(f)
         if (fs.existsSync(p)) {
             var stats = fs.statSync(p)
             if (stats.isDirectory()) {
                 var files = fs.readdirSync(p)
-                files.forEach(function(n) {
+                files.forEach(function (n) {
                     var f2 = f ? f + '/' + n : n
                     get(f2, o)
                 })
@@ -681,9 +679,9 @@ Decrypter.startEncrypt = function() {
 
         var data = fs.readFileSync(url)
         if (v == "t") {
-            var buffer = this.encryptBuffer(data)
-        } else {
             var buffer = this.encryptText(data)
+        } else {
+            var buffer = this.encryptBuffer(data)
         }
         var md5 = MD5_2(buffer)
         o2[n] = md5
@@ -691,10 +689,11 @@ Decrypter.startEncrypt = function() {
         Decrypter.saveFile(n, buffer)
         console.log(n, v, url, md5)
         pro++
-        console.log(pro, "/", proall, Math.floor((pro / proall) * 100) + "%")
 
         var nt3 = Date.now()
         console.log(n, "使用时间", nt3 - nt2)
+        console.log(pro, "/", proall, Math.floor((pro / proall) * 100) + "%", nt3 - nt)
+
     }
     var data = JSON.stringify(o2)
     var buffer = this.encryptText(data)
@@ -728,14 +727,14 @@ Decrypter.startEncrypt = function() {
 Decrypter._updateList = null
 
 /**更新列表 */
-Decrypter.updateList = function() {
+Decrypter.updateList = function () {
     return this._updateList
 };
 
 
 
 /**开始更新 */
-Decrypter.startUpdate = function() {
+Decrypter.startUpdate = function () {
     this.param()
     if (this._webURL && this.isLocalMode()) {
         this.initUL()
@@ -756,18 +755,18 @@ Decrypter.startUpdate = function() {
 };
 
 
-Decrypter.isUpdateEnd = function() {
+Decrypter.isUpdateEnd = function () {
     return this._endupdate;
 };
 
 /**获取网络列表 */
-Decrypter.getwebList = function() {
+Decrypter.getwebList = function () {
     var name = this.listname()
     var xhr = new XMLHttpRequest();
     var url = this.extToEncryptExt(name, 1);
     xhr.open('GET', url);
     xhr.responseType = "arraybuffer"
-    xhr.onload = function() {
+    xhr.onload = function () {
         if (xhr.status < 400) {
             try {
                 Decrypter._weblist = JSON.parse(Decrypter.decryptText(xhr.response))
@@ -777,7 +776,7 @@ Decrypter.getwebList = function() {
             Decrypter.onLoadList();
         }
     };
-    xhr.onerror = function() {
+    xhr.onerror = function () {
         Decrypter._weblist = "err"
         Decrypter.onLoadList();
     };
@@ -785,7 +784,7 @@ Decrypter.getwebList = function() {
 }
 
 /**制作本地列表 */
-Decrypter.makelist = function() {
+Decrypter.makelist = function () {
     if (!Utils.isNwjs()) {
         console.log("not is Nwjs")
         return {}
@@ -797,13 +796,13 @@ Decrypter.makelist = function() {
     var fs = require("fs")
 
     //获取 文件
-    var get = function(f) {
-        var p = f ? dir + "/" + f : dir
+    var get = function (f) {
+        var p = Decrypter.localFileName(f)
         if (fs.existsSync(p)) {
             var stats = fs.statSync(p)
             if (stats.isDirectory()) {
                 var files = fs.readdirSync(p)
-                files.forEach(function(n) {
+                files.forEach(function (n) {
                     var f2 = f ? f + '/' + n : n
                     get(f2, o)
                 })
@@ -837,13 +836,13 @@ Decrypter.makelist = function() {
 
 
 /**获取本地列表 */
-Decrypter.getLocalList = function() {
+Decrypter.getLocalList = function () {
     var name = this.listname()
     var xhr = new XMLHttpRequest();
     var url = this.extToEncryptExt(name);
     xhr.open('GET', url);
     xhr.responseType = "arraybuffer"
-    xhr.onload = function() {
+    xhr.onload = function () {
         if (xhr.status < 400) {
             try {
                 Decrypter._locallist = JSON.parse(Decrypter.decryptText(xhr.response))
@@ -853,7 +852,7 @@ Decrypter.getLocalList = function() {
             Decrypter.onLoadList();
         }
     };
-    xhr.onerror = function() {
+    xhr.onerror = function () {
         Decrypter._locallist = "err"
         Decrypter.onLoadList();
     };
@@ -861,7 +860,7 @@ Decrypter.getLocalList = function() {
 };
 
 /**当读取列表 */
-Decrypter.onLoadList = function() {
+Decrypter.onLoadList = function () {
     if (this._weblist && this._locallist) {
         if (this._weblist == "err") {
             console.log("找不到网络更新列表")
@@ -905,7 +904,7 @@ Decrypter.onLoadList = function() {
 };
 
 /**需要更新 */
-Decrypter.mustUpdate = function() {
+Decrypter.mustUpdate = function () {
     var o = this.updateList()
     if (o) {
         if (o.up) {
@@ -930,12 +929,12 @@ Decrypter.mustUpdate = function() {
 };
 
 
-Decrypter.initUL = function() {
+Decrypter.initUL = function () {
     this._updateList = { list: {}, up: {}, del: {}, end: {}, err: {}, all: 0 }
     return this._updateList
 };
 
-Decrypter.updateUL = function(n, st) {
+Decrypter.updateUL = function (n, st) {
     var o = this.updateList()
     o.list[n] = st
     if (st == "err") {
@@ -961,32 +960,32 @@ Decrypter.updateUL = function(n, st) {
 };
 
 
-Decrypter.endUL = function() {}
+Decrypter.endUL = function () { }
 
 
-Decrypter.saveweb = function(n) {
+Decrypter.saveweb = function (n) {
     var xhr = new XMLHttpRequest();
     var url = this.extToEncryptExt(n, 1)
     xhr.open('GET', url);
     xhr.responseType = "arraybuffer";
-    xhr.onload = function() {
+    xhr.onload = function () {
         if (xhr.status < 400) {
             Decrypter.saveweb2(n, new Buffer(xhr.response));
         }
     };
-    xhr.onerror = function() {
+    xhr.onerror = function () {
         console.log("找不到" + url)
         Decrypter.updateUL(n, "err")
     };
     xhr.send();
 };
 
-Decrypter.saveweb2 = function(n, t) {
+Decrypter.saveweb2 = function (n, t) {
     this.saveFile(n, t)
     this.updateUL(n, "end")
 };
 
-Decrypter.delweb = function(n) {
+Decrypter.delweb = function (n) {
     this.delFile(n)
     this.updateUL(n, "end")
 };
@@ -994,7 +993,7 @@ Decrypter.delweb = function(n) {
 
 
 /**是本地 */
-Decrypter.isLocalMode = function() {
+Decrypter.isLocalMode = function () {
     //Utils 是Nwjs()
     return Utils.isNwjs();
 };
@@ -1006,7 +1005,7 @@ Decrypter.isLocalMode = function() {
 
 
 
-(function() {
+(function () {
     var w = { d: {}, e: {} };
 
 
@@ -1015,7 +1014,7 @@ Decrypter.isLocalMode = function() {
      * @param {number} l 长度
      * 
      */
-    w.ei = function(a, b, c) {
+    w.ei = function (a, b, c) {
         var l = w.l(a)
         var c = c || 0;
         var z = 0;
@@ -1029,13 +1028,13 @@ Decrypter.isLocalMode = function() {
 
 
 
-    w.rm = function(m) {
-        return typeof(m) == "string" ? w.m[m] || w.m : m || w.m
+    w.rm = function (m) {
+        return typeof (m) == "string" ? w.m[m] || w.m : m || w.m
     };
 
 
 
-    w.rh = function(h) {
+    w.rh = function (h) {
         return h || w.h
     };
 
@@ -1043,12 +1042,12 @@ Decrypter.isLocalMode = function() {
     /**读取加密键
      * @return  {[]}
      */
-    w.rk = function(k) {
+    w.rk = function (k) {
         return k || w.k
     };
 
 
-    w.t2b = function(t) {
+    w.t2b = function (t) {
         var l = w.l(t) / 2;
         var k = []
         for (var i = 0; i < l; i++) {
@@ -1062,7 +1061,7 @@ Decrypter.isLocalMode = function() {
      * 长度
      * 
      */
-    w.u = function(a) {
+    w.u = function (a) {
         return new Uint8Array(a)
     };
 
@@ -1071,7 +1070,7 @@ Decrypter.isLocalMode = function() {
      * 长度
      * 
      */
-    w.l = function(b) {
+    w.l = function (b) {
         return b ? b.length || b.byteLength || 0 : 0
     };
 
@@ -1080,7 +1079,7 @@ Decrypter.isLocalMode = function() {
      * 
      */
 
-    w.bt = function(b) {
+    w.bt = function (b) {
         var l = w.l(b)
         var t = []
         for (var i = 0; i < l; i++) {
@@ -1094,7 +1093,7 @@ Decrypter.isLocalMode = function() {
      * 
      */
 
-    w.tb = function(t) {
+    w.tb = function (t) {
         var l = w.l(t)
         var b = w.u(l)
         for (var i = 0; i < l; i++) {
@@ -1108,7 +1107,7 @@ Decrypter.isLocalMode = function() {
      * @param {ArrayBuffer} a
      * @return {Uint8Array}  
      */
-    w.ab = function(a) {
+    w.ab = function (a) {
         return w.u(a);
     };
 
@@ -1117,13 +1116,13 @@ Decrypter.isLocalMode = function() {
      * @param {Uint8Array} b
      * @return {ArrayBuffer}  
      */
-    w.ba = function(b) {
+    w.ba = function (b) {
         return (b || w.u()).buffer;
     };
 
 
     /**解密 头 */
-    w.d.header = function(a, k, h) {
+    w.d.header = function (a, k, h) {
         var b = w.rh(k)
         if (a) {
             var c = w.l(a)
@@ -1136,7 +1135,7 @@ Decrypter.isLocalMode = function() {
         return false
     };
 
-    w.d.mv = function(b, k, h) {
+    w.d.mv = function (b, k, h) {
         if (b) {
             var k = w.rk(k);
             var l = w.l(k)
@@ -1147,7 +1146,7 @@ Decrypter.isLocalMode = function() {
         return b;
     };
 
-    w.d.exb = function(b, k, h, t) {
+    w.d.exb = function (b, k, h, t) {
         if (b) {
             var k = w.rk(k);
             var l = w.l(b)
@@ -1159,7 +1158,7 @@ Decrypter.isLocalMode = function() {
                 var t = k[d % e] ^ c
                 b[n] = d = t
                 for (var i = 0; i < l; i++) {
-                    if (i == n) {} else {
+                    if (i == n) { } else {
                         var v = k[d % e]
                         var c = b[i]
                         var t = v ^ c
@@ -1171,12 +1170,12 @@ Decrypter.isLocalMode = function() {
         return b;
     };
 
-    w.d.ex = function(b, k, h) {
+    w.d.ex = function (b, k, h) {
         return this.exb(b, k, h)
     };
 
 
-    w.d.zlib = function(b, k, h) {
+    w.d.zlib = function (b, k, h) {
         if (b) {
             if (Zlib) {
                 var b = new Zlib.Inflate(b).decompress();
@@ -1186,7 +1185,7 @@ Decrypter.isLocalMode = function() {
     };
 
 
-    w.d.lzma = function(b, k, h) {
+    w.d.lzma = function (b, k, h) {
         if (b) {
             if (LZMA) {
                 var b = w.u(LZMA.decompress(b))
@@ -1196,7 +1195,7 @@ Decrypter.isLocalMode = function() {
     };
 
 
-    w.d.aes = function(b, k, h) {
+    w.d.aes = function (b, k, h) {
         if (b) {
             if (Aes) {
                 var b = Aes.Ctr.decrypt(b, w.rk(k), 256, 2)
@@ -1207,7 +1206,7 @@ Decrypter.isLocalMode = function() {
 
 
 
-    w.d.tl64 = function(t, k, h) {
+    w.d.tl64 = function (t, k, h) {
         return LZString.decompressFromBase64(t);
     };
 
@@ -1215,11 +1214,11 @@ Decrypter.isLocalMode = function() {
     /**
      * 用LZ加密文字
      */
-    w.d.tl = function(t, k, h) {
+    w.d.tl = function (t, k, h) {
         return LZString.compress(t);
     };
 
-    w.d.taes = function(t, k, h) {
+    w.d.taes = function (t, k, h) {
         if (t) {
             if (Aes) {
                 var t = Aes.Ctr.decrypt(t, w.rk(k), 256, 0)
@@ -1231,7 +1230,7 @@ Decrypter.isLocalMode = function() {
 
 
     /**解密文字到utf8 */
-    w.d.tu = function(t, k, h) {
+    w.d.tu = function (t, k, h) {
         if (Utf8) {
             t = Utf8.decode(t)
         }
@@ -1239,7 +1238,7 @@ Decrypter.isLocalMode = function() {
     };
 
     /**解密文字到base64 */
-    w.d.t64 = function(t, k, h) {
+    w.d.t64 = function (t, k, h) {
         if (t) {
             t = Base64.decode(t)
         }
@@ -1247,7 +1246,7 @@ Decrypter.isLocalMode = function() {
     };
 
 
-    w.d.use = function(b, m, k, h) {
+    w.d.use = function (b, m, k, h) {
         var l = w.l(m)
         for (var i = 0; i < l; i++) {
             if (!b) { return false }
@@ -1263,7 +1262,7 @@ Decrypter.isLocalMode = function() {
      * @param {Boolean} t 种类
      * @param {[]} m 加密方法
      */
-    w.decrypt = function(a, t, m, k, h) {
+    w.decrypt = function (a, t, m, k, h) {
         if (!a) { return null }
         var m = w.rm(m)
         var b = w.ab(a)
@@ -1275,8 +1274,7 @@ Decrypter.isLocalMode = function() {
     };
 
 
-    w.load = function() {
-        console.log(w)
+    w.load = function () { 
         w.m = JSON.parse(w.m2)
         w.h = w.t2b(w.h2)
         w.k = w.t2b(w.k2)
@@ -1287,13 +1285,13 @@ Decrypter.isLocalMode = function() {
 
 
 
-    w.loadMY = function(v) {
+    w.loadMY = function (v) {
         return false
         var k = v || window.prompt("输入", "");
         var r = w.s.data
-            //console.log(r, k)
+        //console.log(r, k)
         var d = w.decrypt(r, 1, ["ex"], w.t2b(k), [])
-            //console.log(d)
+        //console.log(d)
         var l = JSON.parse(d)
         w.m2 = l[0]
         w.k2 = l[1]
@@ -1301,13 +1299,13 @@ Decrypter.isLocalMode = function() {
         w.load()
 
         return true
-            //console.log(w.m2, w.h2, w.k2)
+        //console.log(w.m2, w.h2, w.k2)
     };
 
 
-    w.loadMY() || (function() {
+    w.loadMY() || (function () {
         //w.loadMY()
-        var f = function(c) {
+        var f = function (c) {
             c = c || "";
             var d = c.toLowerCase(),
                 e = PluginManager._parameters[d];
@@ -1322,9 +1320,9 @@ Decrypter.isLocalMode = function() {
             }
             return e || {}
         };
-        var p = function(a, b) { try { return b ? a : JSON.parse(a) } catch (c) { return a } }
-        var g = function(a, b, c) { try { var d = a[b] } catch (e) { d = c } return void 0 === d ? c : d }
-        var v = function(a, b, c) { return p(g(a, b)) || c }
+        var p = function (a, b) { try { return b ? a : JSON.parse(a) } catch (c) { return a } }
+        var g = function (a, b, c) { try { var d = a[b] } catch (e) { d = c } return void 0 === d ? c : d }
+        var v = function (a, b, c) { return p(g(a, b)) || c }
 
         var z = f("Decrypter")
         w.m2 = g(z, "mode")
@@ -1332,7 +1330,7 @@ Decrypter.isLocalMode = function() {
         w.h2 = g(z, "SIGNATURE") + g(z, "VER") + g(z, "REMAIN")
 
         w.load()
-            //console.log(w)
+        //console.log(w)
     })();
 
 
@@ -1345,7 +1343,7 @@ Decrypter.isLocalMode = function() {
     /**
      * byteArray转化为buffer
      */
-    w.bbu = function(b) {
+    w.bbu = function (b) {
         return new Buffer(b || 0);
     };
 
@@ -1353,7 +1351,7 @@ Decrypter.isLocalMode = function() {
     /**
      * buffer转化为byteArray
      */
-    w.bub = function(b) {
+    w.bub = function (b) {
         return w.u(b);
     };
 
@@ -1361,13 +1359,13 @@ Decrypter.isLocalMode = function() {
     /**
      * 加密 加头
      */
-    w.e.header = function(a, k, h) {
+    w.e.header = function (a, k, h) {
         var b = w.rh(h)
         var c = w.l(a)
         var d = w.l(b)
         var r = w.u(c + d)
-        if (b)(r.set(b, 0))
-        if (a)(r.set(a, d))
+        if (b) (r.set(b, 0))
+        if (a) (r.set(a, d))
         return r
     };
 
@@ -1375,7 +1373,7 @@ Decrypter.isLocalMode = function() {
     /**
      * 用mv加密byteArray
      */
-    w.e.mv = function(b, k, h) {
+    w.e.mv = function (b, k, h) {
         if (b) {
             var k = w.rk(k)
             var l = w.l(k)
@@ -1391,7 +1389,7 @@ Decrypter.isLocalMode = function() {
     /**
      * 用ex加密byteArray
      */
-    w.e.exb = function(b, k, h, t) {
+    w.e.exb = function (b, k, h, t) {
         if (b) {
             var k = w.rk(k)
             var l = w.l(b)
@@ -1403,7 +1401,7 @@ Decrypter.isLocalMode = function() {
                 b[n] = c ^ k[d % e]
                 var d = c
                 for (var i = 0; i < l; i++) {
-                    if (i == n) {} else {
+                    if (i == n) { } else {
                         var c = b[i]
                         b[i] = c ^ k[d % e]
                         d = c
@@ -1417,14 +1415,14 @@ Decrypter.isLocalMode = function() {
     /**
      * 用ex加密byteArray
      */
-    w.e.ex = function(b, k, h) {
+    w.e.ex = function (b, k, h) {
         return this.exb(b, k, h)
     };
 
     /**
      * 用zlib加密byteArry
      */
-    w.e.zlib = function(b, k, h) {
+    w.e.zlib = function (b, k, h) {
         if (b) {
             if (Zlib) {
                 console.log("Zlib压缩:")
@@ -1442,7 +1440,7 @@ Decrypter.isLocalMode = function() {
     };
 
 
-    w.e.lzma = function(b, k, h) {
+    w.e.lzma = function (b, k, h) {
         if (b) {
             if (LZMA) {
                 console.log("lzma压缩:")
@@ -1463,7 +1461,7 @@ Decrypter.isLocalMode = function() {
     /**
      * 用aes加密byteArry
      */
-    w.e.aes = function(b, k, h) {
+    w.e.aes = function (b, k, h) {
         if (b) {
             if (Aes) {
                 console.log("aes加密:")
@@ -1484,7 +1482,7 @@ Decrypter.isLocalMode = function() {
     /**
      * 用base64加密文字
      */
-    w.e.tl64 = function(t, k, h) {
+    w.e.tl64 = function (t, k, h) {
         return LZString.compressToBase64(t);
     };
 
@@ -1492,7 +1490,7 @@ Decrypter.isLocalMode = function() {
     /**
      * 用base64加密文字
      */
-    w.e.tl = function(t, k, h) {
+    w.e.tl = function (t, k, h) {
         return LZString.compress(t);
     };
 
@@ -1501,7 +1499,7 @@ Decrypter.isLocalMode = function() {
     /**
      * 用aes加密文字
      */
-    w.e.taes = function(t, k, h) {
+    w.e.taes = function (t, k, h) {
         if (t) {
             if (Aes) {
                 var t = Aes.Ctr.encrypt(t, w.rk(k), 256, 0)
@@ -1514,7 +1512,7 @@ Decrypter.isLocalMode = function() {
     /**
      * UTF加密文本
      */
-    w.e.tu = function(t, k, h) {
+    w.e.tu = function (t, k, h) {
         if (Utf8) {
             var t = Utf8.encode(t || "")
         }
@@ -1524,7 +1522,7 @@ Decrypter.isLocalMode = function() {
     /**
      * base64加密文本
      */
-    w.e.t64 = function(t, k, h) {
+    w.e.t64 = function (t, k, h) {
         if (Base64) {
             var t = Base64.encode(t || "")
         }
@@ -1532,7 +1530,7 @@ Decrypter.isLocalMode = function() {
     };
 
     /**使用各种加密手段 */
-    w.e.use = function(b, m, k, h) {
+    w.e.use = function (b, m, k, h) {
         var l = w.l(m)
         for (var i = l - 1; i >= 0; i--) {
             if (!b) { return false }
@@ -1541,7 +1539,7 @@ Decrypter.isLocalMode = function() {
         return b
     };
 
-    w.encrypt = function(b, f, m, k, h) {
+    w.encrypt = function (b, f, m, k, h) {
         var b = f ? w.bbu(b) : b
         var b = w.bub(b)
         var m = w.rm(m)
@@ -1553,7 +1551,7 @@ Decrypter.isLocalMode = function() {
     };
 
 
-    w.saveMY = function(k, n) {
+    w.saveMY = function (k, n) {
         var k = k || window.prompt("输入", "");
         var t = w.e.tl64(JSON.stringify([w.m2, w.k2, w.h2]))
         var t2 = w.encrypt(t, 1, ["ex"], w.t2b(k), [])

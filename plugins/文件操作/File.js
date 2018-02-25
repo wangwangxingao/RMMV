@@ -282,24 +282,31 @@ FileManager.fs.LoadData = function (filePath,type) {
 
 FileManager.fs._localURL = ""
 FileManager.fs.localURL = function () {
+    
     if (!this._localURL) {
-        var path = window.location.pathname.replace(/(\/www|)\/[^\/]*$/, "");
-        if (path.match(/^\/([A-Z]\:)/)) {
-            path = path.slice(1);
+        var path = null// require && typeof(require) =="function" && require('path');  
+        if (path) {
+            this._localURL = path.dirname(process.mainModule.filename)
+        } else {
+            var pathname = window.location.pathname
+            var path = pathname.replace(/(\/www|)\/[^\/]*$/, "");
+            if (path.match(/^\/([A-Z]\:)/)) {
+                path = path.slice(1);
+            }
+            this._localURL = decodeURIComponent(path);
         }
-        this._localURL = decodeURIComponent(path);
-    }
+    } 
     return this._localURL
 };
 
-FileManager.fs.localFileName = function (name) {
+FileManager.fs.localFileName = function (name) { 
     if (name) {
         var namelist = name.split("/")
         var dirPath = this.localURL()
         var fs = require('fs');
         var d = ""
         for (var i = 0; i < namelist.length - 1; i++) {
-            d = d + '/' + namelist[i];
+            d = d + ((d || dirPath) ? '/' : "") + namelist[i];
             var d2 = dirPath + d
             if (!this._dirs[d]) {
                 if (!fs.existsSync(d2)) {
@@ -308,9 +315,9 @@ FileManager.fs.localFileName = function (name) {
                 this._dirs[d] = 1
             }
         }
-        d = d + '/' + namelist[i]
+        d = d + ((d || dirPath) ? '/' : "") + namelist[i];
         return dirPath + d
-    }
+    }  
 }
 /**获取所有文件 */
 FileManager.fs.getAllfile = function (pagh) {

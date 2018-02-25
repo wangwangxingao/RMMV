@@ -1,4 +1,23 @@
-Graphics._createAllElements = function() {
+//=============================================================================
+// addELE.js
+//=============================================================================
+/*:
+ * @plugindesc 网页元素添加  
+ * @author wangwang
+ *
+ * @param  addELE
+ * @desc 插件 网页元素添加,作者:汪汪
+ * @default 汪汪 
+ *
+ * @help  
+ *
+ *
+ */
+
+
+
+
+Graphics._createAllElements = function () {
     this._createErrorPrinter();
     this._createCanvas();
     this._createVideo();
@@ -16,7 +35,7 @@ Graphics._createAllElements = function() {
  * @method _updateAllElements
  * @private
  */
-Graphics._updateAllElements = function() {
+Graphics._updateAllElements = function () {
     this._updateRealScale();
     this._updateErrorPrinter();
     this._updateCanvas();
@@ -30,42 +49,22 @@ Graphics._updateAllElements = function() {
 };
 
 
-Graphics._createInputs = function() {
+Graphics._createInputs = function () {
     this._inputs = {}
 };
-
-
-
-Graphics._inputshow = function() {
-    return Graphics && Graphics._input && Graphics._input._sx && Graphics._input._sx.xs
-};
-//添加输入
-Graphics._addInput = function(type, x, y, width, height, fontSize) {
-    this._input.type = type || "text"
-    var sz = this._input._sz
-    sz.x = x
-    sz.y = y
-    sz.width = width || 100
-    sz.height = height || 20
-    sz.fontSize = fontSize || 18
-    this._updateInput()
-    sz.xs = true
-    document.body.appendChild(this._input);
-};
-
-
+ 
 //创建输入
-Graphics._createInput = function(id, type, set) {
+Graphics._createInput = function (id, type, set) {
     this._removeInput(id)
     this._inputs[id] = document.createElement(type);
     this._setInput(id, set)
-
     this._inputs[id].style.zIndex = 12;
-    document.body.appendChild(this._input);
+    document.body.appendChild(this._inputs[id]);
+    return this._inputs[id]
 };
 
 
-Graphics._setInput = function(id, set, type) {
+Graphics._setInput = function (id, set, type) {
     var input = this._inputs[id]
     if (input && set) {
         var sz = input
@@ -78,12 +77,14 @@ Graphics._setInput = function(id, set, type) {
             }
         }
     }
+    this._updateInput(id)
+    return this._inputs[id]
 }
 
 
 
 //移除输入
-Graphics._removeInput = function(id) {
+Graphics._removeInput = function (id) {
     var input = this._inputs[id]
     if (input) {
         input.remove()
@@ -93,15 +94,20 @@ Graphics._removeInput = function(id) {
 
 
 //更新输入
-Graphics._updateInputs = function() {
+Graphics._updateInputs = function () {
     for (var id in this._inputs) {
         this._updateInput(id)
     }
-
 }
 
 
-Graphics._updateInput = function(id) {
+Graphics._getInput = function (id) {
+    return this._inputs[id]
+};
+
+
+
+Graphics._updateInput = function (id) {
     var input = this._inputs[id]
     if (input) {
         var sz = input.sz
@@ -125,15 +131,11 @@ Graphics._updateInput = function(id) {
 
 
 
-
-
-
 //防止默认
-Input._onKeyDown = function(event) {
-    //如果 需要避免默认 (键值)
+Input._onKeyDown = function (event) {
+    //如果 需要避免默认 (键值) 
     if (document.activeElement.type == "text") {
         if (event.keyCode == 13 || event.keyCode == 27) {
-
         } else {
             return
         }

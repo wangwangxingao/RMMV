@@ -90,7 +90,7 @@
  * 
  */
 
- 
+
 Window_Base.deepCopy = function (that) {
     var obj
     if (typeof (that) === "object") {
@@ -952,8 +952,8 @@ Window_Base.prototype.tslPushWH = function (textState, list) {
         "type": "wh",
         "value": list
     }
-    if(this.contents.width< w|| this.contents.height<h){
-        this.contents.resize(w, h)  
+    if (this.contents.width < w || this.contents.height < h) {
+        this.contents.resize(w, h)
     }
     this.tslPushOther(textState, obj)
 };
@@ -985,7 +985,7 @@ Window_Base.prototype.tslPushNewPage = function (textState) {
 
 /**进行新页对象 */
 Window_Base.prototype.tslPushNewPageY = function (textState) {
-    var page = this.makePage(textState) 
+    var page = this.makePage(textState)
     var line = this.makeLine(textState)
     var arr = this.tslPushEscapeParamEx(textState)
     if (arr) {
@@ -2395,10 +2395,10 @@ Sprite_Picture.prototype.loadBitmap = function () {
     if (this._pictureName) {
         // console.log(this._pictureName)
 
-        if (this._pictureName.indexOf("text/") == 0) {
-            var json = this._pictureName.slice(5)
+        if (this._pictureName.indexOf("t/") == 0) {
+            var json = this._pictureName.slice(2)
             if (json) {
-                var list = JSON.parse("[" + json + "]")
+                var list = JSON.parse(json)
                 var w = list[0] || 0
                 var h = list[1] || 0
                 var text = list[2] || ""
@@ -2411,10 +2411,10 @@ Sprite_Picture.prototype.loadBitmap = function () {
             } else {
                 this.bitmap = new Bitmap()
             }
-        } else if (this._pictureName.indexOf("face/") == 0) {
-            var json = this._pictureName.slice(5)
+        } else if (this._pictureName.indexOf("f/") == 0) {
+            var json = this._pictureName.slice(2)
             if (json) {
-                var list = JSON.parse("[" + json + "]")
+                var list = JSON.parse(json)
                 var faceName = list[0] || ""
                 var faceIndex = list[1] || 0
                 this.bitmap = ImageManager.loadFace(faceName);
