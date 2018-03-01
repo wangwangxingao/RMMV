@@ -10,14 +10,14 @@
  * @default 汪汪 
  *
  * @help  
- *
+ * 网页动态添加元素
  *
  */
 
 
 
 
-Graphics._createAllElements = function () {
+Graphics._createAllElements = function() {
     this._createErrorPrinter();
     this._createCanvas();
     this._createVideo();
@@ -27,7 +27,7 @@ Graphics._createAllElements = function () {
     this._createModeBox();
     this._createGameFontLoader();
 
-    this._createInputs() //修改
+    this._createElements() //修改
 };
 
 /**更新所有成分
@@ -35,7 +35,7 @@ Graphics._createAllElements = function () {
  * @method _updateAllElements
  * @private
  */
-Graphics._updateAllElements = function () {
+Graphics._updateAllElements = function() {
     this._updateRealScale();
     this._updateErrorPrinter();
     this._updateCanvas();
@@ -43,33 +43,39 @@ Graphics._updateAllElements = function () {
     this._updateUpperCanvas();
     this._updateRenderer();
 
-    this._updateInputs(); //添加
+    this._updateElements(); //添加
 
     this._paintUpperCanvas();
 };
 
 
-Graphics._createInputs = function () {
-    this._inputs = {}
+Graphics._createElements = function() {
+    this._elements = {}
 };
- 
+
 //创建输入
-Graphics._createInput = function (id, type, set) {
-    this._removeInput(id)
-    this._inputs[id] = document.createElement(type);
-    this._setInput(id, set)
-    this._inputs[id].style.zIndex = 12;
-    document.body.appendChild(this._inputs[id]);
-    return this._inputs[id]
+Graphics._createElement = function(id, type, set, set2) {
+    this._removeElement(id)
+    this._elements[id] = document.createElement(type);
+    this._elements[id].id = id;
+    if (set) {
+        this._setElement(id, set)
+    }
+    this._elements[id].style.zIndex = 112;
+    if (set2) {
+        this._setElement(id, set, "style")
+    }
+    document.body.appendChild(this._elements[id]);
+    return this._elements[id]
 };
 
 
-Graphics._setInput = function (id, set, type) {
-    var input = this._inputs[id]
-    if (input && set) {
-        var sz = input
+Graphics._setElement = function(id, set, type) {
+    var element = this._elements[id]
+    if (element && set) {
+        var sz = element
         if (type) {
-            sz = input[type]
+            sz = element[type]
         }
         if (sz) {
             for (var i in set) {
@@ -77,66 +83,72 @@ Graphics._setInput = function (id, set, type) {
             }
         }
     }
-    this._updateInput(id)
-    return this._inputs[id]
+    this._updateElement(id)
+    return this._elements[id]
 }
 
 
+//是添加元素
+Graphics._isElement = function(element) {
+    if (element && this._elements[element.id] == element) {
+        return true
+    } else {
+        return false
+    }
+};
 
 //移除输入
-Graphics._removeInput = function (id) {
-    var input = this._inputs[id]
-    if (input) {
-        input.remove()
-        delete this._inputs[id]
+Graphics._removeElement = function(id) {
+    var element = this._elements[id]
+    if (element) {
+        element.remove()
+        delete this._elements[id]
     }
 };
 
 
 //更新输入
-Graphics._updateInputs = function () {
-    for (var id in this._inputs) {
-        this._updateInput(id)
+Graphics._updateElements = function() {
+    for (var id in this._elements) {
+        this._updateElement(id)
     }
 }
 
 
-Graphics._getInput = function (id) {
-    return this._inputs[id]
+Graphics._getElement = function(id) {
+    return this._elements[id]
 };
 
 
 
-Graphics._updateInput = function (id) {
-    var input = this._inputs[id]
-    if (input) {
-        var sz = input.sz
+Graphics._updateElement = function(id) {
+    var element = this._elements[id]
+    if (element) {
+        var sz = element.sz
         if (sz) {
             var x = sz.x * this._realScale + (window.innerWidth - this._width * this._realScale) / 2
             var y = sz.y * this._realScale + (window.innerHeight - this._height * this._realScale) / 2
             var width = sz.width * this._realScale;
             var height = sz.height * this._realScale;
             var fontSize = sz.fontSize * this._realScale;
-            input.style.position = 'absolute';
-            input.style.margin = 'auto';
-            input.style.top = y + 'px';
-            input.style.left = x + 'px';
-            input.style.width = width + 'px';
-            input.style.height = height + 'px';
-            input.style.fontSize = fontSize + 'px';
+            element.style.position = 'absolute';
+            element.style.margin = 'auto';
+            element.style.top = y + 'px';
+            element.style.left = x + 'px';
+            element.style.width = width + 'px';
+            element.style.height = height + 'px';
+            element.style.fontSize = fontSize + 'px';
         }
-
     }
 }
 
 
 
 //防止默认
-Input._onKeyDown = function (event) {
+Input._onKeyDown = function(event) {
     //如果 需要避免默认 (键值) 
-    if (document.activeElement.type == "text") {
-        if (event.keyCode == 13 || event.keyCode == 27) {
-        } else {
+    if (Graphics._isElement(document.activeElement)) {
+        if (event.keyCode == 13 || event.keyCode == 27) {} else {
             return
         }
     } else {
@@ -159,3 +171,29 @@ Input._onKeyDown = function (event) {
         this._currentState[buttonName] = true;
     }
 };
+
+
+
+
+ww_ElE = {
+    "button": {},
+    "checkbox": {},
+    "date": {},
+    "datetime": {},
+    "datetime-local": {},
+    "email": {},
+    "file": {},
+    "hidden": {},
+    "image": {},
+    "month": {},
+    "number": {},
+    "password": {},
+    "radio": {},
+    "range": {},
+    "reset": {},
+    "submit": {},
+    "text": {},
+    "time": {},
+    "url": {},
+    "week": {}
+}

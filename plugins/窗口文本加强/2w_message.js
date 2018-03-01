@@ -47,14 +47,35 @@
  *     设置粗体 , 0 为 false  , 1 为true ,不填值为取现值的相反值
  * \/  \/[z] 
  *     设置斜体 , 0 为 false  , 1 为true ,不填值为取现值的相反值
+ *  
+ * \NY   
+ *     添加一个和上页相同设置的新页 
+ * \OC[color]
+ *     设置外围线条颜色 
+ * \OW[number]
+ *     设置外围线条粗细 
  * 
+ * \WT[z] 
+ *     设置本页的横向排列位置 , 不填为 0左对齐,   1 中间,2右对齐
+ * \HT[z] 
+ *     设置本页纵向排列位置 , 不填为 0 上对齐,  1 中间,2 下对齐
+ * 
+ * \AW[z] 
+ *     设置本页是否根据内容调整宽, 不填为 0  不调整 1 调整
+ * \AH[z] 
+ *     设置本页是否根据内容调整高, 不填为 0  不调整 1 调整
+ * 
+ * \WH[wnum hnum] 
+ *     强行设置本页大小 (不推荐使用ing)
+ *  
+ * \TWH[wnum hnum] 
+ *     添加一个wh的文字
+ * 
+ *  
  * \WJ  \WJ[z] 
  *     设置横字间隔 , 不填为 0
  * \HJ  \HJ[z] 
  *     设置纵行间隔 , 不填为 0
- *  
- * 
- * 
  * 
  * 
  * 脸图现在是编号为 -1 左  -2 右 的图片  
@@ -72,6 +93,8 @@
  *  \PRT[[pictureId, rotation, duration]] 旋转图片到(角度)  ///这个还不支持
  *  \PT[[pictureId, tone, duration]]  设置色调
  *  \PE[[pictureId]]  消除图片
+ *  \PEA[[pictureId]]  全部清除图片
+ *  \PES[[pictureId]]  避免一次清除图片
  *  \PZ[[pictureId,zindex]] 设置图片z值高度  <0 为在窗口下面 
  *  \FF[[z]] 设置字体名称  z为字符串 如: "黑体"
  *  \FS[[z]] 设置字体字号  z为数值
@@ -88,7 +111,7 @@
  */
 
 
-
+var mapvar = mapvar || null
 
 Window_Base.deepCopy = function(that) {
     var obj
@@ -149,12 +172,26 @@ Window_Base.prototype.fontSettings = function(i) {
     return this.contents._fontnametext
 };
 
+
+
+
+/**文本高 */
+Window_Base.prototype.standardOutlineColor = function() {
+
+    return 'rgba(0, 0, 0, 0.5)';
+};
+Window_Base.prototype.standardOutlineWidth = function() {
+
+    return 4;
+};
 /**还原 */
 Window_Base.prototype.resetFontSettings = function() {
     this.contents.fontItalic = this.standardFontItalic()
     this.contents.fontBold = this.standardFontBold()
     this.contents.fontFace = this.standardFontFace();
     this.contents.fontSize = this.standardFontSize();
+    this.contents.outlineColor = this.standardOutlineColor();
+    this.contents.outlineWidth = this.standardOutlineWidth();
     this.fontSettings(1)
     this.resetTextColor();
     this.reHjg()
@@ -193,13 +230,15 @@ Window_Base.prototype.makeIcon = function(textState) {
 };
 
 /**测试文字增强 */
-Window_Base.prototype.testTextEx = function(text, x, y, w, h, wt, ht, facepos, wz) {
+Window_Base.prototype.testTextEx = function(text, x, y, w, h, wt, ht, facepos, wz,aw,ah) {
     if (text) {
         var pageset = {
             w: w || Infinity,
             h: h || Infinity,
             wtype: wt,
             htype: ht,
+            autow: aw,
+            autoh: ah,
             facepos: facepos || 0,
             wz: wz || 0
         }
@@ -493,7 +532,8 @@ Window_Base.prototype.testPushLine = function(textState, line, cs) {
 
             page.test.w = Math.max(page.test.w, line0.test.w)
             var must = page.set
-            var w = must.w - (page.set.facepos == 3 ? 168 * 2 : page.set.facepos ? 168 : 0)
+            var fw = Window_Base._faceWidth + 24
+            var w = must.w - (page.set.facepos == 3 ? fw * 2 : page.set.facepos ? fw : 0)
             var h = must.h
                 /**处理宽 */
             if (w != Infinity) {
@@ -544,7 +584,8 @@ Window_Base.prototype.testPushText = function(textState, text) {
         //宽间隔
     var jw = (lw == 0 || tw == 0) ? 0 : this.getWjg() || 0
     var sw = pageset.w
-    var fw = page.set.facepos == 3 ? 168 * 2 : page.set.facepos ? 168 : 0
+    var fw = Window_Base._faceWidth + 24    
+    var fw = page.set.facepos == 3 ? fw * 2 : page.set.facepos ? fw : 0
         //行可以放开字 
     if (lw + jw + tw <= sw - fw || lw == 0) {
         //添加字符 
@@ -653,6 +694,12 @@ Window_Base.prototype.tslPushEscapeCharacter = function(textState, code) {
         case '/':
             this.tslPushChangeFontItalic(textState);
             break;
+        case 'OC':
+            this.tslPushOutColor(textState, this.tslPushTextColorEscapeParam(textState));
+            break;
+        case 'OW':
+            this.tslPushOutWidth(textState, this.tslPushEscapeParam(textState, 0));
+            break;
         case 'WJ':
             this.tslPushWJ(textState, this.tslPushEscapeParam(textState, 0));
             break;
@@ -662,14 +709,34 @@ Window_Base.prototype.tslPushEscapeCharacter = function(textState, code) {
         case 'Y':
             this.tslPushNewPageY(textState)
             break
+        case 'NY':
+            this.tslPushNewPageY2(textState)
+            break
 
-
+        case 'PH':
+            this.tslPushPH(textState, this.tslPushEscapeParam(textState, 0))
+            break
+        case 'HT':
+            this.tslPushHT(textState, this.tslPushEscapeParam(textState, 0))
+            break
+        case 'WT':
+            this.tslPushWT(textState, this.tslPushEscapeParam(textState, 0))
+            break
+        case 'AH':
+            this.tslPushAH(textState, this.tslPushEscapeParam(textState, 0))
+            break
+        case 'AW':
+            this.tslPushAW(textState, this.tslPushEscapeParam(textState, 0))
+            break
         case 'WH':
             this.tslPushWH(textState, this.tslPushEscapeParamEx(textState))
             break
-            /*   case 'MOVE':
-                   this.makeMove(this.obtainEscapeParamEx(textState), textState);
-                   break;*/
+        case 'TWH':
+            this.tslPushTWH(textState, this.tslPushEscapeParamEx(textState))
+            break
+        case 'CWH':
+            this.makeNewContents(textState,this.tslPushEscapeParamEx(textState));
+            break;
         case 'PS':
         case 'PM':
         case 'PO':
@@ -678,6 +745,7 @@ Window_Base.prototype.tslPushEscapeCharacter = function(textState, code) {
         case 'PT':
         case 'PE':
         case 'PEA':
+        case 'PES':
         case 'PZ':
             this.setP(code, this.obtainEscapeParamExs(textState), textState)
             break;
@@ -699,10 +767,14 @@ Window_Base.prototype.tslPushEscapeCharacter = function(textState, code) {
 };
 
 
+
+
+
+
 Window_Base.prototype.obtainEscapeParamExs = function(textState) {
-    var arr = /^\[\[(.*?)\]\]/.exec(textState.text.slice(textState.index));
+    var arr = /^\[\[(.*?)\]\]/.exec(textState.text.slice(textState.textindex));
     if (arr) {
-        textState.index += arr[0].length;
+        textState.textindex += arr[0].length;
         var re = "[" + arr[1] + "]"
         return JSON.parse(re)
     }
@@ -769,31 +841,34 @@ Window_Base.prototype.setP = function(code, list, textState) {
     } else {
         switch (code) {
             case 'PS':
-                this.showPicture(this.obtainEscapeParamEx(textState), textState);
+                this.showPicture(list, textState);
                 break;
             case 'PM':
-                this.movePicture(this.obtainEscapeParamEx(textState), textState);
+                this.movePicture(list, textState);
                 break;
             case 'PO':
-                this.anchorPicture(this.obtainEscapeParamEx(textState), textState);
+                this.anchorPicture(list, textState);
                 break;
             case 'PR':
-                this.rotatePicture(this.obtainEscapeParamEx(textState), textState);
+                this.rotatePicture(list, textState);
                 break;
             case 'PRT':
-                this.rotatePictureTo(this.obtainEscapeParamEx(textState), textState);
+                this.rotatePictureTo(list, textState);
                 break;
             case 'PT':
-                this.tintPicture(this.obtainEscapeParamEx(textState), textState);
+                this.tintPicture(list, textState);
                 break;
             case 'PE':
-                this.erasePicture(this.obtainEscapeParamEx(textState), textState);
+                this.erasePicture(list, textState);
                 break;
             case 'PEA':
-                this.erasePictureAll(this.obtainEscapeParamEx(textState), textState);
+                this.erasePictureAll(list, textState);
+                break;
+            case 'PES':
+                this.savePictureAll(list, textState);
                 break;
             case 'PZ':
-                this.zindexPicture(this.obtainEscapeParamEx(textState), textState);
+                this.zindexPicture(list, textState);
                 break;
         };
     }
@@ -803,6 +878,7 @@ Window_Base.prototype.setP = function(code, list, textState) {
 
 /**设置底显示  */
 Window_Base.prototype.setBackShow = function(list, textState) {
+
     if (textState) {
         this.tslPushParam(textState, "BS", list)
     } else {
@@ -813,11 +889,12 @@ Window_Base.prototype.setBackShow = function(list, textState) {
 
 
 /**设置底显示  */
+/*
 Window_Base.prototype.setBackShow = function(list, textState) {
     this._windowSpriteContainer.visible = (list[0]) ? true : false
 };
 
-
+*/
 
 /**脸图位置 */
 Window_Base.prototype.facePos = function() {
@@ -910,6 +987,12 @@ Window_Base.prototype.tslPushWH = function(textState, list) {
     this.tslPushOther(textState, obj)
 };
 
+Window_Base.prototype.makeNewContents = function(textState, list) {
+    var w =( list && (list[0] || 0) * 1 )|| this.windowWidth(); 
+    var h =( list && (list[1] || 0) * 1) || this.windowHeight() 
+    this.contents = new Bitmap(w,h);
+    this.resetFontSettings();
+};
 
 /**添加新行 */
 Window_Base.prototype.tslPushNewLine = function(textState) {
@@ -950,6 +1033,49 @@ Window_Base.prototype.tslPushNewPageY = function(textState) {
     this.resetFontSettings();
 };
 
+Window_Base.prototype.tslPushNewPageY2 = function(textState) {
+    var page = this.makePage(textState)
+
+    var line = this.makeLine(textState)
+    var arr = this.tslPushEscapeParamEx(textState)
+    if (arr) {
+        textState.textindex += arr[0].length;
+    }
+    if (textState.page) {
+        page.set = textState.page.set
+
+    }
+    this.tslPushPage(textState, page)
+    this.tslPushLine(textState, line)
+    this.resetFontSettings();
+};
+
+
+Window_Base.prototype.tslPushWT = function(textState, wjg) {
+    textState.page.set.wtype = wjg
+};
+
+Window_Base.prototype.tslPushHT = function(textState, wjg) {
+    textState.page.set.htype = wjg
+};
+
+Window_Base.prototype.tslPushAW = function(textState, wjg) {
+    textState.page.set.autow = wjg
+};
+
+Window_Base.prototype.tslPushAH = function(textState, wjg) {
+    textState.page.set.autoh = wjg
+};
+
+Window_Base.prototype.tslPushPH = function(textState, wjg) {
+    var obj = {
+        "type": "pahide",
+        "value": wjg
+    }
+    this.tslPushOther(textState, obj)
+};
+
+
 /**处理正常字符 */
 Window_Base.prototype.tslPushNormalCharacter = function(textState) {
     //c = 文本状态 [文本状态 索引++]
@@ -981,6 +1107,17 @@ Window_Base.prototype.tslPushNormalCharacter = function(textState) {
 
 
 
+Window_Base.prototype.tslPushTWH = function(textState, list) {
+    var text = this.makeText()
+    text.text = ""
+    var w = list[0] * 1
+    var h = list[1] * 1
+    text.test.w = isFinite(w) ? w : 0
+    text.test.h = isFinite(h) ? h : 0
+    this.tslPushOther(textState, text)
+};
+
+
 Window_Base.prototype.tslPushTextColor = function(textState, color) {
     this.contents.textColor = color;
     var obj = {
@@ -990,12 +1127,29 @@ Window_Base.prototype.tslPushTextColor = function(textState, color) {
     this.tslPushOther(textState, obj)
 };
 
+Window_Base.prototype.tslPushOutColor = function(textState, color) {
+    var obj = {
+        "type": "outlineColor",
+        "color": color
+    }
+    this.tslPushOther(textState, obj)
+};
+
+Window_Base.prototype.tslPushOutWidth = function(textState, color) {
+    var obj = {
+        "type": "outlineWidth",
+        "value": color
+    }
+    this.tslPushOther(textState, obj)
+};
+
+
 
 Window_Base.prototype.tslPushDrawIcon = function(textState, iconId) {
-    var icon = this.makeIcon()
-    icon.icon = iconId
-    icon.test.w = Window_Base._iconWidth + 4;
-    icon.test.h = Window_Base._iconHeight + 4;
+    var obj = this.makeIcon()
+    obj.icon = iconId
+    obj.test.w = Window_Base._iconWidth + 4;
+    obj.test.h = Window_Base._iconHeight + 4;
     this.tslPushOther(textState, obj)
 };
 
@@ -1088,15 +1242,20 @@ Window_Base.prototype.tslPushFont = function(textState, obj) {
 
 /**获取参数 */
 Window_Base.prototype.tslPushEscapeParam = function(textState, un) {
-    if (un == undefined) {
+    if (un === undefined) {
         var un = ""
     } else {
         var un = un
     }
-    var arr = /^\[\d+\]/.exec(textState.text.slice(textState.textindex));
+    var arr = /^\[(.*?)\]/.exec(textState.text.slice(textState.textindex));
     if (arr) {
         textState.textindex += arr[0].length;
-        return parseInt(arr[0].slice(1));
+        try {
+            var i = arr[1] * 1              
+        } catch (error) {
+            var i = un
+        }
+        return  i ;
     } else {
         return un;
     }
@@ -1120,12 +1279,18 @@ Window_Base.prototype.tslPushTextColorEscapeParam = function(textState) {
         textState.textindex += arr[0].length;
         return this.textColor(parseInt(arr[1]));
     } else {
-        var arr = /^\[#\w{6}\]/.exec(textState.text.slice(textState.textindex));
+        var arr = /^\[(#\w{6})\]/.exec(textState.text.slice(textState.textindex));
         if (arr) {
             textState.textindex += arr[0].length;
-            return arr[0].slice(1, 8)
+            return arr[1]
         } else {
-            return this.normalColor();
+            var arr = /^\[(rgba\((.*?)\))\]/.exec(textState.text.slice(textState.textindex));
+            if (arr) {
+                textState.textindex += arr[0].length;
+                return arr[1]
+            } else {
+                return this.normalColor();
+            }
         }
     }
 };
@@ -1193,6 +1358,12 @@ Window_Base.prototype.processDrawCharacter = function(textState) {
             case "color":
                 this.contents.textColor = obj.color;
                 break
+            case "outlineColor":
+                this.contents.outlineColor = obj.color;
+                break
+            case "outlineWidth":
+                this.contents.outlineWidth = obj.value;
+                break
             case "text":
                 var x = textState.drawx + obj.test.x
                 var y = textState.drawy + obj.test.y
@@ -1206,10 +1377,14 @@ Window_Base.prototype.processDrawCharacter = function(textState) {
                 var x = textState.drawx + obj.test.x
                 var y = textState.drawy + obj.test.y
                 var h = textState.line.test.h
-                var iconIndex = obj.iconId
+                var iconIndex = obj.icon
                 this.drawIcon(iconIndex, x + 2, y + 2);
                 this.processNormalCharacter2()
                 break
+            case "pahide":
+                this.pausehide = obj.value
+                break
+
             case 'PS':
             case 'PM':
             case 'PO':
@@ -1218,6 +1393,7 @@ Window_Base.prototype.processDrawCharacter = function(textState) {
             case 'PT':
             case 'PE':
             case 'PEA':
+            case 'PES':
             case 'PZ':
                 this.setP(obj.type, obj.value)
                 break;
@@ -1313,7 +1489,6 @@ Window_Message.prototype.tslPushHear2 = function(textState) {
 Window_Message.prototype.tslPushFaceParam = function(textState) {
     var page = textState.page
     var arr = this.tslPushEscapeParamEx(textState)
-
     if (arr) {
         var pos = arr[0] * 1
         var name = arr[1]
@@ -1360,10 +1535,9 @@ Window_Message.prototype.tslPushNewPageY = function(textState) {
             page.set.htype = 0
         }
         if (type >= 3) {
-            page.set.wz = arr
-
-            page.set.w = 491
-            page.set.h = 168
+            page.set.wz = arr 
+            page.set.autow = 1 
+            page.set.autoh = 1
         }
     }
     this.tslPushPage(textState, page)
@@ -1396,6 +1570,11 @@ Window_Message.prototype.tslPushEscapeCharacter = function(textState, code) {
         case '^':
             this.tslPushParam(textState, "pauseskip", true)
             break;
+
+        case 'PK':
+            this.tslPushParam(textState, "pauseskip", this.tslPushEscapeParam(textState, false))
+            break;
+
         case 'S':
             this.tslPushParam(textState, "jiange", this.tslPushEscapeParam(textState, 0))
             break;
@@ -1412,6 +1591,18 @@ Window_Message.prototype.tslPushEscapeCharacter = function(textState, code) {
 };
 
 
+
+Window_Message.prototype.clearSkipFlags = function() {
+    this._showFast = false;
+    this._pauseSkip = false;
+};
+
+Window_Message.prototype.clearlineShowFast = function() {
+    this._lineShowFast = false;
+};
+
+
+
 /**进行绘制普通 */
 Window_Message.prototype.processDrawCharacter = function(textState) {
     var obj = this.needsCharacter(textState)
@@ -1421,7 +1612,7 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
                 this.rejiange()
                 this.clearFace()
                 this.resetFontSettings();
-                this.clearFlags();
+                this.clearlineShowFast();
             case "addpage":
                 textState.page = obj;
                 var page = obj
@@ -1432,7 +1623,7 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
                         this.updatePlacement();
                     }
                 }
-                this._pauseSkip = false;
+                this.clearSkipFlags()
                 break
             case "gold":
                 this._goldWindow.open();
@@ -1449,7 +1640,7 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
                 this._lineShowFast = z;
                 break
             case "pauseskip":
-                this._pauseSkip = true;
+                this._pauseSkip = obj.value;
                 break
             case "jiange":
                 var z = obj.value
@@ -1476,6 +1667,7 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
                 var opacity = 255
                 var blendMode = 0
                 this.showPicture([0, name, origin, x, y, scaleX, scaleY, opacity, blendMode])
+                this.zindexPicture([0, -1])
                 break
             default:
                 Window_Base.prototype.processDrawCharacter.call(this, textState)
@@ -1486,7 +1678,7 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
 Window_Message.prototype.updatePlacement2 = function() {
     var y = 2 * (Graphics.boxHeight - this.height) / 2;
 
-    if (!mapvar.value("cblopen")) {
+    if (mapvar && !mapvar.value("cblopen")) {
         var x = (Graphics.boxWidth - this.width) / 2;
     } else {
         var x = this.windowX()
@@ -1499,24 +1691,53 @@ Window_Message.prototype.updatePlacement2 = function() {
 /**更新位置 */
 Window_Message.prototype.updatePlacement = function() {
     var postype = $gameMessage.positionType();
+
+    var w = this.windowWidth()
+    var h = this.windowHeight()
+
+    if (this._textState) {
+        var page = this._textState.page
+        if (page) { 
+            var set = page.set
+            var p = set && set.facepos
+
+
+            var fw = Window_Base._faceWidth + 24
+            var fh = Window_Base._faceHeight + 24;
+
+            var aw = set && set.autow
+
+            var ah = set && set.autoh
+            var ah = ah||(postype == 0) 
+            var sp2 = this.standardPadding() 
+            sp2 += sp2 //窗口间隔 
+            if(aw == 2){
+                w = page.set.w + sp2
+            }
+            if(aw == 1 || w == Infinity){
+                w =  page.test.x + page.test.w 
+                w += (p == 3 ? (fw * 2) : (p ? fw : 0)) 
+                w += sp2
+            } 
+            if(ah == 2){
+                h = page.set.w + sp2
+            }
+            if(ah == 1 || h == Infinity){
+                var h = page.test.y + page.test.h 
+                h =  p? Math.max(h,fh) : h 
+                h += sp2
+            } 
+        }
+    }
+
     if (typeof(postype) == "number") {
         var y = postype * (Graphics.boxHeight - this.height) / 2;
-        if (!mapvar.value("cblopen")) {
+        if (mapvar && !mapvar.value("cblopen")) {
             var x = (Graphics.boxWidth - this.width) / 2;
         } else {
             var x = this.windowX()
-        }
-        var w = this.windowWidth()
-        var h = this.windowHeight()
+        } 
 
-        if (postype == 0) {
-            if (this._textState) {
-                var page = this._textState.page
-                if (page) {
-                    h = page.test.y + page.test.h + this.standardPadding() * 2
-                }
-            }
-        }
     } else if (Array.isArray(postype)) {
         var types = postype
         var type = (types[0] || 0) * 1
@@ -1528,36 +1749,41 @@ Window_Message.prototype.updatePlacement = function() {
         var wdx = (types[6] || 0) * 1
         var wdy = (types[7] || 0) * 1
 
-
         var rx = 0
         var ry = 0
         var rw = 1
         var rh = 1
         if (type == 8) {
-            if (type == 1) {
+            if (id == 4) {
+                var rx = 0
+                var ry = 0
+                var rw = Graphics._width
+                var rh = Graphics._height
+            }
+            if (id == 1) {
                 var rx = 0
                 var ry = 0
                 var rw = SceneManager._screenWidth
                 var rh = SceneManager._screenHeight
             }
-            if (type == 2) {
+            if (id == 2) {
                 var rw = SceneManager._boxWidth
                 var rh = SceneManager._boxHeight
                 var rx = (SceneManager._screenWidth - SceneManager._boxWidth) * 0.5
                 var ry = (SceneManager._screenHeight - SceneManager._boxHeight) * 0.5
             }
-            if (type == 0) {
+            if (id == 0) {
                 var rx = 0
                 var ry = 0
                 var rw = 1
                 var rh = 1
             }
-            if (type == 3) {
+            if (id == 3) {
                 var rx = 0
                 var ry = 0
                 var rw = SceneManager._screenWidth
                 var rh = SceneManager._screenHeight
-                if (!mapvar.value("cblopen")) {
+                if (mapvar && !mapvar.value("cblopen")) {
                     var rx = 0;
                 } else {
                     var rx = this.windowX()
@@ -1710,42 +1936,48 @@ Window_Message.prototype.updatePlacement = function() {
             }
         }
 
-        var w = this.windowWidth()
-        var h = this.windowHeight()
 
-        if (this._textState) {
-            var page = this._textState.page
-            if (page) {
-                var p = page.set && page.set.facepos
-                h = page.test.y + page.test.h + this.standardPadding() * 2
-                w = page.test.x + page.test.w + this.standardPadding() * 2 + (p == 3 ? (168 * 2) : (p ? 168 : 1))
-            }
-        }
 
         var x = rx + cex * rw - w * wex + wdx
         var y = ry + cey * rh - h * wey + wdx
     }
+    
+ 
 
-    if (!mapvar.value("cblopen")) {
-        var zx = 0;
-    } else {
-        var zx = this.windowX()
+    var u = 0
+    var d = 0
+    var l = 0
+    var r = 0
+    var sw = SceneManager._screenWidth
+    var sh = SceneManager._screenHeight
+    
+    if (mapvar && mapvar.value("cblopen")) {
+        var l = this.windowX()
     }
-    var zy = 0
-    if (this._textState) {
-        var page = this._textState.page
-        if (page && page.set) {
-            zy = page.set.facepos ? 168 : 0
-        }
+
+    if (SceneManager._scene.constructor === Scene_Battle) {
+        var u = 20
+        var d = 20
     }
-    var mx = SceneManager._screenWidth - w
-    var my = SceneManager._screenHeight - h
+
+    var zx = u 
+    var zy = l
+    var sx = sw - r
+    var sy = sh - d
+    var mx = sx - w 
+    var my = sy - h 
+
     x = Math.min(x, mx)
     x = Math.max(x, zx)
     y = Math.min(y, my)
     y = Math.max(y, zy)
+    
     this.move(x, y, w, h);
-    this._goldWindow.y = this.y > 0 ? 0 : Graphics.boxHeight - this._goldWindow.height;
+    var ir = mx - x > x - zx  
+    var id = my - y > y - zy
+
+    this._goldWindow.y = id ? sy - this._goldWindow.height : u ;
+    this._goldWindow.x = ir ? sx - this._goldWindow.width : l ;
 };
 
 
@@ -1760,6 +1992,18 @@ Window_Message.prototype.startMessage = function() {
     this.open();
 };
 
+Window_Message.prototype.updateWait = function() {
+    if (this._waitCount > 0) {
+        this._waitCount--;
+        this.updateShowFast();
+        if (this._showFast) {
+            this._waitCount = 0
+        }
+        return true;
+    } else {
+        return false;
+    }
+};
 
 
 /**更新信息 */
@@ -1772,11 +2016,18 @@ Window_Message.prototype.updateMessage = function() {
                 if (this.needsNewPage(this._textState)) {
                     this.newPage(this._textState);
                 }
-            if (!this._showFast && !this._lineShowFast) {
-                break;
-            }
-            if (this.pause || this._waitCount > 0) {
-                break;
+            if (this._showFast) {
+                if (this.pause) {
+                    this._showFast = false
+                    break
+                }
+            } else {
+                if (!this._lineShowFast) {
+                    break
+                }
+                if (this.pause || this._waitCount > 0) {
+                    break;
+                }
             }
         }
         if (this.isEndOfText(this._textState)) {
@@ -1787,6 +2038,9 @@ Window_Message.prototype.updateMessage = function() {
         return false;
     }
 };
+
+
+
 
 /**新页 */
 Window_Message.prototype.newPage = function(textState, cs) {
@@ -1850,6 +2104,33 @@ Game_Message.prototype.facePos = function() {
 /**进行普通文字处理2 */
 Window_Base.prototype.processNormalCharacter2 = function() {};
 
+
+
+
+
+Window.prototype._updatePauseSign = function() {
+    var sprite = this._windowPauseSignSprite;
+    var x = Math.floor(this._animationCount / 16) % 2;
+    var y = Math.floor(this._animationCount / 16 / 2) % 2;
+    var sx = 144;
+    var sy = 96;
+    var p = 24;
+    if (!this.pause) {
+        sprite.alpha = 0;
+    } else if (sprite.alpha < 1) {
+        if (this.pausehide) {
+            sprite.alpha = 0;
+        } else {
+            sprite.alpha = Math.min(sprite.alpha + 0.1, 1);
+        }
+    }
+    sprite.setFrame(sx + x * p, sy + y * p, p, p);
+    sprite.visible = this.isOpen();
+};
+
+
+
+
 /**窗口宽 */
 Window_Message.prototype.windowWidth = function() {
     return 908
@@ -1875,8 +2156,6 @@ Window_Message.prototype.drawMessageFace = function() {};
 Window_Message.prototype.showMessageFace = function(face, id, pos, textState) {
 
     var name = "face/" + '"' + face + '",' + id
-
-
     if (this.contentsHeight() >= 144) {
         var y = 0
     } else {
@@ -2147,10 +2426,14 @@ Window_Base.prototype.erasePicture = function(list) {
 };
 
 
+Window_Base.prototype.savePictureAll = function() {
+    this._savePicture = true
+};
 /**
  * 抹去所有图片
  */
 Window_Base.prototype.erasePictureAll = function() {
+    if(this._savePicture){return this._savePicture = false}
     if (!this._pictures) {
         this._pictures = {}
         this._picturesSprite = {}
@@ -2210,46 +2493,52 @@ Sprite_WindowPicture.prototype.picture = function() {
 
 
 Sprite_Picture.prototype.loadBitmap = function() {
-    if (this._pictureName.indexOf("text/") == 0) {
-        var json = this._pictureName.slice(5)
-        if (json) {
-            var list = JSON.parse("[" + json + "]")
-            var w = list[0] || 0
-            var h = list[1] || 0
-            var text = list[2] || ""
-            var wb = new Window_Base(0, 0, 1, 1)
-            wb.contents = new Bitmap(w, h)
-            wb.drawTextEx(text, 0, 0)
-            this.bitmap = wb.contents
-            wb.contents = new Bitmap(0, 0)
-            wb = null
+    if (this._pictureName) {
+        // console.log(this._pictureName)
+
+        if (this._pictureName.indexOf("text/") == 0) {
+            var json = this._pictureName.slice(5)
+            if (json) {
+                var list = JSON.parse("[" + json + "]")
+                var w = list[0] || 0
+                var h = list[1] || 0
+                var text = list[2] || ""
+                var wb = new Window_Base(0, 0, 1, 1)
+                wb.contents = new Bitmap(w, h)
+                wb.drawTextEx(text, 0, 0)
+                this.bitmap = wb.contents
+                wb.contents = new Bitmap(0, 0)
+                wb = null
+            } else {
+                this.bitmap = new Bitmap()
+            }
+        } else if (this._pictureName.indexOf("face/") == 0) {
+            var json = this._pictureName.slice(5)
+            if (json) {
+                var list = JSON.parse("[" + json + "]")
+                var faceName = list[0] || ""
+                var faceIndex = list[1] || 0
+                this.bitmap = ImageManager.loadFace(faceName);
+                var that = this
+                this.bitmap.addLoadListener(
+                    function() {
+                        var pw = Window_Base._faceWidth;
+                        var ph = Window_Base._faceHeight;
+                        var sw = pw
+                        var sh = ph
+                        var sx = faceIndex % 4 * pw + (pw - sw) / 2;
+                        var sy = Math.floor(faceIndex / 4) * ph + (ph - sh) / 2;
+                        that.setFrame(sx, sy, sw, sh);
+                    }
+                )
+            } else {
+                this.bitmap = new Bitmap()
+            }
         } else {
-            this.bitmap = new Bitmap()
-        }
-    } else if (this._pictureName.indexOf("face/") == 0) {
-        var json = this._pictureName.slice(5)
-        if (json) {
-            var list = JSON.parse("[" + json + "]")
-            var faceName = list[0] || ""
-            var faceIndex = list[1] || 0
-            this.bitmap = ImageManager.loadFace(faceName);
-            var that = this
-            this.bitmap.addLoadListener(
-                function() {
-                    var pw = Window_Base._faceWidth;
-                    var ph = Window_Base._faceHeight;
-                    var sw = pw
-                    var sh = ph
-                    var sx = faceIndex % 4 * pw + (pw - sw) / 2;
-                    var sy = Math.floor(faceIndex / 4) * ph + (ph - sh) / 2;
-                    that.setFrame(sx, sy, sw, sh);
-                }
-            )
-        } else {
-            this.bitmap = new Bitmap()
+            this.bitmap = ImageManager.loadPicture(this._pictureName);
         }
     } else {
-        this.bitmap = ImageManager.loadPicture(this._pictureName);
+        this.bitmap = ImageManager.loadPicture("");
     }
 }
 
