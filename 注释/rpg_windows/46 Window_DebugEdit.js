@@ -59,6 +59,7 @@ Window_DebugEdit.prototype.itemName = function(dataId) {
 };
 /**项目状态 */
 Window_DebugEdit.prototype.itemStatus = function(dataId) {
+    //如果(模式 == "switch" 开关)
     if (this._mode === 'switch') {
         return $gameSwitches.value(dataId) ? '[ON]' : '[OFF]';
     } else {
