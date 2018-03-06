@@ -15,6 +15,7 @@ Window_Selectable.prototype.constructor = Window_Selectable;
 /**初始化 */
 Window_Selectable.prototype.initialize = function(x, y, width, height) {
     Window_Base.prototype.initialize.call(this, x, y, width, height);
+    //索引 = -1 
     this._index = -1;
     this._cursorFixed = false;
     this._cursorAll = false;
