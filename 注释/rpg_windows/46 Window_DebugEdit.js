@@ -50,6 +50,7 @@ Window_DebugEdit.prototype.drawItem = function(index) {
 };
 /**项目名称 */
 Window_DebugEdit.prototype.itemName = function(dataId) {
+    //如果(模式 == "switch" 开关)
     if (this._mode === 'switch') {
         return $dataSystem.switches[dataId];
     } else {
