@@ -589,7 +589,7 @@ Window_BattleLog.prototype.displaySubstitute = function(substitute, target) {
     var substName = substitute.name();
     //添加(  'performSubstitute'  //表现替代  , 替代者 ,  目标 )
     this.push('performSubstitute', substitute, target);
-    //添加('addText' //添加文本 , 文本管理器 替代 替换 (替代者名 , 目标 名称) 
+    //添加('addText' //添加文本 , 文本管理器 替代者 替换 (替代者名 , 目标 名称) 
     this.push('addText', TextManager.substitute.format(substName, target.name()));
 };
 /**
@@ -627,7 +627,7 @@ Window_BattleLog.prototype.displayActionResults = function(subject, target) {
 Window_BattleLog.prototype.displayFailure = function(target) {
     //如果(目标 结果() 是命中() 并且  不是 目标 结果() 成功)
     if (target.result().isHit() && !target.result().success) {
-        //添加('addText' //添加文本 , 文本管理器 动作失败 替换 (目标 名称) 
+        //添加('addText' //添加文本 , 文本管理器 动作失败 替换 (目标 名称()) 
         this.push('addText', TextManager.actionFailure.format(target.name()));
     }
 };
@@ -699,11 +699,14 @@ Window_BattleLog.prototype.displayEvasion = function(target) {
     var fmt;
     //如果 目标 结果 物理
     if (target.result().physical) {
-        //格式文本 = 文本 显示回避
+        //格式文本 = 文本管理器 回避
         fmt = TextManager.evasion;
+        //添加('performEvasion' //表现回避 ,目标 )
         this.push('performEvasion', target);
     } else {
+        //格式文本 = 文本管理器 魔法回避
         fmt = TextManager.magicEvasion;
+        //添加('performEvasion' //表现魔法回避 ,目标 )
         this.push('performMagicEvasion', target);
     }
     //添加('addText' //添加文本 , 文本管理器 反击 替换 (目标 名称) 
@@ -725,7 +728,7 @@ Window_BattleLog.prototype.displayHpDamage = function(target) {
             //添加("performDamage" //表现恢复 , 目标 )
             this.push('performRecovery', target);
         }
-        //添加('addText' //添加文本 , 文本管理器 反击 替换 (目标 名称) 
+        //添加('addText' //添加文本 , 制作hp伤害文本 替换 (目标)  
         this.push('addText', this.makeHpDamageText(target));
     }
 };
@@ -737,10 +740,10 @@ Window_BattleLog.prototype.displayMpDamage = function(target) {
     if (target.isAlive() && target.result().mpDamage !== 0) {
         //如果(目标 结果() mp伤害 < 0)
         if (target.result().mpDamage < 0) {
-            //添加("performDamage" //表现恢复 , 目标 )
+            //添加("performRecovery" //表现恢复 , 目标 )
             this.push('performRecovery', target);
         }
-        //添加('addText' //添加文本 , 文本管理器 反击 替换 (目标 名称) 
+        //添加('addText' //添加文本 , 制作mp伤害文本 替换 (目标)  
         this.push('addText', this.makeMpDamageText(target));
     }
 };
@@ -752,10 +755,10 @@ Window_BattleLog.prototype.displayTpDamage = function(target) {
     if (target.isAlive() && target.result().tpDamage !== 0) {
         //如果(目标 结果() tp伤害 < 0)
         if (target.result().tpDamage < 0) {
-            //添加("performDamage" //表现恢复 , 目标 )
+            //添加("performRecovery" //表现恢复 , 目标 )
             this.push('performRecovery', target);
         }
-        //添加('addText' //添加文本 , 文本管理器 反击 替换 (目标 名称) 
+        //添加('addText' //添加文本 , 制作tp伤害文本 替换 (目标) 
         this.push('addText', this.makeTpDamageText(target));
     }
 };
@@ -817,7 +820,7 @@ Window_BattleLog.prototype.displayAddedStates = function(target) {
             this.push('popBaseLine');
             //添加('pushBaseLine' //添加基础行)
             this.push('pushBaseLine');
-            //添加('addText' //添加文本 , 目标 名字() + 状态效果 
+            //添加('addText' //添加文本 , 目标 名字() + 状态效果  )
             this.push('addText', target.name() + stateMsg);
             //添加( 'waitForEffect'// 等待为效果 )
             this.push('waitForEffect');
@@ -899,6 +902,7 @@ Window_BattleLog.prototype.makeHpDamageText = function(target) {
         //返回 标准文本 替换 (目标 名称() , 文本管理器 hp, -伤害)
         return fmt.format(target.name(), TextManager.hp, -damage);
     } else {
+        //标准文本 = 是角色? 文本管理器 角色非伤害: 文本管理器 敌人非伤害
         fmt = isActor ? TextManager.actorNoDamage : TextManager.enemyNoDamage;
         //返回 标准文本 替换 (目标 名称()  )
         return fmt.format(target.name());
