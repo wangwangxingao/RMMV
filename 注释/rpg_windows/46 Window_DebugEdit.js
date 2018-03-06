@@ -75,8 +75,11 @@ Window_DebugEdit.prototype.setMode = function(mode) {
 };
 /**设置顶部id */
 Window_DebugEdit.prototype.setTopId = function(id) {
+    //如果(顶部id != id)
     if (this._topId !== id) {
+        //顶部id = id
         this._topId = id;
+        //刷新()
         this.refresh();
     }
 };
