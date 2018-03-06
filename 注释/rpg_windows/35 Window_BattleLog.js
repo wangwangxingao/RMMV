@@ -706,7 +706,7 @@ Window_BattleLog.prototype.displayEvasion = function(target) {
     } else {
         //格式文本 = 文本管理器 魔法回避
         fmt = TextManager.magicEvasion;
-        //添加('performEvasion' //表现魔法回避 ,目标 )
+        //添加('performMagicEvasion' //表现魔法回避 ,目标 )
         this.push('performMagicEvasion', target);
     }
     //添加('addText' //添加文本 , 文本管理器 反击 替换 (目标 名称) 
@@ -725,7 +725,7 @@ Window_BattleLog.prototype.displayHpDamage = function(target) {
         }
         //如果(目标 结果() hp伤害 < 0)
         if (target.result().hpDamage < 0) {
-            //添加("performDamage" //表现恢复 , 目标 )
+            //添加("performRecovery" //表现恢复 , 目标 )
             this.push('performRecovery', target);
         }
         //添加('addText' //添加文本 , 制作hp伤害文本 替换 (目标)  
