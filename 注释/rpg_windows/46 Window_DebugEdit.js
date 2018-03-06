@@ -27,7 +27,9 @@ Window_DebugEdit.prototype.maxItems = function() {
 };
 /**刷新 */
 Window_DebugEdit.prototype.refresh = function() {
+    //内容 清除()
     this.contents.clear();
+    //绘制所有项目组()
     this.drawAllItems();
 };
 /**绘制项目 */
