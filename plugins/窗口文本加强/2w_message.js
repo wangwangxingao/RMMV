@@ -383,7 +383,6 @@ Window_Base.prototype.drawTextEx = function(text, x, y, w, h, p, l) {
                 break
             }
         }
-        //console.log(textState)
         this.resetFontSettings();
         return textState.pages[0].test.w;
     } else {
@@ -473,9 +472,13 @@ Window_Base.prototype.tslPushPic = function(textState, pic) {
     if (pic) {
         ImageManager.loadPicture(pic.name)
         var page = textState.page
+        page.set.ps = page.set.ps||{}
+        page.set.ps[pic.index] = pic.name
         this.tslPush(textState, pic)
     }
 }
+
+
 
 /**页设置脸图 */
 Window_Base.prototype.tslPushFace = function(textState, face) {
@@ -488,7 +491,16 @@ Window_Base.prototype.tslPushFace = function(textState, face) {
             if (face.pos != page.set.facepos) {
                 page.set.facepos = 3
             }
+        } 
+        if (face.pos == 1 || face.pos == 0) { 
+            var pid = -1
+        } else { 
+            var pid = -2
         }
+
+
+        page.set.ps = page.set.ps||{}
+        page.set.ps[pid] = face.name
         this.tslPush(textState, face)
     }
 }
@@ -1504,9 +1516,9 @@ Window_Message.prototype.tslPushFaceParam = function(textState) {
 };
 
 /**文本状态列表添加图片 */
-Window_Message.prototype.tslPushPic = function(textState) {
+Window_Message.prototype.tslPushPicParam = function(textState) {
     var arr = this.tslPushEscapeParamEx(textState)
-    if (arr) {
+    if (arr) { 
         var pos = arr[0] * 1
         var name = arr[1]
         var index = (arr[2]||0) * 1
@@ -1515,11 +1527,14 @@ Window_Message.prototype.tslPushPic = function(textState) {
             "pos": pos,
             "name": name,
             "index":index
-        }
-        ImageManager.loadPicture(name)
-        this.tslPushOther(textState, obj)
+        } 
+        this.tslPushPic(textState, obj)
     }
 };
+
+
+
+
 
 /**文本状态列表添加新页对象 */
 Window_Message.prototype.tslPushNewPageY = function(textState) {
@@ -1586,7 +1601,7 @@ Window_Message.prototype.tslPushEscapeCharacter = function(textState, code) {
             this.tslPushFaceParam(textState)
             break;
         case 'T':
-            this.tslPushPic(textState)
+            this.tslPushPicParam(textState)
             break;
         default:
             Window_Base.prototype.tslPushEscapeCharacter.call(this, textState, code);
@@ -1605,7 +1620,23 @@ Window_Message.prototype.clearlineShowFast = function() {
     this._lineShowFast = false;
 };
 
+Window_Message.prototype.clearPicture = function(page) { 
 
+    var ps = (page.set && page.set.ps)||{} 
+    if (!this._pictures) {
+        this._pictures = {}
+        this._picturesSprite = {}
+        this._picturesZindex = {}
+    }
+    var l = Object.getOwnPropertyNames(this._pictures)
+
+    for (var i = 0; i < l.length; i++) {
+        var pictureId = l[i]
+        if(!ps[pictureId]){
+            this.picture(pictureId, "null"); 
+        }
+    }  
+}
 
 /**进行绘制普通 */
 Window_Message.prototype.processDrawCharacter = function(textState) {
@@ -1614,7 +1645,8 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
         switch (obj.type) {
             case "page":
                 this.rejiange()
-                this.clearFace()
+                this.clearPicture(obj)
+                //this.clearFace()
                 this.resetFontSettings();
                 this.clearlineShowFast();
             case "addpage":
@@ -2245,16 +2277,17 @@ Window_Base.prototype.picture = function(index, picture) {
             this._pictures = {}
             this._picturesSprite = {}
             this._picturesZindex = {}
-        }
+        } 
         if (picture) {
             this._pictures[index] = picture
             if (!this._picturesSprite[index]) {
                 this._picturesSprite[index] = new Sprite_WindowPicture(index)
-
             }
+            
             var s = this._picturesSprite[index]
+            s._zIndex = this._picturesZindex[index] || 0 
+            this.removeChild(s)
             s.setScreen(this)
-            s._zIndex = this._picturesZindex[index] || 0
             var c = this.children
             var l = c.length
             for (var i = 0; i < l; i++) {
@@ -2586,4 +2619,76 @@ Sprite_WindowPicture.prototype.updateOrigin = function() {
             this.anchor.y = 0;
         }
     }
+};
+
+
+
+
+
+
+
+Game_Interpreter.prototype.command101 = function () {
+    //如果(不是 游戏消息 是忙碌的() )
+    if (!$gameMessage.isBusy()) {
+        //游戏消息 设置脸图(参数组[0],参数组[1])
+        $gameMessage.setFaceImage(this._params[0], this._params[1]);
+        //游戏消息 设置背景(参数组[2])
+        $gameMessage.setBackground(this._params[2]);
+        //游戏消息 设置位置种类(参数组[3])
+        $gameMessage.setPositionType(this._params[3]);
+        //当(下一个事件编码() === 401 )
+        while (this.nextEventCode() === 401) {  // Text data 文本数据
+            //索引++
+            this._index++;
+            //游戏消息 添加(当前命令() 参数组[0])
+            $gameMessage.add(this.currentCommand().parameters[0]);
+        }
+        while(this.nextEventCode() === 101){
+            this._index++;
+            var p = this.currentCommand().parameters
+            if(this._params[0] == p[0] && this._params[1] == p[1] && this._params[2] == p[2]&&  this._params[3] == p[3] ){
+                while (this.nextEventCode() === 401) {  // Text data 文本数据
+                    //索引++
+                    this._index++;
+                    //游戏消息 添加(当前命令() 参数组[0])
+                    $gameMessage.add(this.currentCommand().parameters[0]);
+                }
+            } 
+        }
+
+
+        //检查 (下一个事件编码() )
+        switch (this.nextEventCode()) {
+            //当 102
+            case 102:  // Show Choices 显示选项
+                //索引++
+                this._index++;
+                //安装选择组(当前命令() 参数组)
+                this.setupChoices(this.currentCommand().parameters);
+                //中断
+                break;
+            //当 103
+            case 103:  // Input Number 输入数字
+                //索引++
+                this._index++;
+                //安装数字输入(当前命令() 参数组)
+                this.setupNumInput(this.currentCommand().parameters);
+                //中断
+                break;
+            //当 104
+            case 104:  // Select Item 选择物品
+                //索引++
+                this._index++;
+                //安装物品选择(当前命令() 参数组)
+                this.setupItemChoice(this.currentCommand().parameters);
+                //中断
+                break;
+        }
+        //索引++
+        this._index++;
+        //设置等待模式("message"//消息 )
+        this.setWaitMode('message');
+    }
+    //返回 false
+    return false;
 };
