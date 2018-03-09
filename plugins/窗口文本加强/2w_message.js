@@ -35,8 +35,8 @@
  *       
  *       位置为靠近边缘时可自动调整但不能保证效果
  * \WH[w h] :设置当前绘制页的大小
- * \T[n name] :
- *    在message 下显示name的图片, 
+ * \T[n name index] :
+ *    在message 下显示name的图片, index为编号,当不设置时为0,同一编号图片会相互替代 
  *    n 位置: 锚点 图片的 123456789顶点 坐标 message的 123456789顶点
  *            当 小于10 时 锚点 坐标 都为 n   比如 1 ,  图片以左下角正对信息框的左下角 
  *            当 大于10 时 前面为 锚点 后面为坐标  如 12 表示 以左下顶点为锚点 坐标为 message的下顶点 
@@ -230,7 +230,7 @@ Window_Base.prototype.makeIcon = function(textState) {
 };
 
 /**测试文字增强 */
-Window_Base.prototype.testTextEx = function(text, x, y, w, h, wt, ht, facepos, wz,aw,ah) {
+Window_Base.prototype.testTextEx = function(text, x, y, w, h, wt, ht, facepos, wz, aw, ah) {
     if (text) {
         var pageset = {
             w: w || Infinity,
@@ -584,7 +584,7 @@ Window_Base.prototype.testPushText = function(textState, text) {
         //宽间隔
     var jw = (lw == 0 || tw == 0) ? 0 : this.getWjg() || 0
     var sw = pageset.w
-    var fw = Window_Base._faceWidth + 24    
+    var fw = Window_Base._faceWidth + 24
     var fw = page.set.facepos == 3 ? fw * 2 : page.set.facepos ? fw : 0
         //行可以放开字 
     if (lw + jw + tw <= sw - fw || lw == 0) {
@@ -735,7 +735,7 @@ Window_Base.prototype.tslPushEscapeCharacter = function(textState, code) {
             this.tslPushTWH(textState, this.tslPushEscapeParamEx(textState))
             break
         case 'CWH':
-            this.makeNewContents(textState,this.tslPushEscapeParamEx(textState));
+            this.makeNewContents(textState, this.tslPushEscapeParamEx(textState));
             break;
         case 'PS':
         case 'PM':
@@ -988,9 +988,9 @@ Window_Base.prototype.tslPushWH = function(textState, list) {
 };
 
 Window_Base.prototype.makeNewContents = function(textState, list) {
-    var w =( list && (list[0] || 0) * 1 )|| this.windowWidth(); 
-    var h =( list && (list[1] || 0) * 1) || this.windowHeight() 
-    this.contents = new Bitmap(w,h);
+    var w = (list && (list[0] || 0) * 1) || this.windowWidth();
+    var h = (list && (list[1] || 0) * 1) || this.windowHeight()
+    this.contents = new Bitmap(w, h);
     this.resetFontSettings();
 };
 
@@ -1251,11 +1251,11 @@ Window_Base.prototype.tslPushEscapeParam = function(textState, un) {
     if (arr) {
         textState.textindex += arr[0].length;
         try {
-            var i = arr[1] * 1              
+            var i = arr[1] * 1
         } catch (error) {
             var i = un
         }
-        return  i ;
+        return i;
     } else {
         return un;
     }
@@ -1509,10 +1509,12 @@ Window_Message.prototype.tslPushPic = function(textState) {
     if (arr) {
         var pos = arr[0] * 1
         var name = arr[1]
+        var index = (arr[2]||0) * 1
         var obj = {
             "type": "pic",
             "pos": pos,
             "name": name,
+            "index":index
         }
         ImageManager.loadPicture(name)
         this.tslPushOther(textState, obj)
@@ -1535,8 +1537,10 @@ Window_Message.prototype.tslPushNewPageY = function(textState) {
             page.set.htype = 0
         }
         if (type >= 3) {
-            page.set.wz = arr 
-            page.set.autow = 1 
+            page.set.wz = arr
+            page.set.w = 491
+            page.set.h = 168
+            page.set.autow = 1
             page.set.autoh = 1
         }
     }
@@ -1653,6 +1657,7 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
             case "pic":
                 var pos = obj.pos
                 var name = obj.name
+                var index = obj.index 
                 if (pos < 10) {
                     var origin = pos
                     var o = pos
@@ -1666,8 +1671,8 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
                 var scaleY = 100
                 var opacity = 255
                 var blendMode = 0
-                this.showPicture([0, name, origin, x, y, scaleX, scaleY, opacity, blendMode])
-                this.zindexPicture([0, -1])
+                this.showPicture([index, name, origin, x, y, scaleX, scaleY, opacity, blendMode])
+                this.zindexPicture([index, -1])
                 break
             default:
                 Window_Base.prototype.processDrawCharacter.call(this, textState)
@@ -1697,7 +1702,7 @@ Window_Message.prototype.updatePlacement = function() {
 
     if (this._textState) {
         var page = this._textState.page
-        if (page) { 
+        if (page) {
             var set = page.set
             var p = set && set.facepos
 
@@ -1708,25 +1713,25 @@ Window_Message.prototype.updatePlacement = function() {
             var aw = set && set.autow
 
             var ah = set && set.autoh
-            var ah = ah||(postype == 0) 
-            var sp2 = this.standardPadding() 
+            var ah = ah || (postype == 0)
+            var sp2 = this.standardPadding()
             sp2 += sp2 //窗口间隔 
-            if(aw == 2){
+            if (aw == 2) {
                 w = page.set.w + sp2
             }
-            if(aw == 1 || w == Infinity){
-                w =  page.test.x + page.test.w 
-                w += (p == 3 ? (fw * 2) : (p ? fw : 0)) 
+            if (aw == 1 || w == Infinity) {
+                w = page.test.x + page.test.w
+                w += (p == 3 ? (fw * 2) : (p ? fw : 0))
                 w += sp2
-            } 
-            if(ah == 2){
+            }
+            if (ah == 2) {
                 h = page.set.w + sp2
             }
-            if(ah == 1 || h == Infinity){
-                var h = page.test.y + page.test.h 
-                h =  p? Math.max(h,fh) : h 
+            if (ah == 1 || h == Infinity) {
+                var h = page.test.y + page.test.h
+                h = p ? Math.max(h, fh) : h
                 h += sp2
-            } 
+            }
         }
     }
 
@@ -1736,7 +1741,7 @@ Window_Message.prototype.updatePlacement = function() {
             var x = (Graphics.boxWidth - this.width) / 2;
         } else {
             var x = this.windowX()
-        } 
+        }
 
     } else if (Array.isArray(postype)) {
         var types = postype
@@ -1941,8 +1946,8 @@ Window_Message.prototype.updatePlacement = function() {
         var x = rx + cex * rw - w * wex + wdx
         var y = ry + cey * rh - h * wey + wdx
     }
-    
- 
+
+
 
     var u = 0
     var d = 0
@@ -1950,7 +1955,7 @@ Window_Message.prototype.updatePlacement = function() {
     var r = 0
     var sw = SceneManager._screenWidth
     var sh = SceneManager._screenHeight
-    
+
     if (mapvar && mapvar.value("cblopen")) {
         var l = this.windowX()
     }
@@ -1960,24 +1965,24 @@ Window_Message.prototype.updatePlacement = function() {
         var d = 20
     }
 
-    var zx = u 
+    var zx = u
     var zy = l
     var sx = sw - r
     var sy = sh - d
-    var mx = sx - w 
-    var my = sy - h 
+    var mx = sx - w
+    var my = sy - h
 
     x = Math.min(x, mx)
     x = Math.max(x, zx)
     y = Math.min(y, my)
     y = Math.max(y, zy)
-    
+
     this.move(x, y, w, h);
-    var ir = mx - x > x - zx  
+    var ir = mx - x > x - zx
     var id = my - y > y - zy
 
-    this._goldWindow.y = id ? sy - this._goldWindow.height : u ;
-    this._goldWindow.x = ir ? sx - this._goldWindow.width : l ;
+    this._goldWindow.y = id ? sy - this._goldWindow.height : u;
+    this._goldWindow.x = ir ? sx - this._goldWindow.width : l;
 };
 
 
@@ -2433,7 +2438,7 @@ Window_Base.prototype.savePictureAll = function() {
  * 抹去所有图片
  */
 Window_Base.prototype.erasePictureAll = function() {
-    if(this._savePicture){return this._savePicture = false}
+    if (this._savePicture) { return this._savePicture = false }
     if (!this._pictures) {
         this._pictures = {}
         this._picturesSprite = {}
