@@ -1464,7 +1464,7 @@ Window_Message.prototype.tslPushNewPage = function(textState) {
     textState.textindex++
         var page = this.makePage(textState)
     var line = this.makeLine(textState)
-    var type = $gameMessage.positionType()
+    var type = this.positionType()
     page.set.wz = type
     if (type == 0) {
         page.set.wtype = 1
@@ -1481,8 +1481,8 @@ Window_Message.prototype.tslPushNewPage = function(textState) {
 
 
 /**文本状态列表添加头2 */
-Window_Message.prototype.tslPushHear2 = function(textState) {
-    if ($gameMessage.faceName()) {
+Window_Message.prototype.tslPushHear2 = function (textState) {
+    if (this._useMessage && $gameMessage.faceName()) {
         var pos = $gameMessage.facePos()
         var name = $gameMessage.faceName()
         var id = $gameMessage.faceIndex()
@@ -1655,7 +1655,7 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
                 this.contents.clear();
                 if (page.set) {
                     if ("wz" in page.set) {
-                        $gameMessage.setPositionType(page.set.wz)
+                        this.setPositionType(page.set.wz)
                         this.updatePlacement();
                     }
                 }
@@ -1725,9 +1725,19 @@ Window_Message.prototype.updatePlacement2 = function() {
     this.move(x, y, w, h);
 }
 
+
+Window_Message.prototype.positionType = function() {
+    return this._positionType
+};
+
+
+Window_Message.prototype.setPositionType = function(positionType){ 
+    return this._positionType = positionType 
+}
+
 /**更新位置 */
 Window_Message.prototype.updatePlacement = function() {
-    var postype = $gameMessage.positionType();
+    var postype = this.positionType();
 
     var w = this.windowWidth()
     var h = this.windowHeight()
@@ -1768,13 +1778,12 @@ Window_Message.prototype.updatePlacement = function() {
     }
 
     if (typeof(postype) == "number") {
-        var y = postype * (Graphics.boxHeight - this.height) / 2;
+        var y = postype * (Graphics.boxHeight - h) / 2;
         if (mapvar && !mapvar.value("cblopen")) {
-            var x = (Graphics.boxWidth - this.width) / 2;
+            var x = (Graphics.boxWidth - w) / 2;
         } else {
             var x = this.windowX()
-        }
-
+        } 
     } else if (Array.isArray(postype)) {
         var types = postype
         var type = (types[0] || 0) * 1
@@ -2020,9 +2029,18 @@ Window_Message.prototype.updatePlacement = function() {
 
 
 /**开始信息 */
-Window_Message.prototype.startMessage = function() {
-    this._textState = this.testTextEx($gameMessage.allText(), 0, 0, this.contents.width, this.contents.height)
-
+Window_Message.prototype.startMessage = function(positionType,allText) {
+    var positionType = positionType === undefined ? $gameMessage.positionType() :positionType
+    var allText = allText
+    if(allText === undefined){
+        this._useMessage = true
+        allText = $gameMessage.allText()
+    }else{
+        this._useMessage = false
+        allText = allText
+    } 
+    this.setPositionType(positionType)
+    this._textState = this.testTextEx( allText , 0, 0, this.contents.width, this.contents.height)
     this.newPage(this._textState, 1);
     this.updatePlacement();
     this.updateBackground();
@@ -2085,7 +2103,7 @@ Window_Message.prototype.newPage = function(textState, cs) {
         textState.page = textState.list[textState.index]
         var page = textState.page
         if ("wz" in page.set) {
-            $gameMessage.setPositionType(page.set.wz)
+            this.setPositionType(page.set.wz)
         }
     }
     if (!this._pauseSkip && !cs) {
@@ -2113,7 +2131,7 @@ Window_Message.prototype.terminateMessage = function() {
     this.erasePictureAll()
     this.close();
     this._goldWindow.close();
-    $gameMessage.clear();
+    this._useMessage && $gameMessage.clear();
 };
 
 

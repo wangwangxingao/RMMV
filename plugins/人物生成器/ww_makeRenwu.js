@@ -81,7 +81,7 @@
  *
  *   保存功能:
  *   保存人物数据为图片,并且本方法使用1秒后会刷新场景(解决菜单界面修改后不改变的情况)
- *   ww_makeRenwu.baocun.sxall(obj,name,index)
+ *   ww_makeRenwu.baocun.makeall(obj,name,index)
  *   
  *   使用:可以新建一个人物数据,设置后使用本方法保存,
  *   如
@@ -89,7 +89,7 @@
  *        //"AccA"设置为女性"AccA"第2种(男性 为 maid )
  *        rw.jl["AccA"] = ww_makeRenwu.make.feid("AccA", 2) 
  *        //保存人物数据到 Actor1 的 0 号人物(即系统默认的 哈罗德)  
- *        ww_makeRenwu.baocun.sxall(rw,"Actor1",0)
+ *        ww_makeRenwu.baocun.makeall(rw,"Actor1",0)
  *   
  *-------------------------------------------
  * 
@@ -204,7 +204,7 @@ function ww_makeRenwu() {
 	ww_makeRenwu.newRenwu = function (name, sjid) {
 		for (var i = 0; i < 8; i++) {
 			var ww = ww_makeRenwu.new(sjid)
-			ww_makeRenwu.baocun.sxall(ww, name, i)
+			ww_makeRenwu.baocun.makeall(ww, name, i)
 		}
 	}
 
@@ -364,7 +364,7 @@ function ww_makeRenwu() {
 	}
 
 	ww_makeRenwu.save.loadrw = function (ww_make, filename, index) {
-		ww_makeRenwu.baocun.sxall(ww_make, filename, index)
+		ww_makeRenwu.baocun.makeall(ww_make, filename, index)
 	}
 
 	//=============================================================================
@@ -378,55 +378,54 @@ function ww_makeRenwu() {
 	ww_makeRenwu.baocun.savename = function (ww_make) {
 		return encodeURIComponent(this.name(ww_make))
 	}
-	ww_makeRenwu.baocun.sx = function (ww_make) {
+	ww_makeRenwu.baocun.make = function (ww_make,save) {
 		//读取菜单需要的脸图(防止没有在载入脸图时会建立空白脸图)  
 		var filename = this.savename(ww_make)
 		var index = 0
 		//储存人物数据 
-		this.sxall(ww_make, filename, index)
+		this.sxall(ww_make, filename, index,save)
 		return this.name(ww_make)
 	}
 
+ 
 
-
-
-	ww_makeRenwu.baocun.sxall = function (ww_make, filename, index) {
+	ww_makeRenwu.baocun.makeall = function (ww_make, filename, index,save) {
 
 		var index = index * 1
 		//储存人物数据
 		//ww_makeRenwu.save.addrw(ww_make, filename, index)
 
-		ww_makeRenwu.baocun.sxface(ww_make, filename, index)
-		ww_makeRenwu.baocun.sxtv(ww_make, filename, index)
-		ww_makeRenwu.baocun.sxtvd(ww_make, filename, index)
-		ww_makeRenwu.baocun.sxsv(ww_make, filename, index)
+		ww_makeRenwu.baocun.makeface(ww_make, filename, index,save)
+		ww_makeRenwu.baocun.maketv(ww_make, filename, index,save)
+		ww_makeRenwu.baocun.maketvd(ww_make, filename, index,save)
+		ww_makeRenwu.baocun.makesv(ww_make, filename, index,save)
 
 		// 1 秒后 刷新场景)(处理脸图改变后菜单窗口不改变问题)
-		setTimeout(ww_makeRenwu.baocun.sxscene, 1000)
+		setTimeout(ww_makeRenwu.baocun.refreshScene, 1000)
 		return filename
 	}
 
 
 	//刷新场景
-	ww_makeRenwu.baocun.sxscene = function () {
+	ww_makeRenwu.baocun.refreshScene = function () {
 		if (SceneManager && SceneManager._scene) {
 			if (SceneManager._scene.refresh) { SceneManager._scene.refresh() }
-			ww_makeRenwu.baocun.sxchild(SceneManager._scene)
+			ww_makeRenwu.baocun.refreshChild(SceneManager._scene)
 		}
 	};
-	ww_makeRenwu.baocun.sxchild = function (childs) {
+	ww_makeRenwu.baocun.refreshChild = function (childs) {
 		childs.children.forEach(
 			function (child) {
 				if (child.refresh) {
 					child.refresh();
 				}
-				ww_makeRenwu.baocun.sxchild(child)
+				ww_makeRenwu.baocun.refreshChild(child)
 			}
 		)
 	};
 
 
-	ww_makeRenwu.baocun.sxface = function (ww_make, filename, index) {
+	ww_makeRenwu.baocun.makeface = function (ww_make, filename, index, save) {
 		var path = 'img/faces/' + filename + '.png';
 		var bitmap2 = ww_makeRenwu.baocun.loadBitmap(path, "Face")
 		if (bitmap2._loadingState == "loading") {
@@ -446,15 +445,17 @@ function ww_makeRenwu() {
 					bitmap2.clearRect(dx, dy, dw, dh)
 					bitmap2.blt(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
 					bitmap2._loadingState = "loaded"
+					bitmap2._setDirty()
 					bitmap2._callLoadListeners()
+					save && ww_makeRenwu.baocun.savePng(bitmap2, path)
 				}
 			);
 		}
 	}
 
-	ww_makeRenwu.baocun.sxtv = function (ww_make, filename, index) {
+	ww_makeRenwu.baocun.maketv = function (ww_make, filename, index, save) {
 
-		var path = 'img/characters/' + filename + '.png';
+		var path = 'img/characters/' + filename + "_" + "tv" + '.png';
 		var bitmap2 = ww_makeRenwu.baocun.loadBitmap(path, "TV");
 
 		if (bitmap2._loadingState == "loading") {
@@ -475,43 +476,16 @@ function ww_makeRenwu() {
 					bitmap2.clearRect(dx, dy, dw, dh)
 					bitmap2.blt(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
 					bitmap2._loadingState = "loaded"
-					ww_makeRenwu.baocun.SavePng(bitmap2, "" + filename + '_tv' + '.png')
+					bitmap2._setDirty()
+					bitmap2._callLoadListeners()
+					save && ww_makeRenwu.baocun.savePng(bitmap2, path)
+
 				}
 			);
 		}
 	}
 
-	ww_makeRenwu.baocun.sxsv = function (ww_make, filename, index) {
-		var path = 'img/sv_actors/' + filename + "_" + index + '.png';
-		var bitmap2 = ww_makeRenwu.baocun.loadBitmap(path, "SV")
-
-
-
-		if (bitmap2._loadingState == "loading") {
-			bitmap2._loadingState = "makeing"
-			var badds = ww_makeRenwu.make.makeSV(ww_make)
-			var bitmap = ww_makeRenwu.bitmap.makeRenwu(badds)
-			bitmap.addLoadListener(
-				function () {
-					var sx = 0
-					var sy = 0
-					var sw = bitmap.width;
-					var sh = bitmap.height;
-					var dx = 0
-					var dy = 0
-					var dw = bitmap.width
-					var dh = bitmap.height
-					bitmap2.clearRect(dx, dy, dw, dh)
-					bitmap2.blt(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
-					bitmap2._loadingState = "loaded"
-					ww_makeRenwu.baocun.SavePng(bitmap2, "" + filename + "_" + index + '_sv' + '.png')
-				}
-			);
-		}
-	}
-
-	ww_makeRenwu.baocun.sxtvd = function (ww_make, filename, index) {
-
+	ww_makeRenwu.baocun.maketvd = function (ww_make, filename, index, save) {
 		var path = 'img/characters/' + filename + '_tvd' + '.png';
 		var bitmap2 = ww_makeRenwu.baocun.loadBitmap(path, "TVD");
 
@@ -533,7 +507,39 @@ function ww_makeRenwu() {
 					bitmap2.clearRect(dx, dy, dw, dh)
 					bitmap2.blt(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
 					bitmap2._loadingState = "loaded"
-					ww_makeRenwu.baocun.SavePng(bitmap2, "" + filename + '_tvd' + '.png')
+					bitmap2._setDirty()
+					bitmap2._callLoadListeners()
+					save && ww_makeRenwu.baocun.savePng(bitmap2, path)
+				}
+			);
+		}
+	}
+
+	ww_makeRenwu.baocun.makesv = function (ww_make, filename, index, save) {
+
+		var path = 'img/sv_actors/' + filename + '.png';
+		var bitmap2 = ww_makeRenwu.baocun.loadBitmap(path, "SV")
+
+		if (bitmap2._loadingState == "loading") {
+			bitmap2._loadingState = "makeing"
+			var badds = ww_makeRenwu.make.makeSV(ww_make)
+			var bitmap = ww_makeRenwu.bitmap.makeRenwu(badds)
+			bitmap.addLoadListener(
+				function () {
+					var sx = 0
+					var sy = 0
+					var sw = bitmap.width;
+					var sh = bitmap.height;
+					var dx = 0
+					var dy = 0
+					var dw = bitmap.width
+					var dh = bitmap.height
+					bitmap2.clearRect(dx, dy, dw, dh)
+					bitmap2.blt(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
+					bitmap2._loadingState = "loaded"
+					bitmap2._setDirty()
+					bitmap2._callLoadListeners()
+					save && ww_makeRenwu.baocun.savePng(bitmap2, path)
 				}
 			);
 		}
@@ -574,7 +580,7 @@ function ww_makeRenwu() {
 			var bitmap = ImageManager._imageCache.get(key)
 			if (!bitmap) {
 				var str = list[1]
-				ww_makeRenwu.baocun.sx(JSON.parse(LZString.decompressFromBase64(str)))
+				ww_makeRenwu.baocun.make(JSON.parse(LZString.decompressFromBase64(str)))
 				var bitmap = ImageManager._imageCache.get(key)
 			}
 			return bitmap
@@ -681,7 +687,7 @@ function ww_makeRenwu() {
 
 
 	//保存图片到png格式(图片,文件名,文件夹名)
-	ww_makeRenwu.baocun.SavePng = function (bitmap, name, wzname) {
+	ww_makeRenwu.baocun.savePng = function (bitmap, name, wzname) {
 
 		var name = name || 'tupian.png';
 		if (!bitmap || !bitmap.canvas) {
@@ -701,8 +707,7 @@ function ww_makeRenwu() {
 			} else {
 				return true;
 			}
-		});
-
+		}); 
 		return imgData;
 	}
 
@@ -3187,7 +3192,7 @@ function Window_BC() {
 	Scene_makeRenwu.prototype.Baocun = function () {
 		var txt = ww_makeRenwu.make.jiancha(this.ww_makeRenwu, this._jc)
 		if (txt == "true") {
-			ww_makeRenwu.baocun.sxall(this.ww_makeRenwu, this._name, this._index)
+			ww_makeRenwu.baocun.makeall(this.ww_makeRenwu, this._name, this._index)
 		} else {
 			this.Message(txt)
 		}

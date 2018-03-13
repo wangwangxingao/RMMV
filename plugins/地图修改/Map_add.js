@@ -816,10 +816,10 @@
      * 删除事件 
      */
     ww_mapAdd.deleEvent = function(mapid, tid) {
-        var mapid = mapid
+        var mapid = mapid || $gameMap.mapId()
         var key = ["eventByMap", false, tid]
         ww_mapAdd._mapDataAddPush(mapid, key)
-        if (DataManager.isMapLoaded()) {
+        if (mapid == $gameMap.mapId() && DataManager.isMapLoaded()) {
             ww_mapAdd._changeNowMapEvent(tid)
             $gameMap.requestRefresh()
         }
@@ -849,7 +849,7 @@
      * 复制fmapid地图fid事件到tmapid地图tid事件 x ,y 
      */
     ww_mapAdd.copyEventByMap = function(fmapid, fid, tmapid, tid, x, y) {
-        var mapid = tmapid
+        var mapid = tmapid ||  $gameMap.mapId()
         var key = ["copyEventByMap", fmapid, fid, tid]
         if (!(x === null || x === undefined)) { key[4] = x * 1 }
         if (!(y === null || y === undefined)) { key[5] = y * 1 }
@@ -875,7 +875,7 @@
      * 复制 事件到tmapid地图tid事件 x ,y 
      */
     ww_mapAdd.eventByMap = function(event, tmapid, tid, x, y) {
-        var mapid = tmapid
+        var mapid = tmapid || $gameMap.mapId()
         var key = ["eventByMap", event, tid]
         if (!(x === null || x === undefined)) { key[3] = x * 1 }
         if (!(y === null || y === undefined)) { key[4] = y * 1 }

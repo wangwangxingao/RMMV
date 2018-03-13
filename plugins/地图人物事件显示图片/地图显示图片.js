@@ -31,7 +31,7 @@
  * picture.tint(tone, duration)  
  * picture.erase()
  * 
- * 当 前面有 text/ 时 为绘制文字 ,后面跟 [长,宽,文字]
+ * 当 前面有 t/ 时 为绘制文字 ,后面跟 [长,宽,文字]
  * 当前面有 f/ 时为 图片 ,后面跟 [脸图名,索引]
  * 实例 
  *  
@@ -79,6 +79,10 @@ Game_Picture.prototype.nextMethod = function() {
 
 
 
+Game_Picture.prototype.setParentSet = function() {
+    this._p
+};
+
 
 
 
@@ -86,7 +90,7 @@ Game_Picture.prototype.nextMethod = function() {
 Game_Picture.prototype.move = function(origin, x, y, scaleX, scaleY,
     opacity, blendMode, duration) {
 
-    if (duration <= 0) {
+    if ((duration||0) <= 0) {
         //原点 = 原点
         this._origin = origin;
         //x = x 
@@ -330,27 +334,7 @@ Game_CharacterBase.prototype.movePicture = function(pictureId, origin, x, y, sca
 };
 
 
-
-/**移动图片
- * @param {number} pictureId 图片id
- * @param {number} origin 原点
- * @param {number} x x
- * @param {number} y y
- * @param {number} scaleX 比例x
- * @param {number} scaleY 比例y
- * @param {number} opacity 不透明度
- * @param {number} blendMode 混合模式 
- * @param {number} duration 持续时间 
- */
-Game_CharacterBase.prototype.poPicture = function(pictureId, origin) {
-    //图片 = 图片(图片id)
-    var picture = this.picture(pictureId);
-    //如果 图片 
-    if (picture) {
-        //图片 移动  (原点,x,y,比例x,比例y,不透明度,混合方式,持续时间)
-        picture.po(origin);
-    }
-};
+ 
 /**旋转图片
  * @param {number} pictureId 图片id
  * @param {number} speed 速度
@@ -531,7 +515,41 @@ Game_Screen.prototype.pushMethodPicture = function(pictureId) {
 
 
 Sprite_Picture.prototype.loadBitmap = function() {
-    if (this._pictureName.indexOf("t/") == 0) {
+    if(this._window){
+        this.removeChild(this._window)
+        delete this._window 
+    }
+    if (this._pictureName.indexOf("m/") == 0) {
+        var json = this._pictureName.slice(2)
+        if (json) {
+            var list = JSON.parse(json)
+            var w = list[0] || 0
+            var h = list[1] || 0
+            var text = list[2] || ""
+            var wb = new Window_Message(0, 0, w, h)
+            wb.drawTextEx(text, 0, 0) 
+            this._window = wb
+            this.addChild(this._window)
+            this.bitmap = new Bitmap(w, h)
+        } else {
+            this.bitmap = new Bitmap()
+        }
+    }else if (this._pictureName.indexOf("w/") == 0) {
+        var json = this._pictureName.slice(2)
+        if (json) {
+            var list = JSON.parse(json)
+            var w = list[0] || 0
+            var h = list[1] || 0
+            var text = list[2] || ""
+            var wb = new Window_Base(0, 0, w, h)
+            wb.drawTextEx(text, 0, 0) 
+            this._window = wb
+            this.addChild(this._window)
+            this.bitmap = new Bitmap(w, h)
+        } else {
+            this.bitmap = new Bitmap()
+        }
+    }else if (this._pictureName.indexOf("t/") == 0) {
         var json = this._pictureName.slice(2)
         if (json) {
             var list = JSON.parse(json)

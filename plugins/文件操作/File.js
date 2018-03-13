@@ -18,6 +18,51 @@ FileManager.Bitmap_snap = function (stage) {
     return bitmap;
 };
 
+    FileManager._localURL = null
+    FileManager.localURL = function () {
+		if (!this._localURL) {
+			var path = require && typeof(require) == "function" && require('path');  
+			if (path) {
+				this._localURL = path.dirname(process.mainModule.filename)
+			} else {
+				var pathname = window.location.pathname
+				var path = pathname.replace(/(\/www|)\/[^\/]*$/, "");
+				if (path.match(/^\/([A-Z]\:)/)) {
+					path = path.slice(1);
+				}
+				this._localURL = decodeURIComponent(path);
+			}
+		}
+		return this._localURL
+	}; 
+
+	/**当前文件夹 */
+	FileManager._dirs = {}
+
+	/**本地文件位置名称 */
+	FileManager.dirPath = function (name) {
+		if (name) {
+			var namelist = name.split("/")
+			var dirPath = this.localURL()
+			var fs = require('fs');
+			var d = ""
+			for (var i = 0; i < namelist.length - 1; i++) {
+				d = d + ((d || dirPath) ? '/' : "") + namelist[i];
+				var d2 = dirPath + d
+				if (!this._dirs[d]) {
+					if (!fs.existsSync(d2)) {
+						fs.mkdirSync(d2);
+					}
+					this._dirs[d] = 1
+				}
+			}
+			d = d + ((d || dirPath) ? '/' : "") + namelist[i];
+			return dirPath + d
+		}
+	}
+
+
+
 /**位置 */
 FileManager.dirpath = function (name) {
     if (name) {
@@ -281,8 +326,7 @@ FileManager.fs.LoadData = function (filePath,type) {
 
 
 FileManager.fs._localURL = ""
-FileManager.fs.localURL = function () {
-    
+FileManager.fs.localURL = function () { 
     if (!this._localURL) {
         var path = null// require && typeof(require) =="function" && require('path');  
         if (path) {
@@ -320,7 +364,7 @@ FileManager.fs.localFileName = function (name) {
     }  
 }
 /**获取所有文件 */
-FileManager.fs.getAllfile = function (pagh) {
+FileManager.fs.getAllfile = function (path) {
     var o = {}
     var fs = require('fs');
     var get = function (f) {
