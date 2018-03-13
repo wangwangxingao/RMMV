@@ -1,3 +1,7 @@
+/**
+ * 四叉树
+ * 
+ */
 function fourTree() {
     this.initialize.apply(this, arguments)
 }
@@ -49,7 +53,7 @@ fourTree.prototype.split = function() {
 }
 
 /**
- * 
+ * 获取索引
  * @param {{body}} obj 对象
  * @param {boolean} checkIsInner 检查在矩形内
  */
@@ -186,10 +190,10 @@ fourTree.prototype.collidesWith = function(obj) {
 fourTree.prototype.collidesMove = function(obj, xd, yd) {
     var result = []
     var index
-    if (Collides.bodyMoveBodyIn(obj.body, this.bounds, dx, dy)) {
+    if (Collides.bodyMoveBodyIn(obj.body, this.bounds, xd, yd)) {
         result = result.concat(this.objects)
         for (var i = 0; i < this.nodes.length; i++) {
-            result = result.concat(this.nodes[i].collidesWith(rect))
+            result = result.concat(this.nodes[i].collidesMove(rect))
         }
     }
     return result
@@ -209,6 +213,10 @@ fourTree.prototype.collidesFun = function(obj, fun) {
 }
 
 
+/**
+ * 身体在身体中
+ * 
+ */
 Collides.bodyWithBody = function(body1, body2) {
     return Collides.chMoveCh(
         body1.x,
@@ -273,7 +281,14 @@ Collides.chInCh = function(x, y, w, h, x1, y1, w1, h1) {
 }
 
 
-
+/**
+ * 
+ * @param {Collides.body} body1 
+ * @param {Collides.body} body2 
+ * @param {*} xd 
+ * @param {*} yd 
+ * @param {*} type 
+ */
 Collides.bodyMoveBodyIn = function(body1, body2, xd, yd, type) {
     var l = Collides.chMoveCh(
         body1.x,
@@ -303,6 +318,20 @@ Collides.bodyMoveBody = function(body1, body2, xd, yd, type) {
     )
 }
 
+/**
+ * 
+ * @param {number} x 
+ * @param {number} y 
+ * @param {number} w 
+ * @param {number} h 
+ * @param {number} x1 
+ * @param {number} y1 
+ * @param {number} w1 
+ * @param {number} h1 
+ * @param {number} xd 
+ * @param {number} yd 
+ * @param {number} type 
+ */
 
 Collides.chMoveCh = function(x, y, w, h, x1, y1, w1, h1, xd, yd, type) {
     var xa = x1 - x
@@ -352,6 +381,20 @@ Collides.chMoveCh = function(x, y, w, h, x1, y1, w1, h1, xd, yd, type) {
 }
 
 
+/**
+ * 
+ * @param {number} x 
+ * @param {number} y 
+ * @param {number} w 
+ * @param {number} h 
+ * @param {number} x1 
+ * @param {number} y1 
+ * @param {number} w1 
+ * @param {number} h1 
+ * @param {number} xd 
+ * @param {number} yd 
+ * @param {number} type 
+ */
 
 Collides.four = function(x, y, w, h, w1, h1, xd, yd, type) {
     var x0 = x - w
@@ -380,6 +423,13 @@ Collides.four = function(x, y, w, h, w1, h1, xd, yd, type) {
 }
 
 
+/**
+ * 
+ * @param {number} x 
+ * @param {number} y 
+ * @param {number} w 
+ * @param {number} h  
+ */
 
 Collides.body = function(x, y, w, h) {
     return { x: x, y: y, w: w, h: h }
