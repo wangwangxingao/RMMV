@@ -42,7 +42,7 @@
 
 
 
-Game_Picture.prototype.update = function() {
+Game_Picture.prototype.update = function () {
     //更新移动
     this.updateMove();
     //更新色调
@@ -53,7 +53,7 @@ Game_Picture.prototype.update = function() {
 };
 
 
-Game_Picture.prototype.updateNext = function() {
+Game_Picture.prototype.updateNext = function () {
     if (this._duration <= 0 && this._toneDuration <= 0 && this._rotationDuration <= 0) {
         //console.log("next")
         this.nextMethod()
@@ -62,7 +62,7 @@ Game_Picture.prototype.updateNext = function() {
 
 
 
-Game_Picture.prototype.nextMethod = function() {
+Game_Picture.prototype.nextMethod = function () {
     if (this._methods) {
         var method = this._methods[this._methodsIndex];
         //如果 方法 名称 并且 方法 名称 存在 
@@ -77,20 +77,21 @@ Game_Picture.prototype.nextMethod = function() {
     }
 };
 
+Game_Picture.prototype.positionType = function () {
+    return this._positionType
+};
 
 
-Game_Picture.prototype.setParentSet = function() {
-    this._p
+Game_Picture.prototype.setPositionType = function (positionType) {
+    this._positionType = positionType
 };
 
 
 
-
-
-Game_Picture.prototype.move = function(origin, x, y, scaleX, scaleY,
+Game_Picture.prototype.move = function (origin, x, y, scaleX, scaleY,
     opacity, blendMode, duration) {
 
-    if ((duration||0) <= 0) {
+    if ((duration || 0) <= 0) {
         //原点 = 原点
         this._origin = origin;
         //x = x 
@@ -127,7 +128,7 @@ Game_Picture.prototype.move = function(origin, x, y, scaleX, scaleY,
 
 
 /**初始化旋转*/
-Game_Picture.prototype.initRotation = function() {
+Game_Picture.prototype.initRotation = function () {
     this._angle = 0;
     this._rotationSpeed = 0;
     this._rotationTarget = 0;
@@ -138,7 +139,7 @@ Game_Picture.prototype.initRotation = function() {
 /**
  * 更新旋转
  */
-Game_Picture.prototype.updateRotation = function() {
+Game_Picture.prototype.updateRotation = function () {
     if (this._rotationSpeed !== 0) {
         this._angle += this._rotationSpeed / 2;
     }
@@ -156,7 +157,7 @@ Game_Picture.prototype.updateRotation = function() {
  * @param {number} duration 持续时间 ,0时为立刻
  * 
  */
-Game_Picture.prototype.rotateTo = function(rotation, duration) {
+Game_Picture.prototype.rotateTo = function (rotation, duration) {
     this._rotationTarget = rotation || 0;
     this._rotationDuration = duration || 0;
     if (this._rotationDuration <= 0) {
@@ -170,7 +171,7 @@ Game_Picture.prototype.rotateTo = function(rotation, duration) {
  * @param {number|[number,number]|{x:number,y:number}}origin 原点
  * 
  */
-Game_Picture.prototype.setOrigin = function(origin) {
+Game_Picture.prototype.setOrigin = function (origin) {
     this._origin = origin || 0
 };
 
@@ -182,7 +183,7 @@ Game_Picture.prototype.setOrigin = function(origin) {
  * @param {number|[number,number]|{x:number,y:number}}origin 原点
  * 
  */
-Game_Picture.prototype.setParentOrigin = function(origin) {
+Game_Picture.prototype.setParentOrigin = function (origin) {
     this._parentOrigin = origin
 };
 
@@ -194,7 +195,7 @@ Game_Picture.prototype.setParentOrigin = function(origin) {
  * @param {boolean} re 返回
  * 
  */
-Game_Picture.prototype.setMethod = function(list, re) {
+Game_Picture.prototype.setMethod = function (list, re) {
     this._methods = list || []
     this._methodsIndex = 0
     this._methodsre = re
@@ -206,7 +207,7 @@ Game_Picture.prototype.setMethod = function(list, re) {
  * @param {number }index 索引
  * 
  */
-Game_Picture.prototype.setMethodIndex = function(index) {
+Game_Picture.prototype.setMethodIndex = function (index) {
     this._methodsIndex = index
 };
 
@@ -215,11 +216,11 @@ Game_Picture.prototype.setMethodIndex = function(index) {
  * @param {boolean} re 返回
  * 
  */
-Game_Picture.prototype.setMethodRe = function(re) {
+Game_Picture.prototype.setMethodRe = function (re) {
     this._methodsre = re
 };
 
-Game_Picture.prototype.pushMethod = function(methodName) {
+Game_Picture.prototype.pushMethod = function (methodName) {
     if (!this._methods) { this.setMethod() }
     //方法参数 = 数组 切割 呼叫 (参数,1)
     var methodArgs = Array.prototype.slice.call(arguments, 1);
@@ -237,14 +238,14 @@ Game_Picture.prototype.pushMethod = function(methodName) {
 
 
 var _Game_CharacterBase_prototype_initMembers = Game_CharacterBase.prototype.initMembers
-Game_CharacterBase.prototype.initMembers = function() {
+Game_CharacterBase.prototype.initMembers = function () {
     _Game_CharacterBase_prototype_initMembers.call(this)
     this._pictures = {}
 }
 
 
 
-Game_CharacterBase.prototype.update = function() {
+Game_CharacterBase.prototype.update = function () {
     if (this.isStopping()) {
         this.updateStop();
     }
@@ -260,7 +261,7 @@ Game_CharacterBase.prototype.update = function() {
 
 
 
-Game_CharacterBase.prototype.picture = function(pictureId) {
+Game_CharacterBase.prototype.picture = function (pictureId) {
     return this._pictures[pictureId]
 };
 
@@ -269,7 +270,7 @@ Game_CharacterBase.prototype.picture = function(pictureId) {
 
 
 /**更新图片*/
-Game_CharacterBase.prototype.updatePictures = function() {
+Game_CharacterBase.prototype.updatePictures = function () {
     if (this._pictures) {
         for (var n in this._pictures) {
             var picture = this._pictures[n]
@@ -300,7 +301,7 @@ Game_CharacterBase.prototype.updatePictures = function() {
  * @param {number} blendMode 混合模式 
  * @param {number} duration 持续时间 
  */
-Game_CharacterBase.prototype.showPicture = function(pictureId, name, origin, x, y,
+Game_CharacterBase.prototype.showPicture = function (pictureId, name, origin, x, y,
     scaleX, scaleY, opacity, blendMode) {
     //真实图片id = 真实图片id(图片id)
     var pictureId = pictureId;
@@ -322,7 +323,7 @@ Game_CharacterBase.prototype.showPicture = function(pictureId, name, origin, x, 
  * @param {number} blendMode 混合模式 
  * @param {number} duration 持续时间 
  */
-Game_CharacterBase.prototype.movePicture = function(pictureId, origin, x, y, scaleX,
+Game_CharacterBase.prototype.movePicture = function (pictureId, origin, x, y, scaleX,
     scaleY, opacity, blendMode, duration) {
     //图片 = 图片(图片id)
     var picture = this.picture(pictureId);
@@ -334,13 +335,13 @@ Game_CharacterBase.prototype.movePicture = function(pictureId, origin, x, y, sca
 };
 
 
- 
+
 /**旋转图片
  * @param {number} pictureId 图片id
  * @param {number} speed 速度
  * 
  */
-Game_CharacterBase.prototype.rotatePicture = function(pictureId, speed) {
+Game_CharacterBase.prototype.rotatePicture = function (pictureId, speed) {
     //图片 = 图片(图片id)
     var picture = this.picture(pictureId);
     //如果 图片 
@@ -355,7 +356,7 @@ Game_CharacterBase.prototype.rotatePicture = function(pictureId, speed) {
  * @param {number}  duration 持续时间
  * 
  */
-Game_CharacterBase.prototype.tintPicture = function(pictureId, tone, duration) {
+Game_CharacterBase.prototype.tintPicture = function (pictureId, tone, duration) {
     //图片 = 图片(图片id)
     var picture = this.picture(pictureId);
     //如果 图片 
@@ -367,16 +368,24 @@ Game_CharacterBase.prototype.tintPicture = function(pictureId, tone, duration) {
 /**抹去图片
  * @param {number} pictureId 图片id
  * */
-Game_CharacterBase.prototype.erasePicture = function(pictureId) {
+Game_CharacterBase.prototype.erasePicture = function (pictureId) {
     //真实图片id = 真实图片id(图片id)
     var realPictureId = this.picture(pictureId)
-        //图片组[真实图片id] = null
+    //图片组[真实图片id] = null
     this._pictures[realPictureId] = null;
 };
 
+Game_CharacterBase.prototype.setPositionType = function (pictureId, positionType) {
+    var picture = this.picture(pictureId);
+    //如果 图片 
+    if (picture) {
+        //图片 旋转(速度)
+        picture.setPositionType(positionType);
+    }
+};
 
 
-Game_CharacterBase.prototype.setPictureParentOrigin = function(pictureId, origin) {
+Game_CharacterBase.prototype.setPictureParentOrigin = function (pictureId, origin) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setParentOrigin(origin);
@@ -390,7 +399,7 @@ Game_CharacterBase.prototype.setPictureParentOrigin = function(pictureId, origin
  * @param {number|[number,number]|{x:number,y:number}}origin 原点
  * 
  */
-Game_CharacterBase.prototype.setPictureOrigin = function(pictureId, origin) {
+Game_CharacterBase.prototype.setPictureOrigin = function (pictureId, origin) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setOrigin(origin);
@@ -399,7 +408,7 @@ Game_CharacterBase.prototype.setPictureOrigin = function(pictureId, origin) {
 
 
 
-Game_CharacterBase.prototype.setMethodPicture = function(pictureId, list, re) {
+Game_CharacterBase.prototype.setMethodPicture = function (pictureId, list, re) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setMethod(list, re);
@@ -407,14 +416,14 @@ Game_CharacterBase.prototype.setMethodPicture = function(pictureId, list, re) {
 };
 
 
-Game_CharacterBase.prototype.setMethodRePicture = function(pictureId, re) {
+Game_CharacterBase.prototype.setMethodRePicture = function (pictureId, re) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setMethodRe(re);
     }
 };
 
-Game_CharacterBase.prototype.setMethodIndexPicture = function(pictureId, index) {
+Game_CharacterBase.prototype.setMethodIndexPicture = function (pictureId, index) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setMethodIndex(index);
@@ -423,7 +432,7 @@ Game_CharacterBase.prototype.setMethodIndexPicture = function(pictureId, index) 
 
 
 
-Game_CharacterBase.prototype.pushMethodPicture = function(pictureId) {
+Game_CharacterBase.prototype.pushMethodPicture = function (pictureId) {
     var picture = this.picture(pictureId);
     if (picture) {
         var methodArgs = Array.prototype.slice.call(arguments, 1);
@@ -431,10 +440,7 @@ Game_CharacterBase.prototype.pushMethodPicture = function(pictureId) {
     }
 };
 
-
-
-
-
+ 
 
 /**
  * 旋转图片到
@@ -445,7 +451,7 @@ Game_CharacterBase.prototype.pushMethodPicture = function(pictureId) {
  * 
  */
 
-Game_Screen.prototype.rotatePictureTo = function(pictureId, rotation, duration) {
+Game_Screen.prototype.rotatePictureTo = function (pictureId, rotation, duration) {
     //图片 = 图片(图片id)
     var picture = this.picture(pictureId);
     //如果 图片 
@@ -455,8 +461,19 @@ Game_Screen.prototype.rotatePictureTo = function(pictureId, rotation, duration) 
     }
 };
 
+Game_Screen.prototype.setPositionType = function (pictureId, positionType) {
 
-Game_Screen.prototype.setPictureParentOrigin = function(pictureId, origin) {
+    var picture = this.picture(pictureId);
+    //如果 图片 
+    if (picture) {
+        //图片 旋转(速度)
+        picture.setPositionType(positionType);
+    }
+};
+
+
+
+Game_Screen.prototype.setPictureParentOrigin = function (pictureId, origin) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setParentOrigin(origin);
@@ -470,7 +487,7 @@ Game_Screen.prototype.setPictureParentOrigin = function(pictureId, origin) {
  * @param {number|[number,number]|{x:number,y:number}}origin 原点
  * 
  */
-Game_Screen.prototype.setPictureOrigin = function(pictureId, origin) {
+Game_Screen.prototype.setPictureOrigin = function (pictureId, origin) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setOrigin(origin);
@@ -480,7 +497,7 @@ Game_Screen.prototype.setPictureOrigin = function(pictureId, origin) {
 
 
 
-Game_Screen.prototype.setMethodPicture = function(pictureId, list, re) {
+Game_Screen.prototype.setMethodPicture = function (pictureId, list, re) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setMethod(list, re);
@@ -488,14 +505,14 @@ Game_Screen.prototype.setMethodPicture = function(pictureId, list, re) {
 };
 
 
-Game_Screen.prototype.setMethodRePicture = function(pictureId, re) {
+Game_Screen.prototype.setMethodRePicture = function (pictureId, re) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setMethodRe(re);
     }
 };
 
-Game_Screen.prototype.setMethodIndexPicture = function(pictureId, index) {
+Game_Screen.prototype.setMethodIndexPicture = function (pictureId, index) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setMethodIndex(index);
@@ -504,7 +521,7 @@ Game_Screen.prototype.setMethodIndexPicture = function(pictureId, index) {
 
 
 
-Game_Screen.prototype.pushMethodPicture = function(pictureId) {
+Game_Screen.prototype.pushMethodPicture = function (pictureId) {
     var picture = this.picture(pictureId);
     if (picture) {
         var methodArgs = Array.prototype.slice.call(arguments, 1);
@@ -514,10 +531,10 @@ Game_Screen.prototype.pushMethodPicture = function(pictureId) {
 
 
 
-Sprite_Picture.prototype.loadBitmap = function() {
-    if(this._window){
+Sprite_Picture.prototype.loadBitmap = function () {
+    if (this._window) {
         this.removeChild(this._window)
-        delete this._window 
+        delete this._window
     }
     if (this._pictureName.indexOf("m/") == 0) {
         var json = this._pictureName.slice(2)
@@ -527,14 +544,14 @@ Sprite_Picture.prototype.loadBitmap = function() {
             var h = list[1] || 0
             var text = list[2] || ""
             var wb = new Window_Message(0, 0, w, h)
-            wb.drawTextEx(text, 0, 0) 
+            wb.drawTextEx(text, 0, 0)
             this._window = wb
             this.addChild(this._window)
             this.bitmap = new Bitmap(w, h)
         } else {
             this.bitmap = new Bitmap()
         }
-    }else if (this._pictureName.indexOf("w/") == 0) {
+    } else if (this._pictureName.indexOf("w/") == 0) {
         var json = this._pictureName.slice(2)
         if (json) {
             var list = JSON.parse(json)
@@ -542,14 +559,14 @@ Sprite_Picture.prototype.loadBitmap = function() {
             var h = list[1] || 0
             var text = list[2] || ""
             var wb = new Window_Base(0, 0, w, h)
-            wb.drawTextEx(text, 0, 0) 
+            wb.drawTextEx(text, 0, 0)
             this._window = wb
             this.addChild(this._window)
             this.bitmap = new Bitmap(w, h)
         } else {
             this.bitmap = new Bitmap()
         }
-    }else if (this._pictureName.indexOf("t/") == 0) {
+    } else if (this._pictureName.indexOf("t/") == 0) {
         var json = this._pictureName.slice(2)
         if (json) {
             var list = JSON.parse(json)
@@ -560,7 +577,7 @@ Sprite_Picture.prototype.loadBitmap = function() {
             wb.contents = new Bitmap(w, h)
             wb.drawTextEx(text, 0, 0)
             this.bitmap = wb.contents
-                ///wb.contents = new Bitmap(0, 0)
+            ///wb.contents = new Bitmap(0, 0)
             wb = null
         } else {
             this.bitmap = new Bitmap()
@@ -574,7 +591,7 @@ Sprite_Picture.prototype.loadBitmap = function() {
             this.bitmap = ImageManager.loadFace(faceName);
             var that = this
             this.bitmap.addLoadListener(
-                function() {
+                function () {
                     var pw = Window_Base._faceWidth;
                     var ph = Window_Base._faceHeight;
                     var sw = pw
@@ -592,9 +609,202 @@ Sprite_Picture.prototype.loadBitmap = function() {
     }
 }
 
+Sprite_Picture.prototype.updatePlacement2 = function () {
+    this.visible = false
+    return [0, 0]
+}
 
-Sprite_Picture.prototype.updatePosition = function() {
+Sprite_Picture.prototype.updatePlacement = function (picture) {
+
+    var postype = picture.positionType();
+
+    var w = this.width
+    var h = this.height
+
+    var x = 0
+    var y = 0
+
+    if (typeof (postype) == "number") {
+        var y = postype * (Graphics.boxHeight - h) / 2;
+        var x = (Graphics.boxWidth - w) / 2;
+    } else if (Array.isArray(postype)) {
+        var types = postype
+        var type = (types[0] || 0) * 1
+        var id = (types[1] || 0) * 1
+        var cex = types[2] === undefined ? 0.5 : types[2] * 1
+        var cey = types[3] === undefined ? 0.5 : types[3] * 1
+        var wex = types[4] === undefined ? 0.5 : types[4] * 1
+        var wey = types[5] === undefined ? 0.5 : types[5] * 1
+        var wdx = (types[6] || 0) * 1
+        var wdy = (types[7] || 0) * 1
+
+        var rx = 0
+        var ry = 0
+        var rw = 1
+        var rh = 1
+        if (type == 8) {
+            if (id == 4) {
+                var rx = 0
+                var ry = 0
+                var rw = Graphics._width
+                var rh = Graphics._height
+            }
+            if (id == 1) {
+                var rx = 0
+                var ry = 0
+                var rw = SceneManager._screenWidth
+                var rh = SceneManager._screenHeight
+            }
+            if (id == 2) {
+                var rw = SceneManager._boxWidth
+                var rh = SceneManager._boxHeight
+                var rx = (SceneManager._screenWidth - SceneManager._boxWidth) * 0.5
+                var ry = (SceneManager._screenHeight - SceneManager._boxHeight) * 0.5
+            }
+            if (id == 0) {
+                var rx = 0
+                var ry = 0
+                var rw = 1
+                var rh = 1
+            }
+            if (id == 3) {
+                var rx = 0
+                var ry = 0
+                var rw = SceneManager._screenWidth
+                var rh = SceneManager._screenHeight
+            }
+        } else {
+            var actor
+            var character
+            if (type == 3) {
+                if (id < 0) {
+                    character = $gamePlayer.followers().follower(-id - 1)
+                    actor = $gameParty.members()[id]
+                } else if (id == 0) {
+                    character = $gamePlayer
+                    actor = $gameParty.members()[0]
+                } else {
+                    character = $gameMap.event(id);
+                }
+            }
+            /**队伍 */
+            if (type == 5) {
+                actor = $gameParty.members()[id]
+            }
+            /**角色 */
+            if (type == 6) {
+                actor = $gameActors.actor(id)
+            }
+            /**敌人 */
+            if (type == 7) {
+                actor = $gameTroop.members()[id]
+            }
+            if (SceneManager._scene.constructor === Scene_Map && SceneManager._sceneStarted) {
+                if (type == 5 || type == 6 || type == 7) {
+                    if (!actor) {
+                        return this.updatePlacement2()
+                    }
+                    var pid = -1
+                    var l = $gameParty.members()
+                    for (var i = 0; i < l.length; i++) {
+                        if (l[i] == actor) {
+                            pid = i
+                        }
+                    }
+                    if (pid == -1) {
+
+                    } else if (pid == 0) {
+                        character = $gamePlayer
+                    } else {
+                        character = $gamePlayer.followers().follower(pid - 1)
+                    }
+                }
+                if (!character) {
+                    return this.updatePlacement2()
+                }
+                var ns
+                var ps
+                var ss = SceneManager._scene._spriteset._characterSprites
+                for (var i = 0; i < ss.length; i++) {
+                    var s = ss[i]
+                    if (s && s._character == character) {
+                        ns = s
+                        break
+                    }
+                }
+                if (!ns) {
+                    return this.updatePlacement2()
+                }
+                var px = ns.x
+                var py = ns.y
+                var pw = ns.patternWidth()
+                var ph = ns.patternHeight()
+
+                var rx = px - pw * 0.5
+                var ry = py - ph * 1
+                var rw = pw
+                var rh = ph
+            }
+            if (SceneManager._scene.constructor === Scene_Battle && SceneManager._sceneStarted) {
+                if (!actor) {
+                    return this.updatePlacement2()
+                }
+
+                var ns
+                var ps
+                var ss = SceneManager._scene._spriteset.battlerSprites()
+                for (var i = 0; i < ss.length; i++) {
+                    var s = ss[i]
+                    if (s && s._battler == actor) {
+                        ns = s
+                        break
+                    }
+                }
+                if (!ns) {
+                    return this.updatePlacement2()
+                }
+                if (ns.constructor == Sprite_Enemy) {
+                    var rx = ns.x
+                    var ry = ns.y
+                    var rw = ns.bitmap.width
+                    var rh = ns.bitmap.height
+                } else if (ns.constructor == Sprite_Actor) {
+                    var px = ns.x
+                    var py = ns.y
+                    var pw = ns._mainSprite.bitmap.width
+                    var ph = ns._mainSprite.bitmap.height
+
+                    var rx = px - pw * 0.5
+                    var ry = py - ph * 1
+                    var rw = pw
+                    var rh = ph
+
+                } else {
+                    var rx = ns.x
+                    var ry = ns.y
+                    var rw = 0
+                    var rh = 0
+                }
+
+            }
+        }
+
+
+        var x = rx + cex * rw - w * wex + wdx
+        var y = ry + cey * rh - h * wey + wdx
+    } else {
+        var x = 0
+        var y = 0
+    }
+    return [x, y]
+}
+
+
+Sprite_Picture.prototype.updatePosition = function () {
+
     var picture = this.picture();
+
+    var bxy = this.updatePlacement(picture)
     var x = picture.x()
     var y = picture.y()
     var ox = 0
@@ -606,18 +816,18 @@ Sprite_Picture.prototype.updatePosition = function() {
     }
     var x = x - (this.parent ? this.parent.width * ox : 0)
     var y = y - (this.parent ? this.parent.height * oy : 0)
-    this.x = Math.floor(x);
-    this.y = Math.floor(y);
+    this.x = Math.floor(bxy[0] + x);
+    this.y = Math.floor(bxy[1] + y);
 };
 
 
 
 
 /**更新原点 */
-Sprite_Picture.prototype.updateOrigin = function() {
+Sprite_Picture.prototype.updateOrigin = function () {
     var picture = this.picture();
     var origin = picture.origin()
-    var t = typeof(origin)
+    var t = typeof (origin)
     if (t == "object") {
 
     } else if (t == "number") {
@@ -654,22 +864,22 @@ Sprite_WindowPicture.prototype = Object.create(Sprite_Picture.prototype);
 /**设置创造者 */
 Sprite_WindowPicture.prototype.constructor = Sprite_WindowPicture;
 
-Sprite_WindowPicture.prototype.initialize = function(pictureId, screen) {
+Sprite_WindowPicture.prototype.initialize = function (pictureId, screen) {
     this.setScreen(screen)
     Sprite_Picture.prototype.initialize.call(this, pictureId);
 
 };
 
-Sprite_WindowPicture.prototype.setScreen = function(screen) {
+Sprite_WindowPicture.prototype.setScreen = function (screen) {
     this._screen = screen
 };
 
 
-Sprite_WindowPicture.prototype.screen = function() {
+Sprite_WindowPicture.prototype.screen = function () {
     return this._screen
 
 };
-Sprite_WindowPicture.prototype.picture = function() {
+Sprite_WindowPicture.prototype.picture = function () {
     return this.screen() && this.screen().picture && this.screen().picture(this._pictureId);
 };
 
@@ -677,12 +887,12 @@ Sprite_WindowPicture.prototype.picture = function() {
 
 
 var Sprite_Character_prototype_update = Sprite_Character.prototype.update
-Sprite_Character.prototype.update = function() {
+Sprite_Character.prototype.update = function () {
     Sprite_Character_prototype_update.call(this)
     this.updatePictures()
 }
 
-Sprite_Character.prototype.updatePictures = function() {
+Sprite_Character.prototype.updatePictures = function () {
     if (this._character) {
         if (!this._pictures) { this._pictures = {} }
         var del = []
@@ -710,8 +920,8 @@ Sprite_Character.prototype.updatePictures = function() {
 
 
 
-Sprite_Character.prototype.sortPicture = function() {
-    this.children.sort(function(a, b) {
+Sprite_Character.prototype.sortPicture = function () {
+    this.children.sort(function (a, b) {
         var az = a._zIndex || 0
         var bz = b._zIndex || 0
         if (az == bz) {
@@ -726,13 +936,13 @@ Sprite_Character.prototype.sortPicture = function() {
 
 
 
-Sprite_Character.prototype.addPicture = function(n) {
+Sprite_Character.prototype.addPicture = function (n) {
     this._pictures[n] = new Sprite_WindowPicture(n, this._character)
     this.addChild(this._pictures[n])
 }
 
 
-Sprite_Character.prototype.delPicture = function(n) {
+Sprite_Character.prototype.delPicture = function (n) {
     this.removeChild(this._pictures[n])
     delete this._pictures[n]
 }

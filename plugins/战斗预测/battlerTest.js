@@ -3,7 +3,9 @@ BattleManager.setupTest = function (troopId) {
     var json = JsonEx.stringify(DataManager.makeSaveContents());
 
     var re = this.battleTest(troopId)
+    this.makeRewards()
 
+ 
     DataManager.extractSaveContents(JsonEx.parse(json));
     return re 
 }
@@ -16,7 +18,8 @@ BattleManager.battleTest = function (troopId) {
     $gameSystem.onBattleStart();
     $gameParty.onBattleStart();
     $gameTroop.onBattleStart();
-    var i = 1000 
+    var i = 1000
+    var t = 1   
     while (true) { 
         if (i-- < 0) { break } 
         $gameParty.members().forEach(function (member) {
@@ -38,6 +41,7 @@ BattleManager.battleTest = function (troopId) {
         }); 
         $gameTroop.makeActions();
         this.makeActionOrders(); 
+        t++
         var subject = this.getNextSubject();
         while (subject) { 
             if (i-- < 0) { break }
@@ -77,11 +81,11 @@ BattleManager.battleTest = function (troopId) {
                     }
 
                     if (this.checkAbort()) {
-                        return 3
+                        return [3,t]
                     } else if ($gameParty.isAllDead()) {
-                        return 1
+                        return [1,t]
                     } else if ($gameTroop.isAllDead()) {
-                         return 2
+                        return [2,t]
                     }
                 }
                 subject.removeCurrentAction();
@@ -99,14 +103,14 @@ BattleManager.battleTest = function (troopId) {
         }
  
         if (this.checkAbort()) {
-            return 3
+            return [3,t]
         } else if ($gameParty.isAllDead()) {
-            return 1
+            return [1,t]
         } else if ($gameTroop.isAllDead()) {
-            return 2
-        } 
+            return [2,t]
+        }
     }
-    return  0 
+    return  [0,t]
 }
  
 
