@@ -35,7 +35,7 @@
  * 当前面有 f/ 时为 图片 ,后面跟 [脸图名,索引]
  * 实例 
  *  
- *  $gameMap.event(1).picture().show('t/[1000,100,"s546tsa156tsfssgdffa asffads \\nat"]',0, 0, 0, 100, 100, 255, 0  )  
+ *  $gameMap.event(1).picture().show('t/1000,100,"s546tsa156tsfssgdffa asffads \\nat"]',0, 0, 0, 100, 100, 255, 0  )  
  *  
  * 
  */
@@ -375,6 +375,13 @@ Game_CharacterBase.prototype.erasePicture = function (pictureId) {
     this._pictures[realPictureId] = null;
 };
 
+
+
+Game_CharacterBase.prototype.eraseAllPicture = function () {
+    this._pictures = {}
+};
+
+
 Game_CharacterBase.prototype.setPositionType = function (pictureId, positionType) {
     var picture = this.picture(pictureId);
     //如果 图片 
@@ -440,7 +447,7 @@ Game_CharacterBase.prototype.pushMethodPicture = function (pictureId) {
     }
 };
 
- 
+
 
 /**
  * 旋转图片到
@@ -894,14 +901,11 @@ Sprite_Character.prototype.update = function () {
 
 Sprite_Character.prototype.updatePictures = function () {
     if (this._character) {
-        if (!this._pictures) { this._pictures = {} }
-        var del = []
-        var ps = this._character._pictures
-        if (ps) {
-            for (var n in ps) {
-                if (!this._pictures[n]) {
-                    this.addPicture(n)
-                }
+        if (!this._pictures) { this._pictures = {} } 
+        var ps = this._character._pictures || {} 
+        for (var n in ps) {
+            if (!this._pictures[n]) {
+                this.addPicture(n)
             }
         }
         var ps2 = this._pictures
@@ -946,3 +950,45 @@ Sprite_Character.prototype.delPicture = function (n) {
     this.removeChild(this._pictures[n])
     delete this._pictures[n]
 }
+
+
+
+function Sprite_MorePicture() {
+    this.initialize.apply(this, arguments);
+}
+
+
+/**设置原形  */
+Sprite_MorePicture.prototype = Object.create(Sprite_Character.prototype);
+/**设置创造者 */
+Sprite_MorePicture.prototype.constructor = Sprite_MorePicture;
+Sprite_MorePicture.prototype.updatePosition =  function(){ 
+};
+
+
+
+
+
+Game_Screen.prototype.morePictures = function () {
+    if (!this._morePictures) {
+        this._morePictures = new Game_CharacterBase()
+    }
+    return this._morePictures
+};
+
+
+
+Spriteset_Base.prototype.createUpperLayer = function() {
+    this.createMorePictures()
+
+    this.createPictures();
+    this.createTimer();
+    this.createScreenSprites();
+};
+
+Spriteset_Base.prototype.createMorePictures = function () { 
+    this._morePictures = new Sprite_MorePicture($gameScreen.morePictures())
+    this.addChild(this._morePictures);
+
+};
+  
