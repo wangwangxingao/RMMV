@@ -13,30 +13,62 @@
  * 
  * 
  * @help
+ *   
  * 
- * 获取插件数据
- * 获取人物/事件的picture  
- * 获取事件(1号) : 
- * $gameMap.event(1).picture() 
- * 控制人物的
- * $gamePlayer.picture()
- * 跟随人物的
- * $gamePlayer.followers().follower(1).picture()
+ * 对于人物/事件/场景增加图片组
+ * 
+ * 如 $gamePlayer ,$gameMap.event(1),  $gameScreen.morePictures()
+ * 显示图片
+ * .showPicture(pictureId, name, origin, x, y, scaleX, scaleY, opacity, blendMode) 
+ * 移动图片
+ * .movePicture (pictureId, origin, x, y, scaleX,scaleY, opacity, blendMode, duration)
+ * 着色图片
+ * .tintPicture  (pictureId, tone, duration)
+ * 抹去图片
+ * .erasePicture  (pictureId)
+ * 抹去所有图片
+ * .eraseAllPicture()
+ * 设置图片位置种类
+ * .setPicturePositionType (pictureId, positionType)
+ *      positionType 为数组 ,[type,id,pw,ph,tw,th,dx,dy]
+ *      type 种类,4 为pid
+ *      id   type为4时 为pid的精灵 
+ *      pw   位于以上确定精灵的宽的比例
+ *      ph   位于以上确定精灵的高的比例 
+ *      tw   位于本精灵的宽的比例
+ *      th   位于本精灵的高的比例
+ *      dx   偏移x 
+ *      dy   偏移y
+ *      最终位置为(type ,id 确定的精灵为p)
+ *       x = p的x + pw * p的宽 - 本精灵的宽 * tw + dx
+ *       y = p的y + ph * p的高 - 本精灵的高 * th + dy
  * 
  * 
- * 图片显示
- * picture.show(name, origin, x, y, scaleX, scaleY, opacity, blendMode)  
- * picture.move(origin, x, y, scaleX, scaleY,opacity, blendMode, duration) 
- * picture.rotate(speed)
- * picture.tint(tone, duration)  
- * picture.erase()
+ * 设置图片方法组
+ * .setPictureMethod(pictureId, list,re)
+ *  list为数组 
+ *  [{name:方法名,params:[参数,参数,参数]},{name:方法名,params:[参数,参数,参数]}]
+ *  如 
+ * 让1号图片在 0 ,100 到 100 , 100 之间来回移动
+ * .setPictureMethod(1, [{name:"move",params:[0,0 , 100,100,100,255,0,100]},{name:"movePicture",params:[0,100,100,100,100,255,0,100]}],true)
+ * 让1号图片在 0 ,100 到 100 , 100 之间来回移动
  * 
- * 当 前面有 t/ 时 为绘制文字 ,后面跟 [长,宽,文字]
- * 当前面有 f/ 时为 图片 ,后面跟 [脸图名,索引]
- * 实例 
- *  
- *  $gameMap.event(1).picture().show('t/1000,100,"s546tsa156tsfssgdffa asffads \\nat"]',0, 0, 0, 100, 100, 255, 0  )  
- *  
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 当name中 前面有 t/ 时 为绘制文字 ,后面跟 [长,宽,文字]
+ * 当name中 前面有 t/ 时 为绘制窗口 ,后面跟[ 长,宽,文字]
+ * 当name中 前面有 f/ 时为 图片 ,后面跟 [脸图名,索引]
+ * 
+ * 
+ * 范例
+ * s = $gameScreen.morePictures()
+ * s.showPicture(1,'t/[100,100,"test"]',0,0,0,100,100,255,0)
+ * s.setPicturePositionType(1,[4,3,0.5,1,0.5,1])
  * 
  */
 
@@ -52,7 +84,7 @@ Game_Picture.prototype.update = function () {
     this.updateNext()
 };
 
-
+/**更新下一个 */
 Game_Picture.prototype.updateNext = function () {
     if (this._duration <= 0 && this._toneDuration <= 0 && this._rotationDuration <= 0) {
         //console.log("next")
@@ -61,7 +93,7 @@ Game_Picture.prototype.updateNext = function () {
 };
 
 
-
+/**下一个方法 */
 Game_Picture.prototype.nextMethod = function () {
     if (this._methods) {
         var method = this._methods[this._methodsIndex];
@@ -77,17 +109,18 @@ Game_Picture.prototype.nextMethod = function () {
     }
 };
 
+/**设置位置种类 */
 Game_Picture.prototype.positionType = function () {
     return this._positionType
 };
 
-
+/**设置位置种类 */
 Game_Picture.prototype.setPositionType = function (positionType) {
     this._positionType = positionType
 };
 
 
-
+/**移动到 */
 Game_Picture.prototype.move = function (origin, x, y, scaleX, scaleY,
     opacity, blendMode, duration) {
 
@@ -178,15 +211,7 @@ Game_Picture.prototype.setOrigin = function (origin) {
 
 
 
-/**
- * 设置原点
- * @param {number|[number,number]|{x:number,y:number}}origin 原点
- * 
- */
-Game_Picture.prototype.setParentOrigin = function (origin) {
-    this._parentOrigin = origin
-};
-
+ 
 
 
 /**
@@ -220,6 +245,12 @@ Game_Picture.prototype.setMethodRe = function (re) {
     this._methodsre = re
 };
 
+
+/**
+ * 添加方法
+ * @param {string} methodName
+ * @param {} params
+ */
 Game_Picture.prototype.pushMethod = function (methodName) {
     if (!this._methods) { this.setMethod() }
     //方法参数 = 数组 切割 呼叫 (参数,1)
@@ -279,12 +310,7 @@ Game_CharacterBase.prototype.updatePictures = function () {
                 picture.update();
             }
         }
-        /*  //图片组 对每一个 (方法 图片)
-                this._pictures.forEach(function(picture) {  //如果 图片 
-                    if (picture) {  //图片 更新
-                        picture.update();
-                    }
-                });*/
+    
     }
 };
 
@@ -370,19 +396,23 @@ Game_CharacterBase.prototype.tintPicture = function (pictureId, tone, duration) 
  * */
 Game_CharacterBase.prototype.erasePicture = function (pictureId) {
     //真实图片id = 真实图片id(图片id)
-    var realPictureId = this.picture(pictureId)
+    //var realPictureId = this.picture(pictureId)
     //图片组[真实图片id] = null
-    this._pictures[realPictureId] = null;
+    this._pictures[pictureId] = null;
 };
 
 
-
+/**消失所有图片 */
 Game_CharacterBase.prototype.eraseAllPicture = function () {
     this._pictures = {}
 };
 
-
-Game_CharacterBase.prototype.setPositionType = function (pictureId, positionType) {
+/**
+ * 设置图片位置
+ * @param {number} pictureId 图片id
+ * @param {[type,id,pw,ph,tw,th,dx,dy]} positionType
+ */
+Game_CharacterBase.prototype.setPicturePositionType = function (pictureId, positionType) {
     var picture = this.picture(pictureId);
     //如果 图片 
     if (picture) {
@@ -392,15 +422,10 @@ Game_CharacterBase.prototype.setPositionType = function (pictureId, positionType
 };
 
 
-Game_CharacterBase.prototype.setPictureParentOrigin = function (pictureId, origin) {
-    var picture = this.picture(pictureId);
-    if (picture) {
-        picture.setParentOrigin(origin);
-    }
-};
+ 
 
 /**
- * 设置图片
+ * 设置图片原点
  * 
  * @param {number} pictureId 图片id
  * @param {number|[number,number]|{x:number,y:number}}origin 原点
@@ -414,8 +439,8 @@ Game_CharacterBase.prototype.setPictureOrigin = function (pictureId, origin) {
 };
 
 
-
-Game_CharacterBase.prototype.setMethodPicture = function (pictureId, list, re) {
+/**设置方法 */
+Game_CharacterBase.prototype.setPictureMethod  = function (pictureId, list, re) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setMethod(list, re);
@@ -423,14 +448,17 @@ Game_CharacterBase.prototype.setMethodPicture = function (pictureId, list, re) {
 };
 
 
-Game_CharacterBase.prototype.setMethodRePicture = function (pictureId, re) {
+
+/**设置图片方法循环*/
+Game_CharacterBase.prototype.setPictureMethodRe  = function (pictureId, re) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setMethodRe(re);
     }
 };
 
-Game_CharacterBase.prototype.setMethodIndexPicture = function (pictureId, index) {
+/**设置图片方法索引 */
+Game_CharacterBase.prototype.setPictureMethodIndex = function (pictureId, index) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setMethodIndex(index);
@@ -438,8 +466,12 @@ Game_CharacterBase.prototype.setMethodIndexPicture = function (pictureId, index)
 };
 
 
-
-Game_CharacterBase.prototype.pushMethodPicture = function (pictureId) {
+/**添加图片方法
+ * @param {number} pictureId
+ * @param {[]} methodArgs
+ * 
+ */
+Game_CharacterBase.prototype.pushPictureMethod = function (pictureId) {
     var picture = this.picture(pictureId);
     if (picture) {
         var methodArgs = Array.prototype.slice.call(arguments, 1);
@@ -468,8 +500,9 @@ Game_Screen.prototype.rotatePictureTo = function (pictureId, rotation, duration)
     }
 };
 
-Game_Screen.prototype.setPositionType = function (pictureId, positionType) {
 
+/**设置图片位置种类 */
+Game_Screen.prototype.setPicturePositionType = function (pictureId, positionType) {
     var picture = this.picture(pictureId);
     //如果 图片 
     if (picture) {
@@ -480,13 +513,7 @@ Game_Screen.prototype.setPositionType = function (pictureId, positionType) {
 
 
 
-Game_Screen.prototype.setPictureParentOrigin = function (pictureId, origin) {
-    var picture = this.picture(pictureId);
-    if (picture) {
-        picture.setParentOrigin(origin);
-    }
-};
-
+ 
 /**
  * 设置图片
  * 
@@ -504,7 +531,7 @@ Game_Screen.prototype.setPictureOrigin = function (pictureId, origin) {
 
 
 
-Game_Screen.prototype.setMethodPicture = function (pictureId, list, re) {
+Game_Screen.prototype.setPictureMethod = function (pictureId, list, re) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setMethod(list, re);
@@ -512,14 +539,14 @@ Game_Screen.prototype.setMethodPicture = function (pictureId, list, re) {
 };
 
 
-Game_Screen.prototype.setMethodRePicture = function (pictureId, re) {
+Game_Screen.prototype.setPictureMethodRe = function (pictureId, re) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setMethodRe(re);
     }
 };
 
-Game_Screen.prototype.setMethodIndexPicture = function (pictureId, index) {
+Game_Screen.prototype.setPictureMethodIndex = function (pictureId, index) {
     var picture = this.picture(pictureId);
     if (picture) {
         picture.setMethodIndex(index);
@@ -528,7 +555,7 @@ Game_Screen.prototype.setMethodIndexPicture = function (pictureId, index) {
 
 
 
-Game_Screen.prototype.pushMethodPicture = function (pictureId) {
+Game_Screen.prototype.pushPictureMethod = function (pictureId) {
     var picture = this.picture(pictureId);
     if (picture) {
         var methodArgs = Array.prototype.slice.call(arguments, 1);
@@ -616,12 +643,14 @@ Sprite_Picture.prototype.loadBitmap = function () {
     }
 }
 
-Sprite_Picture.prototype.updatePlacement2 = function () {
+Sprite_Picture.prototype.getPosition2 = function () {
     this.visible = false
     return [0, 0]
 }
 
-Sprite_Picture.prototype.updatePlacement = function (picture) {
+
+/**获取图片位置 */
+Sprite_Picture.prototype.getPosition = function (picture) {
 
     var postype = picture.positionType();
 
@@ -632,8 +661,8 @@ Sprite_Picture.prototype.updatePlacement = function (picture) {
     var y = 0
 
     if (typeof (postype) == "number") {
-        var y = postype * (Graphics.boxHeight - h) / 2;
-        var x = (Graphics.boxWidth - w) / 2;
+        var y = Math.floor(postype / 3) * (Graphics.boxHeight - h) / 2;
+        var x = (postype % 3) * (Graphics.boxWidth - w) / 2;
     } else if (Array.isArray(postype)) {
         var types = postype
         var type = (types[0] || 0) * 1
@@ -649,7 +678,12 @@ Sprite_Picture.prototype.updatePlacement = function (picture) {
         var ry = 0
         var rw = 1
         var rh = 1
-        if (type == 8) {
+        if(type == 0){
+            var rx = 0
+            var ry = 0
+            var rw =  this.parent ? this.parent.width   : 0 
+            var rh =  this.parent ? this.parent.height  : 0 
+        }else if (type == 8) {
             if (id == 4) {
                 var rx = 0
                 var ry = 0
@@ -709,25 +743,25 @@ Sprite_Picture.prototype.updatePlacement = function (picture) {
             if (SceneManager._scene.constructor === Scene_Map && SceneManager._sceneStarted) {
                 if (type == 5 || type == 6 || type == 7) {
                     if (!actor) {
-                        return this.updatePlacement2()
+                        return this.getPosition2()
                     }
-                    var pid = -1
+                    var fid = -1
                     var l = $gameParty.members()
                     for (var i = 0; i < l.length; i++) {
                         if (l[i] == actor) {
-                            pid = i
+                            fid = i
                         }
                     }
-                    if (pid == -1) {
+                    if (fid == -1) {
 
-                    } else if (pid == 0) {
+                    } else if (fid == 0) {
                         character = $gamePlayer
                     } else {
-                        character = $gamePlayer.followers().follower(pid - 1)
+                        character = $gamePlayer.followers().follower(fid - 1)
                     }
                 }
                 if (!character) {
-                    return this.updatePlacement2()
+                    return this.getPosition2()
                 }
                 var ns
                 var ps
@@ -740,7 +774,7 @@ Sprite_Picture.prototype.updatePlacement = function (picture) {
                     }
                 }
                 if (!ns) {
-                    return this.updatePlacement2()
+                    return this.getPosition2()
                 }
                 var px = ns.x
                 var py = ns.y
@@ -754,7 +788,7 @@ Sprite_Picture.prototype.updatePlacement = function (picture) {
             }
             if (SceneManager._scene.constructor === Scene_Battle && SceneManager._sceneStarted) {
                 if (!actor) {
-                    return this.updatePlacement2()
+                    return this.getPosition2()
                 }
 
                 var ns
@@ -768,7 +802,7 @@ Sprite_Picture.prototype.updatePlacement = function (picture) {
                     }
                 }
                 if (!ns) {
-                    return this.updatePlacement2()
+                    return this.getPosition2()
                 }
                 if (ns.constructor == Sprite_Enemy) {
                     var rx = ns.x
@@ -809,20 +843,10 @@ Sprite_Picture.prototype.updatePlacement = function (picture) {
 
 Sprite_Picture.prototype.updatePosition = function () {
 
-    var picture = this.picture();
-
-    var bxy = this.updatePlacement(picture)
+    var picture = this.picture(); 
+    var bxy = this.getPosition(picture)
     var x = picture.x()
-    var y = picture.y()
-    var ox = 0
-    var oy = 0
-    var po = picture._parentOrigin
-    if (po) {
-        var ox = po[0]
-        var oy = po[1]
-    }
-    var x = x - (this.parent ? this.parent.width * ox : 0)
-    var y = y - (this.parent ? this.parent.height * oy : 0)
+    var y = picture.y() 
     this.x = Math.floor(bxy[0] + x);
     this.y = Math.floor(bxy[1] + y);
 };

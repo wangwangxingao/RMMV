@@ -111,7 +111,6 @@
  */
 
 
-var mapvar = mapvar || null
 
 Window_Base.deepCopy = function(that) {
     var obj
@@ -184,6 +183,13 @@ Window_Base.prototype.standardOutlineWidth = function() {
 
     return 4;
 };
+
+
+Window_Base.prototype.standardBS= function() { 
+    return true;
+};
+
+ 
 /**还原 */
 Window_Base.prototype.resetFontSettings = function() {
     this.contents.fontItalic = this.standardFontItalic()
@@ -192,6 +198,9 @@ Window_Base.prototype.resetFontSettings = function() {
     this.contents.fontSize = this.standardFontSize();
     this.contents.outlineColor = this.standardOutlineColor();
     this.contents.outlineWidth = this.standardOutlineWidth();
+
+    this._windowSpriteContainer.visible = this.standardBS()   
+    
     this.fontSettings(1)
     this.resetTextColor();
     this.reHjg()
@@ -1715,11 +1724,8 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
 Window_Message.prototype.updatePlacement2 = function() {
     var y = 2 * (Graphics.boxHeight - this.height) / 2;
 
-    if (mapvar && !mapvar.value("cblopen")) {
-        var x = (Graphics.boxWidth - this.width) / 2;
-    } else {
-        var x = this.windowX()
-    }
+    var x = (Graphics.boxWidth - this.width) / 2;
+    
     var w = this.windowWidth()
     var h = this.windowHeight()
     this.move(x, y, w, h);
@@ -1779,11 +1785,7 @@ Window_Message.prototype.updatePlacement = function() {
 
     if (typeof(postype) == "number") {
         var y = postype * (Graphics.boxHeight - h) / 2;
-        if (mapvar && !mapvar.value("cblopen")) {
-            var x = (Graphics.boxWidth - w) / 2;
-        } else {
-            var x = this.windowX()
-        } 
+        var x = (Graphics.boxWidth - w) / 2;
     } else if (Array.isArray(postype)) {
         var types = postype
         var type = (types[0] || 0) * 1
@@ -1829,12 +1831,6 @@ Window_Message.prototype.updatePlacement = function() {
                 var ry = 0
                 var rw = SceneManager._screenWidth
                 var rh = SceneManager._screenHeight
-                if (mapvar && !mapvar.value("cblopen")) {
-                    var rx = 0;
-                } else {
-                    var rx = this.windowX()
-                    var rw = rw - rx
-                }
             }
         } else {
 
@@ -1997,14 +1993,11 @@ Window_Message.prototype.updatePlacement = function() {
     var sw = SceneManager._screenWidth
     var sh = SceneManager._screenHeight
 
-    if (mapvar && mapvar.value("cblopen")) {
-        var l = this.windowX()
-    }
 
-    if (SceneManager._scene.constructor === Scene_Battle) {
+    /*if (SceneManager._scene.constructor === Scene_Battle) {
         var u = 20
         var d = 20
-    }
+    }*/
 
     var zx = u
     var zy = l
@@ -2191,10 +2184,6 @@ Window_Message.prototype.windowWidth = function() {
     return 908
 };
 
-/**窗口x */
-Window_Message.prototype.windowX = function() {
-    return 242
-};
 
 
 
