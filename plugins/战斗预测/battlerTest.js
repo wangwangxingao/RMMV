@@ -12,8 +12,7 @@
  *  
  * 
  * @help 
- * 自动战斗模拟并返回结果 6 为失败,1-5为成功且分级
- * BattleManager.autoBattle(敌群id,是否先回复) 
+ *   
  * 
  * */
 Game_Battler.prototype.escape = function () {
@@ -28,40 +27,71 @@ Game_Battler.prototype.escape = function () {
 
 
 /**
- * 恢复的战斗测试
- *
- * @param {number} troopId  敌群id
- * @param {boolean} hf 恢复本
- * 
+ * 战斗测试
+ * @param {number} troopId  敌群id 
+ * @param {boolean} starthf 开始前恢复全体
+ * @param {boolean} endtrue 把这个结果作为真实结果,会死亡 
+ * @param {boolean} get 获得战利品
+ * @param {boolean} dis 获得战利品显示
+ * @param {boolean} re 直接设置结果 
+ * @returns {[number,number]} 返回结果为数组,第一个值为2时为胜利,第二个值为回合
+ *  
  */
 
-
-BattleManager.saveBattleTest = function (troopId, hf) {
-
-    var json = JsonEx.stringify(DataManager.makeSaveContents());
-
-    var re = this.battleTest(troopId, hf)
-    //this.makeRewards()
-    DataManager.extractSaveContents(JsonEx.parse(json));
+BattleManager.battleTest = function (troopId, starthf, endtrue, get, dis, re) {
+    if (!endtrue) {
+        //保存数据
+        var json = JsonEx.stringify(DataManager.makeSaveContents());
+    }
+    var re = re || this.battleTest(troopId, starthf)
+    if (endtrue) {
+        if (re[0] == 2) {
+            BattleManager.getBattleRewards(get, dis)
+        }
+    } else {
+        //恢复数据
+        DataManager.extractSaveContents(JsonEx.parse(json));
+    }
     return re
 }
+
+
+
 /**
- * 
+ * 战斗测试
+ * @param {number} troopId  敌群id 
+ * @param {boolean} starthf 开始前恢复全体
+ * @param {boolean} endtrue 把这个结果作为真实结果,会死亡 
+ * @param {boolean} get 获得战利品
+ * @param {boolean} dis 获得战利品显示
+ * @param {boolean} re 直接设置结果 
+ * @returns {boolean} 返回胜利或者失败
+ *  
+ */
+
+BattleManager.battleTestRe = function (troopId, starthf, endtrue, get, dis, re) {
+    var re =  BattleManager.battleTest(troopId, starthf, endtrue, get, dis, re)
+    return re[0] == 2 
+}
+
+
+/**
+ * 获取10次战斗中获胜的次数
  * @param {number} troopId  敌群id
- * @param {boolean} hf 恢复
+ * @param {boolean} starthf 开始前恢复全体
  * 
  */
 
-BattleManager.getTestPer = function (troopId, hf) {
+BattleManager.getBattleTestPer = function (troopId, starthf) {
     var n = 0
     var i = 10
     while (i--) {
-        var re = this.saveBattleTest(troopId, hf)
+        var re = this.battleTest(troopId, starthf)
         if (re[0] == 2) {
             n++
         }
     }
-    return "" + n * 10 + "%"
+    return n
 }
 
 
@@ -75,24 +105,19 @@ BattleManager.battleTestEnd = function () {
 /**
  * 
  * @param {number} troopId  敌群id
- * @param {boolean} hf 恢复
- * 
+ * @param {boolean} starthf 开始前恢复全体
  * 
  */
 
-
-BattleManager.battleTest = function (troopId, hf) {
+BattleManager.doBattleTest = function (troopId, starthf) {
     BattleManager._testBattle = true
     this.initMembers();
     $gameTroop.setup(troopId);
     //$gameSystem.onBattleStart();
     $gameParty.onBattleStart();
     $gameTroop.onBattleStart();
-    if (hf) {
-        $gameParty.members().forEach(function (actor) {
-            actor.recoverAll();
-        });
-    }
+    starthf && $gameParty.members().forEach(function (actor) { actor.recoverAll(); });
+
     var i = 1000
     var t = 1
     while (true) {
@@ -207,102 +232,18 @@ BattleManager.battleTest = function (troopId, hf) {
 
 
 /**
- * 
- * @param {number} troopId  敌群id
- * @param {boolean} hf 恢复
+ * 获得战利品
  * 
  */
-
-BattleManager.autoBattle = function (troopId, hf) {
-    //var json = JsonEx.stringify(DataManager.makeSaveContents());
-
-    var re = this.battleTest(troopId, hf)
-    var v = 6
-    if (re[0] == 2) {
-        var t = re[1]
-        if (t < 2) {
-            v = 1
-        } else if (t < 4) {
-            v = 2
-        } else if (t < 6) {
-            v = 3
-        } else if (t < 9) {
-            v = 4
-        } else {
-            v = 5
-        }
-
+BattleManager.getBattleRewards = function (get, dis) {
+    if (get) {
         BattleManager.makeRewards()
         BattleManager.gainRewards()
-        if (this._rewards && this._rewards.itemHash) {
-            var l = []
-            for (var i in this._rewards.itemHash) {
-                var list = this._rewards.itemHash[i]
-                var name = list[0].name
-                var num = list[1]
-                var it = name + "x" + num
-                
-                l.push(it)
-            }
-            ww.pushMessage.list = l
-        }
-    } else {
-        $gameParty.reviveBattleMembers()
+        dis && BattleManager.displayRewards()
     }
-    $gameParty.onBattleEnd()
-    ww.pushMessage.re = v
-
-
-
-    $gameMessage.pushMessage2() 
- 
-
-    return v
+    return true
 }
 
 
 
 
-
-
-Game_Party.prototype.gainRandomItem = function (type, id, min, max, includeEquip) {
-
-    var num = max - min
-    var amount = min + Math.randomInt(num)
-
-    /** */
-
-    if (type) {
-        var item = null
-        if (type == 1) {
-            var item = $dataItems[id];
-        } else if (type == 2) {
-            var item = $dataWeapons[id];
-        } else if (type == 3) {
-            var item = $dataArmors[id];
-        }
-        if (item && amount) {
-            var it = item.name + "x" + amount
-            ww.pushMessage.list = ww.pushMessage.list || []
-            ww.pushMessage.list.push(it)
-            this.gainItem(item, amount, includeEquip)
-        }
-    } else {
-        if (amount) {
-
-            var it = TextManager.obtainGold.format(amount)
-            ww.pushMessage.list = ww.pushMessage.list || []
-            ww.pushMessage.list.push(it)
-            this.gainGold(amount)
-
-
-        }
-
-
-    }
-
-
-    $gameMessage.pushMessage2() 
-     
-
-};
