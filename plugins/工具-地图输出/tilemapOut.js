@@ -14,9 +14,10 @@
  * 
  * @help
  *   
- * ww.tilemapOut(地图id , 最大宽,最大高)
+ * ww.tilemapOut(地图id , 最大宽(单位:图块),最大高(单位:图块),x缩放比例 ,y缩放比例 )
  * 地图id 为0 时 为 输出所有
  * 最大宽高 为0 时 为 地图的宽或高
+ * 缩放比例为 0 时默认为 1 
  * 只绘制地图部分
  * 
  * 
@@ -26,16 +27,17 @@
 
 
 var ww = ww || {}
-ww.tilemapOut = function (mapId, tx, ty) {
-
+ww.tilemapOut = function (mapId, tx, ty, sx, sy) {
+    var sx = sx||1
+    var sy = sy||1 
     if (mapId) {
-        ww.tilemapOut.loadMap(mapId, tx, ty)
+        ww.tilemapOut.loadMap(mapId, tx, ty, sx, sy)
     } else {
 
         for (var i = 0; i < $dataMapInfos.length; i++) {
             var info = $dataMapInfos[i]
             if (info) {
-                ww.tilemapOut.loadMap(info.id, tx, ty)
+                ww.tilemapOut.loadMap(info.id, tx, ty, sx, sy)
             }
         }
     }
@@ -45,11 +47,11 @@ ww.tilemapOut._tileMaps = {}
 ww.tilemapOut._dataMaps = {}
 ww.tilemapOut._event = {}
 
-ww.tilemapOut.loadMap = function (mapId, tx, ty) {
+ww.tilemapOut.loadMap = function (mapId, tx, ty, sx, sy) {
     if (mapId > 0 && $dataMapInfos && $dataMapInfos[mapId]) {
 
         if (ww.tilemapOut._dataMaps[mapId]) {
-            ww.tilemapOut.onLoad(mapId, tx, ty)
+            ww.tilemapOut.onLoad(mapId, tx, ty, sx, sy)
         } else {
             var filename = 'Map%1.json'.format(mapId.padZero(3));
             var xhr = new XMLHttpRequest();
@@ -59,7 +61,7 @@ ww.tilemapOut.loadMap = function (mapId, tx, ty) {
             xhr.onload = function () {
                 if (xhr.status < 400) {
                     ww.tilemapOut._dataMaps[mapId] = JSON.parse(xhr.responseText);
-                    ww.tilemapOut.onLoad(mapId, tx, ty)
+                    ww.tilemapOut.onLoad(mapId, tx, ty, sx, sy)
                 }
             };
             xhr.send();
@@ -67,7 +69,7 @@ ww.tilemapOut.loadMap = function (mapId, tx, ty) {
     }
 }
 
-ww.tilemapOut.onLoad = function (mapId, tx, ty) {
+ww.tilemapOut.onLoad = function (mapId, tx, ty, sx, sy) {
     var gmap = ww.tilemapOut._dataMaps[mapId]
 
     if (gmap) {
@@ -100,7 +102,7 @@ ww.tilemapOut.onLoad = function (mapId, tx, ty) {
             this._tileMaps[mapId] = tilemap
         }
 
-        this._event[mapId] = [tx, ty]
+        this._event[mapId] = [tx, ty, sx, sy]
         !this._wait && ww.tilemapOut.waitRead()
     }
 
@@ -114,9 +116,11 @@ ww.tilemapOut.waitRead = function () {
         var tilemap = this._tileMaps[i]
         var tx = l[0]
         var ty = l[1]
+        var sx = l[2]
+        var sy = l[3]
         if (tilemap.isReady()) {
             tilemap.update()
-            tilemap._paintAllTiles2(i, tx, ty)
+            tilemap._paintAllTiles2(i, tx, ty, sx, sy)
             delete this._event[i]
         } else {
             this._wait = true
@@ -130,7 +134,7 @@ ww.tilemapOut.waitRead = function () {
 
 
 
-Tilemap.prototype._paintAllTiles2 = function (mapId, tx, ty) {
+Tilemap.prototype._paintAllTiles2 = function (mapId, tx, ty, sx, sy) {
     var width = this._mapWidth
     var height = this._mapHeight
     var tileCols = tx || width;
@@ -146,24 +150,42 @@ Tilemap.prototype._paintAllTiles2 = function (mapId, tx, ty) {
             h = tileRows < h ? tileRows : h
 
 
-            var bitmap = new Bitmap(w * this._tileWidth, h * this._tileHeight)
+            var bitmap0 = new Bitmap(w * this._tileWidth, h * this._tileHeight)
             for (var y = 0; y <= h; y++) {
                 for (var x = 0; x < w; x++) {
-                    this._paintTiles2(bitmap, startX, startY, x, y);
+                    this._paintTiles2(bitmap0, startX, startY, x, y);
                 }
+            }
+
+
+            if (sx == 1 && sy == 1) {
+                var bitmap = bitmap0
+                var sxy = ""
+
+
+            } else {
+
+                var w1 = bitmap0.width
+                var h1 = bitmap0.height
+                var w2 = w1 * sx
+                var h2 = h1 * sy
+
+                var bitmap = new Bitmap(w2, h2)
+                bitmap.blt(bitmap0, 0, 0, w1, h1, 0, 0, w2, h2)
+                var sxy = "," + sx +"x"+sy
             }
             bitmaps[mx + "," + my] = bitmap
 
             var name = $dataMapInfos[mapId].name
             if (tileCols == width && tileRows == height) {
-                var big = "" 
-                var index = "" 
+                var big = ""
+                var index = ""
             } else {
                 var big = "," + tileCols + "x" + tileRows + ""
-                var index ="," +  mx + "-" + my
+                var index = "," + mx + "-" + my
             }
 
-            ww.tilemapOut.savePng(bitmap, mapId + "," + name + big + index + ".png", "tilemapOut/")
+            ww.tilemapOut.savePng(bitmap, mapId + "," + name + big +sxy + index + ".png", "tilemapOut/")
         }
     }
     console.log(mapId, bitmaps)
