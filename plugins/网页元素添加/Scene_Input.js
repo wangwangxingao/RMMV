@@ -14,7 +14,7 @@
  * 事件脚本或脚本中使用
  * SceneManager.push(Scene_Input)
  * 进入输入场景
- */ 
+ */
 
 function Scene_Input() {
     this.initialize.apply(this, arguments);
@@ -28,24 +28,29 @@ Scene_Input.prototype.constructor = Scene_Input;
 Scene_Input.prototype.initialize = function () {
     Scene_Base.prototype.initialize.call(this);
     this._set = {
-        "okp": ["ok", 200, 400],
-        "nop": ["no", 300, 400],
-        "input": [["name", "input", {
-            "type": "text",
-            "sz": { "x": 200, "y": 250, "width": 200, "height": 40, "fontSize": 35 }
-        }], ["pass", "input", {
-            "type": "password",
-            "sz": { "x": 200, "y": 300, "width": 200, "height": 40, "fontSize": 35 }
-        }], ["pass1", "input", {
-            "type": "password",
-            "sz": { "x": 200, "y": 350, "width": 200, "height": 40, "fontSize": 35 }
-        }]
-        ]
+        "imgInput": {
+           "ok": ["ok", 200, 400],
+           "no": ["no", 300, 400],
+        },
+        "input": {
+            "yzm": [
+                "input",
+                {
+                    "type": "text",
+                    "sz": { "x": 200, "y": 300, "width": 200, "height": 35, "fontSize": 20 }
+                }
+            ], "sjh": [
+                "input", {
+                    "type": "tel",
+                    "sz": { "x": 200, "y": 250, "width": 300, "height": 35, "fontSize": 20 }
+                }
+            ] 
+        }
     }
 };
 //准备
 Scene_Input.prototype.prepare = function (set) {
-    this._set = set ||  this._set
+    this._set = set || this._set
 };
 
 
@@ -55,7 +60,6 @@ Scene_Input.prototype.create = function () {
     Scene_Base.prototype.create.call(this);
     this.createBackground()
     this.createInputs()
-
     this.createButton()
 };
 
@@ -71,14 +75,16 @@ Scene_Input.prototype.createBackground = function () {
 };
 
 Scene_Input.prototype.createInputs = function () {
-    console.log(this._set, this)
+    //console.log(this._set, this)
     this._inputs = {}
     if (this._set && this._set.input) {
         var h = this._set.input
-        for (var i = 0; i < h.length; i++) {
-            var l = h[i]
-            if (Array.isArray) {
-                this._inputs[l[0]] = Graphics._createElement.apply(Graphics, l)
+        for (var id  in  h ) {
+            var l = h[id]
+            if (Array.isArray(l)) {
+                var input = Graphics._createElement.call(Graphics,id, l[0],l[1],l[2])
+                input.onclick = this.callHandler.bind(this,id)
+                this._inputs[id] = input 
             }
         }
     }
@@ -86,24 +92,21 @@ Scene_Input.prototype.createInputs = function () {
 
 
 Scene_Input.prototype.createButton = function () {
-    this._okSprite = new Sprite()
-
-    if (this._set && this._set.okp) {
-        var h = this._set.okp
-        this._okSprite.bitmap = ImageManager.loadPicture(h[0]);
-        this._okSprite.x = h[1]
-        this._okSprite.y = h[2]
+    this._imgList = {}
+    if (this._set && this._set.imgInput) {
+        for (var i in this._set.imgInput) {
+            var h = this._set.imgInput[i]
+            if (h) {
+                var s = new Sprite()
+                s.bitmap = ImageManager.loadPicture(h[0]);
+                s.x = h[1]
+                s.y = h[2]
+                s._inputId = i
+                this.addChild(s)
+                this._imgList[i] = s
+            }
+        }
     }
-    this._noSprite = new Sprite()
-
-    if (this._set && this._set.nop) {
-        var h = this._set.nop
-        this._noSprite.bitmap = ImageManager.loadPicture(h[0]);
-        this._noSprite.x = h[1]
-        this._noSprite.y = h[2]
-    }
-    this.addChild(this._okSprite)
-    this.addChild(this._noSprite)
 };
 
 
@@ -114,7 +117,6 @@ Scene_Input.prototype.start = function () {
 
 
 //输入初始化 
-
 Scene_Input.prototype.trim = function (s) {
     return s.replace(/(^\s*)|(\s*$)/g, "");
 }
@@ -128,46 +130,27 @@ Scene_Input.prototype.rtrim = function (s) {
 
 Scene_Input.prototype.update = function () {
     Scene_Base.prototype.update.call(this)
-
     this.updateInput()
     this.updateTouchInput()
 };
 
-
-
 Scene_Input.prototype.updateInput = function () {
     if (Input.isTriggered("ok")) {
-        this.onInputOk()
+        this.callHandler("ok")
     } else if (Input.isTriggered("escape")) {
-        this.onInputNo()
+        this.callHandler("no") 
     }
 };
-
-
 
 Scene_Input.prototype.updateTouchInput = function () {
-    if(TouchInput.isTriggered()){
-        if (this.isButtonTouched(this._okSprite)) {
-            this.onInputOk()
-        } else if (this.isButtonTouched(this._noSprite)) {
-            this.onInputNo()
-        } 
+    if (TouchInput.isTriggered()) {
+        for (var i in this._imgList) {
+            if (this.isButtonTouched(this._imgList[i])) {
+                this.callHandler(i)
+            }
+        }
     }
-
 };
-
-
-
-Scene_Input.prototype.trim = function (s) {
-    return ("" + s).replace(/(^\s*)|(\s*$)/g, "");
-}
-Scene_Input.prototype.ltrim = function (s) {
-    return ("" + s).replace(/(^\s*)/g, "");
-}
-Scene_Input.prototype.rtrim = function (s) {
-    return ("" + s).replace(/(\s*$)/g, "");
-}
-
 
 
 Scene_Input.prototype.isButtonTouched = function (s) {
@@ -200,18 +183,11 @@ Scene_Input.prototype.canvasToLocalY = function (y, s) {
 
 
 //当输入确定
-Scene_Input.prototype.onInputOk = function () {
+Scene_Input.prototype.callHandler = function (type) {
     var o = {}
     for (var i in this._inputs) {
         o[i] = "" + this._inputs[i].value
     }
-    alert(JSON.stringify(o))
-};
-
-Scene_Input.prototype.onInputNo = function () {
-    var o = {}
-    for (var i in this._inputs) {
-        o[i] = "" + this._inputs[i].value
-    }
-    alert(JSON.stringify(o)) 
+    console.log(type,o)
+    // alert(JSON.stringify(o)) 
 };

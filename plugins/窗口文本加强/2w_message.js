@@ -172,7 +172,13 @@ Window_Base.prototype.fontSettings = function(i) {
 };
 
 
+Window_Base.prototype.standardTextColor= function() { 
+    return '#ffffff';
+};
 
+Window_Base.prototype.standardFontSize = function() {
+    return 20;
+};
 
 /**文本高 */
 Window_Base.prototype.standardOutlineColor = function() {
@@ -189,9 +195,9 @@ Window_Base.prototype.standardBS= function() {
     return true;
 };
 
- 
 /**还原 */
 Window_Base.prototype.resetFontSettings = function() {
+    this.contents.textColor = this.standardTextColor()
     this.contents.fontItalic = this.standardFontItalic()
     this.contents.fontBold = this.standardFontBold()
     this.contents.fontFace = this.standardFontFace();
@@ -207,6 +213,49 @@ Window_Base.prototype.resetFontSettings = function() {
     this.reWjg()
     this.rejiange()
 };
+
+Window_Base.prototype.saveFontSettings = function(bitmap){ 
+    if(bitmap){
+        var fontSet = {
+            textColor :bitmap.textColor,
+            fontItalic : bitmap.fontItalic ,
+            fontBold : bitmap.fontBold ,
+            fontFace : bitmap.fontFace ,
+            fontSize : bitmap.fontSize ,
+            outlineColor : bitmap.outlineColor,
+            outlineWidth : bitmap.outlineWidth  
+        } 
+
+    }else{
+        var fontSet = {
+            textColor :this.standardTextColor(),
+            fontItalic : this.standardFontItalic(),
+            fontBold : this.standardFontBold(),
+            fontFace : this.standardFontFace(),
+            fontSize : this.standardFontSize(),
+            outlineColor : this.standardOutlineColor(),
+            outlineWidth : this.standardOutlineWidth(),
+        } 
+    } 
+    return fontSet
+}
+
+
+Window_Base.prototype.loadFontSettings = function(bitmap,fontSet){ 
+    if (fontSet && bitmap) {
+        //console.log("load",fontSet)
+        bitmap.textColor = fontSet.textColor
+        bitmap.fontItalic = fontSet.fontItalic
+        bitmap.fontBold = fontSet.fontBold
+        bitmap.fontFace = fontSet.fontFace
+        bitmap.fontSize = fontSet.fontSize
+        bitmap.outlineColor = fontSet.outlineColor
+        bitmap.outlineWidth = fontSet.outlineWidth
+    }
+
+}
+
+
 
 
 /**文本高 */
@@ -241,6 +290,7 @@ Window_Base.prototype.makeIcon = function(textState) {
 /**测试文字增强 */
 Window_Base.prototype.testTextEx = function(text, x, y, w, h, wt, ht, facepos, wz, aw, ah) {
     if (text) {
+        var draw = { x: x || 0, y: y || 0 }
         var pageset = {
             w: w || Infinity,
             h: h || Infinity,
@@ -249,9 +299,9 @@ Window_Base.prototype.testTextEx = function(text, x, y, w, h, wt, ht, facepos, w
             autow: aw,
             autoh: ah,
             facepos: facepos || 0,
-            wz: wz || 0
+            wz: wz || 0,
+            draw: draw 
         }
-        var draw = { x: x || 0, y: y || 0 }
         var t = this.convertEscapeCharacters(text)
         var textState = {
             text: t,
@@ -262,7 +312,6 @@ Window_Base.prototype.testTextEx = function(text, x, y, w, h, wt, ht, facepos, w
             pages: [],
             list: [],
             pageset: pageset,
-            draw: draw
         };
 
         this.resetFontSettings();
@@ -493,20 +542,11 @@ Window_Base.prototype.tslPushPic = function(textState, pic) {
 Window_Base.prototype.tslPushFace = function(textState, face) {
     if (face) {
         ImageManager.loadFace(face.name)
-        var page = textState.page
-        if (!page.set.facepos) {
-            page.set.facepos = face.pos
-        } else {
-            if (face.pos != page.set.facepos) {
-                page.set.facepos = 3
-            }
-        } 
         if (face.pos == 1 || face.pos == 0) { 
             var pid = -1
         } else { 
             var pid = -2
         }
-
 
         page.set.ps = page.set.ps||{}
         page.set.ps[pid] = face.name
@@ -629,7 +669,7 @@ Window_Base.prototype.testPushText = function(textState, text) {
             textState.line = null
             var page2 = this.makePage(textState)
             page2.type = "addpage"
-            page2.set = page.set
+            page2.set =  Window_Base.deepCopy(page.set)
             this.testPushPage(textState, page2)
                 //行添加到新页
             this.testPushLine(textState, line)
@@ -733,7 +773,12 @@ Window_Base.prototype.tslPushEscapeCharacter = function(textState, code) {
         case 'NY':
             this.tslPushNewPageY2(textState)
             break
-
+        case 'F':
+            this.tslPushFaceParam(textState)
+            break;
+        case 'T':
+            this.tslPushPicParam(textState)
+            break;
         case 'PH':
             this.tslPushPH(textState, this.tslPushEscapeParam(textState, 0))
             break
@@ -751,6 +796,9 @@ Window_Base.prototype.tslPushEscapeCharacter = function(textState, code) {
             break
         case 'WH':
             this.tslPushWH(textState, this.tslPushEscapeParamEx(textState))
+            break
+        case 'DXY':
+            this.tslPushDXY(textState, this.tslPushEscapeParamEx(textState))
             break
         case 'TWH':
             this.tslPushTWH(textState, this.tslPushEscapeParamEx(textState))
@@ -996,6 +1044,19 @@ Window_Base.prototype.tslPushHJ = function(textState, hjg) {
 };
 
 
+
+Window_Base.prototype.tslPushDXY = function(textState, list) {
+    if (textState && textState.page && textState.page.set) {
+        textState.page.set.draw.x = (list[0] || 0) * 1
+        textState.page.set.draw.y = (list[1] || 0) * 1
+    }
+    var obj = {
+        "type": "dxy",
+        "value": list
+    }
+    this.tslPushOther(textState, obj)
+};
+
 Window_Base.prototype.tslPushWH = function(textState, list) {
     if (textState && textState.page && textState.page.set) {
         textState.page.set.w = (list[0] || 0) * 1
@@ -1142,8 +1203,8 @@ Window_Base.prototype.tslPushTWH = function(textState, list) {
 Window_Base.prototype.tslPushTextColor = function(textState, color) {
     this.contents.textColor = color;
     var obj = {
-        "type": "color",
-        "color": color
+        "type": "textColor",
+        "value": color
     }
     this.tslPushOther(textState, obj)
 };
@@ -1151,15 +1212,15 @@ Window_Base.prototype.tslPushTextColor = function(textState, color) {
 Window_Base.prototype.tslPushOutColor = function(textState, color) {
     var obj = {
         "type": "outlineColor",
-        "color": color
+        "value": color
     }
     this.tslPushOther(textState, obj)
 };
 
-Window_Base.prototype.tslPushOutWidth = function(textState, color) {
+Window_Base.prototype.tslPushOutWidth = function(textState, width) {
     var obj = {
         "type": "outlineWidth",
-        "value": color
+        "value": width
     }
     this.tslPushOther(textState, obj)
 };
@@ -1186,7 +1247,7 @@ Window_Base.prototype.tslPushFontItalic = function(textState, Italic) {
     this.contents.fontItalic = Italic;
     var obj = {
         "type": "fontItalic",
-        "fontItalic": Italic
+        "value": Italic
     }
     this.tslPushFont(textState, obj)
 };
@@ -1203,7 +1264,7 @@ Window_Base.prototype.tslPushFontBlod = function(textState, bold) {
     this.contents.fontBold = bold;
     var obj = {
         "type": "fontBold",
-        "fontBold": bold
+        "value": bold
     }
     this.tslPushFont(textState, obj)
 };
@@ -1248,7 +1309,7 @@ Window_Base.prototype.tslPushFontSize = function(textState, fontSize) {
     this.contents.fontSize = fontSize;
     var obj = {
         "type": "fontSize",
-        "fontSize": fontSize
+        "value": fontSize
     }
     this.tslPushFont(textState, obj)
 };
@@ -1257,6 +1318,43 @@ Window_Base.prototype.tslPushFontSize = function(textState, fontSize) {
 Window_Base.prototype.tslPushFont = function(textState, obj) {
     this.fontSettings(1)
     this.tslPushOther(textState, obj)
+};
+
+
+
+/**文本状态列表添加脸图 */
+Window_Base.prototype.tslPushFaceParam = function(textState) {
+    var page = textState.page
+    var arr = this.tslPushEscapeParamEx(textState)
+    if (arr) {
+        var pos = (arr[0] || 0) * 1
+        var name = arr[1]
+        var id = (arr[2] || 0) * 1
+        var face = {
+            "type": "face",
+            "pos": pos || 1,
+            "name": name,
+            "id": id
+        }
+        this.tslPushFace(textState, face)
+    }
+};
+
+/**文本状态列表添加图片 */
+Window_Base.prototype.tslPushPicParam = function(textState) {
+    var arr = this.tslPushEscapeParamEx(textState)
+    if (arr) { 
+        var pos = arr[0] * 1
+        var name = arr[1]
+        var index = (arr[2]||0) * 1
+        var obj = {
+            "type": "pic",
+            "pos": pos,
+            "name": name,
+            "index":index
+        } 
+        this.tslPushPic(textState, obj)
+    }
 };
 
 
@@ -1305,6 +1403,11 @@ Window_Base.prototype.tslPushTextColorEscapeParam = function(textState) {
             textState.textindex += arr[0].length;
             return arr[1]
         } else {
+            var arr = /^\[(#\w{3})\]/.exec(textState.text.slice(textState.textindex));
+            if (arr) {
+                textState.textindex += arr[0].length;
+                return arr[1]
+            } else {
             var arr = /^\[(rgba\((.*?)\))\]/.exec(textState.text.slice(textState.textindex));
             if (arr) {
                 textState.textindex += arr[0].length;
@@ -1313,6 +1416,7 @@ Window_Base.prototype.tslPushTextColorEscapeParam = function(textState) {
                 return this.normalColor();
             }
         }
+    }
     }
 };
 
@@ -1352,14 +1456,15 @@ Window_Base.prototype.processDrawCharacter = function(textState) {
                 textState.line = obj;
                 textState.drawx =
                     /**绘制基础位置 */
-                    textState.draw.x +
+                    textState.page.set.draw.x +
                     /**页开始位置 */
                     textState.page.test.x +
                     /**脸图位置 */
                     ((textState.page.set.facepos == 1 || textState.page.set.facepos == 3) ? 168 : 0) +
                     /**行位置 */
                     textState.line.test.x
-                textState.drawy = textState.draw.y +
+                textState.drawy =  
+                    textState.page.set.draw.y +
                     textState.page.test.y +
                     textState.line.test.y
                 break
@@ -1368,22 +1473,12 @@ Window_Base.prototype.processDrawCharacter = function(textState) {
                 textState.page = obj;
                 break
             case "fontSize":
-                this.contents.fontSize = obj.fontSize
-                break
             case "fontBold":
-                this.contents.fontBold = obj.fontBold
-                break
             case "fontItalic":
-                this.contents.fontItalic = obj.fontItalic
-                break
-            case "color":
-                this.contents.textColor = obj.color;
-                break
+            case "textColor": 
             case "outlineColor":
-                this.contents.outlineColor = obj.color;
-                break
             case "outlineWidth":
-                this.contents.outlineWidth = obj.value;
+                this.processFont(obj.type , obj.value);
                 break
             case "text":
                 var x = textState.drawx + obj.test.x
@@ -1391,7 +1486,7 @@ Window_Base.prototype.processDrawCharacter = function(textState) {
                 var w = obj.test.w
                 var h = textState.line.test.h
                 var c = obj.text
-                this.contents.drawText(c, x, y, w * 2, h);
+                this.processText(c, x, y, w * 2, h)
                 this.processNormalCharacter2()
                 break
             case "icon":
@@ -1399,13 +1494,12 @@ Window_Base.prototype.processDrawCharacter = function(textState) {
                 var y = textState.drawy + obj.test.y
                 var h = textState.line.test.h
                 var iconIndex = obj.icon
-                this.drawIcon(iconIndex, x + 2, y + 2);
+                this.processIcon(iconIndex, x + 2, y + 2);
                 this.processNormalCharacter2()
                 break
             case "pahide":
                 this.pausehide = obj.value
                 break
-
             case 'PS':
             case 'PM':
             case 'PO':
@@ -1436,6 +1530,42 @@ Window_Base.prototype.processDrawCharacter = function(textState) {
     }
 }
 
+
+
+Window_Base.prototype.processFont = function(type,value) { 
+    this.drawBitmapFont( this.contents , type,value) 
+}
+
+ 
+Window_Base.prototype.processText = function(c, x, y, w , h) {
+    this.drawBitmapText( this.contents ,c, x, y, w , h  )
+}
+
+Window_Base.prototype.processIcon = function(iconIndex, x, y) {
+    this.drawBitmapIcon( this.contents , iconIndex, x, y  )
+}
+
+
+Window_Base.prototype.cloneBitmapFont = function(b,b2) {  
+    var font = this.saveFontSettings(b2)
+    this.loadFontSettings(b,font)
+}
+
+Window_Base.prototype.drawBitmapFont = function(b, type,value ) {
+    b && (b[type] = value)
+};
+
+Window_Base.prototype.drawBitmapIcon = function(b, iconIndex, x, y) {
+    var bitmap = ImageManager.loadSystem('IconSet');
+    var pw = Window_Base._iconWidth;
+    var ph = Window_Base._iconHeight;
+    var sx = iconIndex % 16 * pw;
+    var sy = Math.floor(iconIndex / 16) * ph;
+    b && b.blt(bitmap, sx, sy, pw, ph, x, y);
+};
+Window_Base.prototype.drawBitmapText = function(b,c, x, y , w,h) { 
+    b && b.drawText(c, x, y, w  , h); 
+};
 
 
 /**添加参数 */
@@ -1506,40 +1636,31 @@ Window_Message.prototype.tslPushHear2 = function (textState) {
     }
 };
 
-/**文本状态列表添加脸图 */
-Window_Message.prototype.tslPushFaceParam = function(textState) {
-    var page = textState.page
-    var arr = this.tslPushEscapeParamEx(textState)
-    if (arr) {
-        var pos = arr[0] * 1
-        var name = arr[1]
-        var id = arr[2] * 1
-        var face = {
-            "type": "face",
-            "pos": pos || 1,
-            "name": name,
-            "id": id
-        }
-        this.tslPushFace(textState, face)
-    }
-};
 
-/**文本状态列表添加图片 */
-Window_Message.prototype.tslPushPicParam = function(textState) {
-    var arr = this.tslPushEscapeParamEx(textState)
-    if (arr) { 
-        var pos = arr[0] * 1
-        var name = arr[1]
-        var index = (arr[2]||0) * 1
-        var obj = {
-            "type": "pic",
-            "pos": pos,
-            "name": name,
-            "index":index
-        } 
-        this.tslPushPic(textState, obj)
+
+Window_Message.prototype.tslPushFace = function(textState, face) {
+    if (face) {
+        ImageManager.loadFace(face.name)
+    var page = textState.page
+        if (!page.set.facepos) {
+            page.set.facepos = face.pos
+        } else {
+            if (face.pos != page.set.facepos) {
+                page.set.facepos = 3
+            }
+        }
+        if (face.pos == 1 || face.pos == 0) { 
+            var pid = -1
+        } else { 
+            var pid = -2
     }
-};
+
+
+        page.set.ps = page.set.ps||{}
+        page.set.ps[pid] = face.name
+        this.tslPush(textState, face)
+        } 
+    }
 
 
 
@@ -1568,6 +1689,8 @@ Window_Message.prototype.tslPushNewPageY = function(textState) {
             page.set.autoh = 1
         }
     }
+    page.set.isY = true
+    
     this.tslPushPage(textState, page)
     this.tslPushLine(textState, line)
     this.resetFontSettings();
@@ -1605,12 +1728,6 @@ Window_Message.prototype.tslPushEscapeCharacter = function(textState, code) {
 
         case 'S':
             this.tslPushParam(textState, "jiange", this.tslPushEscapeParam(textState, 0))
-            break;
-        case 'F':
-            this.tslPushFaceParam(textState)
-            break;
-        case 'T':
-            this.tslPushPicParam(textState)
             break;
         default:
             Window_Base.prototype.tslPushEscapeCharacter.call(this, textState, code);
@@ -1662,6 +1779,10 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
                 textState.page = obj;
                 var page = obj
                 this.contents.clear();
+                if(this._cloneBitmap){
+                    this._cloneBitmap.clear(); 
+                    this.cloneBitmapFont(this._cloneBitmap,this.contents)
+                }           
                 if (page.set) {
                     if ("wz" in page.set) {
                         this.setPositionType(page.set.wz)
@@ -1721,6 +1842,30 @@ Window_Message.prototype.processDrawCharacter = function(textState) {
     }
 }
 
+Window_Message.prototype.processFont = function(type,value) { 
+    this.drawBitmapFont( this.contents , type,value) 
+    if(this._cloneBitmap){
+        this.drawBitmapFont( this._cloneBitmap , type,value) 
+    }
+}
+
+ 
+Window_Message.prototype.processText = function(c, x, y, w , h) {
+    this.drawBitmapText( this.contents ,c, x, y, w , h  )
+    if(this._cloneBitmap){
+        this.drawBitmapText( this._cloneBitmap ,c, x, y, w , h ) 
+    }
+}
+
+Window_Message.prototype.processIcon = function(iconIndex, x, y) {
+    this.drawBitmapIcon( this.contents , iconIndex, x, y  )
+    if(this._cloneBitmap){
+        this.drawBitmapIcon( this._cloneBitmap ,  iconIndex, x, y ) 
+    }
+}
+
+
+
 Window_Message.prototype.updatePlacement2 = function() {
     var y = 2 * (Graphics.boxHeight - this.height) / 2;
 
@@ -1740,6 +1885,12 @@ Window_Message.prototype.positionType = function() {
 Window_Message.prototype.setPositionType = function(positionType){ 
     return this._positionType = positionType 
 }
+
+Window_Message.prototype.updateBackground = function(background) {
+    this._background = background ;
+    this.setBackgroundType(this._background);
+};
+
 
 /**更新位置 */
 Window_Message.prototype.updatePlacement = function() {
@@ -1994,10 +2145,7 @@ Window_Message.prototype.updatePlacement = function() {
     var sh = SceneManager._screenHeight
 
 
-    /*if (SceneManager._scene.constructor === Scene_Battle) {
-        var u = 20
-        var d = 20
-    }*/
+
 
     var zx = u
     var zy = l
@@ -2022,8 +2170,9 @@ Window_Message.prototype.updatePlacement = function() {
 
 
 /**开始信息 */
-Window_Message.prototype.startMessage = function(positionType,allText) {
+Window_Message.prototype.startMessage = function(allText,positionType,background) {
     var positionType = positionType === undefined ? $gameMessage.positionType() :positionType
+    var background =  background === undefined ? $gameMessage.background() :background
     var allText = allText
     if(allText === undefined){
         this._useMessage = true
@@ -2036,7 +2185,7 @@ Window_Message.prototype.startMessage = function(positionType,allText) {
     this._textState = this.testTextEx( allText , 0, 0, this.contents.width, this.contents.height)
     this.newPage(this._textState, 1);
     this.updatePlacement();
-    this.updateBackground();
+    this.updateBackground(background);
     this.open();
 };
 
@@ -2088,6 +2237,20 @@ Window_Message.prototype.updateMessage = function() {
 };
 
 
+Window_Message.prototype.startInput = function() {
+    if ($gameMessage.isChoice()) {
+        this._choiceWindow.start();
+        return true;
+    } else if ($gameMessage.isNumberInput()) {
+        this._numberWindow.start();
+        return true;
+    } else if ($gameMessage.isItemChoice()) {
+        this._itemWindow.start();
+        return true;
+    } else {
+        return false;
+    }
+};
 
 
 /**新页 */

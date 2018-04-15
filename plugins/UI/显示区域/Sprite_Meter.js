@@ -44,8 +44,7 @@ Sprite_UIBase.prototype.setMask = function(mask) {
     if (this.mask) {
         this.removeChild(this.mask)
     }
-    this.mask = mask
-    this.
+    this.mask = mask 
 };
 
 
