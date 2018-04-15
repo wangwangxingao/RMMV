@@ -1,22 +1,22 @@
 
 var Sprite_prototype_initialize = Sprite.prototype.initialize
-    /**初始化 */
-Sprite.prototype.initialize = function(bitmap) {
+/**初始化 */
+Sprite.prototype.initialize = function (bitmap) {
     //精灵 初始化 呼叫(this)
     Sprite_prototype_initialize.call(this, bitmap);
     this._anm = {}
 };
 
 var Sprite_prototype_update = Sprite.prototype.update
-    /**更新 */
-Sprite.prototype.update = function() {
+/**更新 */
+Sprite.prototype.update = function () {
     //精灵 更新 呼叫(this)
     Sprite_prototype_update.call(this);
     this.updateAnm()
 };
 
 /**更新所有动画 */
-Sprite.prototype.updateAnm = function() {
+Sprite.prototype.updateAnm = function () {
     this._anming = false
     for (var name in this._anm) {
         this._anming = true
@@ -27,16 +27,16 @@ Sprite.prototype.updateAnm = function() {
     }
 };
 
-Sprite.prototype.getAnmStep = function() {
+Sprite.prototype.getAnmStep = function () {
     return this._anmStep || 0
 };
 
-Sprite.prototype.setAnmStep = function(i) {
+Sprite.prototype.setAnmStep = function (i) {
     return this._anmStep = i
 };
 
 /**动画播放中 */
-Sprite.prototype.anmPlaying = function(name) {
+Sprite.prototype.anmPlaying = function (name) {
     if (name) {
         return this._anm[name]
     } else {
@@ -46,7 +46,7 @@ Sprite.prototype.anmPlaying = function(name) {
 
 
 
-Sprite.prototype.anmPlaying = function(name) {
+Sprite.prototype.anmPlaying = function (name) {
     if (name) {
         if (this._anm[name]) {
             return true
@@ -70,7 +70,7 @@ Sprite.prototype.anmPlaying = function(name) {
 
 
 /**动画开始 */
-Sprite.prototype.anmSt = function(name, list) {
+Sprite.prototype.anmSt = function (name, list) {
     if (!list) { return this.anmClear(name, list) }
     if (!Array.isArray(list)) {
         var list = [list]
@@ -100,7 +100,7 @@ Sprite.prototype.anmSt = function(name, list) {
 
 
 
-Sprite.prototype.anmAdd = function(name, list) {
+Sprite.prototype.anmAdd = function (name, list) {
     var oa = this._anm[name]
 
     if (oa && oa.length) {
@@ -117,7 +117,7 @@ Sprite.prototype.anmAdd = function(name, list) {
 
 
 /**单个动画更新 */
-Sprite.prototype.anmUpdate = function(name, list) {
+Sprite.prototype.anmUpdate = function (name, list) {
     if (list) {
         var oa = list[0]
         if (oa) {
@@ -149,7 +149,7 @@ Sprite.prototype.anmUpdate = function(name, list) {
 
 
 /**动画结束 */
-Sprite.prototype.anmEnd = function(name, list) {
+Sprite.prototype.anmEnd = function (name, list) {
     if (list) {
         var oa = list.shift()
         if (oa) {
@@ -184,7 +184,7 @@ Sprite.prototype.anmEnd = function(name, list) {
 };
 
 
-Sprite.prototype.anmClear = function(name, list) {
+Sprite.prototype.anmClear = function (name, list) {
     if (name) {
         this._anm[name] = null
         delete this._anm[name]
@@ -199,10 +199,10 @@ Sprite.prototype.anmClear = function(name, list) {
 
 
 /**画布到局部x 
- * @param {number} x x
- * @return {number}  
- */
-Sprite.spriteToLocalX = function(sprite, x) {
+* @param {number} x x
+* @return {number}  
+*/
+Sprite.prototype.spriteToLocalX = function (x, sprite) {
     var node = sprite || this;
     while (node) {
         x -= node.x;
@@ -211,10 +211,10 @@ Sprite.spriteToLocalX = function(sprite, x) {
     return x;
 };
 /**画布到局部y
- * @param {number} y y
- * @return {number}  
- */
-Sprite.spriteToLocalY = function(sprite, y) {
+* @param {number} y y
+* @return {number}  
+*/
+Sprite.prototype.priteToLocalY = function (y, sprite) {
     var node = sprite || this;
     while (node) {
         y -= node.y;
@@ -223,89 +223,57 @@ Sprite.spriteToLocalY = function(sprite, y) {
     return y;
 };
 
+
+
+
+Sprite.prototype.worldToLocalXY = function (x, y, sprite) {
+    var node = sprite || this;
+    return node.worldTransform.applyInverse({ x: x, y: y }, { visible: node.worldVisible });
+};
+
+
+
 /**
- * 是触摸自己
- * @param {number} x 父的x坐标
- * @param {number} y 父的y坐标
- * @param {boolean} type 是否不检查位图(true 为不检查 )
- * @param {bolean}c 是否检查子图(true 为 检查 )
- * 
- * 
- */
-Sprite.prototype.isTouchThis = function(x, y, type, c) {
+* 是触摸自己
+* @param {number} x x坐标
+* @param {number} y y坐标
+* @param {boolean} type 是否不检查位图(true 为不检查 )
+* @param {bolean}c 是否检查子图(true 为 检查 )
+* 
+* 
+*/
+Sprite.prototype.isTouchThis = function (x, y, type, c) {
     if (this.visible) {
-        var x = Sprite.spriteToLocalX(this.parent, x)
-        var y = Sprite.spriteToLocalY(this.parent, y)
-        var x = x - this.x
-        var y = y - this.y
-        if (c) {
-            for (var i = 0; i < this.children.length; i++) {
-                var s = this.children[i]
-                if (s.isTouch && s.isTouch(x, y, type)) {
-                    return true
+        var loc = this.worldToLocalXY(x, y)
+        var x = loc.x
+        var y = loc.y
+        var v = loc.visible
+
+        if (v) {
+            if (c) {
+                for (var i = 0; i < this.children.length; i++) {
+                    var s = this.children[i]
+                    if (s && s.isTouchThis && s.isTouchThis(x, y, type, c)) {
+                        return true
+                    }
                 }
             }
-        }
-        if (this.isTouchIn && this.isTouchIn(x, y, type)) {
-            return true
+
+            if (this.isTouchIn && this.isTouchIn(x, y, type)) {
+                return true
+            }
         }
     }
     return false
 }
 
-/**
- * 是触摸
- * @param {number} x 父的x坐标
- * @param {number} y 父的y坐标
- * @param {boolean} type 是否不检查位图(true 为不检查 )
- * @param {bolean}c 是否检查子图(true 为 检查 )
- */
-Sprite.prototype.isTouch = function(x, y, type, c) {
-    if (this.visible) {
-        var x = x - this.x
-        var y = y - this.y
-        if (c) {
-            for (var i = 0; i < this.children.length; i++) {
-                var s = this.children[i]
-                if (s.isTouch && s.isTouch(x, y, type)) {
-                    return true
-                }
-            }
-        }
-        if (this.isTouchIn && this.isTouchIn(x, y, type)) {
-            return true
-        }
-    }
-    return false
-}
 
 
 /**是在之中 
- * @param {boolean} type 不检查图片
- * 
+* @param {boolean} type 不检查图片
+* 
 */
-Sprite.prototype.isTouchIn = function(x, y, type) {
-    var a = this.rotation
-    if (a) {
-        if (a == 1.5707963267948966) {
-            var x = y
-            var y = -x
-        } else if (a == 3.141592653589793) {
-            var x = -x
-            var y = -y
-        } else if (a == 4.71238898038469) {
-            var x = -y
-            var y = x
-        } else if (a == 6.283185307179586) {
-            var x = x
-            var y = y
-        } else {
-            r = Math.sqrt(x * x + y * y)
-            var a = Math.atan2(y, x) - a
-            var x = r * Math.cos(a)
-            var y = r * Math.sin(a)
-        }
-    }
+Sprite.prototype.isTouchIn = function (x, y, type) {
     if (this.anchor) {
         var x = x + this.anchor.x * this.width
         var y = y + this.anchor.y * this.height
@@ -319,49 +287,22 @@ Sprite.prototype.isTouchIn = function(x, y, type) {
 
 
 /**是在区域中 */
-Sprite.prototype.isTouchInFrame = function(x, y, type) {
+Sprite.prototype.isTouchInFrame = function (x, y, type) {
     return x >= 0 && y >= 0 && x < this.width && y < this.height;
-    //
-    return (x >= 0 - type[0]) &&
-        (y >= 0 - type[1]) &&
-        (x < this.width + type[0]) &&
-        (y < this.height + type[1]);
 };
 
 
 /**是在位图上不透明点 */
-Sprite.prototype.isTouchInBitamp = function(x, y) {
-    if (this._frame) {
-        var x = x + this._frame.x
-        var y = y + this._frame.y 
-        
+Sprite.prototype.isTouchInBitamp = function (x, y) {
+    if (this._realFrame) {
+        var x = x + this._realFrame.x
+        var y = y + this._realFrame.y
     }
     if (this.bitmap && this.bitmap.getAlphaPixel(x, y)) {
         return true
-            //console.log("bitmap")
+        //console.log("bitmap")
     }
     return false
 }
-
-
-
-
-
-
-function Sprite_UIBase() {
-    this.initialize.apply(this, arguments);
-}
-Sprite_UIBase.prototype = Object.create(Sprite.prototype);
-Sprite_UIBase.prototype.constructor = Sprite_UIBase;
-
-
-
-Sprite_UIBase.prototype.initialize = function(set) {
-    Sprite.prototype.initialize.call(this)
-    if (set) {
-        this.bitmap = new Bitmap(set[0], set[1])
-    }
-};
-
 
 
