@@ -454,8 +454,8 @@ File System
     关于文件操作，那么这边主要的就是 fs 这个模块。对于node中 fs 模块提供的API很多，但是其所有的方法均有同步和异步的形式。对于读取文件内容来说，最需要注意的一点就是异步与同步之间控制执行流程的问题~
 
 var fs = require('fs');
-/** 使用异步回调的方式 因为是异步的，所以对于数据读取完后的操作我们需要使用回调的方式进行处理 */
-/** 这点对于习惯事件操作的前端开发应该是习以为常的 。 */
+ 使用异步回调的方式 因为是异步的，所以对于数据读取完后的操作我们需要使用回调的方式进行处理 
+ 这点对于习惯事件操作的前端开发应该是习以为常的 。 
 fs.readFile('data.json',function(err, data){
   if(err){ }else{ 
     console.log(data.length);
@@ -466,7 +466,7 @@ fs.readFile('data.json',function(err, data){
     每个异步的API，都有其回调函数可以使用，那么对于下面的方式就会报错，就犹如在JS使用的setTimeout等类似，                                                      
 
 var fs = require('fs');
-/**会有错 因为是异步读取文件 ，在console的时候数据还未读取出来 */
+会有错 因为是异步读取文件 ，在console的时候数据还未读取出来 
 var data = fs.readFile('data.json');
 console.log(data.length);
 
@@ -475,7 +475,7 @@ console.log(data.length);
     或者干脆直接     使用其对应的同步API使用
 
 var fs = require('fs');
-/** 或者改为同步的API读取 */
+ 或者改为同步的API读取 
 var data = fs.readFileSync('data.json');
 console.log(data.length);
 
@@ -487,12 +487,12 @@ fs.writeFile('delete.txt','1234567890'，function(err){
     console('youxi!');
 });
 
-/** 删除文件 */
+ 删除文件 
 fs.unlink('delete.txt', function(){
  console.log('success');
 });
 
-/** 修改文件名称 */
+ 修改文件名称 
 fs.rename('delete.txt','anew.txt',function(err){
  console.log('rename success');
 
@@ -502,7 +502,7 @@ fs.stat('anew.txt', function(err, stat){
  });
 });
 
-/** 判断文件是否存在 */
+ 判断文件是否存在 
 fs.exists('a.txt', function( exists ){
     console.log( exists );
 });
@@ -539,7 +539,7 @@ option : Object
     encoding : String | Null, default = Null
     flag : String default = 'r'    
 callback : Function
-/** callback 具有两个参数，( err, data )，和node中大部分回调接口类似。 */
+ callback 具有两个参数，( err, data )，和node中大部分回调接口类似。 
 
 
 fs.writeFile( filename, data,  [optins], callback );
@@ -552,7 +552,7 @@ option : Object
 callback : Function
 
 
-/** 将数据添加到文件末尾 */
+ 将数据添加到文件末尾 
 fs.appendFile( filename, data,  [optins], callback );
 filename : String
 data : String | Buffer
@@ -580,8 +580,8 @@ copy('data.json', 'dataStream.json');
 
     在需要处理大文件的情况时，便要使用file system的另外几个API，createReadStream和fs.createWriteStream，将文件作为一块一块小的数据流进行处理，而不是一整块大型数据。
 
-/** 也可能出现内存爆仓 写入数据跟不上读取速度 一直读取的文件不断放入内存中 */
-/** 但是两个操作速度绝对是不一样的，于是未被写入的数据在内存中不断变大，就可能会导致内存的爆仓。 */
+ 也可能出现内存爆仓 写入数据跟不上读取速度 一直读取的文件不断放入内存中 
+ 但是两个操作速度绝对是不一样的，于是未被写入的数据在内存中不断变大，就可能会导致内存的爆仓。 
 var fs = require('fs');
 var rs = fs.createReadStream('data.json'); 
  var ws = fs.createWriteStream('dataStream.json')
@@ -619,7 +619,7 @@ var rs = fs.createReadStream('data.json');
  });
 
 或者：
-/**eg2 */
+eg2 
  function reStartRead( rs ){
   console.log('lasted readed data write OK, reStart Read.');
   rs.resume();

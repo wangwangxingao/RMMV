@@ -36,7 +36,7 @@
 
     var ww = ww || {}
 
-    ww.spriteMask = {} 
+    ww.spriteMask = {}
 
 
     ww.spriteMask.Sprite_Picture_prototype_update = Sprite_Picture.prototype.update
@@ -86,15 +86,13 @@
                 this.mask.scale.y = this.mask.iheight * this.height * scale
                 this.mask.iscale = scale
             }
-
-        }
-        var pos = this.picture() ? this.picture()._maskPos : null
-        if (pos) {
-            this.mask.x = pos[0]
-            this.mask.y = pos[1]
-            this.picture()._maskPos = null
-        }
-
+            var pos = this.picture() ? this.picture()._maskPos : null
+            if (pos) {
+                this.mask.x = pos[0]
+                this.mask.y = pos[1]
+                this.picture()._maskPos = null
+            } 
+        } 
     }
 
 
