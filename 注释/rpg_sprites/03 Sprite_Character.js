@@ -32,7 +32,7 @@ Sprite_Character.prototype.initMembers = function() {
     this._lowerBody = null;
 };
 /**设置人物 
- * @param {{}} character 游戏人物 
+ * @param {Game_Character} character 人物 
  */
 Sprite_Character.prototype.setCharacter = function(character) {
     //人物 = character//人物
@@ -42,23 +42,32 @@ Sprite_Character.prototype.setCharacter = function(character) {
 Sprite_Character.prototype.update = function() {
     //精灵基础 更新 呼叫(this)
     Sprite_Base.prototype.update.call(this);
+    //更新位图() 
     this.updateBitmap();
+    //更新帧()
     this.updateFrame();
+    //更新位置()
     this.updatePosition();
+    //更新动画()
     this.updateAnimation();
+    //更新气球()
     this.updateBalloon();
+    //更新其他()
     this.updateOther();
 };
 /**更新可见度 */
 Sprite_Character.prototype.updateVisibility = function() {
     //精灵 更新可见度 呼叫(this)
     Sprite_Base.prototype.updateVisibility.call(this);
+    //如果(人物 是透明() )
     if (this._character.isTransparent()) {
+        //可见度 = false
         this.visible = false;
     }
 };
 /**是图块 */
 Sprite_Character.prototype.isTile = function() {
+    //返回 角色
     return this._character.tileId > 0;
 };
 /**图块位图 */

@@ -294,7 +294,7 @@ Graphics._updateAllElements = function () {
 Graphics._updateElementsBody = function () {
     this._elementsBody.width = this._width;
     this._elementsBody.height = this._height;
-    this._elementsBody.style.zIndex = 12;
+    this._elementsBody.style.zIndex = 112;
     this._centerElement(this._elementsBody);
 };
 
@@ -307,7 +307,7 @@ Graphics._createElement = function (id, type, set, set2) {
     if (set) {
         this._setElement(id, set)
     }
-    this._elements[id].style.zIndex = 112;
+    //this._elements[id].style.zIndex = 112;
     if (set2) {
         this._setElement(id, set, "style")
     }
@@ -491,28 +491,6 @@ Input._onKeyDown = function (event) {
 
 
 
-/**当左键按下
- * @static
- * @method _onLeftButtonDown
- * @param {MouseEvent} event
- * @private
- */
-TouchInput._onLeftButtonDown = function (event) {
-    //x  = 画布x
-    var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
-    //y  = 画布y
-    var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
-    //是画布内部
-    if (Graphics.isInsideCanvas(x, y)) {
-        //鼠标按下 _mousePressed = true
-        this._mousePressed = true;
-        //按下时间 _pressedTime = 0
-        this._pressedTime = 0;
-        //当触发(x,y)
-        this._onTrigger(x, y);
-    }
-};
-
 
 
 
@@ -545,6 +523,31 @@ Graphics.pageToCanvasY2 = function (x, y) {
     }
     return Graphics.pageToCanvasY(y)
 }
+
+
+
+/**当左键按下
+ * @static
+ * @method _onLeftButtonDown
+ * @param {MouseEvent} event
+ * @private
+ */
+TouchInput._onLeftButtonDown = function (event) {
+    //x  = 画布x
+    var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
+    //y  = 画布y
+    var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
+    //是画布内部
+    if (Graphics.isInsideCanvas(x, y)) {
+        //鼠标按下 _mousePressed = true
+        this._mousePressed = true;
+        //按下时间 _pressedTime = 0
+        this._pressedTime = 0;
+        //当触发(x,y)
+        this._onTrigger(x, y);
+    }
+};
+
 
 /**当右键按下
  * @static
@@ -584,9 +587,9 @@ TouchInput._onMouseMove = function (event) {
     //如果 鼠标按下
     if (this._mousePressed) {
         //画布x
-        var x = Graphics.pageToCanvasX(event.pageX);
+        var x = Graphics.pageToCanvasX2(event.pageX);
         //画布y
-        var y = Graphics.pageToCanvasY(event.pageY);
+        var y = Graphics.pageToCanvasY2(event.pageY);
         //当移动(x,y)
         this._onMove(x, y);
     }
@@ -604,9 +607,9 @@ TouchInput._onMouseUp = function (event) {
     //如果 事件按键 ===0
     if (event.button === 0) {
         //画布 x
-        var x = Graphics.pageToCanvasX(event.pageX);
+        var x = Graphics.pageToCanvasX2(event.pageX);
         //画布 y
-        var y = Graphics.pageToCanvasY(event.pageY);
+        var y = Graphics.pageToCanvasY2(event.pageY);
         //鼠标 按下
         this._mousePressed = false;
         //当释放(x,y)
