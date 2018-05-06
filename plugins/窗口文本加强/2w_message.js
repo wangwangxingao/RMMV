@@ -165,10 +165,10 @@ Window_Base.prototype.standardFontItalic = function() {
 
 /**字体设置 */
 Window_Base.prototype.fontSettings = function(i) {
-    if (i || !this.contents._fontnametext) {
-        this.contents._fontnametext = this.contents._makeFontNameText()
+    if (i || this._fontnametext) {
+        this._fontnametext = this.makeFontSettings(this.contents)
     }
-    return this.contents._fontnametext
+    return this._fontnametext
 };
 
 
@@ -207,12 +207,31 @@ Window_Base.prototype.resetFontSettings = function() {
 
     this._windowSpriteContainer.visible = this.standardBS()   
     
-    this.fontSettings(1)
-    this.resetTextColor();
+    this.fontSettings(1) 
     this.reHjg()
     this.reWjg()
     this.rejiange()
 };
+
+
+Window_Base.prototype.makeFontSettings = function (bitmap) {
+    if (bitmap) {
+        return "" +
+            (bitmap.fontFace || "") +" "+
+            (bitmap.fontSize || "") +" "+
+            (bitmap.fontItalic || "") +" "+
+            (bitmap.fontBold || "") +" "+
+            (bitmap.textColor || "") +" "+
+            (bitmap.outlineColor || "") +" "+
+            (bitmap.outlineWidth || "")
+    } else {
+        return ""
+    }
+}
+
+
+
+
 
 Window_Base.prototype.saveFontSettings = function(bitmap){ 
     if(bitmap){
@@ -463,7 +482,7 @@ Window_Base.prototype.drawTextEx2 = function(text, x, y, w, h, p, l) {
             }
         }
         this.resetFontSettings();
-        return textState;
+        return textState.pages[0].test.h; 
     } else {
         return 0;
     }
@@ -1158,13 +1177,16 @@ Window_Base.prototype.tslPushPH = function(textState, wjg) {
 };
 
 
+
+Window_Base.textf = {}
+
 /**处理正常字符 */
 Window_Base.prototype.tslPushNormalCharacter = function(textState) {
     //c = 文本状态 [文本状态 索引++]
     var c = textState.text[textState.textindex++];
     //w = c 文本宽 
     var f = this.fontSettings()
-    var textf = textState.textf
+    var textf = Window_Base.textf
     if (textf[f]) {
         if (textf[f][c]) {
             var w = textf[f][c]["w"]
@@ -1172,13 +1194,23 @@ Window_Base.prototype.tslPushNormalCharacter = function(textState) {
         } else {
             var w = this.textWidth(c);
             var h = this.calcTextHeight()
-            textf[f][c] = { w: w, h: h }
+            var w2 = w + w 
+            var b = new Bitmap( w2, h)
+            this.cloneBitmapFont(b,this.contents )
+            b.drawText(c,0,0,w2,h)
+
+            textf[f][c] = { w: w, h: h , b :b}
         }
     } else {
         textf[f] = {}
         var w = this.textWidth(c);
         var h = this.calcTextHeight()
-        textf[f][c] = { "w": w, "h": h }
+        
+        var w2 = w + w 
+        var b = new Bitmap( w2, h)
+        this.cloneBitmapFont(b,this.contents )
+        b.drawText(c,0,0,w2,h)
+        textf[f][c] = { "w": w, "h": h ,b : b}
     }
     var text = this.makeText()
     text.text = c
@@ -1206,7 +1238,7 @@ Window_Base.prototype.tslPushTextColor = function(textState, color) {
         "type": "textColor",
         "value": color
     }
-    this.tslPushOther(textState, obj)
+    this.tslPushFont(textState, obj)
 };
 
 Window_Base.prototype.tslPushOutColor = function(textState, color) {
@@ -1214,7 +1246,7 @@ Window_Base.prototype.tslPushOutColor = function(textState, color) {
         "type": "outlineColor",
         "value": color
     }
-    this.tslPushOther(textState, obj)
+    this.tslPushFont(textState, obj)
 };
 
 Window_Base.prototype.tslPushOutWidth = function(textState, width) {
@@ -1222,7 +1254,7 @@ Window_Base.prototype.tslPushOutWidth = function(textState, width) {
         "type": "outlineWidth",
         "value": width
     }
-    this.tslPushOther(textState, obj)
+    this.tslPushFont(textState, obj)
 };
 
 
@@ -1472,6 +1504,7 @@ Window_Base.prototype.processDrawCharacter = function(textState) {
             case "addpage":
                 textState.page = obj;
                 break
+            case "fontFace":
             case "fontSize":
             case "fontBold":
             case "fontItalic":
@@ -1534,6 +1567,7 @@ Window_Base.prototype.processDrawCharacter = function(textState) {
 
 Window_Base.prototype.processFont = function(type,value) { 
     this.drawBitmapFont( this.contents , type,value) 
+    this.fontSettings(1)    
 }
 
  
@@ -1547,8 +1581,8 @@ Window_Base.prototype.processIcon = function(iconIndex, x, y) {
 
 
 Window_Base.prototype.cloneBitmapFont = function(b,b2) {  
-    var font = this.saveFontSettings(b2)
-    this.loadFontSettings(b,font)
+    var font =  b2 || this.saveFontSettings()
+    b && font && this.loadFontSettings(b,font)
 }
 
 Window_Base.prototype.drawBitmapFont = function(b, type,value ) {
@@ -1563,8 +1597,22 @@ Window_Base.prototype.drawBitmapIcon = function(b, iconIndex, x, y) {
     var sy = Math.floor(iconIndex / 16) * ph;
     b && b.blt(bitmap, sx, sy, pw, ph, x, y);
 };
+
+
 Window_Base.prototype.drawBitmapText = function(b,c, x, y , w,h) { 
-    b && b.drawText(c, x, y, w  , h); 
+    b && b.drawText(c, x, y, w  , h);
+};
+
+Window_Base.prototype.drawBitmapText = function(b,c, x, y , w,h) { 
+    if(!b){return }
+    var f = this.fontSettings()
+    var textf =  Window_Base.textf
+    if(textf && textf[f] && textf[f][c] ){
+       var bitmap =  textf[f][c].b 
+       if(bitmap){
+           b.blt(bitmap,0,0,w,h,x,y,w,h)
+       } 
+    } 
 };
 
 
@@ -2435,430 +2483,4 @@ Window_ChoiceList.prototype.textWidthEx = function(text) {
 };
 
 
-
-
-/**更新图片*/
-Window_Base.prototype.picture = function(index, picture) {
-    if (picture) {
-        if (picture == "null") {
-            picture = null
-        }
-        if (!this._pictures) {
-            this._pictures = {}
-            this._picturesSprite = {}
-            this._picturesZindex = {}
-        } 
-        if (picture) {
-            this._pictures[index] = picture
-            if (!this._picturesSprite[index]) {
-                this._picturesSprite[index] = new Sprite_WindowPicture(index)
-            }
-            
-            var s = this._picturesSprite[index]
-            s._zIndex = this._picturesZindex[index] || 0 
-            this.removeChild(s)
-            s.setScreen(this)
-            var c = this.children
-            var l = c.length
-            for (var i = 0; i < l; i++) {
-                if (s._zIndex < (c[i]._zIndex || 0)) {
-                    break
-                }
-            }
-            this.addChildAt(s, i)
-        } else {
-            if (this._picturesSprite[index]) {
-                this.removeChild(this._picturesSprite[index])
-                delete this._picturesSprite[index]
-            }
-            delete this._pictures[index]
-            delete this._picturesZindex[index]
-        }
-    } else {
-        if (this._pictures) {
-            return this._pictures[index]
-        } else {
-            return null
-        }
-    }
-};
-
-
-Window_Base.prototype.pictureZindex = function(index, zindex) {
-    if (!this._pictures) {
-        this._pictures = {}
-        this._picturesSprite = {}
-        this._picturesZindex = {}
-    }
-    if (this._picturesZindex[index] != zindex) {
-        this._picturesZindex[index] = zindex
-        var s = this._picturesSprite[index]
-        if (s) {
-            this.removeChild(s)
-            s._zIndex = this._picturesZindex[index] || 0
-            var c = this.children
-            var l = c.length
-            for (var i = 0; i < l; i++) {
-                if (s._zIndex < (c[i]._zIndex || 0)) {
-                    break
-                }
-            }
-            this.addChildAt(s, i)
-        }
-    }
-};
-
-
-/**更新图片*/
-Window_Base.prototype.updatePictures = function() {
-    if (this._pictures) {
-        //图片组 对每一个 (方法 图片)
-        this._pictures.forEach(function(picture) {
-            //如果 图片 
-            if (picture) {
-                //图片 更新
-                picture.update();
-            }
-        });
-    }
-};
-
-
-
-/**显示图片
- * @param {number} pictureId 图片id
- * @param {number} origin 原点
- * @param {number} x x
- * @param {number} y y
- * @param {number} scaleX 比例x
- * @param {number} scaleY 比例y
- * @param {number} opacity 不透明度
- * @param {number} blendMode 混合模式  
- */
-Window_Base.prototype.showPicture = function(list) {
-    var pictureId = list[0]
-    var name = list[1]
-    var origin = list[2] || 0
-    var x = list[3] || 0
-    var y = list[4] || 0
-    var scaleX = list[5] === undefined ? 100 : list[5]
-    var scaleY = list[6] === undefined ? 100 : list[6]
-    var opacity = list[7] === undefined ? 255 : list[7]
-    var blendMode = list[8] || 0
-    var picture = new Game_Picture();
-    picture.show(name, origin, x, y, scaleX, scaleY, opacity, blendMode);
-    this.picture(pictureId, picture);
-};
-
-/**设置图片z值 */
-Window_Base.prototype.zindexPicture = function(list) {
-    var pictureId = list[0]
-    var zindex = list[1]
-    this.pictureZindex(pictureId, zindex)
-};
-
-/**设置图片坐标 */
-Window_Base.prototype.anchorPicture = function(list) {
-    var pictureId = list[0]
-    var picture = this.picture(pictureId);
-    if (picture) {
-        picture.origin = list[1]
-    }
-};
-
-
-
-/**移动图片
- * @param {number} pictureId 图片id
- * @param {number} origin 原点
- * @param {number} x x
- * @param {number} y y
- * @param {number} scaleX 比例x
- * @param {number} scaleY 比例y
- * @param {number} opacity 不透明度
- * @param {number} blendMode 混合模式 
- * @param {number} duration 持续时间 
- */
-Window_Base.prototype.movePicture = function(list) {
-    var pictureId = list[0]
-    var origin = list[1] || 0
-    var x = list[2] || 0
-    var y = list[5] || 0
-    var scaleX = list[4] === undefined ? 100 : list[4]
-    var scaleY = list[5] === undefined ? 100 : list[5]
-    var opacity = list[6] === undefined ? 255 : list[6]
-    var blendMode = list[7] || 0
-    var duration = list[8] || 0
-    var picture = this.picture(pictureId);
-    //如果 图片 
-    if (picture) {
-        picture.move(origin, x, y, scaleX, scaleY, opacity, blendMode, duration);
-    }
-};
-/**旋转图片
- * @param {number} pictureId 图片id
- * @param {number} speed 速度
- * 
- */
-Window_Base.prototype.rotatePicture = function(list) {
-    var pictureId = list[0]
-    var speed = list[1]
-    var picture = this.picture(pictureId);
-    if (picture) {
-        picture.rotate(speed);
-    }
-};
-/**着色图片
- * @param {number} pictureId 图片id
- * @param {[number,number,number,number]} tone 色调
- * @param {number}  duration 持续时间
- * 
- */
-Window_Base.prototype.tintPicture = function(list) {
-    var pictureId = list[0]
-    var tone = list[1]
-    var duration = list[2]
-    var picture = this.picture(pictureId);
-    if (picture) {
-        picture.tint(tone, duration);
-    }
-};
-
-
-/**抹去图片
- * @param {number} pictureId 图片id
- * */
-Window_Base.prototype.erasePicture = function(list) {
-    var pictureId = list[0]
-    this.picture(pictureId, "null");
-};
-
-
-Window_Base.prototype.savePictureAll = function() {
-    this._savePicture = true
-};
-/**
- * 抹去所有图片
- */
-Window_Base.prototype.erasePictureAll = function() {
-    if (this._savePicture) { return this._savePicture = false }
-    if (!this._pictures) {
-        this._pictures = {}
-        this._picturesSprite = {}
-        this._picturesZindex = {}
-    }
-    var l = Object.getOwnPropertyNames(this._pictures)
-
-    for (var i = 0; i < l.length; i++) {
-        var pictureId = l[i]
-        this.picture(pictureId, "null");
-    }
-
-};
-
-
-
-Window_Base.prototype.rotatePictureTo = function(pictureId, rotation, duration) {
-    var pictureId = list[0]
-    var rotation = list[1]
-    var duration = list[2]
-        //图片 = 图片(图片id)
-    var picture = this.picture(pictureId);
-    //如果 图片 
-    if (picture) {
-        //图片 旋转(速度)
-        picture.rotateTo(rotation, duration);
-    }
-};
-
-
-
-
-
-function Sprite_WindowPicture() {
-    this.initialize.apply(this, arguments);
-}
-
-
-/**设置原形  */
-Sprite_WindowPicture.prototype = Object.create(Sprite_Picture.prototype);
-/**设置创造者 */
-Sprite_WindowPicture.prototype.constructor = Sprite_WindowPicture;
-
-
-Sprite_WindowPicture.prototype.setScreen = function(screen) {
-    this._screen = screen
-};
-
-
-Sprite_WindowPicture.prototype.screen = function() {
-    return this._screen
-
-};
-Sprite_WindowPicture.prototype.picture = function() {
-    return this.screen() && this.screen().picture && this.screen().picture(this._pictureId);
-};
-
-
-Sprite_Picture.prototype.loadBitmap = function() {
-    if (this._pictureName) {
-        // console.log(this._pictureName)
-
-        if (this._pictureName.indexOf("text/") == 0) {
-            var json = this._pictureName.slice(5)
-            if (json) {
-                var list = JSON.parse("[" + json + "]")
-                var w = list[0] || 0
-                var h = list[1] || 0
-                var text = list[2] || ""
-                var wb = new Window_Base(0, 0, 1, 1)
-                wb.contents = new Bitmap(w, h)
-                wb.drawTextEx(text, 0, 0)
-                this.bitmap = wb.contents
-                wb.contents = new Bitmap(0, 0)
-                wb = null
-            } else {
-                this.bitmap = new Bitmap()
-            }
-        } else if (this._pictureName.indexOf("face/") == 0) {
-            var json = this._pictureName.slice(5)
-            if (json) {
-                var list = JSON.parse("[" + json + "]")
-                var faceName = list[0] || ""
-                var faceIndex = list[1] || 0
-                this.bitmap = ImageManager.loadFace(faceName);
-                var that = this
-                this.bitmap.addLoadListener(
-                    function() {
-                        var pw = Window_Base._faceWidth;
-                        var ph = Window_Base._faceHeight;
-                        var sw = pw
-                        var sh = ph
-                        var sx = faceIndex % 4 * pw + (pw - sw) / 2;
-                        var sy = Math.floor(faceIndex / 4) * ph + (ph - sh) / 2;
-                        that.setFrame(sx, sy, sw, sh);
-                    }
-                )
-            } else {
-                this.bitmap = new Bitmap()
-            }
-        } else {
-            this.bitmap = ImageManager.loadPicture(this._pictureName);
-        }
-    } else {
-        this.bitmap = ImageManager.loadPicture("");
-    }
-}
-
-
-
-
-
-Sprite_Picture.prototype.updateOrigin = function() {
-    var picture = this.picture();
-    var o = picture.origin()
-    if (Array.isArray(o)) {
-        this.anchor.x = o[0];
-        this.anchor.y = o[1];
-    } else {
-        if (picture.origin() === 0) {
-            this.anchor.x = 0;
-            this.anchor.y = 0;
-        } else {
-            this.anchor.x = 0.5;
-            this.anchor.y = 0.5;
-        }
-    }
-};
-
-
-Sprite_WindowPicture.prototype.updateOrigin = function() {
-    var picture = this.picture();
-    var o = picture.origin()
-    if (Array.isArray(o)) {
-        this.anchor.x = o[0];
-        this.anchor.y = o[1];
-    } else {
-        if (o > 0 && o < 10) {
-            var x = ((o - 1) % 3) * 0.5
-            var y = 1 - Math.floor((o - 1) / 3) * 0.5
-            this.anchor.x = x;
-            this.anchor.y = y;
-        } else {
-            this.anchor.x = 0;
-            this.anchor.y = 0;
-        }
-    }
-};
-
-
-
-
-
-
-
-Game_Interpreter.prototype.command101 = function () {
-    //如果(不是 游戏消息 是忙碌的() )
-    if (!$gameMessage.isBusy()) {
-        //游戏消息 设置脸图(参数组[0],参数组[1])
-        $gameMessage.setFaceImage(this._params[0], this._params[1]);
-        //游戏消息 设置背景(参数组[2])
-        $gameMessage.setBackground(this._params[2]);
-        //游戏消息 设置位置种类(参数组[3])
-        $gameMessage.setPositionType(this._params[3]);
-        //当(下一个事件编码() === 401 )
-        while (this.nextEventCode() === 401) {  // Text data 文本数据
-            //索引++
-            this._index++;
-            //游戏消息 添加(当前命令() 参数组[0])
-            $gameMessage.add(this.currentCommand().parameters[0]);
-        }
-        while(this.nextEventCode() === 101){
-            this._index++;
-            var p = this.currentCommand().parameters
-            if(this._params[0] == p[0] && this._params[1] == p[1] && this._params[2] == p[2]&&  this._params[3] == p[3] ){
-                while (this.nextEventCode() === 401) {  // Text data 文本数据
-                    //索引++
-                    this._index++;
-                    //游戏消息 添加(当前命令() 参数组[0])
-                    $gameMessage.add(this.currentCommand().parameters[0]);
-                }
-            } 
-        }
-
-
-        //检查 (下一个事件编码() )
-        switch (this.nextEventCode()) {
-            //当 102
-            case 102:  // Show Choices 显示选项
-                //索引++
-                this._index++;
-                //安装选择组(当前命令() 参数组)
-                this.setupChoices(this.currentCommand().parameters);
-                //中断
-                break;
-            //当 103
-            case 103:  // Input Number 输入数字
-                //索引++
-                this._index++;
-                //安装数字输入(当前命令() 参数组)
-                this.setupNumInput(this.currentCommand().parameters);
-                //中断
-                break;
-            //当 104
-            case 104:  // Select Item 选择物品
-                //索引++
-                this._index++;
-                //安装物品选择(当前命令() 参数组)
-                this.setupItemChoice(this.currentCommand().parameters);
-                //中断
-                break;
-        }
-        //索引++
-        this._index++;
-        //设置等待模式("message"//消息 )
-        this.setWaitMode('message');
-    }
-    //返回 false
-    return false;
-};
+ 
