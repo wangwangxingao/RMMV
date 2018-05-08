@@ -162,6 +162,64 @@ var MD5 = function (e) {
 var MD5_2 = function (data) { try { return require('crypto').createHash('md5').update(data).digest('hex').toUpperCase() } catch (e) { return "D41D8CD98F00B204E9800998ECF8427E" }; };
 
 
+var Utf8 = {}; // Utf8 namespace
+
+/**
+ * Encode multi-byte Unicode string into utf-8 multiple single-byte characters 
+ * (BMP / basic multilingual plane only)
+ *
+ * Chars in range U+0080 - U+07FF are encoded in 2 chars, U+0800 - U+FFFF in 3 chars
+ *
+ * @param {String} strUni Unicode string to be encoded as UTF-8
+ * @returns {String} encoded string
+ */
+Utf8.encode = function(strUni) {
+    // use regular expressions & String.replace callback function for better efficiency 
+    // than procedural approaches
+    var strUtf = strUni.replace(
+        /[\u0080-\u07ff]/g, // U+0080 - U+07FF => 2 bytes 110yyyyy, 10zzzzzz
+        function(c) {
+            var cc = c.charCodeAt(0);
+            return String.fromCharCode(0xc0 | cc >> 6, 0x80 | cc & 0x3f);
+        }
+    );
+    strUtf = strUtf.replace(
+        /[\u0800-\uffff]/g, // U+0800 - U+FFFF => 3 bytes 1110xxxx, 10yyyyyy, 10zzzzzz
+        function(c) {
+            var cc = c.charCodeAt(0);
+            return String.fromCharCode(0xe0 | cc >> 12, 0x80 | cc >> 6 & 0x3F, 0x80 | cc & 0x3f);
+        }
+    );
+    return strUtf;
+}
+
+/**
+ * Decode utf-8 encoded string back into multi-byte Unicode characters
+ *
+ * @param {String} strUtf UTF-8 string to be decoded back to Unicode
+ * @returns {String} decoded string
+ */
+Utf8.decode = function(strUtf) {
+    // note: decode 3-byte chars first as decoded 2-byte strings could appear to be 3-byte char!
+    var strUni = strUtf.replace(
+        /[\u00e0-\u00ef][\u0080-\u00bf][\u0080-\u00bf]/g, // 3-byte chars
+        function(c) { // (note parentheses for precence)
+            var cc = ((c.charCodeAt(0) & 0x0f) << 12) | ((c.charCodeAt(1) & 0x3f) << 6) | (c.charCodeAt(2) & 0x3f);
+            return String.fromCharCode(cc);
+        }
+    );
+    strUni = strUni.replace(
+        /[\u00c0-\u00df][\u0080-\u00bf]/g, // 2-byte chars
+        function(c) { // (note parentheses for precence)
+            var cc = (c.charCodeAt(0) & 0x1f) << 6 | c.charCodeAt(1) & 0x3f;
+            return String.fromCharCode(cc);
+        }
+    );
+    return strUni;
+}
+
+
+
 /**
  * 读取数据文件
  * @param {string} name 名称
@@ -1010,8 +1068,9 @@ Decrypter.isLocalMode = function () {
 
 
     /**计算
-     * @param {[]} k 键组
-     * @param {number} l 长度
+     * @param {[]} a 键组
+     * @param {number} b 长度
+     * @param {number} c 计算次数
      * 
      */
     w.ei = function (a, b, c) {
@@ -1028,25 +1087,38 @@ Decrypter.isLocalMode = function () {
 
 
 
+    /**
+     * 读取模式
+     * @param {string|[string]} m 
+     */
     w.rm = function (m) {
         return typeof (m) == "string" ? w.m[m] || w.m : m || w.m
     };
 
 
 
+    /**
+     * 读取头
+     * @param {string} h 
+     */
     w.rh = function (h) {
         return h || w.h
     };
 
 
-    /**读取加密键
-     * @return  {[]}
+    /**
+     * 
+     * @param {*} k 
      */
     w.rk = function (k) {
         return k || w.k
     };
 
 
+    /**
+     * 文本转化为数组
+     * @param {string} t 
+     */
     w.t2b = function (t) {
         var l = w.l(t) / 2;
         var k = []
@@ -1058,27 +1130,29 @@ Decrypter.isLocalMode = function () {
     };
 
     /**
-     * 长度
-     * 
+     * 转化为Uint8Array
+     * @param {*} a 
+     * @return {Uint8Array}
      */
     w.u = function (a) {
         return new Uint8Array(a)
     };
 
 
-    /**
-     * 长度
-     * 
-     */
+   /**
+    * 长度
+    * @param {[]|ArrayBuffer} b 
+    * @return {number}
+    */
     w.l = function (b) {
         return b ? b.length || b.byteLength || 0 : 0
     };
 
     /**
-     * 数组转文本
-     * 
+     * 数组转化为文本
+     * @param {[]} b 数组
+     * @return {string}  文本
      */
-
     w.bt = function (b) {
         var l = w.l(b)
         var t = []
@@ -1089,10 +1163,10 @@ Decrypter.isLocalMode = function () {
     };
 
     /**
-     * 文本转数组
-     * 
+     * 文本转化为数组
+     * @param {string} t 文本
+     * @return {Uint8Array} Uint8Array数组
      */
-
     w.tb = function (t) {
         var l = w.l(t)
         var b = w.u(l)
@@ -1104,8 +1178,8 @@ Decrypter.isLocalMode = function () {
 
     /**
      * arrayBuffer转Uint8Arry
-     * @param {ArrayBuffer} a
-     * @return {Uint8Array}  
+     * @param {ArrayBuffer} a arrayBuffer数据
+     * @return {Uint8Array}  Uint8Arry数据
      */
     w.ab = function (a) {
         return w.u(a);
@@ -1113,15 +1187,20 @@ Decrypter.isLocalMode = function () {
 
     /**
      * arrayBuffer转Uint8Arry
-     * @param {Uint8Array} b
-     * @return {ArrayBuffer}  
+     * @param {Uint8Array} b Uint8Arry数据
+     * @return {ArrayBuffer} arrayBuffer数据
      */
     w.ba = function (b) {
         return (b || w.u()).buffer;
     };
 
 
-    /**解密 头 */
+    /**
+     * @param {Uint8Array} a Uint8Arry数据
+     * @param {[]} k 密钥
+     * @param {[]} h 文件头
+     * 
+     */
     w.d.header = function (a, k, h) {
         var b = w.rh(k)
         if (a) {
