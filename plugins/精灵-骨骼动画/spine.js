@@ -1,4 +1,22 @@
+/**
+ * 骨骼动画
+ * 
+ *   s = new Spine("dragon")
+ *   SceneManager._scene.addChild(s)
+ *   s.scale.set(0.3, 0.3)
+ *   s.y = 300
+ *   s.x = 300
+ *   s.addLoadListener(
+ *       function (spine) {
+ *           spine.state.setAnimation(0, "flying", true)
+ *       }
+ *   )
+ * 
+ *  
+ * 
+ */
 
+/**骨骼动画精灵 */
 function Spine() {
     this.initialize.apply(this, arguments);
 }
@@ -6,10 +24,12 @@ function Spine() {
 Spine.prototype = Object.create(PIXI.Container.prototype);
 Spine.prototype.constructor = Spine;
 
+/**骨骼动画数据组 */
 Spine._spines = {}
+/**骨骼动画呼叫 */
 Spine._spinescall = {}
 
-
+/**骨骼动画加载请求 */
 Spine.request = function (name, fun) {
     if (!Spine._spines[name]) {
         if (!Spine._spinescall[name]) {
@@ -35,10 +55,10 @@ Spine.request = function (name, fun) {
     }
 }
 
-
+/**初始化 */
 Spine.prototype.initialize = function (name) {
     PIXI.Container.call(this);
-    this.interactive = false; 
+    this.interactive = false;
     this._loadListeners = []
     this._loading = false
     this._spine = null
@@ -46,6 +66,7 @@ Spine.prototype.initialize = function (name) {
     this.spineName = name;
 };
 
+/**动画数据名称 */
 Object.defineProperty(Spine.prototype, 'spineName', {
     get: function () {
         return this._spineName;
@@ -59,6 +80,7 @@ Object.defineProperty(Spine.prototype, 'spineName', {
     configurable: true
 });
 
+/**更新时间 */
 Object.defineProperty(Spine.prototype, 'updateTime', {
     get: function () {
         return this._updateTime;
@@ -71,7 +93,7 @@ Object.defineProperty(Spine.prototype, 'updateTime', {
     configurable: true
 });
 
-
+/**骨骼动画 */
 Object.defineProperty(Spine.prototype, 'spine', {
     get: function () {
         return this._spine;
@@ -91,7 +113,7 @@ Object.defineProperty(Spine.prototype, 'spine', {
 });
 
 
-
+/**状态 */
 Object.defineProperty(Spine.prototype, 'state', {
     get: function () {
         return this._spine && this._spine.state;
@@ -99,8 +121,8 @@ Object.defineProperty(Spine.prototype, 'state', {
     configurable: false
 });
 
-
-Spine.prototype.load = function (name) {  
+/**读取 */
+Spine.prototype.load = function (name) {
     this._spineName = name;
     this._loading = true
     this._loadListeners = []
@@ -113,38 +135,40 @@ Spine.prototype.load = function (name) {
     }
 }
 
+
+/**设置骨骼动画数据 */
 Spine.prototype.setSpineDate = function (name) {
     if (this.spineName == name) {
         this._loading = false
         var data = Spine._spines[name] || null
         if (name && data) {
             var spine = new PIXI.spine.Spine(data);
-            spine.skeleton.setToSetupPose(); 
+            spine.skeleton.setToSetupPose();
             spine.update(0);
-            spine.autoUpdate = false; 
-            this.spine = spine  
+            spine.autoUpdate = false;
+            this.spine = spine
         } else {
             this.spine = null
         }
- 
+
         this._callLoadListeners()
     }
-    
+
 }
 
-
+/**更新 */
 Spine.prototype.update = function () {
     if (this.spine) {
         this.spine.update(this._updateTime)
     }
 }
 
-
+/**是加载好 */
 Spine.prototype.isReady = function () {
-    return !this._loading 
+    return !this._loading
 };
 
-
+/**添加读取事件 */
 Spine.prototype.addLoadListener = function (listner) {
     if (!this.isReady()) {
         this._loadListeners.push(listner);
@@ -153,7 +177,7 @@ Spine.prototype.addLoadListener = function (listner) {
     }
 };
 
-
+/**呼叫读取事件 */
 Spine.prototype._callLoadListeners = function () {
     while (this._loadListeners.length > 0) {
         var listener = this._loadListeners.shift();

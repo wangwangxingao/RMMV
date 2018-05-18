@@ -1616,6 +1616,12 @@ Window_Base.prototype.drawBitmapText = function(b,c, x, y , w,h) {
 };
 
 
+
+/**进行普通文字处理2 */
+Window_Base.prototype.processNormalCharacter2 = function() {};
+
+
+
 /**添加参数 */
 Window_Message.prototype.tslPushParam = function(textState, name, value) {
     var obj = {
@@ -2356,12 +2362,6 @@ Game_Message.prototype.setFaceImage = function(faceName, faceIndex, facepos) {
 Game_Message.prototype.facePos = function() {
     return this._facepos
 };
-
-
-
-
-/**进行普通文字处理2 */
-Window_Base.prototype.processNormalCharacter2 = function() {};
 
 
 
