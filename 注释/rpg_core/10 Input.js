@@ -121,23 +121,23 @@ Input.gamepadMapper = {
  * @method clear
  */
 Input.clear = function() {
-	//当前状态
+	//当前状态 = {}
     this._currentState = {};
-    //以前的状态
+    //以前的状态 = {}
     this._previousState = {};
-    //游戏手柄状态
+    //游戏手柄状态 = []
     this._gamepadStates = [];
-    //最新键
+    //最新键 = null
     this._latestButton = null;
-    //按下时间
+    //按下时间 = 0
     this._pressedTime = 0;
-    //4方向
+    //4方向 = 0 
     this._dir4 = 0;
-    //8方向
+    //8方向 = 0 
     this._dir8 = 0;
-    //优先轴
+    //优先轴 = ""
     this._preferredAxis = '';
-    //日期
+    //日期 = 0
     this._date = 0;
 };
 
@@ -352,26 +352,29 @@ Input._setupEventHandlers = function() {
 /**当键按下
  * @static
  * @method _onKeyDown
- * @param {KeyboardEvent} event
+ * @param {KeyboardEvent} event 按键事件
  * @private
  */ 
 Input._onKeyDown = function(event) {
-	//如果 需要避免默认 (键值)
+	//如果( 需要避免默认 (事件 键编码))
     if (this._shouldPreventDefault(event.keyCode)) {
 	    //避免默认
         event.preventDefault();
     }
-    //键值===144
+    //如果( 事件 键编码===144)
     if (event.keyCode === 144) {    // Numlock  数字开关
         //清除
         this.clear();
     }
+    //键名 = 键映射[事件 键编码]
     var buttonName = this.keyMapper[event.keyCode];
-    //如果 键名
+    //如果( 资源处理程序 存在() && 按键名 == "ok")
     if (ResourceHandler.exists() && buttonName === 'ok') {
+        //资源处理程序 重试()
         ResourceHandler.retry();
+    //否则 如果(键名)
     } else if (buttonName) {
-	    //当前状态 键 =true
+	    //当前状态[ 键名 ]= true
         this._currentState[buttonName] = true;
     }
 };
@@ -379,7 +382,7 @@ Input._onKeyDown = function(event) {
 /**需要避免默认
  * @static
  * @method _shouldPreventDefault
- * @param {number} keyCode
+ * @param {number} keyCode 键编码
  * @private
  */ 
 Input._shouldPreventDefault = function(keyCode) {
@@ -399,18 +402,18 @@ Input._shouldPreventDefault = function(keyCode) {
 /**当键抬起
  * @static
  * @method _onKeyUp
- * @param {KeyboardEvent} event
+ * @param {KeyboardEvent} event 按键事件
  * @private
  */ 
 Input._onKeyUp = function(event) {
-	//键名= 键名表[键值]
+	//键名= 键映射[事件 键编码]
     var buttonName = this.keyMapper[event.keyCode];
-    //如果键名存在
+    //如果(键名) 
     if (buttonName) {
-	    //当前键名 状态 = false
+	    //当前状态[键名] = false
         this._currentState[buttonName] = false;
     }
-    // 如果 键值===0
+    // 如果 (事件 键编码===0)
     if (event.keyCode === 0) {  // For QtWebEngine on OS X
        //清除
         this.clear();
@@ -456,12 +459,12 @@ Input._pollGamepads = function() {
 /**更新游戏手柄状态
  * @static
  * @method _updateGamepadState
- * @param {Gamepad} gamepad
- * @param {number} index
+ * @param {Gamepad} gamepad 游戏手柄
+ * @param {number} index 索引
  * @private
  */ 
 Input._updateGamepadState = function(gamepad) {
-	// 最后状态 = 游戏手柄 状态[游戏手柄.索引]
+	// 最后状态 = 游戏手柄状态[游戏手柄.索引]
     var lastState = this._gamepadStates[gamepad.index] || [];
     //新的状态 = []
     var newState = [];
@@ -476,41 +479,44 @@ Input._updateGamepadState = function(gamepad) {
     newState[13] = false;
     newState[14] = false;
     newState[15] = false;
-    //循环 开始时 i = 0 ; 当 i < 按键组 长度 时 ; 每一次 i++
+    //循环( 开始时 i = 0 ; 当 i < 按键组 长度 时 ; 每一次 i++)
     for (var i = 0; i < buttons.length; i++) {
 	    //新状态[i]= 按键组[i].按下
         newState[i] = buttons[i].pressed;
     }
     
-    //如果 坐标轴[1]< -临界值
+    //如果 (坐标轴[1]< -临界值)
     if (axes[1] < -threshold) {
 	    //新状态[12] = true 上 
         newState[12] = true;    // up
-    //否则 如果 坐标轴[1] > 临界值 
+    //否则 (如果 坐标轴[1] > 临界值 )
     } else if (axes[1] > threshold) {
 	    //新状态[13] = true 下
         newState[13] = true;    // down
     }
-    //如果 坐标轴[0]< -临界值
+    //如果( 坐标轴[0]< -临界值)
     if (axes[0] < -threshold) {
 	    //新状态[14] = true 左
         newState[14] = true;    // left
-    //否则 如果 坐标轴[0] > 临界值 
+    //否则 (如果 坐标轴[0] > 临界值 )
     } else if (axes[0] > threshold) {
 	    //新状态[15] = true 右
         newState[15] = true;    // right
     }
-    //循环 开始时 j = 0 ; 当 j < 新状态 长度 时 ; 每一次 j++
+    //循环( 开始时 j = 0 ; 当 j < 新状态 长度 时 ; 每一次 j++)
     for (var j = 0; j < newState.length; j++) {
-	    //
+	    //如果(新状态[j] !== 最后状态[j])
         if (newState[j] !== lastState[j]) {
+            //键名 = 手柄按钮映射[j]
             var buttonName = this.gamepadMapper[j];
+            //如果(键名)
             if (buttonName) {
 	            //当前状态 [键名] = 新状态[j]
                 this._currentState[buttonName] = newState[j];
             }
         }
     }
+    //游戏手柄状态[游戏手柄.索引] = 新状态
     this._gamepadStates[gamepad.index] = newState;
 };
 

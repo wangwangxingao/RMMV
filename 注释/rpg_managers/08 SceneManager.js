@@ -68,6 +68,7 @@ SceneManager.initialize = function() {
     this.checkPluginErrors();
     this.setupErrorHandlers();
 };
+
 /**初始化图形 */
 SceneManager.initGraphics = function() {
     var type = this.preferableRendererType();
@@ -82,17 +83,24 @@ SceneManager.initGraphics = function() {
         this.checkWebGL();
     }
 };
+
 /**可取渲染器类型 */
 SceneManager.preferableRendererType = function() {
-	//是选择启用有效
+	//如果( 公用程序 是选择启用有效('canvas') )
     if (Utils.isOptionValid('canvas')) {
+        //返回 "canvas"
         return 'canvas';
+	//否则 如果( 公用程序 是选择启用有效('webgl') ) 
     } else if (Utils.isOptionValid('webgl')) {
+        //返回 "webgl"
         return 'webgl';
+	//否则  
     } else {
+        //返回 "auto"
         return 'auto';
     }
 };
+
 /**应该使用画布渲染器 */
 SceneManager.shouldUseCanvasRenderer = function() {
 	//是移动设备
@@ -104,12 +112,14 @@ SceneManager.checkWebGL = function() {
         throw new Error('Your browser does not support WebGL.');
     }
 };
+
 /**检查文件访问 */
 SceneManager.checkFileAccess = function() {
     if (!Utils.canReadGameFiles()) {
         throw new Error('Your browser does not allow to read local files.');
     }
 };
+
 /**初始化音频 */
 SceneManager.initAudio = function() {
     var noAudio = Utils.isOptionValid('noaudio');
@@ -117,11 +127,13 @@ SceneManager.initAudio = function() {
         throw new Error('Your browser does not support Web Audio API.');
     }
 };
+
 /**初始化输入 */
 SceneManager.initInput = function() {
     Input.initialize();
     TouchInput.initialize();
 };
+
 /**初始化NW JS */
 SceneManager.initNwjs = function() {
     if (Utils.isNwjs()) {
@@ -135,15 +147,18 @@ SceneManager.initNwjs = function() {
         }
     }
 };
+
 /**检查插件错误 */
 SceneManager.checkPluginErrors = function() {
     PluginManager.checkErrors();
 };
+
 /**设置错误处理程序 */
 SceneManager.setupErrorHandlers = function() {
     window.addEventListener('error', this.onError.bind(this));
     document.addEventListener('keydown', this.onKeyDown.bind(this));
 };
+
 /**要求更新 */
 SceneManager.requestUpdate = function() {
 	//如果 不是 停止的 
@@ -152,6 +167,7 @@ SceneManager.requestUpdate = function() {
         requestAnimationFrame(this.update.bind(this));
     }
 };
+
 /**更新 */
 SceneManager.update = function() {
     try {
@@ -166,14 +182,16 @@ SceneManager.update = function() {
         //标记结束
         this.tickEnd();
     } catch (e) {
-	    //捕捉异常
+        //捕捉异常(e)
         this.catchException(e);
     }
 };
+
 /**终止 */
 SceneManager.terminate = function() {
     window.close();
 };
+
 /**出错时 */
 SceneManager.onError = function(e) {
     console.error(e.message);
@@ -185,6 +203,7 @@ SceneManager.onError = function(e) {
     } catch (e2) {
     }
 };
+
 /**在键按下 */
 SceneManager.onKeyDown = function(event) {
     if (!event.ctrlKey && !event.altKey) {
@@ -207,7 +226,11 @@ SceneManager.onKeyDown = function(event) {
         }
     }
 };
-/**捕捉异常 */
+
+/**
+ * 捕捉异常 
+ * @param {Error} e 错误
+ */
 SceneManager.catchException = function(e) {
     if (e instanceof Error) {
         Graphics.printError(e.name, e.message);
@@ -218,19 +241,23 @@ SceneManager.catchException = function(e) {
     AudioManager.stopAll();
     this.stop();
 };
+
 /**标记开始 */
 SceneManager.tickStart = function() {
     Graphics.tickStart();
 };
+
 /**标记结束 */
 SceneManager.tickEnd = function() {
     Graphics.tickEnd();
 };
+
 /**更新输入数据 */
 SceneManager.updateInputData = function() {
     Input.update();
     TouchInput.update();
 };
+
 /**更新主要 */
 SceneManager.updateMain = function() {
     if (Utils.isMobileSafari()) {
@@ -252,6 +279,7 @@ SceneManager.updateMain = function() {
     this.renderScene();
     this.requestUpdate();
 };
+
 /**更新管理器 */
 SceneManager.updateManagers = function() {
     ImageManager.update();

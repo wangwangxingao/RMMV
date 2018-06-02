@@ -20,9 +20,9 @@ Graphics._videoVolume = 1;
  *
  * @static
  * @method initialize
- * @param {number} width The width of the game screen
- * @param {number} height The height of the game screen
- * @param {string} type The type of the renderer.
+ * @param {number} width 游戏画面的宽度. The width of the game screen
+ * @param {number} height 游戏画面的高度. The height of the game screen
+ * @param {string} type 渲染器的类型。 The type of the renderer.
  *                 'canvas', 'webgl', or 'auto'.
  */
 Graphics.initialize = function(width, height, type) {
@@ -71,7 +71,7 @@ Graphics.initialize = function(width, height, type) {
     this._setupCssFontLoading();
 };
 
-
+/**安装Css字体加载*/
 Graphics._setupCssFontLoading = function(){
     if(Graphics._cssFontLoading){
         document.fonts.ready.then(function(fonts){
@@ -82,21 +82,23 @@ Graphics._setupCssFontLoading = function(){
     }
 };
 
+/**可以使用Css字体加载 */
 Graphics.canUseCssFontLoading = function(){
     return !!this._cssFontLoading;
 };
 
-/**游戏画面的总帧数
+/**帧计数
+ * 
+ * 游戏画面的总帧数
  * The total frame count of the game screen.
  *
  * @static
  * @property frameCount
  * @type Number
- */
-  //帧计数 = 0 
+ */ 
 Graphics.frameCount     = 0;
 
-/**混合 正常
+/**混合 正常 
  * The alias of PIXI.blendModes.NORMAL.
  *
  * @static
@@ -136,7 +138,9 @@ Graphics.BLEND_MULTIPLY = 2;
  */
 Graphics.BLEND_SCREEN   = 3;
 
-/**标记每帧FPSMeter的开始
+/**
+ * 标记开始
+ * 标记每帧FPSMeter的开始
  * Marks the beginning of each frame for FPSMeter.
  *
  * @static
@@ -148,7 +152,9 @@ Graphics.tickStart = function() {
     }
 };
 
-/**标记每帧FPSMeter的末端
+/**
+ * 标记结束
+ * 标记每帧FPSMeter的末端
  * Marks the end of each frame for FPSMeter.
  *
  * @static
@@ -166,7 +172,7 @@ Graphics.tickEnd = function() {
  *
  * @static
  * @method render
- * @param {Stage} stage The stage object to be rendered
+ * @param {Stage} stage 要呈现的舞台对象. The stage object to be rendered
  */ 
 Graphics.render = function(stage) {
 	//如果( )
@@ -220,7 +226,10 @@ Graphics.hasWebGL = function() {
     }
 };
 
-/**检查画布上混合模式“差异”是否支持
+/**
+ * 可以使用差异混合
+ * 
+ * 检查画布上混合模式"差异"是否支持
  * Checks whether the canvas blend mode 'difference' is supported.
  *
  * @static
@@ -231,7 +240,10 @@ Graphics.canUseDifferenceBlend = function() {
     return this._canUseDifferenceBlend;
 };
 
-/**检查画布上混合模式“饱和”是否支持
+/**
+ * 可以使用饱和度混合
+ * 
+ * 检查画布上混合模式"饱和"是否支持
  * Checks whether the canvas blend mode 'saturation' is supported.
  *
  * @static
@@ -242,7 +254,9 @@ Graphics.canUseSaturationBlend = function() {
     return this._canUseSaturationBlend;
 };
 
-/**设置“NOW LOADING”形象的来源
+/**
+ * 设置加载图像
+ * 设置"Now Loading"形象的来源
  * Sets the source of the "Now Loading" image.
  *
  * @static
@@ -253,7 +267,9 @@ Graphics.setLoadingImage = function(src) {
     this._loadingImage.src = src;
 };
 
-/**初始化显示“NOW LOADING”的形象 计数器
+/**
+ * 开始加载
+ * 初始化显示"Now Loading"的形象 计数器
  * Initializes the counter for displaying the "Now Loading" image.
  *
  * @static
@@ -263,7 +279,9 @@ Graphics.startLoading = function() {
     this._loadingCount = 0;
 };
 
-/**递增加载计数器并在必要时显示“NOW LOADING”的形象。
+/**
+ * 更新加载
+ * 递增加载计数器并在必要时显示"Now Loading"的形象。
  * Increments the loading counter and displays the "Now Loading" image if necessary.
  *
  * @static
@@ -275,7 +293,9 @@ Graphics.updateLoading = function() {
     this._upperCanvas.style.opacity = 1;
 };
 
-/**擦除“NOW LOADING”的形象
+/**
+ * 结束加载
+ * 清除"Now Loading"的图像
  * Erases the "Now Loading" image.
  *
  * @static
@@ -285,12 +305,14 @@ Graphics.endLoading = function() {
     this._clearUpperCanvas();
     this._upperCanvas.style.opacity = 0;
 };
+
 /**
+ * 显示加载错误
+ * 在屏幕上显示加载错误文本。
  * Displays the loading error text to the screen.
- *
  * @static
  * @method printLoadingError
- * @param {String} url The url of the resource failed to load
+ * @param {String} url 资源的URL未能加载.The url of the resource failed to load. 
  */
 Graphics.printLoadingError = function(url) {
     if (this._errorPrinter && !this._errorShowed) {
@@ -310,6 +332,8 @@ Graphics.printLoadingError = function(url) {
 };
 
 /**
+ * 清除加载错误
+ * 清除加载错误文本。
  * Erases the loading error text.
  *
  * @static
@@ -323,13 +347,15 @@ Graphics.eraseLoadingError = function() {
 };
  
 
-/**显示错误文本到画面上
+/**
+ * 显示错误
+ * 显示错误文本到画面上
  * Displays the error text to the screen.
  *
  * @static
  * @method printError
- * @param {string} name The name of the error
- * @param {string} message The message of the error
+ * @param {string} name 错误的名称.The name of the error
+ * @param {string} message 错误的消息.The message of the error
  */
 Graphics.printError = function(name, message) {
     this._errorShowed = true;
@@ -432,10 +458,10 @@ Graphics.playVideo = function(src) {
     this._playVideo(src);
 };
 
-/**
+/**播放视频
  * @static
  * @method _playVideo
- * @param {String} src
+ * @param {String} src 地址
  * @private
  */
 Graphics._playVideo = function(src) {
@@ -453,7 +479,7 @@ Graphics._playVideo = function(src) {
  *
  * @static
  * @method isVideoPlaying
- * @return {boolean} True if the video is playing
+ * @return {boolean} 如果视频正在播放，则为真. True if the video is playing
  */ 
 Graphics.isVideoPlaying = function() {
      return this._videoLoading || this._isVideoVisible();
@@ -466,14 +492,16 @@ Graphics.isVideoPlaying = function() {
  *
  * @static
  * @method canPlayVideoType
- * @param {string} type The video type to test support for
- * @return {boolean} True if the browser can play the specified video type
+ * @param {string} type 要测试支持的视频类型. The video type to test support for
+ * @return {boolean} 如果浏览器可以播放指定的视频类型，则为真. True if the browser can play the specified video type
  */ 
 Graphics.canPlayVideoType = function(type) {
     return this._video && this._video.canPlayType(type);
 };
 
 /**
+ * 设置视频音量
+ * 设置视频的音量
  * Sets volume of a video.
  *
  * @static
@@ -493,8 +521,8 @@ Graphics.setVideoVolume = function(value) {
  *
  * @static
  * @method pageToCanvasX
- * @param {number} x The x coordinate on the page to be converted
- * @return {number} The x coordinate on the canvas area
+ * @param {number} x 要转换的页面上的x坐标. The x coordinate on the page to be converted
+ * @return {number} 画布区域的x坐标. The x coordinate on the canvas area
  */ 
 Graphics.pageToCanvasX = function(x) {
     if (this._canvas) {
@@ -512,8 +540,8 @@ Graphics.pageToCanvasX = function(x) {
  *
  * @static
  * @method pageToCanvasY
- * @param {number} y The y coordinate on the page to be converted
- * @return {number} The y coordinate on the canvas area
+ * @param {number} y 要转换的页面上的y坐标. The y coordinate on the page to be converted
+ * @return {number} 画布区域的y坐标. The y coordinate on the canvas area
  */ 
 Graphics.pageToCanvasY = function(y) {
     if (this._canvas) {
@@ -530,9 +558,9 @@ Graphics.pageToCanvasY = function(y) {
  *
  * @static
  * @method isInsideCanvas
- * @param {number} x The x coordinate on the canvas area
- * @param {number} y The y coordinate on the canvas area
- * @return {boolean} True if the specified point is inside the game canvas area
+ * @param {number} x 画布区域的x坐标. The x coordinate on the canvas area
+ * @param {number} y 画布区域的y坐标. The y coordinate on the canvas area
+ * @return {boolean} 如果指定的点位于游戏画布区域内，则为真. True if the specified point is inside the game canvas area
  */ 
 Graphics.isInsideCanvas = function(x, y) {
     return (x >= 0 && x < this._width && y >= 0 && y < this._height);
@@ -655,7 +683,7 @@ Object.defineProperty(Graphics, 'scale', {
     configurable: true
 });
 
-/**创造所有成员
+/**创造所有元素组
  * @static
  * @method _createAllElements
  * @private
@@ -671,7 +699,7 @@ Graphics._createAllElements = function() {
     this._createGameFontLoader();
 };
 
-/**更新所有成分
+/**更新所有元素组
  * @static
  * @method _updateAllElements
  * @private
@@ -706,8 +734,8 @@ Graphics._updateRealScale = function() {
 /**制作错误Html
  * @static
  * @method _makeErrorHtml
- * @param {string} name
- * @param {string} message
+ * @param {string} name 名称
+ * @param {string} message 信息
  * @return {string}
  * @private
  */
@@ -1020,7 +1048,7 @@ Graphics._createFontLoader = function(name) {
     document.body.appendChild(div);
 };
 
-/**创建成员
+/**中心元素
  * @static
  * @method _centerElement
  * @param {HTMLElement} element
@@ -1174,7 +1202,7 @@ Graphics._onKeyDown = function(event) {
     }
 };
 
-/**
+/**当触摸结束
  * @static
  * @method _onTouchEnd
  * @param {TouchEvent} event
