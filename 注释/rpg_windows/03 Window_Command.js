@@ -15,7 +15,9 @@ Window_Command.prototype = Object.create(Window_Selectable.prototype);
 Window_Command.prototype.constructor = Window_Command;
 /**初始化 */
 Window_Command.prototype.initialize = function(x, y) {
+    //清除命令列表()
     this.clearCommandList();
+    //制作命令列表() 
     this.makeCommandList();
     var width = this.windowWidth();
     var height = this.windowHeight();

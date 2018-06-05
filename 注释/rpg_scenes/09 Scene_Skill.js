@@ -49,7 +49,9 @@ Scene_Skill.prototype.createStatusWindow = function() {
     var ww = Graphics.boxWidth - wx;
     var wh = this._skillTypeWindow.height;
     this._statusWindow = new Window_SkillStatus(wx, wy, ww, wh);
+    //状态窗口 预约脸图()
     this._statusWindow.reserveFaceImages();
+    //添加窗口(状态窗口)
     this.addWindow(this._statusWindow);
 };
 /**创建物品窗口 */

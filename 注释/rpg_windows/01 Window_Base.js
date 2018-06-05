@@ -805,8 +805,12 @@ Window_Base.prototype.canvasToLocalY = function(y) {
     return y;
 };
 
+/**预约脸图 */
 Window_Base.prototype.reserveFaceImages = function() {
+    //游戏队伍 成员组() 对每一个 角色
     $gameParty.members().forEach(function(actor) {
+        //图像管理器 预约脸图(角色 脸图名称())
         ImageManager.reserveFace(actor.faceName());
+    //this)
     }, this);
 };

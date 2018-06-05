@@ -74,20 +74,27 @@ Scene_Menu.prototype.createGoldWindow = function() {
 Scene_Menu.prototype.createStatusWindow = function() {
     //状态窗口 = 新 窗口菜单状态(命令窗口 宽 , 0 )
     this._statusWindow = new Window_MenuStatus(this._commandWindow.width, 0);
+    //状态窗口 预约脸图()
     this._statusWindow.reserveFaceImages();
     //添加窗口(状态窗口)
     this.addWindow(this._statusWindow);
 };
 /**命令物品 */
 Scene_Menu.prototype.commandItem = function() {
+    //场景管理器 添加(场景物品)
     SceneManager.push(Scene_Item);
 };
 /**命令个人 */
 Scene_Menu.prototype.commandPersonal = function() {
+    //状态窗口 设置编队模式(false) 
     this._statusWindow.setFormationMode(false);
+    //状态窗口 选择表()  
     this._statusWindow.selectLast();
+    //状态窗口 使活动()  
     this._statusWindow.activate();
+    //状态窗口 设置编队模式(false)  
     this._statusWindow.setHandler('ok',     this.onPersonalOk.bind(this));
+    //状态窗口 设置编队模式(false)  
     this._statusWindow.setHandler('cancel', this.onPersonalCancel.bind(this));
 };
 /**命令编队 */

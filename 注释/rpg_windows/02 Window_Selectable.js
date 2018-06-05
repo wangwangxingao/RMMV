@@ -86,31 +86,31 @@ Window_Selectable.prototype.maxRows = function() {
     //(   (最大项目数/最大列数)向上取整 , 1 )之间最大的
     return Math.max(Math.ceil(this.maxItems() / this.maxCols()), 1);
 };
-/**使活动 */
+/**活动 */
 Window_Selectable.prototype.activate = function() {
-    //使用 Window_Base 里 使活动 的方法
+    //窗口基础 活动 呼叫(this)
     Window_Base.prototype.activate.call(this);
-    //重选
+    //重选()
     this.reselect();
 };
-/**使不活动 */
+/**不活动 */
 Window_Selectable.prototype.deactivate = function() {
     //窗口基础 不活动 呼叫(this)
     Window_Base.prototype.deactivate.call(this);
-    //重新
+    //重新()
     this.reselect();
 };
 /**选择 */
 Window_Selectable.prototype.select = function(index) {
-    // _索引 = index
+    //索引 = index
     this._index = index;
     //停留计数 = 0 
     this._stayCount = 0;
-    //确定光标可见
+    //确定光标可见()
     this.ensureCursorVisible();
-    //更新光标
+    //更新光标()
     this.updateCursor();
-    //呼叫更新帮助
+    //呼叫更新帮助()
     this.callUpdateHelp();
 };
 /**取消选择 */
@@ -120,7 +120,7 @@ Window_Selectable.prototype.deselect = function() {
 };
 /**重选 */
 Window_Selectable.prototype.reselect = function() {
-    //选择  _index
+    //选择(索引)
     this.select(this._index);
 };
 /**行  (从0开始)

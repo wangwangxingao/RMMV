@@ -151,12 +151,33 @@ RVO.Agent.prototype.computeNewVelocity = function () {
             continue;
         }
 
+        /**距离平方1 =平方 相对位置1 */
         var distSq1 = RVO.Vector.absSq(relativePosition1)
+        /**距离平方2 =平方 相对位置2 */
             , distSq2 = RVO.Vector.absSq(relativePosition2)
+            /**半径平方 = 平方 半径 */
             , radiusSq = RVO.sqr(this.radius)
+            /**相对向量 = 相对位置1 - 相对位置2 */
             , obstacleVector = RVO.Vector.subtract(obstacle2.point, obstacle1.point)
-            , s = RVO.Vector.dotProduct(RVO.Vector.invert(relativePosition1), obstacleVector) / RVO.Vector.absSq(obstacleVector)
-            , distSqLine = RVO.Vector.absSq(RVO.Vector.subtract(RVO.Vector.invert(relativePosition1), RVO.Vector.multiply(obstacleVector, s)))
+            /**s = 数量积 / 相对向量平方 */
+            , s = RVO.Vector.dotProduct(
+                /**相反 相对位置1 */
+                RVO.Vector.invert(relativePosition1), 
+                /**相对向量 */
+                obstacleVector ) /
+                /**相对向量 平方 */
+                RVO.Vector.absSq(obstacleVector)
+            /**到线距离平方 =   相反 相对位置1*/
+            , distSqLine = RVO.Vector.absSq( 
+                /**相减 */
+                RVO.Vector.subtract(
+                     /**相反 相对位置1 */
+                    RVO.Vector.invert(relativePosition1), 
+                    /**相对向量 相乘 s */
+                    RVO.Vector.multiply(obstacleVector, s)
+                )
+            )
+            /**线  = [] */
             , line = new Array(2);
 
         if (s < 0 && distSq1 <= radiusSq) {
@@ -404,7 +425,10 @@ RVO.Agent.prototype.insertObstacleNeighbor = function (obstacle, rangeSq) {
 
 /**更新 */
 RVO.Agent.prototype.update = function () {
+    /**速度 = 新速度*/
     this.velocity = this.newVelocity;
+
+    /**移动 位置  = 速度 * 时间步数  */
     RVO.Vector.shift(this.position, RVO.Vector.multiply(this.velocity, this.sim.timeStep));
 }
 
@@ -561,36 +585,43 @@ RVO.Agent.linearProgram3 = function (lines, numObstLines, beginLine, radius, res
 var RVO = RVO || {};
 
 /**
- * 
+ * kd树
  * @param {*} sim 
  */
 RVO.KdTree = function (sim) {
     this.sim = sim;
+    /**代理组 = [] */
     this.agents = [];
+    /**代理树 = [] */
     this.agentTree = [];
+    /**障碍树 = 0 */
     this.obstacleTree = 0;
 }
 
 RVO.KdTree.MAX_LEAF_SIZE = 10;
 
 /**
- * 
+ * 构建代理树
  */
 RVO.KdTree.prototype.buildAgentTree = function () {
+    /**如果 代理数 < sim 代理数 */
     if (this.agents.length < this.sim.agents.length) {
         for (var i = this.agents.length, len = this.sim.agents.length; i < len; ++i) {
+            /**添加 代理 */
             this.agents.push(this.sim.agents[i]);
         }
     }
 
+    /**代理树 = [] */
     this.agentTree = [];
     if (this.agents.length) {
+        /** 构建代理树递归 */
         this.buildAgentTreeRecursive(0, this.agents.length, 0);
     }
 }
 
 /**
- * 
+ * 构建代理树递归
  * @param {*} begin 
  * @param {*} end 
  * @param {*} node 
@@ -653,6 +684,9 @@ RVO.KdTree.prototype.buildAgentTreeRecursive = function (begin, end, node) {
     }
 }
 
+/**
+ * 创建障碍树
+ */
 RVO.KdTree.prototype.buildObstacleTree = function () {
     var obstacles = [];
 
@@ -664,6 +698,7 @@ RVO.KdTree.prototype.buildObstacleTree = function () {
 }
 
 /**
+ * 创建障碍树递归
  * 
  * @param {*} obstacles 
  */
@@ -768,11 +803,12 @@ RVO.KdTree.prototype.buildObstacleTreeRecursive = function (obstacles) {
         node.right = this.buildObstacleTreeRecursive(rightObstacles);
         return node;
     }
+    
 }
 
 
 /**
- * 
+ * 计算代理邻居组 
  * @param {*} agent 
  * @param {*} rangeSq 
  */
@@ -781,7 +817,7 @@ RVO.KdTree.prototype.computeAgentNeighbors = function (agent, rangeSq) {
 }
 
 /**
- * 
+ * 计算障碍邻居组
  * @param {*} agent 
  * @param {*} rangeSq 
  */
@@ -790,35 +826,50 @@ RVO.KdTree.prototype.computeObstacleNeighbors = function (agent, rangeSq) {
 }
 
 /**
- * 
+ * 查询代理树递归
  * @param {*} agent 
  * @param {*} rangeSq 
  * @param {*} node 
  */
 RVO.KdTree.prototype.queryAgentTreeRecursive = function (agent, rangeSq, node) {
+    /**节点代理 = 代理树 节点*/
     var nodeAgent = this.agentTree[node]
+    /**新范围平方 = 范围平方 */
         , newRangeSq = rangeSq;
+    /**如果(节点代理 结束 - 节点代理 开始 <= 最大叶片尺寸) */
     if (nodeAgent.end - nodeAgent.begin <= RVO.KdTree.MAX_LEAF_SIZE) {
+        /**循环  */
         for (var i = nodeAgent.begin, len = nodeAgent.end; i < len; ++i) {
+            /**新范围平方 = 节点  插入代理邻居(代理,新范围平方 )*/
             newRangeSq = agent.insertAgentNeighbor(this.agents[i], newRangeSq);
         }
     }
     else {
+        /**距离平方左 = 0 */
         var distSqLeft = 0
+        /**距离平方右 = 0 */
             , distSqRight = 0
+            /**左代理 = 代理树 节点代理 左 */
             , leftAgent = this.agentTree[nodeAgent.left]
+            /**左代理 = 代理树 节点代理 右 */
             , rightAgent = this.agentTree[nodeAgent.right];
 
+            /**代理 位置x < 最小x */
         if (agent.position[0] < leftAgent.minX) {
+            /**距离平方左 +=  */
             distSqLeft += RVO.sqr(leftAgent.minX - agent.position[0]);
         }
+            /**代理 位置x > 最大x */
         else if (agent.position[0] > leftAgent.maxX) {
+            /**距离平方左 += */
             distSqLeft += RVO.sqr(agent.position[0] - leftAgent.maxX);
         }
 
+            /**代理 位置y < 最小y */
         if (agent.position[1] < leftAgent.minY) {
             distSqLeft += RVO.sqr(leftAgent.minY - agent.position[1]);
         }
+            /**代理 位置y> 最大y */
         else if (agent.position[1] > leftAgent.maxY) {
             distSqLeft += RVO.sqr(agent.position[1] - leftAgent.maxY);
         }
@@ -836,8 +887,10 @@ RVO.KdTree.prototype.queryAgentTreeRecursive = function (agent, rangeSq, node) {
         else if (agent.position[1] > rightAgent.maxY) {
             distSqRight += RVO.sqr(agent.position[1] - rightAgent.maxY);
         }
+        /**如果 距离左 < 距离右 */
 
         if (distSqLeft < distSqRight) {
+            /**如果(距离左 < 范围) */
             if (distSqLeft < rangeSq) {
                 newRangeSq = this.queryAgentTreeRecursive(agent, newRangeSq, nodeAgent.left);
 
@@ -856,11 +909,12 @@ RVO.KdTree.prototype.queryAgentTreeRecursive = function (agent, rangeSq, node) {
             }
         }
     }
+    /**返回 新范围 */
     return newRangeSq;
 }
 
 /**
- * 
+ * 查询障碍树递归
  * @param {*} agent 
  * @param {*} rangeSq 
  * @param {*} node 
@@ -870,25 +924,33 @@ RVO.KdTree.prototype.queryObstacleTreeRecursive = function (agent, rangeSq, node
         return;
     }
     else {
+        /**障碍1 */
         var obstacle1 = node.obstacle
+        /**障碍2 */
             , obstacle2 = obstacle1.nextObstacle
+            /**代理 在线左边  */
             , agentLeftOfLine = RVO.Vector.leftOf(obstacle1.point, obstacle2.point, agent.position)
+            /**到线距离的平方 =  */
             , distSqLine = RVO.sqr(agentLeftOfLine) / RVO.Vector.absSq(RVO.Vector.subtract(obstacle2.point, obstacle1.point));
 
+        /**查询障碍树递归(如果在左侧 左树) */
         this.queryObstacleTreeRecursive(agent, rangeSq, agentLeftOfLine >= 0 ? node.left : node.right);
 
+        /**如果 距离 小于区域距离平方 */
         if (distSqLine < rangeSq) {
+            /**如果(代理 不在线左方 ) */
             if (agentLeftOfLine < 0) {
+                /**插入障碍邻居 */
                 agent.insertObstacleNeighbor(node.obstacle, rangeSq);
             }
-
+            /**查询障碍树递归(如果在左侧 右树) */ 
             this.queryObstacleTreeRecursive(agent, rangeSq, agentLeftOfLine >= 0 ? node.right : node.left);
         }
     }
 }
 
 /**
- * 
+ * 查询可见性
  * @param {*} q1 
  * @param {*} q2 
  * @param {*} radius 
@@ -898,33 +960,51 @@ RVO.KdTree.prototype.queryVisibility = function (q1, q2, radius) {
 }
 
 /**
- * 
+ * 查询可见性递归
  * @param {*} q1 
  * @param {*} q2 
  * @param {*} radius 
  * @param {*} node 
  */
 RVO.KdTree.prototype.queryVisibilityRecursive = function (q1, q2, radius, node) {
+    /**如果(节点 ) */
     if (node.obstacleNo == -1) {
+        /**返回 true */
         return true;
     }
     else {
+        /**障碍 = 障碍组[节点 障碍索引]*/
         var obstacle = this.sim.obstacles[node.obstacleNo]
+        /**点q1 在 i 左边 ? */
             , q1LeftOfI = RVO.Vector.leftOf(obstacle.point1, obstacle.point2, q1)
+        /**点q2 在 i 左边 ? */
             , q2LeftOfI = RVO.Vector.leftOf(obstacle.point1, obstacle.point2, q2);
 
+        /**如果(p1 p2 都在左边 ) */
         if (q1LeftOfI >= 0 && q2LeftOfI >= 0) {
+            /**返回 查询可见性递归 左枝 */
             return this.queryVisibilityRecursive(q1, q2, radius, node.left);
         }
+        /**如果(p1 p2 都在右边 ) */
         else if (q1LeftOfI <= 0 && q2LeftOfI <= 0) {
+            /**返回 查询可见性递归 左枝 */
             return this.queryVisibilityRecursive(q1, q2, radius, node.right);
         }
         else {
+            /** 障碍点1 在 点1点2左边 */
             var point1LeftOfQ = RVO.Vector.leftOf(q1, q2, obstacle.point1)
+            /** 障碍点2 在 点1点2左边 */
                 , point2LeftOfQ = RVO.Vector.leftOf(q1, q2, obstacle.point2)
+                /**1/ 点1点2距离 */
                 , invLengthQ = 1 / RVO.Vector.absSq(RVO.Vector.subtract(q2, q1));;
 
-            return point1LeftOfQ * point2LeftOfQ >= 0 && RVO.sqr(point1LeftOfQ) * invLengthQ >= RVO.sqr(radius) && RVO.sqr(point2LeftOfQ) * invLengthQ >= RVO.sqr(radius) && this.queryVisibilityRecursive(q1, q2, radius, node.left) && this.queryVisibilityRecursive(q1, q2, radius, node.right);
+            /**返回 不在同一侧 */
+            return point1LeftOfQ * point2LeftOfQ >= 0 && 
+                   
+                   RVO.sqr(point1LeftOfQ) * invLengthQ >= RVO.sqr(radius) && 
+                   RVO.sqr(point2LeftOfQ) * invLengthQ >= RVO.sqr(radius) && 
+                   this.queryVisibilityRecursive(q1, q2, radius, node.left) && 
+                   this.queryVisibilityRecursive(q1, q2, radius, node.right);
         }
     }
 }
@@ -1252,7 +1332,8 @@ RVO.Vector.normalize = function (a) {
     return RVO.Vector.divide(a, RVO.Vector.abs(a));
 }
 
-/**在左边 */
+/**在左边 
+*/
 RVO.Vector.leftOf = function (a, b, c) {
     return RVO.Vector.det(RVO.Vector.subtract(a, c), RVO.Vector.subtract(b, a));
 }

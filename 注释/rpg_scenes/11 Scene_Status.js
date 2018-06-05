@@ -24,7 +24,9 @@ Scene_Status.prototype.create = function() {
     this._statusWindow.setHandler('cancel',   this.popScene.bind(this));
     this._statusWindow.setHandler('pagedown', this.nextActor.bind(this));
     this._statusWindow.setHandler('pageup',   this.previousActor.bind(this));
+    //状态窗口 预约脸图()
     this._statusWindow.reserveFaceImages();
+    //添加窗口(状态窗口)
     this.addWindow(this._statusWindow);
 };
 
