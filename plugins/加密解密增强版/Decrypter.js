@@ -1107,7 +1107,7 @@ Decrypter.isLocalMode = function () {
 
 
     /**
-     * 
+     * 读取键
      * @param {*} k 
      */
     w.rk = function (k) {
@@ -1196,6 +1196,7 @@ Decrypter.isLocalMode = function () {
 
 
     /**
+     * 加头
      * @param {Uint8Array} a Uint8Arry数据
      * @param {[]} k 密钥
      * @param {[]} h 文件头
@@ -1214,6 +1215,12 @@ Decrypter.isLocalMode = function () {
         return false
     };
 
+    /**
+     * mv 加密
+     * @param {Uint8Array} a Uint8Arry数据
+     * @param {[]} k 密钥
+     * @param {[]} h 文件头
+     */
     w.d.mv = function (b, k, h) {
         if (b) {
             var k = w.rk(k);
@@ -1274,6 +1281,15 @@ Decrypter.isLocalMode = function () {
     };
 
 
+    w.d.pako = function (b, k, h) {
+        if (b) {
+            if (pako) {
+                var b = pako.inflate(b)
+            }
+        }
+        return b;
+    };
+
     w.d.aes = function (b, k, h) {
         if (b) {
             if (Aes) {
@@ -1329,6 +1345,7 @@ Decrypter.isLocalMode = function () {
         var l = w.l(m)
         for (var i = 0; i < l; i++) {
             if (!b) { return false }
+            console.log(b,m[i]) 
             var b = !!this[m[i]] && this[m[i]](b, k, h)
         }
         return b
@@ -1506,31 +1523,63 @@ Decrypter.isLocalMode = function () {
             if (Zlib) {
                 console.log("Zlib压缩:")
                 var l1 = w.l(b)
-                console.log("原大小:", l1)
+                var t1 = Date.now()
+                console.log( "原大小:", l1)
+                
                 var b = new Zlib.Deflate(b).compress();
+
                 var l2 = w.l(b)
+                var t2 = Date.now()
                 console.log("压缩后:", l2)
                 var l3 = l1 - l2
                 Decrypter.ennum += l3
-                console.log("压缩量", l3, "总压缩量", Decrypter.ennum)
+                console.log("压缩量", l3, "压缩比例:" , l1/l2,"压缩时间",t2-t1 ,  "总压缩量", Decrypter.ennum)
             }
         }
         return b;
     };
 
 
-    w.e.lzma = function (b, k, h) {
+    w.e.pako = function (b, k, h, v) {
+        if (b) {
+            if (pako) {
+                console.log("pako压缩:") 
+                var l1 = w.l(b)
+                var t1 = Date.now()
+                console.log( "原大小:", l1)
+
+                var b = pako.deflate(b,{level:v||9}  )
+
+
+                var l2 = w.l(b)
+                var t2 = Date.now()
+                console.log("压缩后:", l2)
+                var l3 = l1 - l2
+                Decrypter.ennum += l3
+                console.log("压缩量", l3, "压缩比例:" , l1/l2,"压缩时间",t2-t1 ,  "总压缩量", Decrypter.ennum)
+            }
+        }
+        return b;
+    };
+
+
+    w.e.lzma = function (b, k, h, v) {
         if (b) {
             if (LZMA) {
                 console.log("lzma压缩:")
                 var l1 = w.l(b)
-                console.log("原大小:", l1)
-                var b = w.u(LZMA.compress(b, 9))
+                var t1 = Date.now()
+                console.log( "原大小:", l1)
+
+                var b = w.u(LZMA.compress(b, v||9))
+                
+
                 var l2 = w.l(b)
+                var t2 = Date.now()
                 console.log("压缩后:", l2)
                 var l3 = l1 - l2
                 Decrypter.ennum += l3
-                console.log("压缩量", l3, "总压缩量", Decrypter.ennum)
+                console.log("压缩量", l3, "压缩比例:" , l1/l2,"压缩时间",t2-t1 ,  "总压缩量", Decrypter.ennum)
             }
         }
         return b;
@@ -1609,21 +1658,22 @@ Decrypter.isLocalMode = function () {
     };
 
     /**使用各种加密手段 */
-    w.e.use = function (b, m, k, h) {
+    w.e.use = function (b, m, k, h,v) {
         var l = w.l(m)
         for (var i = l - 1; i >= 0; i--) {
             if (!b) { return false }
-            var b = !!this[m[i]] && this[m[i]](b, k, h)
+            console.log(b,m[i])
+            var b = !!this[m[i]] && this[m[i]](b, k, h ,v)
         }
         return b
     };
 
-    w.encrypt = function (b, f, m, k, h) {
+    w.encrypt = function (b, f, m, k, h , v) {
         var b = f ? w.bbu(b) : b
         var b = w.bub(b)
         var m = w.rm(m)
         if (m) {
-            b = w.e.use(b, m, k, h)
+            b = w.e.use(b, m, k, h ,v)
             if (!b) { throw new Error("Encrypt is wrong"); return null }
         }
         return w.bbu(b)
