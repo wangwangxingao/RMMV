@@ -21,32 +21,28 @@
 var DataMessage = {}
 
 
+DataMessage.isObj = function (item) {
+    if (item) {
 
-DataMessage.loadOBJ = function (item) {
+        var list = [
+            "$dataSkills", "skill",
+            "$dataItems", "item",
+            "$dataWeapons", "weapon",
+            "$dataArmors", "armor",
+            "$dataActors", "actor",
+        ]
+        for (var i = 0; i < list.length; i += 2) {
+            var name = list[i]
+            console.log(name)
+            if (window[name] && window[name].contains(item)) {
+                return list[i + 1]
+            }
+        }
 
-    //如果是技能
-    if (DataManager.isSkill(item)) {
+    };
+    return ""
 
-        DataMessage.loadSkill(item)
-
-        //否则 如果 数据管理器 是物品(item)
-    } else if (DataManager.isItem(item)) {
-
-
-
-        //否则 如果 数据管理器 是武器(item)
-    } else if (DataManager.isWeapon(item)) {
-
-
-        //否则 如果 数据管理器 是防具(item)
-    } else if (DataManager.isArmor(item)) {
-
-
-        //否则 
-    } else {
-    }
 }
-
 
 
 
@@ -180,289 +176,357 @@ DataMessage.itemType = function () {
 }
 
 
-/**获取技能 */
-DataMessage.getSkill = function (item, type, must) {
 
-    var rel = []
-    var re = ""
-    var v1 = ""
-    var v2 = ""
-    switch (type) {
-        case "id":
-            re = item[type]
-            break
-        case "name":
-            re = "名称:"
-            var v1 = item[type]
-            break
-        case "iconIndex":
-            //图标
-            re = "\\I[%1]"
-            var v1 = item[type]
-            break
-        case "note":
-            re = ""//文本 
-            break
-        case "meta":
-            re = ""
-            var v1 = item[type]
-            var v2 = v1[must]
-        case "description":
-            re = "" //说明
-            break
-        case "tpCost":
-            re = "TP消耗"
-            var v1 = item[type]
-            break
-        case "mpCost":
-            re = "MP消耗"
-            var v1 = item[type]
-            break
-        case "repeats":
-            re = "连续次数"
-            var v1 = item[type]
-            break
-        case "hitType": 1
-            re = "命中种类:"
-            var v1 = item[type]
-            var v2 = this.skillHitType()[v1]
-            break
-        case "occasion":
+DataMessage.skillSet = {
 
-            re = "应用场景"
-            var v1 = item[type]
-            var v2 = this.skillOccasion()[v1]
-            break
-        case "scope":
-            re = "范围:"
-            var v1 = item[type]
-            var v2 = this.skillScope()[v1]
+    "id": "%1",
+    "name": "名称:%1",
+    "iconIndex": "\\I[%1]",
+    "note": "%1",//文本  
+    "meta": "%2",
+    "description": "%1",//说明 
+    "tpCost": "TP消耗:%1",
+    "mpCost": "MP消耗:%1",
+    "repeats": "连续次数:%1",
+    "hitType": "命中种类:%2",
+    "occasion": "应用场景:%2",
+    "scope": "范围:%2",
+    "stypeId": "技能种类:%2",
+    "requiredWtypeId1": "必要武器1:%2",
+    "requiredWtypeId2": "必要武器2:%2",
+    "speed": "速度修正:%1",
+    "successRate": "成功率:%1",
+}
 
-            break
-        case "stypeId": 0
-            re = "技能种类"
-            var v1 = item[type]
-            var v2 = this.skillTypes()[v1]
-            break
+DataMessage.itemSet = {
 
-        case "requiredWtypeId1":
-            re = "必要武器1:"
-            var v1 = item[type]
-            var v2 = this.weaponTypes()[v1]
-            break
-        case "requiredWtypeId2":
-            re = "必要武器2:"
-            var v1 = item[type]
-            var v2 = this.weaponTypes()[v1]
-            break
-        case "speed": 0
-            re = "速度修正"
-            var v1 = item[type]
-            break
-        case "successRate":
-            re = "成功率"
-            var v1 = item[type]
-            break
+    "id": "%1",
+    "name": "名称:%1",
+    "iconIndex": "\\I[%1]",
+    "note": "%1",//文本  
+    "meta": "%2",
+    "description": "%1",//说明 
+    "consumable": "是消耗品:%2",
+    "itypeId": '物品种类:%2',
+    "tpGain": "TP获得:%1",
+    "repeats": "连续次数:%1",
+    "hitType": "命中种类:%2",
+    "occasion": "应用场景:%2",
+    "scope": "范围:%2", 
+    "speed": "速度修正:%1",
+    "successRate": "成功率:%1",
 
-        case "traits":
-            re = ""
-            var v1 = this.getItemTraits(item[type])
-            break
-        default:
-            break;
-    }
-    return re
+    "traits": "%1",
+    "effects": "%1",
 
+    "price": "价格:%1",
 
 }
 
+DataMessage.armorSet = {
+    "id": "id:%1",
+    "name": "名称:%1",
+    "iconIndex": "\\I[%1]",  //图标 
+    "note": "",//文本  
+    "meta": "%1%2", //注释内容 
+    "description": "说明:%1", //说明 
+    "etypeId": "装备种类:%2",
+    "atypeId": "防具种类:%2",
+    "price": "价格:%1", //价格
+    "traits": "%1",
+    "params": "%1",
+    "param": "%1:%2",
+}
+DataMessage.weaponSet = {
+    "id": "id:%1",
+    "name": "名称:%1",
+    "iconIndex": "\\I[%1]",  //图标 
+    "note": "",//文本  
+    "meta": "%1%2", //注释内容 
+    "description": "说明:%1", //说明 
+    "etypeId": "装备种类:%2",
+    "wtypeId": "武器种类:%2",
+    "price": "价格:%1", //价格
+    "traits": "%1",
+    "params": "%1",
+    "param": "%1:%2",
+}
+DataMessage.actorParamSet = {
+    "param": "%1:%2"
+}
+
+DataMessage.actorTraitSet = {
+    //特征元素比例
+    11: "元素:%2 %4",
+    //特征负面效果比例  
+    12: "状态 %2 %5",
+    //特征状态比例
+    13: "状态 %2 %5",
+    //特征状态无效化
+    14: "无效状态 %2",
+    //特征参数
+    21: "参数:%2 %4",
+    //特征x参数
+    22: "参数:%2 %4",
+    //特征s参数
+    23: "参数:%2 %4",
+    //特征攻击元素
+    31: "攻击元素:%2",
+    //特征攻击状态
+    32: "攻击状态:%2 %5",
+    //特征攻击速度
+    33: "攻击速度增加:%1",
+    //特征攻击次数
+    34: "攻击次数:%1",
+    //特征类型增加
+    41: "添加技能类型:%2",
+    //特征类型封印
+    42: "封印技能种类:%2",
+    //特征技能增加
+    43: "添加技能:%2",
+    //特征技能封印
+    44: "封印技能:%2",
+    //特征装备武器
+    51: "装备种类:%2",
+    //特征装备防具
+    52: "防具种类:%2",
+    //特征装备固定
+    53: "防具固定:%2",
+    //特征装备封印
+    54: "装备封印:%2",
+    //特征孔种类
+    55: "%1",
+    //特征行动添加
+    61: "追加行动:%2",
+    //特征特殊标记
+    62: "%2",
+    //特征死亡种类
+    63: "",
+    //特征队伍能力
+    64: "能力:%2",
+}
+
+
+DataMessage.itemTraitSet = {
+
+    //效果 恢复 hp , 11
+    11: "恢复Hp:%1 + %2",
+
+    //效果 恢复 mp, 12
+    12: "恢复Mp:%1 + %2",
+
+    //效果 获得 tp, 13
+    13: "恢复tp:%1",
+
+    //效果 添加 状态, 21
+    21: "添加状态:%3 %5",
+
+    //效果 移除 状态
+    22: "状态移除:%3 %5",
+    //效果 添加 正面效果
+    31: "添加效果:%2 %3回合",
+
+    //效果 添加 负面效果
+    32: "添加效果:%2 %3回合",
+    //效果 移除 正面效果
+    33: "添加效果:%2 %3回合",
+    //效果 移除 负面效果
+    34: "移除效果:%2",
+    //额外  逃跑
+    41: "%1",
+
+    //效果 生长 
+    42: "%2 %3",
+    //效果 学习技能
+    43: "学习技能%2",
+
+    //效果 公共事件
+    44: "",
+
+}
+
+
+/**获取技能内容 */
+DataMessage.getSkill = function (item, type, must, set) {
+
+
+    var re = ""
+    var v1 = ""
+    var v2 = ""
+
+    var set = set || DataMessage.skillSet
+    if (item && set) {
+        var re = set[type]
+        switch (type) {
+            case "id":
+                var v1 = item[type]
+                break
+            case "name":
+                var v1 = item[type]
+                break
+            case "iconIndex":
+                var v1 = item[type]
+                break
+            case "note":
+                var v1 = item[type]
+                break
+            case "meta":
+                var v1 = item[type]
+                var v2 = v1[must]
+            case "description":
+                var v1 = item[type]
+                break
+            case "tpCost":
+                var v1 = item[type]
+                break
+            case "mpCost":
+                var v1 = item[type]
+                break
+            case "repeats":
+                var v1 = item[type]
+                break
+            case "hitType":
+                var v1 = item[type]
+                var v2 = this.skillHitType()[v1]
+                break
+            case "occasion":
+                var v1 = item[type]
+                var v2 = this.skillOccasion()[v1]
+                break
+            case "scope":
+                var v1 = item[type]
+                var v2 = this.skillScope()[v1]
+
+                break
+            case "stypeId":
+                var v1 = item[type]
+                var v2 = this.skillTypes()[v1]
+                break
+
+            case "requiredWtypeId1":
+                re = "必要武器1:"
+                var v1 = item[type]
+                var v2 = this.weaponTypes()[v1]
+                break
+            case "requiredWtypeId2":
+                re = "必要武器2:"
+                var v1 = item[type]
+                var v2 = this.weaponTypes()[v1]
+                break
+            case "speed": 0
+                re = "速度修正"
+                var v1 = item[type]
+                break
+            case "successRate":
+                re = "成功率"
+                var v1 = item[type]
+                break
+
+            case "traits":
+                re = ""
+                var v1 = this.getItemTraits(item[type])
+                break
+            default:
+                break;
+        }
+
+        if (re) {
+
+            return re.format(v1, v2);
+        }
+    }
+    return ""
+
+
+}
 
 
 /**获取项目 */
-DataMessage.getItem = function (item, type, must) {
+DataMessage.getItem = function (item, type, must, set) {
 
-    var rel = []
-    var re = ""
-    var v1 = ""
-    var v2 = ""
-    switch (type) {
-        case "id":
-            re = ""
-            var v1 = item[type]
-
-            break
-        case "name":
-            re = "名称:"
-            var v1 = item[type]
-
-            break
-        case "iconIndex":
-            //图标
-            re = "\\I[%1]"
-            var v1 = item[type]
-
-            break
-        case "note":
-            re = ""//文本 
-            var v1 = item[type]
-            break
-        case "meta":
-            re = ""
-            var v1 = item[type]
-            var v2 = v1[must]
-        case "description":
-            re = "" //说明
-            var v1 = item[type]
-
-            break
-
-        case "consumable":
-            var v1 = item[type]
-
-
-            break
-        case "itypeId":
-            re = ''
-            var list = this.itemType()
-            var v1 = item[type]
-            var v2 = list[v1]
-
-            break
-        case "tpGain":
-            re = "TP获得"
-            var v1 = item[type]
-            break
-
-        case "repeats":
-            re = "连续次数"
-            var v1 = item[type]
-            break
-
-        case "hitType": 1
-            re = "命中种类:"
-            var v1 = item[type]
-            var v2 = this.skillHitType()[v1]
-            break
-        case "occasion":
-
-            re = "应用场景"
-            var v1 = item[type]
-            var v2 = this.skillOccasion()[v1]
-            break
-        case "scope":
-            re = "范围:"
-            var v1 = item[type]
-            var v2 = this.skillScope()[v1]
-
-            break
-        case "stypeId": 0
-            re = "技能种类"
-            var v1 = item[type]
-            var v2 = this.skillTypes()[v1]
-            break
-
-        case "speed": 0
-            re = "速度修正"
-            var v1 = item[type]
-            break
-        case "successRate":
-            re = "成功率"
-            var v1 = item[type]
-            break
-
-        case "traits", "effects":
-            var type = "effects"
-            re = ""
-            var v1 = this.getItemTraits(item[type])
-            break
-
-        case "price":
-            re = "价格"
-            var v1 = item[type]
-
-            break
-        default:
-            break;
-    }
-    return re
-}
-
-
-
-
-
-/**获取防具 */
-DataMessage.getArmor = function (item, type, must) {
     var re = ""
     var v1 = ""
     var v2 = ""
 
-    switch (type) {
+    var set = set || DataMessage.itemSet
+    if (item && set) {
+        var re = set[type]
+        switch (type) {
+            case "id":
+                var v1 = item[type]
 
-        case "id":
-            re = ""
-            var v1 = item[type]
-            break
-        case "name":
-            re = "名称:"
-            var v1 = item[type]
-            break
-        case "iconIndex":
-            //图标
-            re = "\\I[%1]"
-            var v1 = item[type]
-            break
-        case "note":
-            re = ""//文本 
-            break
-        case "meta":
-            re = ""
-            var v1 = item[type]
-            var v2 = v1[must]
-        case "description":
-            re = "" //说明
-            var v1 = item[type]
-            break
-        case "etypeId":
-            re = "装备种类"
-            var list = this.equipTypes()
-            var v1 = item[type]
-            var v2 = list[v1] 
+                break
+            case "name":
+                var v1 = item[type]
 
-            break
-        case "atypeId":
-            re = "防具种类"
-            var list = this.armorTypes()
-            var v1 = item[type]
-            var v2 = list[v1]
+                break
+            case "iconIndex":
+                var v1 = item[type]
 
-            break
-        case "price":
-            re = "价格"
-            var v1 = item[type]
+                break
+            case "note":
+                var v1 = item[type]
+                break
+            case "meta":
+                var v1 = item[type]
+                var v2 = v1[must]
+            case "description":
+                var v1 = item[type]
 
-            break
+                break
 
-        case "traits":
-            re = ""
-            var v1 = this.getItemTraits(item.traits)
-            break
+            case "consumable":
+                var v1 = item[type]
+                var v2 = v1 ? "是" : "否"
 
-        case "params":
-            re = ""
-            var v1 = this.getActorParams(item.params, must)
-            break
-        case "param":
+                break
+            case "itypeId":
+                var list = this.itemType()
+                var v1 = item[type]
+                var v2 = list[v1]
+                break
+            case "tpGain":
+                var v1 = item[type]
+                break
+            case "repeats":
+                var v1 = item[type]
+                break
 
-            re = ""
-            var v1 = this.getActorParam(item.params, must)
+            case "hitType": 1
+                var v1 = item[type]
+                var v2 = this.skillHitType()[v1]
+                break
+            case "occasion":
+                var v1 = item[type]
+                var v2 = this.skillOccasion()[v1]
+                break
+            case "scope":
+                var v1 = item[type]
+                var v2 = this.skillScope()[v1]
+                break 
+            case "speed": 0
+                var v1 = item[type]
+                break
+            case "successRate":
+                var v1 = item[type]
+                break
+            case "traits", "effects":
+                var type = "effects"
+                var v1 = this.getItemTraits(item[type])
+                break
+            case "price":
+                var v1 = item[type]
+                break
+            default:
+                break;
+        }
 
-            break
-        default:
-            break;
+        if (re) {
+
+            return re.format(v1, v2);
+        }
     }
-    return re
-
+    return ""
 
 }
 
@@ -470,494 +534,570 @@ DataMessage.getArmor = function (item, type, must) {
 
 
 /**获取防具 */
-DataMessage.getWeapon = function (item, type, must) {
+DataMessage.getArmor = function (item, type, must, set) {
 
-     
     var re = ""
     var v1 = ""
     var v2 = ""
 
-    switch (type) {
 
-        case "id":
-            re = ""
-            var v1 = item[type]
-            break
-        case "name":
-            re = "名称:"
-            var v1 = item[type]
-            break
-        case "iconIndex":
-            //图标
-            re = "\\I[%1]"
-            var v1 = item[type]
-            break
-        case "note":
-            re = ""//文本 
-            break
-        case "meta":
-            re = ""
-            var v1 = item[type]
-            var v2 = v1[must]
-        case "description":
-            re = "" //说明
-            var v1 = item[type]
-            break
-        case "etypeId":
-            re = "装备种类"
-            var list = this.equipTypes()
-            var v1 = item[type]
-            var v2 = list[v1] 
-            
-            break
-        case "wtypeId":
-            re = "武器种类"
-            var list = this.weaponTypes()
-            var v1 = item[type]
-            var v2 = list[v1]
+    var set = set || DataMessage.armorSet
+    if (item && set) {
+        var re = set[type]
+        switch (type) {
 
-            break
-        case "price":
-            re = "价格"
-            var v1 = item[type]
-            break
+            case "id":
+                var v1 = item[type]
+                break
+            case "name":
+                var v1 = item[type]
+                break
+            case "iconIndex":
+                var v1 = item[type]
+                break
+            case "note":
+                var v1 = item[type]
+                break
+            case "meta":
+                var v1 = item[type]
+                var v2 = v1[must]
+            case "description":
+                var v1 = item[type]
+                break
+            case "etypeId":
+                var list = this.equipTypes()
+                var v1 = item[type]
+                var v2 = list[v1]
 
+                break
+            case "atypeId":
+                var list = this.armorTypes()
+                var v1 = item[type]
+                var v2 = list[v1]
 
-        /**特征组 */
-        case "traits":
-            re = ""
-            var v1 = this.getItemTraits(item[type])
-            break
+                break
+            case "price":
+                var v1 = item[type]
 
+                break
 
-        /**参数组 */
-        case "params":
-            re = ""
-            var v1 = this.getActorParams(item.params, must)
-            break
+            case "traits":
+                var v1 = this.getActorTraits(item.traits)
+                break
 
-        /**参数 */
-        case "param":
+            case "params":
+                var v1 = this.getActorParams(item.params, must)
+                break
+            case "param":
+                var v1 = this.getActorParam(item.params, must)
 
-            re = ""
-            var v1 = this.getActorParam(item.params, must)
-
-            break
-        default:
-            break;
+                break
+            default:
+                break;
+        }
+        if (re) {//v1 || v2 || v3 || v4 || v5) {
+            return re.format(v1, v2, v3, v4, v5);
+        }
     }
-    return rel
-
-
+    return ""
 }
 
 
 
+
+/**获取防具 */
+DataMessage.getWeapon = function (item, type, must, set) {
+
+
+    var re = ""
+    var v1 = ""
+    var v2 = ""
+
+    var set = set || DataMessage.weaponSet
+    if (item && set) {
+        var re = set[type]
+        switch (type) {
+            case "id":
+                var v1 = item[type]
+                break
+            case "name":
+                var v1 = item[type]
+                break
+            case "iconIndex":
+                var v1 = item[type]
+                break
+            case "note": //文本 
+                var v1 = item[type]
+                break
+            case "meta":
+                var v1 = item[type]
+                var v2 = v1[must]
+            case "description":
+                //说明
+                var v1 = item[type]
+                break
+            case "etypeId":
+                var list = this.equipTypes()
+                var v1 = item[type]
+                var v2 = list[v1]
+
+                break
+            case "wtypeId":
+                var list = this.weaponTypes()
+                var v1 = item[type]
+                var v2 = list[v1]
+
+                break
+            case "price":
+                var v1 = item[type]
+                break
+            /**特征组 */
+            /* case "traits":
+                 var v1 = this.getItemTraits(item[type])
+                 break */
+            /**参数组 */
+            /*case "params":
+                var v1 = this.getActorParams(item.params, must)
+                break*/
+            /**参数 */
+            /* case "param":
+                 var v1 = this.getActorParam(item.params, must)
+                 break*/
+            default:
+                break;
+        }
+        if (re) { //v1 || v2 || v3 || v4 || v5) {
+            return re.format(v1, v2, v3, v4, v5);
+        }
+    }
+    return ""
+}
 
 
 
 /**获取角色参数 */
-DataMessage.getActorParam = function (params, id, must) {
+DataMessage.getActorParam = function (params, id, must, set) {
     var re = ""
-    var list = this.params()
+    var set = set || DataMessage.actorParamSet
 
-    var v1 = list[i]
-    var v2 = params[i]
-    if (must && v2) {
-        re = v1 + v2
-    }
-    return re
-
-}
-
-
-/***获取参数组 */
-DataMessage.getActorParams = function (params, must) {
-
-    for (var i = 0; i < params.length; i++) {
-        var re = this.getActorParam(params, i, must)
-        if (re) {
-
+    if (params && (!must || id == must - 1) && set) {
+        var re = set["param"]
+        var list = this.params()
+        var v1 = list[id]
+        var v2 = params[id]
+        if (v1 || v2 !== undefined) {
+            return re.format(v1, v2)
         }
     }
-
-}
-
-DataMessage.getActorTraits = function (traits) {
-
-
-
-
-
+    return ""
 }
 
 
 
-DataMessage.getActorTrait = function (trait) {
-    switch (trait.code) {
-        //特征元素比例
-        case Game_BattlerBase.TRAIT_ELEMENT_RATE, 11:
-            re = "元素比例"
-            //元素种类
-            trait.dataId
-            //元素比例
-            trait.value
-
-            var list = DataMessage.elements()
-            var v1 = trait.dataId
-            var v2 = list[v1]
-            //元素比例
-            var v3 = trait.value
-            var v4 = v3 * 100
-
-            break
-        //特征负面效果比例
-        case Game_BattlerBase.TRAIT_DEBUFF_RATE, 12:
-
-
-            //状态种类
-            trait.dataId
-            //状态有效度
-            trait.value
-
-            var v1 = trait.dataId
-            var v2 = ""
-            var v3 = ""
-            var state = $dataStates[v1]
-            if (state) {
-                var v2 = state.icon
-                var v3 = state.name
-            }
-
-            //状态有效度
-            trait.value
-            var v4 = trait.value
-            var v5 = v4 * 100
-
-            break
-        //特征状态比例
-        case Game_BattlerBase.TRAIT_STATE_RATE, 13:
-            //状态种类
-            trait.dataId
-            //状态有效度
-            trait.value
-
-            var v1 = trait.dataId
-            var v2 = ""
-            var v3 = ""
-            var state = $dataStates[v1]
-            if (state) {
-                var v2 = state.icon
-                var v3 = state.name
-            }
-
-            //状态有效度
-            trait.value
-            var v4 = trait.value
-            var v5 = v4 * 100
-
-            break
-        //特征状态无效化
-        case Game_BattlerBase.TRAIT_STATE_RESIST, 14:
-            //状态种类
-            trait.dataId
-
-            var list = this.skillTypes()
-            var v1 = trait.dataId
-            var v2 = list[v1]
-
-            break
-        //特征参数
-        case Game_BattlerBase.TRAIT_PARAM, 21:
-            //普通参数种类
-            trait.dataId
-            //普通参数比例
-            trait.value
 
-            var list = DataMessage.params()
-
-            var v1 = trait.dataId
+DataMessage.getActorTrait = function (traits, i, must, set) {
+
+    var re = ""
+
+    var v1 = ""
+    var v2 = ""
+    var v3 = ""
+    var v4 = ""
+    var v5 = ""
+
+    var set = set || DataMessage.actorTraitSet
+
+    var trait = traits && traits[i]
+    if (trait && (!must || trait.code == must) && set) {
+        var re = set[trait.code]
+        switch (trait.code) {
+            //特征元素比例
+            case Game_BattlerBase.TRAIT_ELEMENT_RATE, 11:
+                re = "元素比例"
+                //元素种类
+                trait.dataId
+                //元素比例
+                trait.value
+
+                var list = DataMessage.elements()
+                var v1 = trait.dataId
+                var v2 = list[v1]
+                //元素比例
+                var v3 = trait.value
+                var v4 = v3 * 100
+
+                break
+            //特征负面效果比例
+            case Game_BattlerBase.TRAIT_DEBUFF_RATE, 12:
+
+
+                //状态种类
+                trait.dataId
+                //状态有效度
+                trait.value
+
+                var v1 = trait.dataId
+                var v2 = ""
+                var v3 = ""
+                var state = $dataStates[v1]
+                if (state) {
+                    var v2 = state.icon
+                    var v3 = state.name
+                }
+
+                //状态有效度
+                trait.value
+                var v4 = trait.value
+                var v5 = v4 * 100
+
+                break
+            //特征状态比例
+            case Game_BattlerBase.TRAIT_STATE_RATE, 13:
+                //状态种类
+                trait.dataId
+                //状态有效度
+                trait.value
+
+                var v1 = trait.dataId
+                var v2 = ""
+                var v3 = ""
+                var state = $dataStates[v1]
+                if (state) {
+                    var v2 = state.icon
+                    var v3 = state.name
+                }
+
+                //状态有效度
+                trait.value
+                var v4 = trait.value
+                var v5 = v4 * 100
+
+                break
+            //特征状态无效化
+            case Game_BattlerBase.TRAIT_STATE_RESIST, 14:
+                //状态种类
+                trait.dataId
+
+                var v1 = trait.dataId
+                var v2 = ""
+                var v3 = ""
+                var state = $dataStates[v1]
+                if (state) {
+                    var v2 = state.icon
+                    var v3 = state.name
+                }
+
+                break
+            //特征参数
+            case Game_BattlerBase.TRAIT_PARAM, 21:
+                //普通参数种类
+                trait.dataId
+                //普通参数比例
+                trait.value
+
+                var list = DataMessage.params()
 
-            var v2 = list[v1]
-
-            var v3 = trait.value
+                var v1 = trait.dataId
 
-            var v4 = v3 * 100
-            break
+                var v2 = list[v1]
 
-        //特征x参数
-        case Game_BattlerBase.TRAIT_XPARAM, 22:
+                var v3 = trait.value
 
+                var v4 = v3 * 100
+                break
 
-            trait.dataId
-            //普通增加比率
-            trait.value
+            //特征x参数
+            case Game_BattlerBase.TRAIT_XPARAM, 22:
 
-            var list = DataMessage.xparams()
+                trait.dataId
+                //普通增加比率
+                trait.value
 
-            var v1 = trait.dataId
-            var v2 = list[v1]
+                var list = DataMessage.xparams()
 
+                var v1 = trait.dataId
+                var v2 = list[v1]
 
-            var v3 = trait.value
-            var v4 = v3 * 100
-            break
 
-        //特征s参数
-        case Game_BattlerBase.TRAIT_SPARAM, 23:
-            trait.dataId
-            //普通增加比率
-            trait.value
+                var v3 = trait.value
+                var v4 = v3 * 100
+                break
 
-            var list = DataMessage.sparams()
+            //特征s参数
+            case Game_BattlerBase.TRAIT_SPARAM, 23:
+                trait.dataId
+                //普通增加比率
+                trait.value
 
-            var v1 = trait.dataId
-            var v2 = list[v1]
+                var list = DataMessage.sparams()
 
-            var v3 = trait.value
-            var v4 = v3 * 100
+                var v1 = trait.dataId
+                var v2 = list[v1]
 
-            break
+                var v3 = trait.value
+                var v4 = v3 * 100
 
-        //特征攻击元素
-        case Game_BattlerBase.TRAIT_ATTACK_ELEMENT, 31:
-            //元素种类 
-            trait.dataId
+                break
 
+            //特征攻击元素
+            case Game_BattlerBase.TRAIT_ATTACK_ELEMENT, 31:
+                //元素种类 
+                trait.dataId
 
-            var list = DataMessage.elements()
-            var v1 = trait.dataId
-            var v2 = list[v1]
 
-            break
-        //特征攻击状态
-        case Game_BattlerBase.TRAIT_ATTACK_STATE, 32:
-            //状态种类
-            trait.dataId
-            var v1 = trait.dataId
-            var v2 = ""
-            var v3 = ""
-            var state = $dataStates[v1]
-            if (state) {
-                var v2 = state.icon
-                var v3 = state.name
-            }
+                var list = DataMessage.elements()
+                var v1 = trait.dataId
+                var v2 = list[v1]
 
-            //状态有效度
-            trait.value
-            var v4 = trait.value
-            var v5 = v4 * 100
-            break
+                break
+            //特征攻击状态
+            case Game_BattlerBase.TRAIT_ATTACK_STATE, 32:
+                //状态种类
+                trait.dataId
+                var v1 = trait.dataId
+                var v2 = ""
+                var v3 = ""
+                var state = $dataStates[v1]
+                if (state) {
+                    var v2 = state.icon
+                    var v3 = state.name
+                }
 
-        //特征攻击速度
-        case Game_BattlerBase.TRAIT_ATTACK_SPEED, 33:
+                //状态有效度
+                trait.value
+                var v4 = trait.value
+                var v5 = v4 * 100
+                break
 
-            //攻击速度增加
-            trait.value
+            //特征攻击速度
+            case Game_BattlerBase.TRAIT_ATTACK_SPEED, 33:
 
-            var v1 = trait.value
+                //攻击速度增加
+                trait.value
 
-            break
+                var v1 = trait.value
 
-        //特征攻击次数
-        case Game_BattlerBase.TRAIT_ATTACK_TIMES, 34:
+                break
 
+            //特征攻击次数
+            case Game_BattlerBase.TRAIT_ATTACK_TIMES, 34:
 
-            //攻击次数增加
-            trait.value
 
-            var v1 = trait.value
+                //攻击次数增加
+                trait.value
 
-            break
+                var v1 = trait.value
 
-        //特征类型增加
-        case Game_BattlerBase.TRAIT_STYPE_ADD, 41:
+                break
 
-            //增加技能类型
-            trait.dataId
+            //特征类型增加
+            case Game_BattlerBase.TRAIT_STYPE_ADD, 41:
 
-            var list = this.skillTypes()
-            var v1 = trait.dataId
-            var v2 = list[v1]
+                //增加技能类型
+                trait.dataId
 
-            break
+                var list = this.skillTypes()
+                var v1 = trait.dataId
+                var v2 = list[v1]
 
-        //特征类型封印
-        case Game_BattlerBase.TRAIT_STYPE_SEAL, 42:
+                break
 
-            //封印技能类型
-            trait.dataId
+            //特征类型封印
+            case Game_BattlerBase.TRAIT_STYPE_SEAL, 42:
 
-            var list = this.skillTypes()
-            var v1 = trait.dataId
-            var v2 = list[v1]
+                //封印技能类型
+                trait.dataId
 
-            break
+                var list = this.skillTypes()
+                var v1 = trait.dataId
+                var v2 = list[v1]
 
-        //特征技能增加
-        case Game_BattlerBase.TRAIT_SKILL_ADD, 43:
-            //添加技能
-            trait.dataId
-            var v1 = trait.dataId
-            var v2 = ""
-            var v3 = ""
-            var skill = $dataSkills[v1]
-            if (skill) {
-                v2 = skill.name
-                v3 = skill.icon
-            }
+                break
 
-            break
+            //特征技能增加
+            case Game_BattlerBase.TRAIT_SKILL_ADD, 43:
+                //添加技能
+                trait.dataId
+                var v1 = trait.dataId
+                var v2 = ""
+                var v3 = ""
+                var skill = $dataSkills[v1]
+                if (skill) {
+                    v2 = skill.name
+                    v3 = skill.icon
+                }
 
-        //特征技能封印
-        case Game_BattlerBase.TRAIT_SKILL_SEAL, 44:
-            //封印技能
-            trait.dataId
+                break
 
-            var v1 = trait.dataId
-            var v2 = ""
-            var v3 = ""
-            var skill = $dataSkills[v1]
-            if (skill) {
-                v2 = skill.name
-                v3 = skill.icon
+            //特征技能封印
+            case Game_BattlerBase.TRAIT_SKILL_SEAL, 44:
+                //封印技能
+                trait.dataId
 
-            }
-
-            break
-
-        //特征装备武器
-        case Game_BattlerBase.TRAIT_EQUIP_WTYPE, 51:
-            //武器种类
-            trait.dataId
-
-            var list = this.weaponTypes()
-            var v1 = trait.dataId
-            var v2 = list[v1]
-
-            break
-
-        //特征装备防具
-        case Game_BattlerBase.TRAIT_EQUIP_ATYPE, 52:
-            //防具种类
-            trait.dataId
-
-            var list = this.armorTypes()
-            var v1 = trait.dataId
-            var v2 = list[v1]
-
-            break
-
-        //特征装备固定
-        case Game_BattlerBase.TRAIT_EQUIP_LOCK, 53:
-            //装备种类
-            trait.dataId
-
-            var list = this.equipTypes()
-            var v1 = trait.dataId
-            var v2 = list[v1]
-
-            break
-
-        //特征装备封印
-        case Game_BattlerBase.TRAIT_EQUIP_SEAL, 54:
-            //装备种类
-            trait.dataId
-
-            var list = this.equipTypes()
-            var v1 = trait.dataId
-            var v2 = list[v1]
-
-            break
-        //特征孔种类
-        case Game_BattlerBase.TRAIT_SLOT_TYPE, 55:
-            //二刀流种类
-            trait.dataId
-            if (trait.dataId) {
-
-            }
-
-
-            break
-
-        //特征行动添加
-        case Game_BattlerBase.TRAIT_ACTION_PLUS, 61:
-            //行动追加比例
-            var v1 = trait.value
-
-            var v2 = v1 * 100
-
-            break
-
-        //特征特殊标记
-        case Game_BattlerBase.TRAIT_SPECIAL_FLAG, 62:
-
-            switch (trait.dataId) {
-                //标记id自动战斗
-                case Game_BattlerBase.FLAG_ID_AUTO_BATTLE, 0:
-                    break
-                //标记id防御
-                case Game_BattlerBase.FLAG_ID_GUARD, 1:
-                    break
-                //标记id替代
-                case Game_BattlerBase.FLAG_ID_SUBSTITUTE, 2:
-                    break
-                //标记id保留tp
-                case Game_BattlerBase.FLAG_ID_PRESERVE_TP, 3:
-                    break
-                default:
-                    break;
-            }
-            break
-        //特征死亡种类
-        case Game_BattlerBase.TRAIT_COLLAPSE_TYPE, 63:
-
-            break
-        //特征队伍能力
-        case Game_BattlerBase.TRAIT_PARTY_ABILITY, 64:
-            switch (trait.dataId) {
-                //游戏队伍 能力遭遇减半
-                case Game_Party.ABILITY_ENCOUNTER_HALF, 0:
-                    break
-                //游戏队伍 能力遭遇无效
-                case Game_Party.ABILITY_ENCOUNTER_NONE, 1:
-                    break
-                //游戏队伍 能力突然袭击 
-                case Game_Party.ABILITY_CANCEL_SURPRISE, 2:
-                    break
-                //游戏队伍 能力先发制人
-                case Game_Party.ABILITY_RAISE_PREEMPTIVE, 3:
-                    break
-                //游戏队伍 能力金钱双倍
-                case Game_Party.ABILITY_GOLD_DOUBLE, 4:
-                    break
-                //游戏队伍 能力物品掉落双倍
-                case Game_Party.ABILITY_DROP_ITEM_DOUBLE, 5:
-                    break
-                default:
-                    break;
-            }
-            break
-        default:
-            break;
+                var v1 = trait.dataId
+                var v2 = ""
+                var v3 = ""
+                var skill = $dataSkills[v1]
+                if (skill) {
+                    v2 = skill.name
+                    v3 = skill.icon
+
+                }
+
+                break
+
+            //特征装备武器
+            case Game_BattlerBase.TRAIT_EQUIP_WTYPE, 51:
+                //武器种类
+                trait.dataId
+
+                var list = this.weaponTypes()
+                var v1 = trait.dataId
+                var v2 = list[v1]
+
+                break
+
+            //特征装备防具
+            case Game_BattlerBase.TRAIT_EQUIP_ATYPE, 52:
+                //防具种类
+                trait.dataId
+
+                var list = this.armorTypes()
+                var v1 = trait.dataId
+                var v2 = list[v1]
+
+                break
+
+            //特征装备固定
+            case Game_BattlerBase.TRAIT_EQUIP_LOCK, 53:
+                //装备种类
+                trait.dataId
+
+                var list = this.equipTypes()
+                var v1 = trait.dataId
+                var v2 = list[v1]
+
+                break
+
+            //特征装备封印
+            case Game_BattlerBase.TRAIT_EQUIP_SEAL, 54:
+                //装备种类
+                trait.dataId
+
+                var list = this.equipTypes()
+                var v1 = trait.dataId
+                var v2 = list[v1]
+
+                break
+            //特征孔种类
+            case Game_BattlerBase.TRAIT_SLOT_TYPE, 55:
+                //二刀流种类
+                trait.dataId
+                if (trait.dataId) {
+                    var v1 = "二刀流"
+                }
+                break
+
+            //特征行动添加
+            case Game_BattlerBase.TRAIT_ACTION_PLUS, 61:
+                //行动追加比例
+                var v1 = trait.value
+
+                var v2 = v1 * 100
+
+                break
+
+            //特征特殊标记
+            case Game_BattlerBase.TRAIT_SPECIAL_FLAG, 62:
+
+                var v1 = trait.dataId
+                switch (trait.dataId) {
+                    //标记id自动战斗
+                    case Game_BattlerBase.FLAG_ID_AUTO_BATTLE, 0:
+                        var v2 = "自动战斗"
+                        break
+                    //标记id防御
+                    case Game_BattlerBase.FLAG_ID_GUARD, 1:
+                        var v2 = "防御"
+                        break
+                    //标记id替代
+                    case Game_BattlerBase.FLAG_ID_SUBSTITUTE, 2:
+                        var v2 = "替代"
+                        break
+                    //标记id保留tp
+                    case Game_BattlerBase.FLAG_ID_PRESERVE_TP, 3:
+                        var v2 = "保留tp"
+                        break
+                    default:
+                        break;
+                }
+                break
+            //特征死亡种类
+            case Game_BattlerBase.TRAIT_COLLAPSE_TYPE, 63:
+
+                break
+            //特征队伍能力
+            case Game_BattlerBase.TRAIT_PARTY_ABILITY, 64:
+                var v1 = trait.dataId
+                var v2 = ""
+
+                switch (trait.dataId) {
+                    //游戏队伍 能力遭遇减半
+                    case Game_Party.ABILITY_ENCOUNTER_HALF, 0:
+                        var v2 = "遭遇减半"
+                        break
+                    //游戏队伍 能力遭遇无效
+                    case Game_Party.ABILITY_ENCOUNTER_NONE, 1:
+                        var v2 = "遭遇无效"
+                        break
+                    //游戏队伍 能力突然袭击 
+                    case Game_Party.ABILITY_CANCEL_SURPRISE, 2:
+                        var v2 = "突然袭击"
+                        break
+                    //游戏队伍 能力先发制人
+                    case Game_Party.ABILITY_RAISE_PREEMPTIVE, 3:
+                        var v2 = "先发制人"
+                        break
+                    //游戏队伍 能力金钱双倍
+                    case Game_Party.ABILITY_GOLD_DOUBLE, 4:
+                        var v2 = "金钱双倍"
+                        break
+                    //游戏队伍 能力物品掉落双倍
+                    case Game_Party.ABILITY_DROP_ITEM_DOUBLE, 5:
+                        var v2 = "物品掉落双倍"
+                        break
+                    default:
+                        break;
+                }
+                break
+            default:
+                break;
+        }
+        if (v1 || v2 || v3 || v4 || v5) {
+            return re.format(v1, v2, v3, v4, v5);
+        }
     }
-
-
+    return ""
 }
 
 
- 
 
-DataMessage.getItemTrait = function (trait) {
+DataMessage.getItemTrait = function (traits, i, must, set) {
     var re = ""
     var v1 = ""
     var v2 = ""
-    if (trait) {
+    var v3 = ""
+    var v4 = ""
+    var v5 = ""
+    var set = set || DataMessage.itemTraitSet
+
+    var trait = traits && traits[i]
+    if (trait && (!must || trait.code == must) && set) {
+        var re = set[trait.code]
         switch (trait.code) {
             //效果 恢复 hp
             case Game_Action.EFFECT_RECOVER_HP, 11:
 
-                re = "恢复hp"
                 var v1 = ""
                 var v2 = ""
                 //百分比 
@@ -972,7 +1112,7 @@ DataMessage.getItemTrait = function (trait) {
                 break
             //效果 恢复 mp
             case Game_Action.EFFECT_RECOVER_MP, 12:
-                re = "恢复mp"
+
                 //百分比 
                 var v1 = ""
                 var v2 = ""
@@ -988,43 +1128,51 @@ DataMessage.getItemTrait = function (trait) {
                 break
             //效果 获得 tp
             case Game_Action.EFFECT_GAIN_TP, 13:
-                re = "恢复tp"
-                //固定值 
-                if (trait.value1) {
-                    v1 = trait.value1
-                }
+                //固定值  
+                var v1 = trait.value1
+                
                 break
             //效果 添加 状态
             case Game_Action.EFFECT_ADD_STATE, 21:
                 if (trait.dataId == 0) {
-                    v1 = "" //添加普通攻击状态
+                   var  v1 = trait.dataId 
+                   var  v2 = 0
+                   var  v3 = "普通攻击" //添加普通攻击状态
+                
                 } else {
                     var list = $dataStates
-                    v1 = trait.dataId //添加状态
-                    v2 = list[v1]
+                    var v1 = trait.dataId //添加状态
+                    var state = list[v1]
+                    if (state) {
+                        var v2 = state.icon
+                        var v3 = state.name
+                    }
                 }
-                //添加状态比例
+                //移除状态比例
                 if (trait.value1) {
-                    v3 = trait.value1
-                    v4 = v3 * 100
+                    var v4 = trait.value1
+                    var v5 = v4 * 100 + "%"
                 }
                 break
             //效果 移除 状态
             case Game_Action.EFFECT_REMOVE_STATE, 22:
                 if (trait.dataId) {
                     var list = $dataStates
-                    v1 = trait.dataId //添加状态
-                    v2 = list[v1]
+                    var v1 = trait.dataId //添加状态
+                    var state = list[v1]
+                    if (state) {
+                        var v2 = state.icon
+                        var v3 = state.name
+                    }
                 }
                 //移除状态比例
                 if (trait.value1) {
-                    v3 = trait.value1
-                    v4 = v3 * 100
+                    var v4 = trait.value1
+                    var v5 = v4 * 100+ "%"
                 }
                 break
             //效果 添加 正面效果
             case Game_Action.EFFECT_ADD_BUFF, 31:
-
 
                 var list = this.params()
                 //种类
@@ -1070,12 +1218,10 @@ DataMessage.getItemTrait = function (trait) {
                 break
             //效果 额外的
             case Game_Action.EFFECT_SPECIAL, 41:
-
                 //特殊 效果 逃跑 
                 if (trait.dataId == Game_Action.SPECIAL_EFFECT_ESCAPE) {
-                    re = "逃跑"
+                    var v1 = "逃跑"
                 }
-
                 break
             //效果 生长
             case Game_Action.EFFECT_GROW, 42:
@@ -1090,10 +1236,7 @@ DataMessage.getItemTrait = function (trait) {
                 //增加数
                 trait.value1
                 var v3 = trait.value1
-                if (v3) {
-
-                }
-
+                
                 break
             //效果 学习技能
             case Game_Action.EFFECT_LEARN_SKILL, 43:
@@ -1107,8 +1250,7 @@ DataMessage.getItemTrait = function (trait) {
                 if (skill) {
                     v2 = skill.name
                     v3 = skill.icon
-                }
-
+                } 
                 break
             //效果 公共事件
             case Game_Action.EFFECT_COMMON_EVENT, 44:
@@ -1116,8 +1258,145 @@ DataMessage.getItemTrait = function (trait) {
             default:
                 break;
         }
+
+        if (v1 || v2 || v3 || v4 || v5) { 
+            return re.format(v1, v2, v3, v4, v5);
+        }
+    }
+    return ""
+
+
+}
+
+
+
+/***获取参数组 */
+DataMessage.pushActorParams = function (params, must, set, list) {
+    var list = list || []
+    for (var i = 0; i < params.length; i++) {
+        var r = this.getActorParam(params, i, must, set)
+        if (r) {
+            list.push(r)
+        }
+    }
+    return list
+}
+
+
+
+DataMessage.pushActorTraits = function (traits, must, set, list) {
+    var list = list || []
+    for (var i = 0; i < traits.length; i++) {
+        var r = this.getActorTrait(traits, i, must, set)
+        if (r) {
+            list.push(r)
+        }
     }
     return re
 
+}
 
+
+DataMessage.pushItemTraits = function (traits, must, set, list) {
+    var list = list || []
+    for (var i = 0; i < traits.length; i++) {
+        var r = this.getItemTrait(traits, i, must, set)
+        if (r) {
+            list.push(r)
+        }
+    }
+    return list
+
+}
+
+
+
+DataMessage.pushIs = function (is, item, type, must, set, list) {
+    var list = list || []
+    if (item) {
+        if (type == "params") {
+            DataMessage.pushActorParams(item.params, must, set, list)
+        } else if (type == "traits" || type == "effects") {
+            if (is == "actor" || is == "weapon" || is == "armor") {
+                DataMessage.pushActorTraits(item.traits, must, set, list)
+            } else {
+                DataMessage.pushItemTraits(item.effects, must, set, list)
+            }
+        } else {
+            DataMessage.pushIsOther(is, item, type, must, set, list)
+        }
+    }
+    return list
+}
+
+DataMessage.pushIsOther = function (is, item, type, must, set, list) {
+    var list = list || []
+    var r = ""
+    if (item) {
+        switch (is) {
+            case "actor":
+                r = this.getActor(item, type, must, set)
+                break;
+            case "weapon":
+                r = this.getWeapon(item, type, must, set)
+                break;
+            case "item":
+                r = this.getItem(item, type, must, set)
+                break;
+            case "armor":
+                r = this.getArmor(item, type, must, set)
+                break;
+            case "skill":
+                r = this.getSkill(item, type, must, set)
+                break;
+            default:
+                break;
+        }
+        if (r) {
+            list.push(r)
+        }
+    }
+    return list
+}
+
+
+
+
+DataMessage.pushSet = {
+    actor: ["name", ""],
+    item: ["name", "iconIndex", "description", "consumable", "itypeId", "tpGain", "repeats", "hitType", "occasion", "scope",  "speed", "successRate", "effects", "price"]
+
+}
+
+
+
+DataMessage.pushList =- function (item, set, list) {
+
+    var type = this.isObj(item)
+    console.log(type)
+    var set = set || DataMessage.pushSet[type]
+    var list = list || []
+    if (type && set) {
+        for (var i = 0; i < set.length; i++) {
+            var t = set[i]
+            console.log(DataMessage.pushIs(type, item, t, 0, 0, list))
+        }
+
+    }
+    return list
+}
+
+
+
+DataMessage.list2Text = function (list) {
+
+    var list = list || []
+    var re = ""
+    if(list[0]){
+        re = list[0]||""
+    }
+    for (var i = 1; i < list.length; i++) {
+        re+= "\n" + list[i] 
+    }
+    return re
 }
