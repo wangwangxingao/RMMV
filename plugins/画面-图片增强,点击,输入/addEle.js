@@ -99,6 +99,7 @@ Graphics._disableTextSelection = function() {
 };
 
 
+
 Graphics._createAllElements = function () {
 
     this._createBase()
@@ -335,7 +336,7 @@ Graphics._createElement = function (id, type, set,set3,set4,set5,set6,set2) {
     if (set) {
         this._setElement(id, set)
     }
-    //this._elements[id].style.zIndex = 112;
+    this._elements[id].style.zIndex = 112;
 	if (set3 == "transparent"){//设置透明背景色
 		this._elements[id].style.backgroundColor="transparent"
 		this._elements[id].style.color="#FFFFFF"
@@ -490,14 +491,6 @@ Graphics._updateRealScale = function () {
  
 
 
-/**缺省伸展模式
- * @static
- * @method _defaultStretchMode
- * @private
- */
-Graphics._defaultStretchMode = function() {
-    return true //Utils.isNwjs() || Utils.isMobileDevice();
-};
 
 
 
@@ -539,8 +532,6 @@ Input._onKeyDown = function (event) {
 
 
 
-
-
 Graphics.pageToCanvasX2 = function (x, y) {
     if (this._rotate == 1 || this._rotate == 3) {
         x = y
@@ -569,6 +560,9 @@ Graphics.pageToCanvasY2 = function (x, y) {
     }
     return Graphics.pageToCanvasY(y)
 }
+
+
+
 
 
 
@@ -781,17 +775,3 @@ TouchInput._onPointerDown = function (event) {
         }
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
