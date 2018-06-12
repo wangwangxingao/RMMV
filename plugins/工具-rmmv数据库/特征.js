@@ -212,7 +212,7 @@ DataMessage.itemSet = {
     "repeats": "连续次数:%1",
     "hitType": "命中种类:%2",
     "occasion": "应用场景:%2",
-    "scope": "范围:%2", 
+    "scope": "范围:%2",
     "speed": "速度修正:%1",
     "successRate": "成功率:%1",
 
@@ -503,7 +503,7 @@ DataMessage.getItem = function (item, type, must, set) {
             case "scope":
                 var v1 = item[type]
                 var v2 = this.skillScope()[v1]
-                break 
+                break
             case "speed": 0
                 var v1 = item[type]
                 break
@@ -1130,15 +1130,15 @@ DataMessage.getItemTrait = function (traits, i, must, set) {
             case Game_Action.EFFECT_GAIN_TP, 13:
                 //固定值  
                 var v1 = trait.value1
-                
+
                 break
             //效果 添加 状态
             case Game_Action.EFFECT_ADD_STATE, 21:
                 if (trait.dataId == 0) {
-                   var  v1 = trait.dataId 
-                   var  v2 = 0
-                   var  v3 = "普通攻击" //添加普通攻击状态
-                
+                    var v1 = trait.dataId
+                    var v2 = 0
+                    var v3 = "普通攻击" //添加普通攻击状态
+
                 } else {
                     var list = $dataStates
                     var v1 = trait.dataId //添加状态
@@ -1168,7 +1168,7 @@ DataMessage.getItemTrait = function (traits, i, must, set) {
                 //移除状态比例
                 if (trait.value1) {
                     var v4 = trait.value1
-                    var v5 = v4 * 100+ "%"
+                    var v5 = v4 * 100 + "%"
                 }
                 break
             //效果 添加 正面效果
@@ -1236,7 +1236,7 @@ DataMessage.getItemTrait = function (traits, i, must, set) {
                 //增加数
                 trait.value1
                 var v3 = trait.value1
-                
+
                 break
             //效果 学习技能
             case Game_Action.EFFECT_LEARN_SKILL, 43:
@@ -1250,7 +1250,7 @@ DataMessage.getItemTrait = function (traits, i, must, set) {
                 if (skill) {
                     v2 = skill.name
                     v3 = skill.icon
-                } 
+                }
                 break
             //效果 公共事件
             case Game_Action.EFFECT_COMMON_EVENT, 44:
@@ -1259,7 +1259,7 @@ DataMessage.getItemTrait = function (traits, i, must, set) {
                 break;
         }
 
-        if (v1 || v2 || v3 || v4 || v5) { 
+        if (v1 || v2 || v3 || v4 || v5) {
             return re.format(v1, v2, v3, v4, v5);
         }
     }
@@ -1364,39 +1364,109 @@ DataMessage.pushIsOther = function (is, item, type, must, set, list) {
 
 DataMessage.pushSet = {
     actor: ["name", ""],
-    item: ["name", "iconIndex", "description", "consumable", "itypeId", "tpGain", "repeats", "hitType", "occasion", "scope",  "speed", "successRate", "effects", "price"]
+    item: [
+        "name",
+       // "iconIndex",
+        "description",
+        "consumable",
+        "itypeId",
+        "tpGain",
+        "repeats",
+        "hitType",
+        "occasion",
+        "scope",
+        "speed",
+        "successRate",
+        "effects",
+        "price"
+    ],
+    skill: [ 
+        "name",
+        //"iconIndex",
+        "description",
+        "tpCost",
+        "mpCost",
+        "repeats",
+        "hitType",
+        "occasion",
+        "scope",
+        "stypeId",
+        "requiredWtypeId1",
+        "requiredWtypeId2",
+        "speed",
+        "successRate",
+    ],
 
+    armor: [ 
+        "name",
+       // "iconIndex",  //图标 
+        "description", //说明 
+        "etypeId",
+        "atypeId",
+        "price", //价格
+        "traits",
+        "params",
+    ],
+   
+ 
+    weapon: [ 
+        "name",
+        "iconIndex",  //图标 
+        "note",//文本  
+        "meta", //注释内容 
+        "description", //说明 
+        "etypeId",
+        "wtypeId",
+        "price", //价格
+        "traits",
+        "params",
+        "param",
+    ]
 }
 
 
 
-DataMessage.pushList =- function (item, set, list) {
+DataMessage.pushList = function (item, set, list) {
 
-    var type = this.isObj(item)
-    console.log(type)
-    var set = set || DataMessage.pushSet[type]
+    var is = this.isObj(item) 
+    var setList = setList || DataMessage.pushSet[is]
     var list = list || []
-    if (type && set) {
-        for (var i = 0; i < set.length; i++) {
-            var t = set[i]
-            console.log(DataMessage.pushIs(type, item, t, 0, 0, list))
+    if (is && setList) {
+        for (var i = 0; i < setList.length; i++) {
+            var t = setList[i]
+            if (Array.isArray(t)) {
+                if (typeof (t[1]) == 'object') {
+                    var set = t[1]
+                } else  if(typeof (t[1]) == 'string') {
+                    var set = DataMessage[t[1]]
+                } else{
+                    var set = 0
+                }
+                var must = t[2]
+                var t = t[0]
+                if (t && set) {
+                    DataMessage.pushIs(is, item, t, must, set, list)
+                }
+            } else {
+                console.log(DataMessage.pushIs(is, item, t, 0, 0, list))
+
+            }
         }
 
     }
     return list
 }
 
-
-
-DataMessage.list2Text = function (list) {
+DataMessage.list2Text = function (list, join) {
 
     var list = list || []
     var re = ""
-    if(list[0]){
-        re = list[0]||""
+    var join = join || ""
+    if (list[0]) {
+        re = list[0] || ""
     }
     for (var i = 1; i < list.length; i++) {
-        re+= "\n" + list[i] 
+        re += join + list[i]
     }
     return re
 }

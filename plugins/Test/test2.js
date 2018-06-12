@@ -3,36 +3,6 @@
 
 
 
-
-
-Math.to2 = function (v) {
-
-    return v.toFixed(1) * 1
-};
-
-
-Math.randomInt2 = function (min, max) {
-    return Math.floor(max * Math.random()) + min;
-};
-
-js3 = function(){
-   var all = 0
-   var l = []
-
-    for (var i = 0; i < 7; i++) {
-        var z = Math.randomInt2(8, 2)
-        l[i] = z
-        all+=z
-    }
-  l[7] =Math.to2( all / 7 )
-
-
-  console.log(l)  
-}
-
-js3()
-
- 
 js1 = function () {
     var re = {}
     re.list = []
