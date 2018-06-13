@@ -15,23 +15,41 @@
  * ===================================================
  * 初始化
  * 
- * $gameVariables._data[1] = new SaoLei(2,5,5,6)
+ * $saolei = new SaoLei(2,5,5,6)
  * 基础事件 2号事件(之后不要有事件)
  * 宽 5
  * 高 5
  * 雷数 6
  * 
  * ===================================================
- * 更新 
- * 
+ * 使用更新默认方式
  * 当结束时返回 true 
  * 
- * $gameVariables._data[1].update()
+ * $saolei.update()
  * 
- * 键盘输入时
- *   
- * 按 ok 键 翻开雷区
- * 按 shift + ok 插拔旗
+ * 
+ * ===================================================
+ * 
+ * 
+ * $saolei.input(1,0)
+ * 插拔旗子
+ * 
+ * 
+ * $saolei.input(1,1)
+ * 翻开雷区
+ * 
+ * 
+ * 
+ * ===================================================
+ * 
+ * 输入 
+ * 
+ * $saolei.updateTouchInput()
+ * 触摸时把角色移动到触摸位置
+ * 
+ * 
+ * ===================================================
+ *  
  * 
  * 触摸输入时
  * 
@@ -41,25 +59,44 @@
  * 插旗只能插指定地雷数的旗
  * 当 翻开地雷 或者 除插旗外都翻开时 结束
  * 
+ * 
+ * 
+ * ===================================================
+ * 是游戏结束 
+ * $saolei.end()
+ * 
+ * 游戏结束返回true
+ * 
+ * 
  * ===================================================
  * 结果
  * 
- * var z = $gameVariables._data[1].gameEval()
+ * var z = $saolei.gameEval()
  * "未标的地雷数" , z[0]
  * "标错的旗子数" , z[1]
  * "正确的旗子数" , z[2]
  * 
+ * =================================================== 
+ * 胜利
+ * 
+ * $saolei.win()
+ * 无标错或未标旗子时返回true
+ * 
  * ===================================================
+ * 
+ * 
+ * 
  * 刷新
  * 
  * 雷区重置
- * $gameVariables._data[1].refresh() 
+ * $saolei.refresh() 
  * 
  * ===================================================
  * 
  *  
 */
 
+var $saolei = null
 
 function SaoLei() {
     this.initialize.apply(this, arguments);
@@ -72,7 +109,7 @@ SaoLei.prototype.constructor = SaoLei;
 SaoLei.prototype.initialize = function (id, x, y, z) {
     this._x = x
     this._y = y
-    this._z = z 
+    this._z = z
     this.make()
     this.setup(id)
     console.log(this.makeSprite2())
@@ -102,11 +139,37 @@ SaoLei.prototype.gameEval = function () {
 }
 
 
-SaoLei.prototype.update = function () {
-    if( this.isend() ){
-        return  true
+SaoLei.prototype.win = function () {
+    var r = [0, 0, 0]
+    for (var i = 0; i < this._leiqu.length; i++) {
+        var z0 = (this._leiqu[i] == 9)
+        var z1 = (this._xianshi[i] == 2)
+        if (z0) {
+            if (!z1) {
+                //未插旗的地雷
+                r[0]++
+            } else {
+                //正确的旗子
+                r[2]++
+            }
+        } else {
+            if (z1) {
+                //错误的旗子
+                r[1]++
+            }
+        }
     }
-    var shift = Input.isPressed('shift')
+    return r[0] == 0 && r[1] == 0
+}
+
+
+
+
+
+SaoLei.prototype.update = function () {
+    if (this.end()) {
+        return true
+    }
     var ok = Input.isTriggered('ok')
     if (ok) {
     } else {
@@ -114,15 +177,14 @@ SaoLei.prototype.update = function () {
         if (ok) {
             shift = true
             if (TouchInput.isLongPressed()) {
-                this.updateInput(true, true)
+                this.input(true, true)
                 shift = false
             }
         }
     }
-    this.updateInput(ok, shift)
-    return  false
+    this.input(ok, shift)
+    return false
 }
-
 
 SaoLei.prototype.updateTouchInput = function () {
     if (TouchInput.isRepeated()) {
@@ -139,7 +201,7 @@ SaoLei.prototype.updateTouchInput = function () {
 }
 
 
-SaoLei.prototype.updateInput = function (ok, shift) {
+SaoLei.prototype.input = function (ok, shift) {
     if (ok) {
         var x = $gamePlayer._x
         var y = $gamePlayer._y
@@ -156,7 +218,7 @@ SaoLei.prototype.updateInput = function (ok, shift) {
     }
 }
 
-SaoLei.prototype.refresh = function () { 
+SaoLei.prototype.refresh = function () {
     this.make()
     var all = this._x * this._y
     for (var i = 0; i < all; i++) {
@@ -233,54 +295,15 @@ SaoLei.prototype.make = function (x, y, z) {
 //安装
 SaoLei.prototype.showleiqu = function (id, z) {
     var e = $gameMap.event(id + this._eventId)
+    var l = [[4,0],[4,1],[4,2],[6,0],[6,1],[6,2],[8,0],[8,1],[8,2],[2,2],[2,1],[2,0]]
     if (e) {
-        if (z == 0) {
-            var d = 4
-            var p = 0
-
-        } else if (z == 1) {
-            var d = 4
-            var p = 1
-
-        } else if (z == 2) {
-            var d = 4
-            var p = 2
-
-        } else if (z == 3) {
-            var d = 6
-            var p = 0
-
-        } else if (z == 4) {
-            var d = 6
-            var p = 1
-
-        } else if (z == 5) {
-            var d = 6
-            var p = 2
-
-        } else if (z == 6) {
-            var d = 8
-            var p = 0
-
-        } else if (z == 7) {
-            var d = 8
-            var p = 1
-
-        } else if (z == 8) {
-            var d = 8
-            var p = 2
-        } else if (z == 9) {
-            var d = 2
-            var p = 2
-        } else if (z == 10) {
-            var d = 2
-            var p = 1
-        } else if (z == 11) {
-            var d = 2
-            var p = 0
-        }
+        var dp = l[z] || [4,0]
+        var d = dp[0]
+        var p = dp[1]
+ 
         e._direction = d
         e._originalPattern = p
+        e._pattern = p
     }
 };
 
@@ -327,11 +350,11 @@ SaoLei.prototype.makeSprite2 = function () {
         t += "\n"
         for (var xi = 0; xi < this._x; xi++) {
             var id = xi + yi * this._x
-            if (this._xianshi[id] == 1 ) {
+            if (this._xianshi[id] == 1) {
                 t += this._leiqu[id]
-            } else if(this._xianshi[id] == 2 ){
+            } else if (this._xianshi[id] == 2) {
                 t += "F"
-            }else{
+            } else {
                 t += "H"
             }
         }
@@ -355,7 +378,7 @@ SaoLei.prototype.makenum = function (id) {
 };
 
 
-SaoLei.prototype.isend = function () { 
+SaoLei.prototype.end = function () {
     return this._xianshi.length == this._xsshu
 };
 
@@ -377,7 +400,7 @@ SaoLei.prototype.dianji2 = function (id) {
         if (this._qishu < this._z) {
             this.setQi(id, 2)
             this.showleiqu(id, 10)
-            console.log(this.makeSprite2())            
+            console.log(this.makeSprite2())
         }
     } else if (this._xianshi[id] == 2) {
         this.setQi(id, 0)
@@ -409,7 +432,7 @@ SaoLei.prototype.showall = function (id) {
         var z = this._xianshi[i]
         this.setQi(i, z || 1)
         var num = this.getLeiQu(i)
-        if(num == 9 && z == 2){
+        if (num == 9 && z == 2) {
             num = 10
         }
         this.showleiqu(i, num)
@@ -424,14 +447,14 @@ SaoLei.prototype.show = function (id) {
         for (var d = 1; d < 10; d++) {
             var id2 = this.idd(id, d)
             if (id2 >= 0 && d != 5 && !this._xianshi[id2]) {
-                this.show(id2) 
+                this.show(id2)
             }
         }
     }
 };
 
 //复制fid事件到tid x ,y
-SaoLei.copyEvent = function (fid, id, x, y) { 
+SaoLei.copyEvent = function (fid, id, x, y) {
     if (fid > 0 && id > 0) {
         var fid = fid
         var tid = fid + id

@@ -1675,7 +1675,7 @@ Window_Message.prototype.tslPushNewPage = function(textState) {
 
 /**文本状态列表添加头2 */
 Window_Message.prototype.tslPushHear2 = function (textState) {
-    if (this._useMessage && $gameMessage.faceName()) {
+    if ( $gameMessage.faceName()) {
         var pos = $gameMessage.facePos()
         var name = $gameMessage.faceName()
         var id = $gameMessage.faceIndex()
@@ -2225,16 +2225,9 @@ Window_Message.prototype.updatePlacement = function() {
 
 /**开始信息 */
 Window_Message.prototype.startMessage = function(allText,positionType,background) {
-    var positionType = positionType === undefined ? $gameMessage.positionType() :positionType
-    var background =  background === undefined ? $gameMessage.background() :background
-    var allText = allText
-    if(allText === undefined){
-        this._useMessage = true
-        allText = $gameMessage.allText()
-    }else{
-        this._useMessage = false
-        allText = allText
-    } 
+    var positionType = $gameMessage.positionType()
+    var background =  $gameMessage.background() 
+    var allText =  $gameMessage.allText()
     this.setPositionType(positionType)
     this._textState = this.testTextEx( allText , 0, 0, this.contents.width, this.contents.height)
     this.newPage(this._textState, 1);
@@ -2341,7 +2334,7 @@ Window_Message.prototype.terminateMessage = function() {
     this.erasePictureAll()
     this.close();
     this._goldWindow.close();
-    this._useMessage && $gameMessage.clear();
+    $gameMessage.clear();
 };
 
 
