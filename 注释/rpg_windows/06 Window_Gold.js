@@ -13,7 +13,11 @@ function Window_Gold() {
 Window_Gold.prototype = Object.create(Window_Base.prototype);
 /**设置创造者 */
 Window_Gold.prototype.constructor = Window_Gold;
-/**初始化 */
+/**初始化
+ * 
+ * @param {number} x x
+ * @param {number} y y 
+ */
 Window_Gold.prototype.initialize = function(x, y) {
     var width = this.windowWidth();
     var height = this.windowHeight();

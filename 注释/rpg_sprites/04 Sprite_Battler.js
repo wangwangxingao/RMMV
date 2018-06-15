@@ -53,7 +53,11 @@ Sprite_Battler.prototype.setBattler = function(battler) {
 	//战斗者 = battler
     this._battler = battler;
 };
-/**设置始位 */
+/**设置始位
+ * 
+ * @param {number} x x
+ * @param {number} y y 
+ */
 Sprite_Battler.prototype.setHome = function(x, y) {
 	//始位x = x
     this._homeX = x;

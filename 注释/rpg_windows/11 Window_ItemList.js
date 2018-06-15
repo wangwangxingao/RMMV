@@ -13,13 +13,22 @@ function Window_ItemList() {
 Window_ItemList.prototype = Object.create(Window_Selectable.prototype);
 /**设置创造者 */
 Window_ItemList.prototype.constructor = Window_ItemList;
-/**初始化 */
+/**初始化
+ * 
+ * @param {number} x x
+ * @param {number} y y
+ * @param {number} width 宽
+ * @param {number} height 高
+ */
 Window_ItemList.prototype.initialize = function(x, y, width, height) {
     Window_Selectable.prototype.initialize.call(this, x, y, width, height);
     this._category = 'none';
     this._data = [];
 };
-/**设置分类 */
+/**设置分类 
+ * 
+ * 
+*/
 Window_ItemList.prototype.setCategory = function(category) {
     if (this._category !== category) {
         this._category = category;

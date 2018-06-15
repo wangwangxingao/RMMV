@@ -13,7 +13,13 @@ function Window_BattleItem() {
 Window_BattleItem.prototype = Object.create(Window_ItemList.prototype);
 /**设置创造者 */
 Window_BattleItem.prototype.constructor = Window_BattleItem;
-/**初始化 */
+/**初始化
+ * 
+ * @param {number} x x
+ * @param {number} y y
+ * @param {number} width 宽
+ * @param {number} height 高
+ */
 Window_BattleItem.prototype.initialize = function(x, y, width, height) {
     Window_ItemList.prototype.initialize.call(this, x, y, width, height);
     this.hide();

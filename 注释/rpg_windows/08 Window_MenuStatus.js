@@ -13,7 +13,12 @@ function Window_MenuStatus() {
 Window_MenuStatus.prototype = Object.create(Window_Selectable.prototype);
 /**设置创造者 */
 Window_MenuStatus.prototype.constructor = Window_MenuStatus;
-/**初始化 */
+/**初始化
+ * 
+ * @param {number} x x
+ * @param {number} y y 
+ * 
+ */
 Window_MenuStatus.prototype.initialize = function(x, y) {
     var width = this.windowWidth();
     var height = this.windowHeight();

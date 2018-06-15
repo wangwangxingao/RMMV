@@ -12,7 +12,13 @@ function Window_Selectable() {
 Window_Selectable.prototype = Object.create(Window_Base.prototype);
 /**设置创造者 */
 Window_Selectable.prototype.constructor = Window_Selectable;
-/**初始化 */
+/**初始化
+ * 
+ * @param {number} x x
+ * @param {number} y y
+ * @param {number} width 宽
+ * @param {number} height 高
+ */
 Window_Selectable.prototype.initialize = function(x, y, width, height) {
     Window_Base.prototype.initialize.call(this, x, y, width, height);
     //索引 = -1 

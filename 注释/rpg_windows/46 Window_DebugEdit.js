@@ -13,7 +13,11 @@ function Window_DebugEdit() {
 Window_DebugEdit.prototype = Object.create(Window_Selectable.prototype);
 /**设置创造者 */
 Window_DebugEdit.prototype.constructor = Window_DebugEdit;
-/**初始化 */
+/**初始化 
+ * @param {number} x x
+ * @param {number} y y
+ * @param {number} width 宽 
+ */
 Window_DebugEdit.prototype.initialize = function(x, y, width) {
     var height = this.fittingHeight(10);
     Window_Selectable.prototype.initialize.call(this, x, y, width, height);

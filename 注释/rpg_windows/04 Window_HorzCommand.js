@@ -13,7 +13,11 @@ function Window_HorzCommand() {
 Window_HorzCommand.prototype = Object.create(Window_Command.prototype);
 /**设置创造者 */
 Window_HorzCommand.prototype.constructor = Window_HorzCommand;
-/**初始化 */
+/**初始化
+ * 
+ * @param {number} x x
+ * @param {number} y y 
+ */
 Window_HorzCommand.prototype.initialize = function(x, y) {
     Window_Command.prototype.initialize.call(this, x, y);
 };

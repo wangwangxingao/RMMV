@@ -13,7 +13,11 @@ function Window_BattleActor() {
 Window_BattleActor.prototype = Object.create(Window_BattleStatus.prototype);
 /**设置创造者 */
 Window_BattleActor.prototype.constructor = Window_BattleActor;
-/**初始化 */
+/**初始化
+ * 
+ * @param {number} x x
+ * @param {number} y y 
+ */
 Window_BattleActor.prototype.initialize = function(x, y) {
 	//窗口战斗状态 初始化 呼叫(this)
     Window_BattleStatus.prototype.initialize.call(this);

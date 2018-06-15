@@ -13,7 +13,12 @@ function Window_MenuCommand() {
 Window_MenuCommand.prototype = Object.create(Window_Command.prototype);
 /**设置创造者 */
 Window_MenuCommand.prototype.constructor = Window_MenuCommand;
-/**初始化 */
+/**初始化
+ * 
+ * @param {number} x x
+ * @param {number} y y 
+ * 
+ */
 Window_MenuCommand.prototype.initialize = function(x, y) {
     Window_Command.prototype.initialize.call(this, x, y);
     this.selectLast();

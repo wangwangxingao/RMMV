@@ -13,7 +13,12 @@ function Window_SkillType() {
 Window_SkillType.prototype = Object.create(Window_Command.prototype);
 /**设置创造者 */
 Window_SkillType.prototype.constructor = Window_SkillType;
-/**初始化 */
+/**初始化
+ * 
+ * @param {number} x x
+ * @param {number} y y 
+ * 
+ */
 Window_SkillType.prototype.initialize = function(x, y) {
     Window_Command.prototype.initialize.call(this, x, y);
     this._actor = null;

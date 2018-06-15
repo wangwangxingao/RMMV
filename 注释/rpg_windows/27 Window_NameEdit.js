@@ -13,7 +13,9 @@ function Window_NameEdit() {
 Window_NameEdit.prototype = Object.create(Window_Base.prototype);
 /**设置创造者 */
 Window_NameEdit.prototype.constructor = Window_NameEdit;
-/**初始化 */
+/**初始化
+ * 
+ */
 Window_NameEdit.prototype.initialize = function(actor, maxLength) {
     var width = this.windowWidth();
     var height = this.windowHeight();

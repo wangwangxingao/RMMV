@@ -13,7 +13,11 @@ function Window_EquipCommand() {
 Window_EquipCommand.prototype = Object.create(Window_HorzCommand.prototype);
 /**设置创造者 */
 Window_EquipCommand.prototype.constructor = Window_EquipCommand;
-/**初始化 */
+/**初始化 
+ * @param {number} x x
+ * @param {number} y y
+ * @param {number} width 宽 
+ */
 Window_EquipCommand.prototype.initialize = function(x, y, width) {
     this._windowWidth = width;
     Window_HorzCommand.prototype.initialize.call(this, x, y);

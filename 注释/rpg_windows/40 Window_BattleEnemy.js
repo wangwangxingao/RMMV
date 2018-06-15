@@ -13,7 +13,12 @@ function Window_BattleEnemy() {
 Window_BattleEnemy.prototype = Object.create(Window_Selectable.prototype);
 /**设置创造者 */
 Window_BattleEnemy.prototype.constructor = Window_BattleEnemy;
-/**初始化 */
+/**初始化
+ * 
+ * @param {number} x x
+ * @param {number} y y 
+ * 
+ */
 Window_BattleEnemy.prototype.initialize = function(x, y) {
     this._enemies = [];
     var width = this.windowWidth();

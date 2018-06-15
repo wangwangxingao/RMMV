@@ -16,7 +16,11 @@ Window_DebugRange.prototype.constructor = Window_DebugRange;
 
 Window_DebugRange.lastTopRow = 0;
 Window_DebugRange.lastIndex  = 0;
-/**初始化 */
+/**初始化
+ * 
+ * @param {number} x x
+ * @param {number} y y 
+ */
 Window_DebugRange.prototype.initialize = function(x, y) {
     this._maxSwitches = Math.ceil(($dataSystem.switches.length - 1) / 10);
     this._maxVariables = Math.ceil(($dataSystem.variables.length - 1) / 10);

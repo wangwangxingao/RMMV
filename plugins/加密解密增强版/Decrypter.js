@@ -1131,7 +1131,7 @@ Decrypter.isLocalMode = function () {
 
     /**
      * 转化为Uint8Array
-     * @param {*} a 
+     * @param {ArrayBuffer|number} a 
      * @return {Uint8Array}
      */
     w.u = function (a) {
@@ -1150,7 +1150,7 @@ Decrypter.isLocalMode = function () {
 
     /**
      * 数组转化为文本
-     * @param {[]} b 数组
+     * @param {[]|Uint8Array|Blob} b 数组
      * @return {string}  文本
      */
     w.bt = function (b) {
@@ -1186,7 +1186,7 @@ Decrypter.isLocalMode = function () {
     };
 
     /**
-     * arrayBuffer转Uint8Arry
+     * Uint8Arry转arrayBuffer
      * @param {Uint8Array} b Uint8Arry数据
      * @return {ArrayBuffer} arrayBuffer数据
      */
@@ -1202,22 +1202,22 @@ Decrypter.isLocalMode = function () {
      * @param {[]} h 文件头
      * 
      */
-    w.d.header = function (a, k, h) {
-        var b = w.rh(k)
-        if (a) {
-            var c = w.l(a)
-            var d = w.l(b)
+    w.d.header = function (b, k, h) {
+        var a = w.rh(k)
+        if (b) {
+            var c = w.l(b)
+            var d = w.l(a)
             for (var i = 0; i < d; i++) {
-                if (a[i] != b[i]) { return false }
+                if (b[i] != a[i]) { return false }
             }
-            return w.u(a.subarray(d))
+            return w.u(b.subarray(d))
         }
         return false
     };
 
     /**
-     * mv 加密
-     * @param {Uint8Array} a Uint8Arry数据
+     * mv 加密 的解密
+     * @param {Uint8Array} b Uint8Arry数据
      * @param {[]} k 密钥
      * @param {[]} h 文件头
      */
@@ -1231,7 +1231,13 @@ Decrypter.isLocalMode = function () {
         }
         return b;
     };
-
+    /**
+     * ex 
+     * 加密的解密 
+     * @param {Uint8Array} b Uint8Arry数据
+     * @param {[]} k 密钥
+     * @param {[]} h 文件头
+     */
     w.d.exb = function (b, k, h, t) {
         if (b) {
             var k = w.rk(k);
@@ -1256,11 +1262,25 @@ Decrypter.isLocalMode = function () {
         return b;
     };
 
+    /**
+     * ex 
+     * 加密的解密
+     * @param {Uint8Array} b Uint8Arry数据
+     * @param {[]} k 密钥
+     * @param {[]} h 文件头
+     * 
+    */
     w.d.ex = function (b, k, h) {
         return this.exb(b, k, h)
     };
 
 
+    /**
+     * zlib 解压缩
+     * @param {Uint8Array} b Uint8Arry数据
+     * @param {[]} k 密钥
+     * @param {[]} h 文件头
+     */
     w.d.zlib = function (b, k, h) {
         if (b) {
             if (Zlib) {
@@ -1270,7 +1290,12 @@ Decrypter.isLocalMode = function () {
         return b;
     };
 
-
+    /**
+     * LZMA 解压缩
+     * @param {Uint8Array} b Uint8Arry数据
+     * @param {[]} k 密钥
+     * @param {[]} h 文件头
+     */
     w.d.lzma = function (b, k, h) {
         if (b) {
             if (LZMA) {
@@ -1280,7 +1305,12 @@ Decrypter.isLocalMode = function () {
         return b;
     };
 
-
+    /**
+     * pako 解压缩
+     * @param {Uint8Array} b Uint8Arry数据
+     * @param {[]} k 密钥
+     * @param {[]} h 文件头
+     */
     w.d.pako = function (b, k, h) {
         if (b) {
             if (pako) {
@@ -1290,6 +1320,12 @@ Decrypter.isLocalMode = function () {
         return b;
     };
 
+    /**
+     * aes 解加密
+     * @param {Uint8Array} b Uint8Arry数据
+     * @param {[]} k 密钥
+     * @param {[]} h 文件头
+     */
     w.d.aes = function (b, k, h) {
         if (b) {
             if (Aes) {
@@ -1341,6 +1377,7 @@ Decrypter.isLocalMode = function () {
     };
 
 
+    /**使用方法 */
     w.d.use = function (b, m, k, h) {
         var l = w.l(m)
         for (var i = 0; i < l; i++) {
@@ -1353,7 +1390,8 @@ Decrypter.isLocalMode = function () {
 
 
 
-    /**arrd 
+    /**
+     * 解密 
      * @param {Array} a 数据
      * @param {Boolean} t 种类
      * @param {[]} m 加密方法
@@ -1370,6 +1408,7 @@ Decrypter.isLocalMode = function () {
     };
 
 
+    /**读取 */
     w.load = function () { 
         w.m = JSON.parse(w.m2)
         w.h = w.t2b(w.h2)

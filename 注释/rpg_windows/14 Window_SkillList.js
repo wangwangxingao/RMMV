@@ -13,7 +13,13 @@ function Window_SkillList() {
 Window_SkillList.prototype = Object.create(Window_Selectable.prototype);
 /**设置创造者 */
 Window_SkillList.prototype.constructor = Window_SkillList;
-/**初始化 */
+/**初始化
+ *  
+ * @param {number} x x
+ * @param {number} y y
+ * @param {number} width 宽
+ * @param {number} height 高
+ */
 Window_SkillList.prototype.initialize = function(x, y, width, height) {
     Window_Selectable.prototype.initialize.call(this, x, y, width, height);
     //角色 = null

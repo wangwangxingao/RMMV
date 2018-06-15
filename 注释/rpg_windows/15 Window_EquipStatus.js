@@ -13,7 +13,13 @@ function Window_EquipStatus() {
 Window_EquipStatus.prototype = Object.create(Window_Base.prototype);
 /**设置创造者 */
 Window_EquipStatus.prototype.constructor = Window_EquipStatus;
-/**初始化 */
+
+/**初始化
+ * 
+ * @param {number} x x
+ * @param {number} y y 
+ * 
+ */
 Window_EquipStatus.prototype.initialize = function(x, y) {
     var width = this.windowWidth();
     var height = this.windowHeight();

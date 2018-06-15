@@ -13,25 +13,45 @@ function Window_EquipItem() {
 Window_EquipItem.prototype = Object.create(Window_ItemList.prototype);
 /**设置创造者 */
 Window_EquipItem.prototype.constructor = Window_EquipItem;
-/**初始化 */
+/**初始化
+ * @param {number} x x
+ * @param {number} y y
+ * @param {number} width 宽
+ * @param {number} height 高
+ * 
+ */
 Window_EquipItem.prototype.initialize = function(x, y, width, height) {
     Window_ItemList.prototype.initialize.call(this, x, y, width, height);
+    //角色 = null
     this._actor = null;
+    //槽Id = 0
     this._slotId = 0;
 };
-/**设置角色 */
+/**设置角色
+ * @param {Game_Actor} actor 角色
+ */
 Window_EquipItem.prototype.setActor = function(actor) {
+    //如果(角色!= 角色)
     if (this._actor !== actor) {
+        //角色 = 角色
         this._actor = actor;
+        //刷新()
         this.refresh();
+        //重新滚动()
         this.resetScroll();
     }
 };
-/**设置槽id */
+/**设置槽id 
+ * @param {number} slotId 槽id
+*/
 Window_EquipItem.prototype.setSlotId = function(slotId) {
+    //如果(槽id!=槽id)
     if (this._slotId !== slotId) {
+        //槽id = 槽id
         this._slotId = slotId;
+        //刷新()
         this.refresh();
+        //重新滚动()
         this.resetScroll();
     }
 };
