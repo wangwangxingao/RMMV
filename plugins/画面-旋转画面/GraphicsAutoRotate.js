@@ -1,8 +1,7 @@
 
 Graphics.rotate = function (type) {
     this.rotateTo(type)
-    this.rotateLock(true)
-    this._updateAllElements();
+    this.rotateLock(true) 
 }
 
 
@@ -13,17 +12,11 @@ Graphics.rotateLock = function (type) {
 Graphics.rotateTo = function (type) {
     var type = type || 0
     if (this._rotate != type) {
-        if (type == 1) {
-            this._setElementSet(this._base, this._rotateSet[1], "style")
-        } else if (type == 2) {
-            this._setElementSet(this._base, this._rotateSet[2], "style")
-        } else if (type == 3) {
-            this._setElementSet(this._base, this._rotateSet[3], "style")
-        } else {
-            this._setElementSet(this._base, this._rotateSet[0], "style")
-            type = 0
-        }
+        var list = [0, -90, -180, 90]
+        var set = this._getRotateSet(list[type])
+        this._setElementSet(this._base, set, "style")
         this._rotate = type
+        Graphics._updateAllElements()
     }
 }
 

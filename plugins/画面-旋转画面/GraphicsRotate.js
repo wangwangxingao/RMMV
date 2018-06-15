@@ -60,42 +60,14 @@ Graphics._eleType = {
     "week": {}
 }
 
+ 
 
-Graphics._rotateSet = [
-    {
-        "-webkit-transform": "",
-        "-moz-transform": '',
-        "-ms-transform": "",
-        "transform": ""
-    },
-    {
-        "-webkit-transform": "rotate(-90deg)",
-        "-moz-transform": 'rotate(-90deg)',
-        "-ms-transform": "rotate(-90deg)",
-        "transform": "rotate(-90deg)"
-    }, {
-        "-webkit-transform": "rotate(-180deg)",
-        "-moz-transform": 'rotate(-180deg)',
-        "-ms-transform": "rotate(-180deg)",
-        "transform": "rotate(-180deg)"
-    }, {
-        "-webkit-transform": "rotate(90deg)",
-        "-moz-transform": 'rotate(90deg)',
-        "-ms-transform": "rotate(90deg)",
-        "transform": "rotate(90deg)"
-    }
-]
-
-
-
-
-
-Graphics._disableTextSelection = function() {
+Graphics._disableTextSelection = function () {
     var body = document.body;
     body.style.userSelect = '';
     body.style.webkitUserSelect = '';
     body.style.msUserSelect = '';
-    body.style.mozUserSelect = ''; 
+    body.style.mozUserSelect = '';
 };
 
 
@@ -115,7 +87,7 @@ Graphics._createAllElements = function () {
     this._createElements() //修改
 
     this._updateAllElements()
-    
+
     // this._switchFPSMeter();
 
 };
@@ -283,14 +255,14 @@ Graphics._createElements = function () {
 
 
 Graphics._addElementToBody = function (e) {
-    this._base.appendChild(e);  
+    this._base.appendChild(e);
 }
 
 Graphics._addElementToBody2 = function (e) {
-    this._elementsBody.appendChild(e); 
+    this._elementsBody.appendChild(e);
 }
 
- 
+
 
 
 
@@ -328,15 +300,15 @@ Graphics._updateElementsBody = function () {
 
 
 //创建输入
-Graphics._createElement = function (id, type, set,set3,set4,set5,set6,set2) {
-    this._removeElement(id)
-    this._elements[id] = document.createElement(type);
-    this._elements[id].id = id;
+Graphics._createElement = function (id, type, set, set2) {
+
+    var element = document.createElement(type); 
+    this._setElement(id, element) 
     if (set) {
-        this._setElement(id, set)
+        this._setElementSet(element, set)
     }
     //this._elements[id].style.zIndex = 112;
-	if (set3 == "transparent"){//设置透明背景色
+	/*if (set3 == "transparent"){//设置透明背景色
 		this._elements[id].style.backgroundColor="transparent"
 		this._elements[id].style.color="#FFFFFF"
 	}
@@ -345,19 +317,20 @@ Graphics._createElement = function (id, type, set,set3,set4,set5,set6,set2) {
 	this._elements[id].style.borderStyle = "solid"
 	this._elements[id].style.borderColor= set5 //"#ff0000";//边框颜色
 	this._elements[id].style.borderWidth= set6 //"1px";//边框宽度
-	}
+	}*/
     if (set2) {
-        this._setElement(id, set, "style")
+        this._setElementSet(element, set, "style")
     }
+    this._updateElement(id)
     this._addElementToBody2(this._elements[id]);
     return this._elements[id]
 };
 
 
-Graphics._setElement = function (id, set, type) {
-    var element = this._elements[id]
-    this._setElementSet(element, set, type)
-    this._updateElement(id)
+Graphics._setElement = function (id, element) { 
+    this._removeElement(id)
+    this._elements[id] = element
+    element.id = id; 
     return this._elements[id]
 }
 
@@ -412,7 +385,7 @@ Graphics._getElement = function (id) {
 
 
 Graphics._updateElement = function (id) {
-    var element = this._elements[id]
+    var element = this._getElement(id)
     if (element) {
         var sz = element.sz
         if (sz) {
@@ -427,29 +400,58 @@ Graphics._updateElement = function (id) {
             element.style.left = x + 'px';
             element.style.width = width + 'px';
             element.style.height = height + 'px';
-            element.style.fontSize = fontSize + 'px'; 
+            element.style.fontSize = fontSize + 'px';
         }
     }
 }
 
 
- 
+Graphics._getRotateSet = function (rotate) {
+    var rotate = rotate ? "rotate(" + rotate + "deg)" : ""
+    var set = {
+        "-webkit-transform": rotate,
+        "-moz-transform": rotate,
+        "-ms-transform": rotate,
+        "transform": rotate,
+    }
+    return set
+}
 
-Graphics.rotate = function (type) {
+
+
+Graphics._getRotateOriginSet = function (ox, oy) {
+    var ox = ox ? "" + ox + "%" : "0"
+    var oy = ox ? "" + oy + "%" : "0"
+    var origin = ox + " " + oy
+    var set = {
+        "-webkit-transform-origin": origin,
+        "-moz-transform-origin": origin,
+        "-ms-transform-origin": origin,
+        "transform-origin": origin,
+    }
+    return set
+}
+
+
+
+Graphics._rotateElement = function (id, rotate, ox, oy) {
+    var rotateset = this._getRotateSet(rotate)
+    var originset = this._getRotateOriginSet(ox, oy)
+    var element = this._getElement(id)
+    this._setElementSet(element, rotateset, "style")
+    this._setElementSet(element, originset, "style")
+}
+
+
+
+
+Graphics.rotateTo = function (type) {
     var type = type || 0
     if (this._rotate != type) {
-        if (type == 1) {
-            this._setElementSet(this._base, this._rotateSet[1], "style")
-        } else if (type == 2) {
-            this._setElementSet(this._base, this._rotateSet[2], "style")
-        } else if (type == 3) {
-            this._setElementSet(this._base, this._rotateSet[3], "style")
-        } else {
-            this._setElementSet(this._base, this._rotateSet[0], "style")
-            type = 0
-        }
+        var list = [0, -90, -180, 90]
+        var set = this._getRotateSet(list[type])
+        this._setElementSet(this._base, set, "style")
         this._rotate = type
-
         Graphics._updateAllElements()
     }
 }
@@ -487,7 +489,7 @@ Graphics._updateRealScale = function () {
     }
 };
 
- 
+
 
 
 /**缺省伸展模式
@@ -495,40 +497,10 @@ Graphics._updateRealScale = function () {
  * @method _defaultStretchMode
  * @private
  */
-Graphics._defaultStretchMode = function() {
+Graphics._defaultStretchMode = function () {
     return true //Utils.isNwjs() || Utils.isMobileDevice();
 };
 
-
-
-
-//防止默认
-Input._onKeyDown = function (event) {
-    //如果 需要避免默认 (键值) 
-    if (Graphics._isElement(document.activeElement)) {
-        if (event.keyCode == 13 || event.keyCode == 27) { } else {
-            return
-        }
-    } else {
-        //需要避免默认
-        if (this._shouldPreventDefault(event.keyCode)) {
-            //避免默认
-            event.preventDefault();
-        }
-    }
-
-    //键值===144
-    if (event.keyCode === 144) { // Numlock  数字开关
-        //清除
-        this.clear();
-    }
-    var buttonName = this.keyMapper[event.keyCode];
-    //如果 键名
-    if (buttonName) {
-        //当前状态 键 =true
-        this._currentState[buttonName] = true;
-    }
-};
 
 
 
@@ -572,6 +544,36 @@ Graphics.pageToCanvasY2 = function (x, y) {
 
 
 
+
+//防止默认
+Input._onKeyDown = function (event) {
+    //如果 需要避免默认 (键值) 
+    if (Graphics._isElement(document.activeElement)) {
+        if (event.keyCode == 13 || event.keyCode == 27) { } else {
+            return
+        }
+    } else {
+        //需要避免默认
+        if (this._shouldPreventDefault(event.keyCode)) {
+            //避免默认
+            event.preventDefault();
+        }
+    }
+
+    //键值===144
+    if (event.keyCode === 144) { // Numlock  数字开关
+        //清除
+        this.clear();
+    }
+    var buttonName = this.keyMapper[event.keyCode];
+    //如果 键名
+    if (buttonName) {
+        //当前状态 键 =true
+        this._currentState[buttonName] = true;
+    }
+};
+
+
 /**当左键按下
  * @static
  * @method _onLeftButtonDown
@@ -579,7 +581,7 @@ Graphics.pageToCanvasY2 = function (x, y) {
  * @private
  */
 TouchInput._onLeftButtonDown = function (event) {
-        //x  = 画布x
+    //x  = 画布x
     var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
     //y  = 画布y
     var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
@@ -685,7 +687,7 @@ TouchInput._onTouchStart = function (event) {
     for (var i = 0; i < event.changedTouches.length; i++) {
         //触摸 =  事件改变触摸组[i]
         var touch = event.changedTouches[i];
-          //x  = 画布x 
+        //x  = 画布x 
         var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
         //y  = 画布y
         var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
@@ -703,17 +705,17 @@ TouchInput._onTouchStart = function (event) {
                 this._onTrigger(x, y);
             }
             //避免默认
-            
-            if(!Graphics._isElement(event.target)){
+
+            if (!Graphics._isElement(event.target)) {
                 event.preventDefault();
             }
         }
     }
     if (window.cordova || window.navigator.standalone) {
         //避免默认
-            if(!Graphics._isElement(event.target)){
-                event.preventDefault();
-            }
+        if (!Graphics._isElement(event.target)) {
+            event.preventDefault();
+        }
     }
 };
 
@@ -768,14 +770,14 @@ TouchInput._onTouchEnd = function (event) {
  * @private
  */
 TouchInput._onPointerDown = function (event) {
-    if (event.pointerType === 'touch' && !event.isPrimary) {   
+    if (event.pointerType === 'touch' && !event.isPrimary) {
         var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
         //y  = 画布y
         var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
         if (Graphics.isInsideCanvas(x, y)) {
             // For Microsoft Edge
             this._onCancel(x, y);
-            if(!Graphics._isElement(event.target)){
+            if (!Graphics._isElement(event.target)) {
                 event.preventDefault();
             }
         }
