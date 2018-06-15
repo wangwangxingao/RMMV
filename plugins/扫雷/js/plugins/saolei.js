@@ -40,6 +40,17 @@
  * 
  * 
  * 
+ * 获取角色位置雷区Id
+ * $saolei.inputId()
+ * 
+ * 获取角色位置雷区情况(9为雷)
+ * $saolei.inputLeiQu()
+ * 
+ * 
+ * 获取角色位置插旗情况(0 (false)为没有插旗,1 为已经翻开, 2为插旗了) 
+ * $saolei.inputQi()
+ * 
+ * 
  * ===================================================
  * 
  * 输入 
@@ -200,24 +211,52 @@ SaoLei.prototype.updateTouchInput = function () {
     return false
 }
 
+SaoLei.prototype.inputId = function(){ 
+    var x = $gamePlayer._x
+    var y = $gamePlayer._y
+    var x0 = x - this._eventx
+    var y0 = y - this._eventy
+    var id = y0 * this._x + x0
+    if (x0 >= 0 && x0 < this._x && y0 >= 0 && y0 <= this._y) {
+        var id = y0 * this._x + x0
+        return id
+    }else{
+        return -1
+    } 
+}
 
+
+SaoLei.prototype.inputLeiQu = function(){ 
+    var id = this.inputId()
+    if(id>=0){  
+        return this.getLeiQu(id)
+    } 
+}
+
+SaoLei.prototype.inputQi = function(){ 
+    var id = this.inputId()
+    if(id>=0){  
+        return this.getQi(id)
+    } 
+}
+
+
+
+/**输入 */
 SaoLei.prototype.input = function (ok, shift) {
     if (ok) {
-        var x = $gamePlayer._x
-        var y = $gamePlayer._y
-        var x0 = x - this._eventx
-        var y0 = y - this._eventy
-        if (x0 >= 0 && x0 < this._x && y0 >= 0 && y0 <= this._y) {
-            var id = y0 * this._x + x0
+        var id = this.inputId()
+        if(id>=0){ 
             if (shift) {
                 this.dianji2(id)
             } else {
                 this.dianji(id)
-            }
-        }
+            } 
+        } 
     }
 }
 
+/**刷新 */
 SaoLei.prototype.refresh = function () {
     this.make()
     var all = this._x * this._y
@@ -226,19 +265,23 @@ SaoLei.prototype.refresh = function () {
     }
 }
 
+/**安装 */
 SaoLei.prototype.setup = function (id) {
     this.getevent(id)
     this.makeEvent()
 }
 
+/**设置雷区 */
 SaoLei.prototype.setLeiQu = function (id, num) {
     this._leiqu[id] = num
 }
+
+/**获取雷区 */
 SaoLei.prototype.getLeiQu = function (id) {
     return this._leiqu[id]
 }
 
-
+/**设置 */
 SaoLei.prototype.setQi = function (id, num) {
     if (num == 0) {
         if (this._xianshi[id]) {
@@ -260,7 +303,9 @@ SaoLei.prototype.setQi = function (id, num) {
     }
     this._xianshi[id] = num
 }
-SaoLei.prototype.getQu = function (id) {
+
+/**获取显示内容 */
+SaoLei.prototype.getQi = function (id) {
     return this._xianshi[id]
 }
 
@@ -299,8 +344,7 @@ SaoLei.prototype.showleiqu = function (id, z) {
     if (e) {
         var dp = l[z] || [4,0]
         var d = dp[0]
-        var p = dp[1]
- 
+        var p = dp[1] 
         e._direction = d
         e._originalPattern = p
         e._pattern = p
@@ -308,7 +352,7 @@ SaoLei.prototype.showleiqu = function (id, z) {
 };
 
 
-
+/**获取事件 */
 SaoLei.prototype.getevent = function (id) {
     this._eventId = id
     this._eventx = $gameMap.event(this._eventId)._x
@@ -323,6 +367,7 @@ SaoLei.prototype._idy = function (id) {
     return (id - id % this._x) / this._y
 }
 
+/**制作事件 */
 SaoLei.prototype.makeEvent = function () {
     for (var i = 1; i < this._leiqu.length; i++) {
         var x = this._idx(i)
@@ -331,7 +376,7 @@ SaoLei.prototype.makeEvent = function () {
     }
 };
 
-
+/**制作精灵 */
 SaoLei.prototype.makeSprite = function () {
     var t = ""
     for (var yi = 0; yi < this._y; yi++) {
@@ -344,6 +389,7 @@ SaoLei.prototype.makeSprite = function () {
     return t
 };
 
+/**制作精灵2 */
 SaoLei.prototype.makeSprite2 = function () {
     var t = ""
     for (var yi = 0; yi < this._y; yi++) {
@@ -362,7 +408,7 @@ SaoLei.prototype.makeSprite2 = function () {
     return t
 };
 
-
+/**制作数目 */
 SaoLei.prototype.makenum = function (id) {
     if (this.getLeiQu(id) === 9) {
         return
@@ -377,11 +423,12 @@ SaoLei.prototype.makenum = function (id) {
     this.setLeiQu(id, num)
 };
 
-
+/**结束 */
 SaoLei.prototype.end = function () {
     return this._xianshi.length == this._xsshu
 };
 
+/**通过方向 获取id */
 SaoLei.prototype.idd = function (id, d) {
     var x = id % this._x
     var y = (id - x) / this._x
@@ -395,6 +442,7 @@ SaoLei.prototype.idd = function (id, d) {
     return y2 * this._x + x2
 };
 
+/**插拔旗 */
 SaoLei.prototype.dianji2 = function (id) {
     if (!this._xianshi[id]) {
         if (this._qishu < this._z) {
@@ -409,6 +457,7 @@ SaoLei.prototype.dianji2 = function (id) {
     }
 };
 
+/**翻雷区 */
 SaoLei.prototype.dianji = function (id) {
     if (!this._xianshi[id]) {
         if (this.getLeiQu(id) == 9) {
@@ -421,11 +470,13 @@ SaoLei.prototype.dianji = function (id) {
     }
 };
 
+/**死亡 */
 SaoLei.prototype.dead = function (id) {
     var e = $gameMap.event(id + this._eventId)
     e.requestAnimation(1)
 };
 
+/**显示所有雷区 */
 SaoLei.prototype.showall = function (id) {
     var all = this._x * this._y
     for (var i = 0; i < all; i++) {
@@ -439,6 +490,7 @@ SaoLei.prototype.showall = function (id) {
     }
 }
 
+/**显示雷区 */
 SaoLei.prototype.show = function (id) {
     this.setQi(id, 1)
     var num = this.getLeiQu(id)
