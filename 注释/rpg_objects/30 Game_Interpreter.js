@@ -954,8 +954,8 @@ Game_Interpreter.prototype.command113 = function () {
         if (command.code === 112){
             depth++;
         }
-        //如果 (命令 编码 === 413 并且 命令 缩进 < 缩进 )
-        if (command.code === 413 && command.indent < this._indent) {
+        //如果 (命令 编码 === 413  )
+        if (command.code === 413) {
             if (depth > 0) {
                 depth--;
             } else {

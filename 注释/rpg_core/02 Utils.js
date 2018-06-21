@@ -28,8 +28,8 @@ Utils.RPGMAKER_NAME = 'MV';
  * @type String
  * @final
  */
-/** RPGMaker版本 = "1.5.0"*/
-Utils.RPGMAKER_VERSION = "1.6.0";
+/** RPGMaker版本 = "1.6.1"*/
+Utils.RPGMAKER_VERSION = "1.6.1";
 
 
 /**是选项有效检查 项目URL字符串是否有(name) 测试游戏时会带

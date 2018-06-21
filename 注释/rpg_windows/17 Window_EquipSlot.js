@@ -79,7 +79,6 @@ Window_EquipSlot.prototype.setStatusWindow = function(statusWindow) {
 /**设置项目窗口 */
 Window_EquipSlot.prototype.setItemWindow = function(itemWindow) {
     this._itemWindow = itemWindow;
-    this.update();
 };
 /**更新帮助 */
 Window_EquipSlot.prototype.updateHelp = function() {

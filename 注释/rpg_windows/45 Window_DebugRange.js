@@ -100,5 +100,4 @@ Window_DebugRange.prototype.processCancel = function() {
 /**设置编辑窗口 */
 Window_DebugRange.prototype.setEditWindow = function(editWindow) {
     this._editWindow = editWindow;
-    this.update();
 };

@@ -218,11 +218,6 @@ SceneManager.onKeyDown = function(event) {
                 require('nw.gui').Window.get().showDevTools();
             }
             break;
-        case 123: //F12
-            if (Utils.isNwjs()) {
-                event.preventDefault();
-            }
-            break;
         }
     }
 };

@@ -11,7 +11,7 @@ function Graphics() {
 
 
 
-Graphics._cssFontLoading =  document.fonts && document.fonts.ready && document.fonts.ready.then;
+Graphics._cssFontLoading =  document.fonts && document.fonts.ready;
 Graphics._fontLoaded = null;
 Graphics._videoVolume = 1;
 
@@ -43,7 +43,7 @@ Graphics.initialize = function(width, height, type) {
     this._errorPrinter = null;
     this._canvas = null;
     this._video = null;
-    this._videoUnlocked = !Utils.isMobileDevice();
+    this._videoUnlocked = false;
     this._videoLoading = false;
     this._upperCanvas = null;
     this._renderer = null;
@@ -1165,6 +1165,8 @@ Graphics._isVideoVisible = function() {
 Graphics._setupEventHandlers = function() {
     window.addEventListener('resize', this._onWindowResize.bind(this));
     document.addEventListener('keydown', this._onKeyDown.bind(this));
+    document.addEventListener('keydown', this._onTouchEnd.bind(this));
+    document.addEventListener('mousedown', this._onTouchEnd.bind(this));
     document.addEventListener('touchend', this._onTouchEnd.bind(this));
 };
 

@@ -62,7 +62,6 @@ Window_SkillType.prototype.update = function() {
 /**设置技能窗口 */
 Window_SkillType.prototype.setSkillWindow = function(skillWindow) {
     this._skillWindow = skillWindow;
-    this.update();
 };
 /**选择列表 */
 Window_SkillType.prototype.selectLast = function() {
