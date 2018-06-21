@@ -1270,60 +1270,116 @@ DataMessage.getItemTrait = function (traits, i, must, set) {
 
 
 
-/***获取参数组 */
+/***添加角色全部参数 */
 DataMessage.pushActorParams = function (params, must, set, list) {
     var list = list || []
     for (var i = 0; i < params.length; i++) {
-        var r = this.getActorParam(params, i, must, set)
-        if (r) {
-            list.push(r)
-        }
+        this.pushActorParam(params, i, must, set, list)
+    }
+    return list
+}
+
+
+/**添加角色参数 */
+DataMessage.pushActorParam = function (params, i, must, set, list) {
+    var list = list || []
+    var r = this.getActorParam(params, i, must, set)
+    if (r) {
+        list.push(r)
     }
     return list
 }
 
 
 
+
+/**添加角色全部特征 */
 DataMessage.pushActorTraits = function (traits, must, set, list) {
     var list = list || []
     for (var i = 0; i < traits.length; i++) {
-        var r = this.getActorTrait(traits, i, must, set)
-        if (r) {
-            list.push(r)
-        }
+        this.pushActorTrait(traits, i, must, set, list)
     }
-    return re
+    return list
+}
 
+/**添加角色特征 */
+DataMessage.pushActorTrait = function (traits, i, must, set, list) {
+    var list = list || []
+    var r = this.getActorTrait(traits, i, must, set)
+    if (r) {
+        list.push(r)
+    }
+    return list
 }
 
 
+
+/**添加物品全部特征 */
 DataMessage.pushItemTraits = function (traits, must, set, list) {
     var list = list || []
     for (var i = 0; i < traits.length; i++) {
-        var r = this.getItemTrait(traits, i, must, set)
-        if (r) {
-            list.push(r)
-        }
+        this.pushItemTrait(traits, i, must, set, list)
     }
     return list
-
 }
 
+
+/**添加物品特征 */
+DataMessage.pushItemTrait = function (traits, i, must, set, list) {
+    var list = list || []
+    var r = this.getItemTrait(traits, i, must, set)
+    if (r) {
+        list.push(r)
+    }
+    return list
+}
 
 
 DataMessage.pushIs = function (is, item, type, must, set, list) {
     var list = list || []
-    if (item) {
-        if (type == "params") {
-            DataMessage.pushActorParams(item.params, must, set, list)
-        } else if (type == "traits" || type == "effects") {
-            if (is == "actor" || is == "weapon" || is == "armor") {
-                DataMessage.pushActorTraits(item.traits, must, set, list)
+    if (!item) {
+        if (!type) {
+            return list
+        }
+    } else {
+
+        var i
+        if (type.indexOf("param") == 0) {
+            var i = type.slice(5)
+            if (i == "s") {
+                DataMessage.pushActorParams(item.params, must, set, list)
             } else {
-                DataMessage.pushItemTraits(item.effects, must, set, list)
+                i = i * 1
+                DataMessage.pushActorParam(item.params, i, must, set, list)
             }
+            i = ""
+        } else if (type.indexOf("trait") == 0) {
+            var i = type.slice(5)
+        } else if (type.indexOf("effect") == 0) {
+            var i = type.slice(5)
+        } else if (type.indexOf("meta") == 0) {
+            var i = type.slice(4)
+            DataMessage.pushIsOther(is, item, "meta", i, set, list)
         } else {
             DataMessage.pushIsOther(is, item, type, must, set, list)
+            i = ""
+        }
+        if (i) {
+            if (is == "actor" || is == "weapon" || is == "armor") {
+                if (i == "s") {
+                    DataMessage.pushActorTraits(item.traits, must, set, list)
+                } else {
+                    i = i * 1
+                    DataMessage.pushActorTrait(item.traits, i, must, set, list)
+                }
+            } else {
+                if (i == "s") {
+                    DataMessage.pushItemTraits(item.traits, must, set, list)
+                } else {
+                    i = i * 1
+                    DataMessage.pushItemTrait(item.traits, i, must, set, list)
+                }
+            }
         }
     }
     return list
@@ -1366,7 +1422,7 @@ DataMessage.pushSet = {
     actor: ["name", ""],
     item: [
         "name",
-       // "iconIndex",
+        // "iconIndex",
         "description",
         "consumable",
         "itypeId",
@@ -1380,7 +1436,7 @@ DataMessage.pushSet = {
         "effects",
         "price"
     ],
-    skill: [ 
+    skill: [
         "name",
         //"iconIndex",
         "description",
@@ -1397,9 +1453,9 @@ DataMessage.pushSet = {
         "successRate",
     ],
 
-    armor: [ 
+    armor: [
         "name",
-       // "iconIndex",  //图标 
+        // "iconIndex",  //图标 
         "description", //说明 
         "etypeId",
         "atypeId",
@@ -1407,9 +1463,9 @@ DataMessage.pushSet = {
         "traits",
         "params",
     ],
-   
- 
-    weapon: [ 
+
+
+    weapon: [
         "name",
         "iconIndex",  //图标 
         "note",//文本  
@@ -1420,15 +1476,14 @@ DataMessage.pushSet = {
         "price", //价格
         "traits",
         "params",
-        "param",
     ]
 }
 
 
 
-DataMessage.pushList = function (item, set, list) {
+DataMessage.pushList = function (item, setList, list) {
 
-    var is = this.isObj(item) 
+    var is = this.isObj(item)
     var setList = setList || DataMessage.pushSet[is]
     var list = list || []
     if (is && setList) {
@@ -1437,9 +1492,9 @@ DataMessage.pushList = function (item, set, list) {
             if (Array.isArray(t)) {
                 if (typeof (t[1]) == 'object') {
                     var set = t[1]
-                } else  if(typeof (t[1]) == 'string') {
+                } else if (typeof (t[1]) == 'string') {
                     var set = DataMessage[t[1]]
-                } else{
+                } else {
                     var set = 0
                 }
                 var must = t[2]
