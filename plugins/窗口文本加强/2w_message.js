@@ -1602,7 +1602,7 @@ Window_Base.prototype.drawBitmapIcon = function(b, iconIndex, x, y) {
 Window_Base.prototype.drawBitmapText = function(b,c, x, y , w,h) { 
     b && b.drawText(c, x, y, w  , h);
 };
-
+/*
 Window_Base.prototype.drawBitmapText = function(b,c, x, y , w,h) { 
     if(!b){return }
     var f = this.fontSettings()
@@ -1615,7 +1615,7 @@ Window_Base.prototype.drawBitmapText = function(b,c, x, y , w,h) {
     } 
 };
 
-
+*/
 
 /**进行普通文字处理2 */
 Window_Base.prototype.processNormalCharacter2 = function() {};

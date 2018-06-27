@@ -228,7 +228,7 @@ DataMessage.armorSet = {
     "name": "名称:%1",
     "iconIndex": "\\I[%1]",  //图标 
     "note": "",//文本  
-    "meta": "%1%2", //注释内容 
+    "meta": "%2", //注释内容 
     "description": "说明:%1", //说明 
     "etypeId": "装备种类:%2",
     "atypeId": "防具种类:%2",
@@ -242,7 +242,7 @@ DataMessage.weaponSet = {
     "name": "名称:%1",
     "iconIndex": "\\I[%1]",  //图标 
     "note": "",//文本  
-    "meta": "%1%2", //注释内容 
+    "meta": "%2", //注释内容 
     "description": "说明:%1", //说明 
     "etypeId": "装备种类:%2",
     "wtypeId": "武器种类:%2",
@@ -372,7 +372,7 @@ DataMessage.getSkill = function (item, type, must, set) {
                 break
             case "meta":
                 var v1 = item[type]
-                var v2 = v1[must]
+                var v2 = v1[must] ||""
             case "description":
                 var v1 = item[type]
                 break
@@ -469,7 +469,7 @@ DataMessage.getItem = function (item, type, must, set) {
                 break
             case "meta":
                 var v1 = item[type]
-                var v2 = v1[must]
+                var v2 = v1[must]||""
             case "description":
                 var v1 = item[type]
 
@@ -560,7 +560,7 @@ DataMessage.getArmor = function (item, type, must, set) {
                 break
             case "meta":
                 var v1 = item[type]
-                var v2 = v1[must]
+                var v2 = v1[must]||""
             case "description":
                 var v1 = item[type]
                 break
@@ -631,7 +631,7 @@ DataMessage.getWeapon = function (item, type, must, set) {
                 break
             case "meta":
                 var v1 = item[type]
-                var v2 = v1[must]
+                var v2 = v1[must]||""
             case "description":
                 //说明
                 var v1 = item[type]
@@ -1360,6 +1360,7 @@ DataMessage.pushIs = function (is, item, type, must, set, list) {
         } else if (type.indexOf("meta") == 0) {
             var i = type.slice(4)
             DataMessage.pushIsOther(is, item, "meta", i, set, list)
+            i = ""
         } else {
             DataMessage.pushIsOther(is, item, type, must, set, list)
             i = ""

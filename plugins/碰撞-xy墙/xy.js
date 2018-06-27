@@ -1,28 +1,21 @@
+  
  
 
-var h = {}
-var w = {}
 
 
-function add(o, i, x, y) {
-    o[i] = o[i] || []
-    o[i].push([x, y])
-    o[i].sort(
-        function (a, b) {
-            return a[0] - b[0]
-        }
-    )
+find = function find(i, l, r, list) { 
+    while( l!= r && l+1!= r ){ 
+        var m = (l + r) >> 1 
+        if (list[m] == i) {
+            return m
+        } else if (list[m] < i) {
+            l = m
+        } else {
+            r = m 
+        } 
+    }
+    return l 
 }
 
 
-function addH(i, x, y) {
-    add(w, i, x, y)
-}
-
-
-function addW(i, x, y) {
-    add(h, i, x, y)
-}
-
-
-
+ 

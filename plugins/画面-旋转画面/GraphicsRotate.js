@@ -60,7 +60,7 @@ Graphics._eleType = {
     "week": {}
 }
 
- 
+
 
 Graphics._disableTextSelection = function () {
     var body = document.body;
@@ -258,9 +258,21 @@ Graphics._addElementToBody = function (e) {
     this._base.appendChild(e);
 }
 
-Graphics._addElementToBody2 = function (e) {
-    this._elementsBody.appendChild(e);
+Graphics._addElement2 = function (e, body) {
+    var body = this._getElementById(body)
+    var body = body || this._elementsBody
+    body.appendChild(e); 
 }
+
+
+Graphics._getElementById = function (element) {
+    var t = typeof (element)
+    if (t == "string" || t == "number") {
+        var element = this._getElement(element)
+    }
+    return element
+}
+
 
 
 
@@ -300,12 +312,12 @@ Graphics._updateElementsBody = function () {
 
 
 //创建输入
-Graphics._createElement = function (id, type, set, set2) {
+Graphics._createElement = function (id, type, set, set2, body) {
 
-    var element = document.createElement(type); 
-    this._setElement(id, element) 
+    var element = document.createElement(type);
+    this._addElement(id, element)
     if (set) {
-        this._setElementSet(element, set)
+        this._setElement(element, set)
     }
     //this._elements[id].style.zIndex = 112;
 	/*if (set3 == "transparent"){//设置透明背景色
@@ -319,23 +331,25 @@ Graphics._createElement = function (id, type, set, set2) {
 	this._elements[id].style.borderWidth= set6 //"1px";//边框宽度
 	}*/
     if (set2) {
-        this._setElementSet(element, set, "style")
+        this._setElement(element, set, "style")
     }
     this._updateElement(id)
-    this._addElementToBody2(this._elements[id]);
+    this._addElement2(this._elements[id], body);
     return this._elements[id]
 };
 
 
-Graphics._setElement = function (id, element) { 
+Graphics._addElement = function (id, element) {
     this._removeElement(id)
     this._elements[id] = element
     element.id = id; 
     return this._elements[id]
 }
 
-
-Graphics._setElementSet = function (element, set, type) {
+ 
+ 
+Graphics._setElement = function (element, set, type) {
+    var element = Graphics._getElementById(element)
     if (element && set) {
         var sz = element
         if (type) {
@@ -438,8 +452,8 @@ Graphics._rotateElement = function (id, rotate, ox, oy) {
     var rotateset = this._getRotateSet(rotate)
     var originset = this._getRotateOriginSet(ox, oy)
     var element = this._getElement(id)
-    this._setElementSet(element, rotateset, "style")
-    this._setElementSet(element, originset, "style")
+    this._setElement(element, rotateset, "style")
+    this._setElement(element, originset, "style")
 }
 
 
@@ -450,7 +464,7 @@ Graphics.rotateTo = function (type) {
     if (this._rotate != type) {
         var list = [0, -90, -180, 90]
         var set = this._getRotateSet(list[type])
-        this._setElementSet(this._base, set, "style")
+        this._setElement(this._base, set, "style")
         this._rotate = type
         Graphics._updateAllElements()
     }
@@ -475,7 +489,7 @@ Graphics._updateRealScale = function () {
 
         var set = { width: this.innerWidth + "px", height: this.innerHeight + "px", margin: margin }
 
-        this._setElementSet(
+        this._setElement(
             this._base,
             set,
             "style"

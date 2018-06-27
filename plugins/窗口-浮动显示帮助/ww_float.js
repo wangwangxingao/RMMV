@@ -943,12 +943,8 @@ Window_Base.prototype.tslPushNewLine = function (textState) {
 
 /**进行行对象 */
 Window_Base.prototype.tslPushNewLineL = function (textState) {
-    var line = textState.line
-    var arr = /^\[(\d+)\]/.exec(textState.text.slice(textState.textindex));
-    if (arr) {
-        textState.textindex += arr[0].length;
-        line.cs = arr[1]
-    }
+    textState.textindex+=2;
+    this.tslPushLine(textState)
 };
 
 /**进行新页对象 */
@@ -1688,6 +1684,27 @@ Window_FloatHelp.prototype.clear = function () {
 
 //设置项目
 Window_FloatHelp.prototype.setItem = function (item) {
+    if(item){p
+        var text = ""
+    }else{
+        if(item.meta && "help" in item.meta ){
+            var set = null 
+            try {
+                var set = JSON.parse(item.meta.help) 
+            } catch (error) { 
+            }  
+            var list = DataMessage.pushList(item)
+
+            var text = DataMessage.list2Text(list,"\n")
+
+        }else{
+
+            var text = item.description || ''
+        }
+    }
+
+
+
     this.setText(item ? item.description : '');
 };
 
