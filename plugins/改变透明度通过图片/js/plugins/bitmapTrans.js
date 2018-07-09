@@ -1,29 +1,17 @@
-﻿/*
-b = ImageManager.loadTitle1($dataSystem.title1Name)
-c = ImageManager.loadSystem("1 (1)")
-a = new Bitmap()
-a.setTransitions(b,c)
-s = new Sprite_Base()
-SceneManager._scene.addChild(s)
-s.bitmap = a 
-s.setTransitions(200,10,256,-1)
-
-
-b = ImageManager.loadTitle1($dataSystem.title1Name)
-c = ImageManager.loadSystem("1 (12)")
-a.setTransitions(b,c)
-s.setTransitions(50,10,-1,256,1)
-
-*/
-
-
-
-
 
 
 var ww = ww || {}
 
 ww.bitmapTransitions = {}
+
+Bitmap.setTransitionPictures  =function(name1,name2,f){ 
+    var b = f ? f(name1) : ImageManager.loadPicture(name1) 
+    var c = f ? f(name2) : ImageManager.loadPicture(name2)   
+    var a = new Bitmap()
+    a.setTransitions(b,c)
+    return  a
+} 
+
 
 
 /**
@@ -222,43 +210,4 @@ Bitmap.prototype.transitionsAlphaTo = function (a) {
             this._setDirty();
         }
     }
-};
-
-//更新
-
-
-
-ww.bitmapTransitions.update = Sprite.prototype.update
-Sprite.prototype.update = function () {
-    ww.bitmapTransitions.update.call(this);
-    this.updateTransitions();
-
-};
-
-
-
-/**更新透明度 */
-Sprite.prototype.updateTransitions = function () {
-    if (this.bitmap && this.bitmap._transitionsBitamp == 2 && this._transitionsDuration > 0) {
-        var d = this._transitionsDuration ;
-        var a = this._transitionsAlpha || 0
-        a = (a * (d - 1) + this._transitionsTargetAlpha) / d;
-        this.bitmap.transitionsAlphaTo(a)
-        this._transitionsDuration--; 
-    }
-};
-
-/**
- * 设置透明度转化
- * @param {*} d 
- * @param {*} d2 
- * @param {*} a 
- * @param {*} ta 
- * @param {*} cs 
- */
-Sprite.prototype.setTransitions = function (d, d2, a, ta, cs) {
-    this._transitionsDuration = d || 0
-    this._transitionsAlpha = a || 0
-    this._transitionsTargetAlpha = ta || 0
-    this.bitmap.transitionsToAlpha(this._transitionsAlpha)
 };

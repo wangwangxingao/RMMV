@@ -1,4 +1,612 @@
 //=============================================================================
+// Scene_GUI.js
+//=============================================================================
+
+/*:
+ * @plugindesc 可视化精灵调整
+ * @author wangwang
+ *   
+ * @param Scene_GUI
+ * @desc 插件 可视化精灵调整
+ * @default 汪汪
+ *  
+ * 
+ * @help 
+ * SceneManager.goto(Scene_GUI)
+ * 
+ * 名称   种类
+ * x      y 
+ * width  height
+ * value
+ * 
+ * 
+ * 种类  
+ * text 时  value为文本内容
+ * bitmap时 value为pictures文件夹的图片
+ * base时 为空白图片
+ * 其他时为半透明图片
+ * 
+ * 
+ * 
+ * 
+ * */
+
+
+function UIData() {
+    this.initialize.apply(this, arguments);
+}
+/**设置原形  */
+UIData.prototype = Object.create(UIData.prototype);
+/**设置创造者 */
+UIData.prototype.constructor = UIData;
+
+
+UIData.prototype.initialize = function (name, type, x, y, width, height, value) {
+    this._name = name || ""
+    this._type = type || ""
+    this._x = x || 0
+    this._y = y || 0
+    this._width = width || 100
+    this._height = height || 100
+    this._value = value || ""
+    this._children = []
+}
+
+
+function Sprite_UIShow() {
+    this.initialize.apply(this, arguments);
+}
+//设置原形 
+Sprite_UIShow.prototype = Object.create(Sprite.prototype);
+//设置创造者
+Sprite_UIShow.prototype.constructor = Sprite_UIShow;
+
+
+
+/**初始化 */
+Sprite_UIShow.prototype.initialize = function (data) {
+    Sprite.prototype.initialize.call(this);
+    this._data = data
+    this._childList = []
+};
+
+/**设置 */
+Sprite_UIShow.prototype.setUI = function (data) {
+    this._data = data
+    if (!data) {
+        this.visible = false
+    } else {
+        this.refesh()
+    }
+}
+
+
+
+
+Sprite_UIShow.prototype.update = function () {
+    if (this._data) {
+
+        this.updateData()
+    }
+    Sprite.prototype.update.call(this)
+}
+
+
+Sprite_UIShow.prototype.updateData = function () {
+    if (this._data) {
+        if (this._type != this._data._type || this._value != this._data._value ||this._width != this._data._width || this._height!= this._data._height) {
+            this._type = this._data._type
+            this._value = this._data._value
+            this._width  = this._data._width  
+            this._height = this._data._height
+            if (this._type == "bitmap") {
+                this.bitmap = ImageManager.loadPicture(this._data._value)
+            } else if (this._type == "text") {
+                this.bitmap = new Bitmap(this._data._width, this._data._height)
+                var w = this.bitmap.window()
+                this.bitmap.clear()
+                w.drawTextEx(this._data._value, 0, 0, this.bitmap.width, this.bitmap.height)
+            } else if (this._type == "base") {
+
+                this.bitmap = new Bitmap(0, 0)
+
+            } else {
+                this.bitmap = new Bitmap(this._data._width, this._data._height)
+
+                var r = Math.randomInt(255)
+                var g = Math.randomInt(255)
+                var b = Math.randomInt(255)
+                var a = 0.2
+                this._value = this._data._value = "rgba(" + r + "," + g + "," + b + "," + a + ")"
+                this.bitmap.fillAll(this._value)
+            }
+        }
+        if (this._x !== this._data._x) {
+            this.x = this._x = this._data._x
+        }
+        if (this._y !== this._data._y) {
+            this.y = this._y = this._data._y
+        }
+
+    }
+}
+
+
+Sprite_UIShow.prototype.refesh = function () {
+    if (this._data) {
+
+        this.updateData()
+        var adds = this._data._children
+        if (Array.isArray(adds)) {
+            var i0 = this._childList.length
+            var i1 = adds.length
+            for (var i = i0; i < i1; i++) {
+                var add = adds[i]
+                var sprite = new Sprite_UIShow()
+                sprite.setUI(add)
+                this._childList.push(sprite)
+                this.addChild(sprite)
+            }
+            for (var i = i0 - 1; i >= 0; i--) {
+                var sprite = this._childList[i]
+                if (i < i1) {
+                    var add = adds[i]
+                    sprite.setUI(add)
+                } else {
+                    this.removeChild(sprite)
+                    this._childList.pop()
+                }
+            }
+        } else {
+            while (this._childList.length) {
+                var sprite = this._childList.pop()
+                sprite.clear()
+                this.removeChild(sprite)
+            }
+        }
+    }
+}
+
+
+
+
+
+
+function Scene_GUI() {
+    this.initialize.apply(this, arguments);
+}
+
+Scene_GUI.prototype = Object.create(Scene_Base.prototype);
+Scene_GUI.prototype.constructor = Scene_GUI;
+
+Scene_GUI.prototype.initialize = function () {
+    Scene_Base.prototype.initialize.call(this);
+    this._data = new UIData("base", "base")
+    this._list = []
+};
+
+Scene_GUI.prototype.create = function () {
+    Scene_Base.prototype.create.call(this);
+    this.makeInput()
+};
+
+
+
+
+Scene_GUI.prototype.start = function () {
+    Scene_Base.prototype.start.call(this);
+};
+
+Scene_GUI.prototype.update = function () {
+    if (this.isActive() && !this.isBusy()) {
+        this.updateInput()
+
+    }
+    Scene_Base.prototype.update.call(this);
+};
+
+
+Scene_GUI.prototype.stop = function () {
+    Scene_Base.prototype.stop.call(this);
+};
+
+Scene_GUI.prototype.terminate = function () {
+    Scene_Base.prototype.terminate.call(this);
+};
+
+
+
+
+
+
+
+Scene_GUI.prototype.updateInput = function () {
+    if (this._inputhide) {
+        if (TouchInput.isTriggered()) {
+
+            var xy = this.nowxy()
+            console.log(TouchInput.x, TouchInput.y)
+            var s = this.now()
+            if (s != this.base()) {
+                s._x = TouchInput.x - xy[0]
+                s._y = TouchInput.y- xy[1]
+            }
+        } else if (Input.isTriggered('ok')) {
+            this.onshow()
+            console.log("ok")
+        } else {
+            var x = Input.isRepeated('left') ? -1 : Input.isRepeated("right") ? 1 : 0
+            var y = Input.isRepeated('up') ? -1 : Input.isRepeated("down") ? 1 : 0
+            if (x || y) {
+
+                var s = this.now()
+                if (s != this.base()) { 
+
+                    s._x += x
+
+                    s._y += y
+                }
+            }
+
+        }
+    }
+};
+
+Scene_GUI.prototype.base = function () {
+    return this._data
+}
+
+Scene_GUI.prototype.now = function () {
+    var b = this.base()
+    for (var i = 0; i < this._list.length; i++) {
+        var z = this._list[i]
+        if (!b._children[z]) {
+            b._children[z] = new UIData("" + z)
+        }
+        b = b._children[z]
+    }
+    return b
+}
+
+/**当前的父节点 */
+Scene_GUI.prototype.nowFather = function () {
+    var b = this.base()
+    for (var i = 0; i < this._list.length - 1; i++) {
+        var z = this._list[i]
+        if (!b._children[z]) {
+            b._children[z] = new UIData("" + z)
+        }
+        b = b._children[z]
+    }
+    return b
+}
+
+/**现在的父节点列表 */
+Scene_GUI.prototype.nowFatherList = function () {
+    var b = this.nowFather()
+    var l = []
+    for (var i = 0; i < b._children.length; i++) {
+        var z = b._children[i]
+        var name = z && z._name
+        name = name || ""
+        l.push(name)
+    }
+    return l
+}
+
+
+Scene_GUI.prototype.nowPath = function () {
+    var b = this.base()
+    var l = []
+    for (var i = 0; i < this._list.length; i++) {
+        var z = this._list[i]
+        if (!b._children[z]) {
+            b._children[z] = new UIData("" + z)
+        }
+        b = b._children[z]
+        var name = b && b._name
+        name = name || ""
+        l.push(name)
+    }
+    return l.join(">")
+}
+
+
+Scene_GUI.prototype.nowxy= function () {
+    var b = this.base() 
+    var x = y = 0
+    for (var i = 0; i < this._list.length-1; i++) {
+        var z = this._list[i]
+        if (!b._children[z]) {
+            b._children[z] = new UIData("" + z)
+        }
+        b = b._children[z]
+        x += ( b && b._x)||0
+        y += ( b && b._y)||0 
+    }
+    return [x,y]
+}
+
+
+
+
+
+Scene_GUI.prototype.refesh = function () {
+    this.now()
+    if (this._show) {
+        this._show.setUI(this.base())
+    } else {
+        this._show = new Sprite_UIShow(this.base())
+        this.addChild(this._show)
+    }
+
+    this.nowInput()
+    this._input.fp.value = this.nowPath()
+    Graphics.makeList("list", this.nowFatherList())
+}
+
+
+
+
+Scene_GUI.prototype.pushList = function (i) {
+    this._list.push(i)
+    this.refesh()
+}
+
+
+Scene_GUI.prototype.popList = function () {
+    this._list.pop()
+    if (this._list.length == 0) {
+        this._list.push(0)
+    }
+    this.refesh()
+}
+
+Scene_GUI.prototype.change = function (i) {
+    this._list.pop()
+    this._list.push(i)
+    this.refesh()
+    this._input.list.selectedIndex = i
+}
+
+
+
+
+
+
+
+Scene_GUI.prototype.makeInput = function () {
+
+
+    this._gui = Graphics._createElement("gui", "div", { sz: { x: 300, y: 300 } }, 0)
+
+    this._input = {}
+    //名称
+    this._input.name = Graphics._createElement("name", "input", { "type": "text", sz: { x: 0, y: 0, width: 50, height: 20 } }, 0, "gui")
+    this._input.type = Graphics._createElement("type", "input", { "type": "text", sz: { x: 60, y: 0, width: 50, height: 20 } }, 0, "gui")
+    this._input.x = Graphics._createElement("x", "input", { "type": "number", sz: { x: 0, y: 30, width: 50, height: 20 } }, 0, "gui")
+    this._input.y = Graphics._createElement("y", "input", { "type": "number", sz: { x: 60, y: 30, width: 50, height: 20 } }, 0, "gui")
+    this._input.w = Graphics._createElement("w", "input", { "type": "number", sz: { x: 0, y: 60, width: 50, height: 20 } }, 0, "gui")
+    this._input.h = Graphics._createElement("h", "input", { "type": "number", sz: { x: 60, y: 60, width: 50, height: 20 } }, 0, "gui")
+
+    //值 
+    this._input.value = Graphics._createElement("value", "input", { "type": "text", sz: { x: 0, y: 90, width: 100, height: 20 } }, 0, "gui")
+
+
+    //列表
+    this._input.list = Graphics._createElement("list", "select", { size: 10, sz: { x: -100, y: 0, width: 100, height: 110 } }, 0, "gui")
+    this._input.list.onclick = this.onchange.bind(this)
+
+    //添加
+    this._input.add = Graphics._createElement("add", "input", { "type": "button", sz: { x: 120, y: 0, width: 50, height: 20 }, value: "添加" }, 0, "gui")
+    this._input.add.onclick = this.onadd.bind(this)
+    //确定
+    this._input.ok = Graphics._createElement("ok", "input", { "type": "button", sz: { x: 120, y: 30, width: 50, height: 20 }, value: "确定" }, 0, "gui")
+    this._input.ok.onclick = this.onok.bind(this)
+    //隐藏
+    this._input.hide = Graphics._createElement("hide", "input", { "type": "button", sz: { x: 120, y: 60, width: 50, height: 20 }, value: "手动" }, 0, "gui")
+    this._input.hide.onclick = this.onhide.bind(this)
+    //保存
+    this._input.save = Graphics._createElement("save", "input", { "type": "button", sz: { x: 120, y: 90, width: 50, height: 20 }, value: "保存" }, 0, "gui")
+    this._input.save.onclick = this.onsave.bind(this)
+ 
+
+    //到父项
+    this._input.tof = Graphics._createElement("tof", "input", { "type": "button", sz: { x: 0, y: -30, width: 50, height: 20 }, value: "父项" }, 0, "gui")
+    this._input.tof.onclick = this.onfa.bind(this) 
+    //到子项
+    this._input.toc = Graphics._createElement("toc", "input", { "type": "button", sz: { x: 60, y: -30, width: 50, height: 20 }, value: "子项" }, 0, "gui")
+    this._input.toc.onclick = this.onch.bind(this)
+    //位置
+    this._input.fp = Graphics._createElement("fp", "input", { "type": "text", sz: { x: -100, y: -30, width: 100, height: 20 } }, 0, "gui")
+
+  
+    Graphics.makeList("list", this.nowFatherList())
+
+    this.change(0)
+    this.change(1)
+    this.change(2)
+    this.change(3)
+    this.change(4)
+}
+
+
+
+
+Scene_GUI.prototype.onok = function () {
+
+    var b = this.now()
+    b._name = this._input.name.value
+    b._type = this._input.type.value
+    b._x = (this._input.x.value || 0) * 1
+    b._y = (this._input.y.value || 0) * 1
+    
+    b._width = (this._input.w.value || 0) * 1
+    b._height = (this._input.h.value || 0) * 1
+    b._value = this._input.value.value
+    // this.hideInput()
+}
+
+
+
+Scene_GUI.prototype.onsave = function () {
+    this.save()
+    // this.hideInput()
+}
+
+
+Scene_GUI.prototype.onchange = function () {
+
+    var v = this._input.list.selectedIndex
+    if (v >= 0) {
+        this.change(v)
+    }
+}
+
+
+
+Scene_GUI.prototype.onadd = function () {
+    var list = this.nowFatherList()||[]
+    var i = list.length
+    this.change(i) 
+}
+
+
+
+
+Scene_GUI.prototype.onhide = function () {
+
+    this.onok()
+    this.hideInput()
+}
+
+
+Scene_GUI.prototype.onfa = function () {
+    this.popList()
+
+}
+
+
+
+Scene_GUI.prototype.onch = function () {
+    this.pushList(0)
+
+}
+
+Scene_GUI.prototype.onshow = function () {
+
+    this.nowInput()
+    this.showInput()
+}
+
+Scene_GUI.prototype.hideInput = function () {
+    this._inputhide = true
+    this._gui.style.display = "none"
+}
+
+
+
+
+Scene_GUI.prototype.showInput = function () {
+    this._inputhide = false
+    this._gui.style.display = "inline"
+}
+
+
+
+Scene_GUI.prototype.nowInput = function () {
+    var b = this.now()
+    this._input.name.value = b._name
+    this._input.type.value = b._type
+    this._input.x.value = b._x
+    this._input.y.value = b._y
+    
+    
+    this._input.w.value =  b._width 
+    this._input.h.value = b._height
+    this._input.value.value = b._value
+}
+
+
+Scene_GUI.prototype.save = function () {
+
+  var data =  JsonEx.stringify(this.base())
+  var fs = require('fs');
+  // 目录路径 = 本地文件目录路径()
+  var dirPath = StorageManager.localFileDirectoryPath();
+  // 文件路径 = 本地文件路径( 保存文件id )
+  var filePath = StorageManager.localFileDirectoryPath() + "uisave.txt";
+  //如果(不是 fs 存在(目录路径))
+  if (!fs.existsSync(dirPath)) {
+      //fs 建立目录(目录路径)
+      fs.mkdirSync(dirPath);
+  }
+  //fs 写入文件(文件路径, 数据 )
+  fs.writeFileSync(filePath, data)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//=============================================================================
 // GraphicsRotate.js
 //=============================================================================
 /*:
@@ -60,8 +668,8 @@ Graphics._inputType = {
     "week": {}
 }
 
-   /* overflow: hidden;
-    white-space: nowrap;*/
+/* overflow: hidden;
+ white-space: nowrap;*/
 
 Graphics._disableTextSelection = function () {
     var body = document.body;
@@ -380,8 +988,8 @@ Graphics._isElement = function (element) {
     try {
         if (element && this._elements[element.id] == element) {
             return true
-        } 
-    } catch (error) {}
+        }
+    } catch (error) { }
     return false
 };
 
@@ -555,7 +1163,7 @@ Graphics.pageToCanvasX2 = function (x, y) {
     return Graphics.pageToCanvasX(x)
 }
 
-/**页到画布Y2 */ 
+/**页到画布Y2 */
 Graphics.pageToCanvasY2 = function (x, y) {
     if (this._rotate == 1 || this._rotate == 3) {
         y = x
@@ -819,7 +1427,28 @@ TouchInput._onPointerDown = function (event) {
 
 
 
+Graphics.makeList = function (ele, list) {
+    var ele = this._getElementById(ele)
+    if (ele && ele.options) {
+        this.clearList(ele)
+        if (list) {
+            for (var i = 0; i < list.length; i++) {
+                var option = new Option(list[i], i);
+                ele.options.add(option);
+            }
+        }
+    }
+}
 
+
+Graphics.clearList = function (ele) {
+    var ele = this._getElementById(ele)
+    if (ele && ele.options) {
+        while (ele.options.length) {
+            ele.remove(0);
+        }
+    }
+}
 
 
 

@@ -65,9 +65,108 @@
  * @desc 等待y计数,决定当需要滚动时,滚动完成后停留的时间
  * @default 100
  *
+ * 
+ * @param 其他
+ * @desc 其他设置
+ * @default 其他设置
+ * 
+ * @param filePath
+ * @desc 使用子文件夹,不用设置为空
+ * @default true
+ * 
+ * 
+ * 
  * @help
+ * 
+ * 
+ * 
+ * <pic:1> 
+ * 使用图片1 作为显示
+ *  
+ * 
+ * item,skill,armor,weapon
+ * 分别在 这些子文件夹里
+ * <help:>
+ * 使用默认显示信息
+ * <help:["name","description"]> 
+ * 显示名称,说明
+ * 也可以换成其他内容
+ * 
+ * 
+ * meta + xxx 
+ * 显示注释中的xxx标签内容(如上面<pic:1> 则xxx为pic 显示为 1 )
+ * 如 <help:["name","metapic"]> 
+ * 显示名称,注释中的pic标签内容
+ * 
+ * trait + number 
+ * 显示第number个特征的内容(从0开始) , 如果为s 则为显示全部
+ *  如 <help:["name","metapic","trait1"]> 
+ * 显示名称,注释中的pic标签内容,第二个特征内容
+ * 
+ * param + number 
+ * 显示第number个参数的内容(武器和防具) 如果为s 则为显示全部
+ * 
+ * 
+ * 可以不断添加,每个会换行,
+ *  如 <help:["id","name","metapic","trait1"]> 
+ * 
+ * 
+    技能可用
+
+    "id"        %1",
+    "name"        名称        
+    "iconIndex"     图标
+    "tpCost"        TP消耗        
+    "mpCost"        MP消耗        
+    "repeats"        连续次数        
+    "hitType"        命中种类        
+    "occasion"        应用场景        
+    "scope"        范围        
+    "stypeId"        技能种类        
+    "requiredWtypeId1"        必要武器1        
+    "requiredWtypeId2"        必要武器2        
+    "speed"        速度修正        
+    "successRate"        成功率        
+ 
+    物品可用
+
+    "id"       id
+    "name"        名称        
+    "iconIndex"    图标  
+    "consumable"        是消耗品        
+    "itypeId"        物品种类        
+    "tpGain"        TP获得        
+    "repeats"        连续次数        
+    "hitType"        命中种类        
+    "occasion"        应用场景        
+    "scope"        范围        
+    "speed"        速度修正        
+    "successRate"        成功率 
+    "price"        价格        
+ 
+
+   防具可用 
+    "id"        id        
+    "name"        名称        
+    "iconIndex"       //图标   
+    "description"        说明          
+    "etypeId"        装备种类        
+    "atypeId"        防具种类        
+    "price"        价格         //价格
+       
+  
+  武器设置  
+    "id" id 
+    "name" 名称 
+    "iconIndex"  //图标   
+    "etypeId"        装备种类 
+    "wtypeId"        武器种类        
+    "price"        价格   
+ 
+ * 
+ * 
  * 帮助的信息
- * \nw 换行 其他如 显示文本
+ *  
  *
  *
  */
@@ -94,6 +193,55 @@ Scene_Battle.prototype.createHelpWindow = function () {
 };
 
 
+Scene_ItemBase.prototype.showSubWindow = function(window) {
+    window.x = this.isCursorLeft() ? Graphics.boxWidth - window.width : 0;
+    window.show();
+    window.activate();
+    this._helpWindow&&(this._helpWindow.visible = false )
+};
+/**隐藏替代窗口 
+ * @param {{}} window
+ */
+Scene_ItemBase.prototype.hideSubWindow = function(window) {
+    window.hide();
+    window.deactivate();
+    this.activateItemWindow();
+    this._helpWindow&& (this._helpWindow.visible = true )
+};
+
+
+
+Bitmap._window = null
+Bitmap.prototype.window = function () {
+    if (!Bitmap._window) {
+        Bitmap._window = new Window_Base()
+    }
+    Bitmap._window.contents = this
+    return Bitmap._window
+}
+
+
+
+
+Bitmap.prototype._makeFontNameText = function () {
+    return (this.fontBold ? "Bold " : '') + (this.fontItalic ? 'Italic ' : '') +
+        this.fontSize + 'px ' + this.fontFace;
+};
+
+
+
+function Window_FloatHelp() {
+    this.initialize.apply(this, arguments);
+}
+
+
+Window_Help = Window_FloatHelp
+
+
+//设置原形 
+Window_FloatHelp.prototype = Object.create(Window_Base.prototype);
+//设置创造者
+Window_FloatHelp.prototype.constructor = Window_FloatHelp;
 
 
 Window_FloatHelp.deepCopy = function (that) {
@@ -116,25 +264,6 @@ Window_FloatHelp.deepCopy = function (that) {
         obj = that
     }
     return obj;
-};
-
-
-
-Bitmap._window = null
-Bitmap.prototype.window = function () {
-    if (!Bitmap._window) {
-        Bitmap._window = new Window_Base()
-    }
-    Bitmap._window.contents = this
-    return Bitmap._window
-}
-
-
-
-
-Bitmap.prototype._makeFontNameText = function () {
-    return (this.fontBold ? "Bold " : '') + (this.fontItalic ? 'Italic ' : '') +
-        this.fontSize + 'px ' + this.fontFace;
 };
 
 
@@ -882,12 +1011,9 @@ Window_FloatHelp.prototype.tslPushNewLine = function (textState) {
 
 /**进行行对象 */
 Window_FloatHelp.prototype.tslPushNewLineL = function (textState) {
-    var line = textState.line
-    var arr = /^\[(\d+)\]/.exec(textState.text.slice(textState.textindex));
-    if (arr) {
-        textState.textindex += arr[0].length;
-        line.cs = arr[1]
-    }
+    textState.textindex++;
+    textState.textindex++;
+    this.tslPushLine(textState) 
 };
 
 /**进行新页对象 */
@@ -1020,13 +1146,12 @@ Window_FloatHelp.prototype.tslPushOutWidth = function (textState, width) {
     this.tslPushFont(textState, obj)
 };
 
-
-
 Window_FloatHelp.prototype.tslPushDrawIcon = function (textState, iconId) {
     var obj = this.makeIcon()
     obj.icon = iconId
     obj.test.w = Window_FloatHelp._iconWidth + 4;
     obj.test.h = Window_FloatHelp._iconHeight + 4;
+
     this.tslPushOther(textState, obj)
 };
 
@@ -1329,7 +1454,7 @@ Window_FloatHelp.prototype.drawBitmapIcon = function (b, iconIndex, x, y) {
     var ph = Window_FloatHelp._iconHeight;
     var sx = iconIndex % 16 * pw;
     var sy = Math.floor(iconIndex / 16) * ph;
-    b && b.blt(bitmap, sx, sy, pw, ph, x, y);
+    b && b.blt(bitmap, sx, sy, pw, ph, x, y,pw,ph);
 };
 
 
@@ -1337,19 +1462,20 @@ Window_FloatHelp.prototype.drawBitmapText = function (b, c, x, y, w, h) {
     b && b.drawText(c, x, y, w, h);
 };
 
+/*
 Window_FloatHelp.prototype.drawBitmapText = function (b, c, x, y, w, h) {
-    if (!b) { return }
+    if (!b) { return } 
     var f = this.fontSettings()
     var textf = Window_FloatHelp.textf
     if (textf && textf[f] && textf[f][c]) {
         var bitmap = textf[f][c].b
-        if (bitmap) {
-            b.blt(bitmap, 0, 0, w, h, x, y, w, h)
+        if (bitmap) { 
+            b.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y )
         }
     }
 };
 
-
+*/
 
 /**进行普通文字处理2 */
 Window_FloatHelp.prototype.processNormalCharacter2 = function () { };
@@ -1358,25 +1484,13 @@ Window_FloatHelp.prototype.processNormalCharacter2 = function () { };
 
 
 
-
-
-
-function Window_FloatHelp() {
-    this.initialize.apply(this, arguments);
-}
-
-
-Window_Help = Window_FloatHelp
-
-
-//设置原形 
-Window_FloatHelp.prototype = Object.create(Window_Base.prototype);
-//设置创造者
-Window_FloatHelp.prototype.constructor = Window_FloatHelp;
+Window_FloatHelp._iconWidth = Window_Base._iconWidth
+Window_FloatHelp._iconHeight = Window_Base._iconHeight 
 
 //图片宽
 Window_FloatHelp._px = 144
 
+Window_FloatHelp._filePath = false
 //窗口最小宽
 Window_FloatHelp._ckiw = 0
 //窗口最小高
@@ -1405,14 +1519,14 @@ Window_FloatHelp.load = function () {
         if (plugin.parameters["Window_FloatHelp"]) {
             if (plugin.status == true) {
                 var w = plugin.parameters["minWidth"] * 1
-                Window_FloatHelp._ckiw = isFinite(w) ? w : Window_FloatHelp._ckiw
+                Window_FloatHelp._ckiw = isFinite(w) ? w : Window_FloatHelp._ckiw 
                 var h = plugin.parameters["minHeight"] * 1
                 Window_FloatHelp._ckih = isFinite(h) ? h : Window_FloatHelp._ckih
                 var w = plugin.parameters["maxWidth"] * 1
                 Window_FloatHelp._ckaw = isFinite(w) ? w : Window_FloatHelp._ckaw
                 var h = plugin.parameters["maxHeight"] * 1
                 Window_FloatHelp._ckah = isFinite(h) ? h : Window_FloatHelp._ckah
-
+ 
                 var h = plugin.parameters["startYCount"] * 1
                 Window_FloatHelp._startYCount = isFinite(h) ? h : Window_FloatHelp._startYCount
                 var h = plugin.parameters["addYCount"] * 1
@@ -1425,6 +1539,9 @@ Window_FloatHelp.load = function () {
                 Window_FloatHelp._addCount = isFinite(h) ? h : Window_FloatHelp._addCount
                 var h = plugin.parameters["endCont"] * 1
                 Window_FloatHelp._endCont = isFinite(h) ? h : Window_FloatHelp._endCont
+
+                var h = JSON.parse( plugin.parameters["filePath"] ||"false" )
+                Window_FloatHelp._filePath = h
             }
         }
     }
@@ -1443,7 +1560,15 @@ Window_FloatHelp.prototype.initialize = function (w, h) {
     this._lyindax = -10
     this._ckw = 0 //w || 0
     this._ckh = 0 //h || 0
+    this._picture.x = 18
+    this._picture.y = 18
+    this.addChild(this._picture)
 };
+
+ 
+
+
+
 
 //开始计数
 Window_FloatHelp.prototype.startCount = function () {
@@ -1495,7 +1620,7 @@ Window_FloatHelp.prototype.update = function () {
 
 //更新浮动
 Window_FloatHelp.prototype.updateFloat = function () {
-    if (this._text) {
+    if (this._text) { 
         if (this._count < this.endCont()) {
             this._count += this.addCount()
             this._count = Math.min(this._count, this.endCont())
@@ -1549,8 +1674,11 @@ Window_FloatHelp.prototype.updateXywh = function () {
 
         if (!w && !h) {
             var wh = this.getWh()
+
             var w = wh[0].clamp(Window_FloatHelp._ckiw, Window_FloatHelp._ckaw)
             var h = wh[1].clamp(Window_FloatHelp._ckih, Window_FloatHelp._ckah)
+            this._ygd = wh[1] > Window_FloatHelp._ckah   //true
+            console.log(wh[1],h  ,this._ygd)
         }
         w += Window_FloatHelp._px
         var s = this.standardPadding()
@@ -1602,8 +1730,8 @@ Window_FloatHelp.prototype.setLy = function (win) {
 //设置文本
 Window_FloatHelp.prototype.setText = function (text) {
     this._text = text;
-    this.startFloat()
     this.refresh()
+    this.startFloat()
 };
 
 
@@ -1635,20 +1763,29 @@ Window_FloatHelp.prototype.setItem = function (item) {
             try {
                 var set = JSON.parse(item.meta.help)
             } catch (error) {
+        
             }
-            var list = DataMessage.pushList(item)
+            var list = DataMessage.pushList(item,set)
 
             var text = DataMessage.list2Text(list, "\n")
 
         } else {
 
-            var text = item.description || ''
+            var text = item.description 
         }
+
+      
     }
 
 
 
-    this.setText(item ? item.description : '');
+    this.setText(text|| '');
+
+    if (item && item.meta &&  item.meta.pic) { 
+
+        var is = DataMessage.isObj(item) 
+        this.setPicture(item.meta.pic,is) 
+    }
 };
 
 //刷新
@@ -1661,11 +1798,22 @@ Window_FloatHelp.prototype.refresh = function () {
     var h = this._ckh
 
     if (!w && !h) {
-        this._textWh = this.drawTextEx3(this._text, Window_FloatHelp._px, 0, Window_FloatHelp._ckaw);
+
+        this._textWh = this.drawTextEx3(
+            this._text, 
+            Window_FloatHelp._px,
+            0, 
+            Window_FloatHelp._ckaw-this.standardPadding() * 2)
+   
     } else {
-        this._textWh = this.drawTextEx3(this._text, Window_FloatHelp._px, 0, Window_FloatHelp._ckaw);
+        this._textWh = this.drawTextEx3(
+            this._text, 
+            Window_FloatHelp._px, 
+            0, 
+            Window_FloatHelp._ckaw - this.standardPadding() * 2);
 
     }
+    console.log(this._text,this._textWh )
 };
 
 
@@ -1687,7 +1835,7 @@ Window_FloatHelp.prototype.drawTextEx3 = function (text, x, y, w, h, wt, ht) {
             }
         }
         this.resetFontSettings();
-        return [w, h];
+        return [w+ this.standardPadding() * 2, h + this.standardPadding() * 2];
     } else {
         return [0, 0];
     }
@@ -1697,7 +1845,7 @@ Window_FloatHelp.prototype.drawTextEx3 = function (text, x, y, w, h, wt, ht) {
 Window_FloatHelp.prototype.tslPushEscapeCharacter = function (textState, code) {
     switch (code) {
         case "T":
-            this.setPicture(this.tslPushEscapeParam(textState))
+            //this.setPicture(this.tslPushEscapeParam(textState))
             break
         case 'C':
             this.tslPushTextColor(textState, this.tslPushTextColorEscapeParam(textState));
@@ -1735,6 +1883,9 @@ Window_FloatHelp.prototype.tslPushEscapeCharacter = function (textState, code) {
         case 'NY':
             this.tslPushNewPageY2(textState)
             break
+        case 'L':
+            this.tslPushNewLineL(textState)
+            break
         case 'HT':
             this.tslPushHT(textState, this.tslPushEscapeParam(textState, 0))
             break
@@ -1754,15 +1905,21 @@ Window_FloatHelp.prototype.tslPushEscapeCharacter = function (textState, code) {
             this.makeNewContents(textState, this.tslPushEscapeParamEx(textState));
             break;
         default:
-            Window_Base.prototype.tslPushEscapeCharacter.call(this, textState, code)
+            break; 
+            //Window_Base.prototype.tslPushEscapeCharacter.call(this, textState, code)
     }
 };
 
 
 
 
-Window_FloatHelp.prototype.setPicture = function (name) {
-    if (name) { }
+Window_FloatHelp.prototype.setPicture = function (name,path) {
+    if (name) { 
+        if(Window_FloatHelp._filePath && path){
+            var name = path + "/" + name
+        } 
+    }
+    console.log(name)
     this._picture.bitmap = ImageManager.loadPicture(name)
 };
 
@@ -2004,7 +2161,13 @@ DataMessage.weaponSet = {
     "param": "%1:%2",
 }
 DataMessage.actorParamSet = {
-    "param": "%1:%2"
+    "0": "\\I[32]%1:%2",
+    "1": "\\I[33]%1:%2",
+    "2": "\\I[34]%1:%2",
+    "3": "\\I[35]%1:%2",
+    "4": "\\I[36]%1:%2",
+    "5": "\\I[37]%1:%2",
+    "6": "\\I[38]%1:%2",
 }
 
 DataMessage.actorTraitSet = {
@@ -2068,7 +2231,7 @@ DataMessage.itemTraitSet = {
     12: "恢复Mp:%1 + %2",
 
     //效果 获得 tp, 13
-    13: "恢复tp:%1",
+    13: "恢复Tp:%1",
 
     //效果 添加 状态, 21
     21: "添加状态:%3 %5",
@@ -2290,7 +2453,7 @@ DataMessage.getArmor = function (item, type, must, set) {
 
     var re = ""
     var v1 = ""
-    var v2 = ""
+    var v2 = "" 
 
 
     var set = set || DataMessage.armorSet
@@ -2347,8 +2510,8 @@ DataMessage.getArmor = function (item, type, must, set) {
             default:
                 break;
         }
-        if (re) {//v1 || v2 || v3 || v4 || v5) {
-            return re.format(v1, v2, v3, v4, v5);
+        if (re) { 
+            return re.format(v1, v2 );
         }
     }
     return ""
@@ -2419,7 +2582,7 @@ DataMessage.getWeapon = function (item, type, must, set) {
                 break;
         }
         if (re) { //v1 || v2 || v3 || v4 || v5) {
-            return re.format(v1, v2, v3, v4, v5);
+            return re.format(v1, v2);
         }
     }
     return ""
@@ -2432,12 +2595,17 @@ DataMessage.getActorParam = function (params, id, must, set) {
     var re = ""
     var set = set || DataMessage.actorParamSet
 
-    if (params && (!must || id == must - 1) && set) {
-        var re = set["param"]
+    if (params && (!must || id == must - 1) && set && set[id]) {
+        var re = set[id] 
         var list = this.params()
         var v1 = list[id]
         var v2 = params[id]
         if (v1 || v2 !== undefined) {
+            if(v2 < 0){
+                v2 = "-" + v2
+            }else{
+                v2 = "+" + v2
+            }
             return re.format(v1, v2)
         }
     }
@@ -3127,10 +3295,10 @@ DataMessage.pushIs = function (is, item, type, must, set, list) {
                 }
             } else {
                 if (i == "s") {
-                    DataMessage.pushItemTraits(item.traits, must, set, list)
+                    DataMessage.pushItemTraits(item.effects, must, set, list)
                 } else {
                     i = i * 1
-                    DataMessage.pushItemTrait(item.traits, i, must, set, list)
+                    DataMessage.pushItemTrait(item.effects, i, must, set, list)
                 }
             }
         }
@@ -3167,7 +3335,6 @@ DataMessage.pushIsOther = function (is, item, type, must, set, list) {
     }
     return list
 }
-
 
 
 

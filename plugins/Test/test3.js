@@ -100,3 +100,52 @@ getList = function (list, st) {
 }
 
 getList(makeChangeLength(5236))
+
+
+(
+    function(){
+        l = [3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101]
+        for(var i = 0 ; i <l.length ;i++){
+            var n = l[i] * l[i]
+            console.log(n)
+            var n2 = n - 18
+            for(var i2= 0 ; i2 <=i ; i2++){
+            var n3 =  n2 / l[i2]
+            console.log(n2,l[i2],n3)
+            if(l.indexOf(n3)>=0){
+                return n 
+            }
+            } 
+        }
+    }
+)()
+
+
+
+
+[
+    0,0,1,1,0,0,0,
+    0,1,0,2,1,0,0,
+    1,0,1,3,2,1,1
+]
+
+
+
+
+if (!this.isMoving() && this.canMove()) { var direction =   Input.dir4 ; if (direction > 0) { this.moveStraight(direction);} }
+    //方向 = 获得输入方向()
+   ;
+    //如果(方向 > 0 )
+    if (direction > 0) { 
+        $gameTemp.clearDestination(); 
+    } else if ($gameTemp.isDestinationValid()) { 
+        var x = $gameTemp.destinationX(); 
+        var y = $gameTemp.destinationY(); 
+        direction = this.findDirectionTo(x, y);
+    } 
+    
+}
+ 
+
+
+if (!this.isMoving() && $gamePlayer.isMoving()) {  this.moveStraight($gamePlayer.direction() )}
