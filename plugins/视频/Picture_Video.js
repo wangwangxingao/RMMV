@@ -96,29 +96,21 @@
 
 
     /**
-     * 改变id图片遮罩色调
-     * $gameScreen.maskPictureTone(pictureId,tone, duration, baseTone)
-     * @param {number} pictureId 图片id
-     * @param {[number,number,number,number]} tone 目标色调
-     * @param {number,} duration 持续时间
-     * @param {[number,number,number,number]} baseTone 基础色调
+     * 
+     *
      */
-    Game_Screen.prototype.pictureVideo = function (pictureId, name, play, w, h) {
+    Game_Screen.prototype.pictureVideo = function (pictureId, name, play, vl ,w, h) {
         var picture = this.picture(pictureId);
         if (picture) {
-            picture.setVideo(name, play, w, h)
+            picture.setVideo(name, play, vl , w, h)
         }
     };
 
 
     /**
-     * 遮罩色调
-     * @param {[number,number,number,number]} tone 目标色调
-     * @param {number,} duration 持续时间
-     * @param {[number,number,number,number]} baseTone 基础色调
      */
-    Game_Picture.prototype.setVideo = function (name, play, w, h) {
-        this._video = [name, play, w, h]
+    Game_Picture.prototype.setVideo = function (name, play,vl, w, h) {
+        this._video = [name, play,vl, w, h]
     };
 
 
