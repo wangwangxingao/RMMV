@@ -88,7 +88,10 @@
         if(w ==0 && h == 0){
             this._videoSprite.width = this._video.width 
             this._videoSprite.height =  this._video.height  
-        } 
+        } else{
+            this._videoSprite.width = w 
+            this._videoSprite.height = h
+        }
 
         
 

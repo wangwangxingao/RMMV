@@ -9,8 +9,7 @@ var parse = function (i, type) {
     }
 }
 var find = function (name) {
-    var name = (name||"").toLowerCase()
-    var parameters = PluginManager._parameters[name];
+    var parameters = PluginManager._parameters[(name||"").toLowerCase() ];
     if (parameters) {
     } else {
         var pls = PluginManager._parameters
