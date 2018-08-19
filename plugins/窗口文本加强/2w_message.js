@@ -322,7 +322,7 @@ Window_Base.prototype.testTextEx = function (text, x, y, w, h, wt, ht, facepos, 
 
         this.testMakeList(textState)
 
-        console.log(textState)
+        //console.log(textState)
         this.resetFontSettings();
         return textState;
     } else {
@@ -977,25 +977,27 @@ Window_Base.prototype.jiange = function () {
     return this._jiange || 0
 };
 
-/**还原间隔 */
+/**还原等待间隔 */
 Window_Base.prototype.rejiange = function () {
     this._jiange = this.jiangebase()
 };
 
-/**间隔基础 */
+/**等待间隔基础 */
 Window_Base.prototype.jiangebase = function () {
     return 0
 };
 
-/**设置间隔 */
+/**设置等待间隔 */
 Window_Base.prototype.setJiange = function (i) {
     this._jiange = i
 };
 
+/**设置宽间隔 */
 Window_Base.prototype.setWjg = function (jg) {
     this._wjg = jg || 0
 };
 
+/**设置宽间隔 */ 
 Window_Base.prototype.getWjg = function () {
     return this._wjg
 };
@@ -1111,7 +1113,7 @@ Window_Base.prototype.tslPushNewPageY = function (textState) {
         textState.textindex += arr[0].length;
         page.set.wz = arr[1] * 1
     }
-    console.log(arr)
+    //console.log(arr)
     this.tslPushPage(textState, page)
     this.tslPushLine(textState, line)
     this.resetFontSettings();
@@ -1134,23 +1136,28 @@ Window_Base.prototype.tslPushNewPageY2 = function (textState) {
     this.resetFontSettings();
 };
 
-
+/**添加排版横向种类 */
 Window_Base.prototype.tslPushWT = function (textState, wjg) {
     textState.page.set.wtype = wjg
 };
 
+/**添加排版竖向向种类 */
 Window_Base.prototype.tslPushHT = function (textState, wjg) {
     textState.page.set.htype = wjg
 };
 
+
+/**添加自动宽种类 */ 
 Window_Base.prototype.tslPushAW = function (textState, wjg) {
     textState.page.set.autow = wjg
 };
 
+/**添加自动高种类 */ 
 Window_Base.prototype.tslPushAH = function (textState, wjg) {
     textState.page.set.autoh = wjg
 };
 
+/**添加等待标志隐藏 */
 Window_Base.prototype.tslPushPH = function (textState, wjg) {
     var obj = {
         "type": "pahide",
@@ -1164,7 +1171,48 @@ Window_Base.textf = {}
 /**处理正常字符 */
 Window_Base.prototype.tslPushNormalCharacter = function (textState) {
     //c = 文本状态 [文本状态 索引++]
+
     var c = textState.text[textState.textindex++];
+    var re = this.loadText(c)
+
+    var z = 0
+    /*while (textState.textindex < textState.text.length) {
+        var c = textState.text[textState.textindex]
+        if( c === '\n'  ){
+            break
+        }else if( c === '\f') {
+            break
+        }else if( c === '\x1b' ) {
+            break
+        }else if( c === ' ' ) {
+            if(z == 0){
+                
+                textState.textindex++
+            }else{
+
+            }
+            break
+        } else{
+           var rex =  /([A-Z|0-9|a-z])+/i
+ 
+        } 
+                var c = textState.text[textState.textindex++];
+                var re = this.loadText(c)
+                break;
+        }
+    }*/
+
+
+    var text = this.makeText()
+    text.text = c
+    text.test.w = re.w
+    text.test.h = re.h
+    this.tslPushOther(textState, text)
+};
+
+
+/**读取文字 */
+Window_Base.prototype.loadText = function (c) { 
     //w = c 文本宽 
     var f = this.fontSettings()
     var textf = Window_Base.textf
@@ -1183,15 +1231,10 @@ Window_Base.prototype.tslPushNormalCharacter = function (textState) {
         var h = this.calcTextHeight()
         textf[f][c] = { "w": w, "h": h }
     }
-    var text = this.makeText()
-    text.text = c
-    text.test.w = w
-    text.test.h = h
-    this.tslPushOther(textState, text)
-};
+    return  textf[f][c]
+}
 
-
-
+/**添加空白文本宽高 */
 Window_Base.prototype.tslPushTWH = function (textState, list) {
     var text = this.makeText()
     text.text = ""
@@ -1203,6 +1246,7 @@ Window_Base.prototype.tslPushTWH = function (textState, list) {
 };
 
 
+/**添加文本颜色对象 */
 Window_Base.prototype.tslPushTextColor = function (textState, color) {
     this.contents.textColor = color;
     var obj = {
@@ -1212,6 +1256,7 @@ Window_Base.prototype.tslPushTextColor = function (textState, color) {
     this.tslPushOther(textState, obj)
 };
 
+/**添加描边颜色 */
 Window_Base.prototype.tslPushOutColor = function (textState, color) {
     var obj = {
         "type": "outlineColor",
@@ -1220,6 +1265,7 @@ Window_Base.prototype.tslPushOutColor = function (textState, color) {
     this.tslPushOther(textState, obj)
 };
 
+/**添加描边宽 */
 Window_Base.prototype.tslPushOutWidth = function (textState, width) {
     var obj = {
         "type": "outlineWidth",
@@ -1229,7 +1275,7 @@ Window_Base.prototype.tslPushOutWidth = function (textState, width) {
 };
 
 
-
+/**添加绘制图标 */
 Window_Base.prototype.tslPushDrawIcon = function (textState, iconId) {
     var obj = this.makeIcon()
     obj.icon = iconId
@@ -1238,14 +1284,14 @@ Window_Base.prototype.tslPushDrawIcon = function (textState, iconId) {
     this.tslPushOther(textState, obj)
 };
 
-
+/**添加改变斜体 */
 Window_Base.prototype.tslPushChangeFontItalic = function (textState) {
     var Italic = !this.contents.fontItalic
     var Italic = !!this.tslPushEscapeParam(textState, Italic)
     this.tslPushFontItalic(textState, Italic)
 }
 
-
+/**添加字体粗体 */
 Window_Base.prototype.tslPushFontItalic = function (textState, Italic) {
     this.contents.fontItalic = Italic;
     var obj = {
@@ -1255,7 +1301,7 @@ Window_Base.prototype.tslPushFontItalic = function (textState, Italic) {
     this.tslPushFont(textState, obj)
 };
 
-/**设置粗体 */
+/**设置改变粗体 */
 Window_Base.prototype.tslPushChangeFontBlod = function (textState) {
     var bold = !this.contents.fontBold
     var bold = !!this.tslPushEscapeParam(textState, bold)
@@ -1684,7 +1730,7 @@ Window_Message.prototype.tslPushNewPageY = function (textState) {
         page.set.autow = 1
 
     }
-    console.log(arr)
+    //console.log(arr)
     this.tslPushPage(textState, page)
     this.tslPushLine(textState, line)
     this.resetFontSettings();
@@ -1880,7 +1926,7 @@ Window_Message.prototype.updateBackground = function (background) {
 Window_Message.prototype.updatePlacement = function () {
     var postype = this.positionType();
 
-    console.log(postype)
+    //console.log(postype)
     var w = this.windowWidth()
     var h = this.windowHeight()
 
@@ -1935,7 +1981,7 @@ Window_Message.prototype.updatePlacement = function () {
         var wdx = (types[6] || 0) * 1
         var wdy = (types[7] || 0) * 1
 
-        console.log(type, id, cex, cey)
+        //console.log(type, id, cex, cey)
         var rx = 0
         var ry = 0
         var rw = 1
@@ -2222,6 +2268,7 @@ Window_Message.prototype.updateMessage = function () {
 Window_Message.prototype.startInput = function () {
     if ($gameMessage.isChoice()) {
         this._choiceWindow.start();
+        //console.log("start", this)
         return true;
     } else if ($gameMessage.isNumberInput()) {
         this._numberWindow.start();
@@ -2326,7 +2373,7 @@ Window.prototype._updatePauseSign = function () {
 
 /**窗口宽 */
 Window_Message.prototype.windowWidth = function () {
-    return 908
+    return Graphics.width
 };
 
 
@@ -2364,7 +2411,7 @@ Window_Message.prototype.showMessageFace = function (face, id, pos, textState) {
         w = textState.page.test.w
     }
 
-    console.log(w, h)
+    //console.log(w, h)
     if (h >= 144) {
         var y = 0
     } else {
@@ -2634,23 +2681,23 @@ Sprite_WindowPicture.prototype = Object.create(Sprite_Picture.prototype);
 Sprite_WindowPicture.prototype.constructor = Sprite_WindowPicture;
 
 
-Sprite_WindowPicture.prototype.setScreen = function(screen) {
+Sprite_WindowPicture.prototype.setScreen = function (screen) {
     this._screen = screen
 };
 
 
-Sprite_WindowPicture.prototype.screen = function() {
+Sprite_WindowPicture.prototype.screen = function () {
     return this._screen
 
 };
-Sprite_WindowPicture.prototype.picture = function() {
+Sprite_WindowPicture.prototype.picture = function () {
     return this.screen() && this.screen().picture && this.screen().picture(this._pictureId);
 };
 
 
-Sprite_Picture.prototype.loadBitmap = function() {
+Sprite_Picture.prototype.loadBitmap = function () {
     if (this._pictureName) {
-        console.log(this._pictureName)
+        //console.log(this._pictureName)
 
         if (this._pictureName.indexOf("text/") == 0) {
             var json = this._pictureName.slice(5)
@@ -2677,7 +2724,7 @@ Sprite_Picture.prototype.loadBitmap = function() {
                 this.bitmap = ImageManager.loadFace(faceName);
                 var that = this
                 this.bitmap.addLoadListener(
-                    function() {
+                    function () {
                         var pw = Window_Base._faceWidth;
                         var ph = Window_Base._faceHeight;
                         var sw = pw
@@ -2702,7 +2749,7 @@ Sprite_Picture.prototype.loadBitmap = function() {
 
 
 
-Sprite_Picture.prototype.updateOrigin = function() {
+Sprite_Picture.prototype.updateOrigin = function () {
     var picture = this.picture();
     var o = picture.origin()
     if (Array.isArray(o)) {
@@ -2720,7 +2767,7 @@ Sprite_Picture.prototype.updateOrigin = function() {
 };
 
 
-Sprite_WindowPicture.prototype.updateOrigin = function() {
+Sprite_WindowPicture.prototype.updateOrigin = function () {
     var picture = this.picture();
     var o = picture.origin()
     if (Array.isArray(o)) {

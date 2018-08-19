@@ -253,6 +253,7 @@ Video.prototype.initialize = function() {
 
     this._video = document.createElement('video');
 
+    //this._baseTexture = new PIXI.VideoBaseTexture.fromVideo(this._video)
     this._baseTexture = new PIXI.Texture.fromVideo(this._video);
 
     this.name = ""

@@ -2,7 +2,7 @@
 PluginManager.find = function (n) {
     var l = PluginManager._parameters;
     var p = l[(n || "").toLowerCase()];
-    if (!p) { for (var m in l) { if (l[m] && (n in l[m])) { p = l[n]; } } }
+    if (!p) { for (var m in l) { if (l[m] && (n in l[m])) { p = l[m]; } } }
     return p || {}
 }
 
