@@ -166,6 +166,11 @@ BattleManager.makeEscapeRatio = function() {
 };
 /**更新 */
 BattleManager.update = function() {
+
+    // 当游戏消息 是忙碌()  或者 精灵组 是忙碌() 或者 日志窗口 是忙碌()
+    // 当更新事件中
+    // 不进行更新
+
     //当 (不是 是忙碌()  ) 并且 (不是 更新事件() )
     if (!this.isBusy() && !this.updateEvent()) {
         //检查 阶段
@@ -400,12 +405,14 @@ BattleManager.selectNextCommand = function() {
 };
 /**选择之前的命令 */
 BattleManager.selectPreviousCommand = function() {
-    //如果 角色 能输入 就循环, 如果 没有角色 或者角色输入了 .选择上一个角色 ,如果没有就退出
+    // 循环(如果 不是 角色可以输入 则进行下一个) , 
+    // 清除角色命令 
+    
     //进行
     do {
         //如果 (不是 角色() 或者 不是 角色()选择下一个命令()  )
         if (!this.actor() || !this.actor().selectPreviousCommand()) {
-            //改变角色(角色索引+1 , "undecided" //未定的) 
+            //改变角色(角色索引 - 1 , "undecided" //未定的) 
             this.changeActor(this._actorIndex - 1, 'undecided');
             //如果(角色索引 < 0 )
             if (this._actorIndex < 0) {
