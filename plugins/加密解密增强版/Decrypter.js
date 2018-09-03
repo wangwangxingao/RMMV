@@ -480,10 +480,12 @@ Decrypter.listname = function () {
 }
 
 
-
+/**本地地址
+ * 
+ */
 Decrypter.localURL = function () {
     if (!this._localURL) {
-        var path = null// require &&typeof(require) =="function" && require('path');  
+        var path = null ;// require &&typeof(require) =="function" && require('path');  
         if (path) {
             this._localURL = path.dirname(process.mainModule.filename)
         } else {

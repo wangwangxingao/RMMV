@@ -916,12 +916,20 @@ Game_Actor.prototype.startAnimation = function(animationId, mirror, delay) {
     //游戏战斗者 开始动画 呼叫(this,animationId //动画id, mirror//镜反, delay//延迟 )
     Game_Battler.prototype.startAnimation.call(this, animationId, mirror, delay);
 };
-/**表现动作开始*/
+/**表现动作开始
+ * 
+ * @param {Game_Action} action 动作
+ * 
+*/
 Game_Actor.prototype.performActionStart = function(action) {
     //游戏战斗者 表现动作开始 呼叫(this, 动作 )
     Game_Battler.prototype.performActionStart.call(this, action);
 };
-/**表现动作*/
+/**表现动作
+ * 
+ * @param {Game_Action} action 动作
+ * 
+*/
 Game_Actor.prototype.performAction = function(action) {
     //游戏战斗者 表现动作 呼叫(this, 动作 )
     Game_Battler.prototype.performAction.call(this, action);

@@ -707,7 +707,11 @@ Game_Battler.prototype.isGuardWaiting = function() {
     //返回 false
     return false;
 };
-/**表现动作开始*/
+/**表现动作开始
+ * 
+ * @param {Game_Action} action 动作
+ * 
+*/
 Game_Battler.prototype.performActionStart = function(action) {
 	//如果 不是 动作 是防御
     if (!action.isGuard()) {
@@ -715,7 +719,12 @@ Game_Battler.prototype.performActionStart = function(action) {
         this.setActionState('acting');
     }
 };
-/**表现动作*/
+/**表现动作
+ * 
+ * @param {Game_Action} action 动作
+ * 
+ * 
+*/
 Game_Battler.prototype.performAction = function(action) {
 };
 /**表现动作结束*/

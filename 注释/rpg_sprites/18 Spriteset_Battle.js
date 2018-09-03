@@ -75,12 +75,15 @@ Spriteset_Battle.prototype.createBattleback = function() {
 };
 /**更新战斗背景 */
 Spriteset_Battle.prototype.updateBattleback = function() {
+    //如果 (不是 战斗背景定位后)
     if (!this._battlebackLocated) {
+        //定位战斗背景
         this.locateBattleback();
+        //战斗背景定位后 = true
         this._battlebackLocated = true;
     }
 };
-/**设于战斗背景 */
+/**定位战斗背景 */
 Spriteset_Battle.prototype.locateBattleback = function() {
     //宽 = 战斗区域 宽
     var width = this._battleField.width;

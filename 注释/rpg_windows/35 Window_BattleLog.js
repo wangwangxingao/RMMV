@@ -88,12 +88,22 @@ Window_BattleLog.prototype.messageSpeed = function() {
     //返回 16
     return 16;
 };
-/**是忙碌的 */
+/**是忙碌的
+ * 
+ * 如果 等待计数>0 或者 有等待模式 或者 方法组长度大于0 则为忙碌 
+ * 
+ * 
+ */
 Window_BattleLog.prototype.isBusy = function() {
     //返回 (等待计数 > 0 )或者 (等待模式) 或者 (方法组 长度 > 0)
     return this._waitCount > 0 || this._waitMode || this._methods.length > 0;
 };
-/**更新 */
+/**更新
+ * 
+ * 如果需要更新等待 则进行更新等待的处理
+ * 负责调用下一个方法
+ * 
+ */
 Window_BattleLog.prototype.update = function() {
     //如果 不是 更新等待
     if (!this.updateWait()) {
@@ -106,7 +116,13 @@ Window_BattleLog.prototype.updateWait = function() {
     //返回 更新等待计数() 或者 更新等待模式()
     return this.updateWaitCount() || this.updateWaitMode();
 };
-/**更新等待计数 */
+/**更新等待计数
+ * 
+ * 等待计数>0 时 返回 true 否则返回 false
+ * 当>0时 减去计数,如果减去后<0则为0
+ * 
+ * 
+ */
 Window_BattleLog.prototype.updateWaitCount = function() {
     //如果( 等待计数 > 0)
     if (this._waitCount > 0) {
@@ -123,13 +139,24 @@ Window_BattleLog.prototype.updateWaitCount = function() {
     //返回 false
     return false;
 };
-/**更新模式 */
+/**更新模式
+ * 
+ * 如果有等待模式 进行判断 ,返回结果
+ * 
+ * 如果不是等待的,则把模式设置为 ""
+ * 
+ * 等待模式分为 
+ * "effec"       当精灵组处于效果中
+ * 'movement'   当精灵组处于运动中
+ * 
+ * 
+ */
 Window_BattleLog.prototype.updateWaitMode = function() {
     //等待中 = false
     var waiting = false;
     //检查 等待模式  
     switch (this._waitMode) {
-        //当 "effec"  // 效果
+        //当 'effec'  // 效果
         case 'effect':
             //等待中 = 精灵组 是效果中
             waiting = this._spriteset.isEffecting();
@@ -155,7 +182,12 @@ Window_BattleLog.prototype.setWaitMode = function(waitMode) {
     //等待模式 = waitMode
     this._waitMode = waitMode;
 };
-/**呼叫下一个方法 */
+/**呼叫下一个方法
+ * 
+ * 如果方法组长度大于0,取出第一个,进行处理
+ * 
+ * 
+ */
 Window_BattleLog.prototype.callNextMethod = function() {
     //如果 方法组 长度 > 0
     if (this._methods.length > 0) {
@@ -172,6 +204,12 @@ Window_BattleLog.prototype.callNextMethod = function() {
     }
 };
 /**是快发送 
+ * 
+ * 输入 是长按下(ok)  或者 输入 是按下(shift) 或者 触摸输入 是长按下()
+ * 返回true或者false
+ * 
+ * 为true时处理速度为3,否则为1
+ * 
  * @return {blooean}
  */
 Window_BattleLog.prototype.isFastForward = function() {
@@ -190,7 +228,11 @@ Window_BattleLog.prototype.push = function(methodName) {
     //方法组 添加 ( {名称:方法名称 ,参数:方法参数} )
     this._methods.push({ name: methodName, params: methodArgs });
 };
-/**清除 */
+/**清除
+ * 
+ * 清除行组,基础行堆
+ * 
+ */
 Window_BattleLog.prototype.clear = function() {
     //行组 = []
     this._lines = [];
@@ -223,12 +265,24 @@ Window_BattleLog.prototype.addText = function(text) {
     //等待()
     this.wait();
 };
-/**添加基础行 */
+/**添加基础行 
+ * 
+ * 基础行堆添加行组长度
+ * 
+ * 
+*/
 Window_BattleLog.prototype.pushBaseLine = function() {
     //基础行堆 添加 (行组 长度)
     this._baseLineStack.push(this._lines.length);
 };
-/**最后基础行 */
+/**最后基础行
+ * 
+ * 获取基础行堆 最后一个的值 作为 基础行值
+ * 如果行组长度 大于 这个值 ,就删除这一个
+ * 即删除到上一个的基础行保存时的长度
+ * 
+ * 
+ */
 Window_BattleLog.prototype.popBaseLine = function() {
     //基础行 = 基础行堆 最后一个(并删除)
     var baseLine = this._baseLineStack.pop();
@@ -240,6 +294,11 @@ Window_BattleLog.prototype.popBaseLine = function() {
 };
 /**
  * 等待为新行
+ * 
+ * 基础行 = 0 
+ * 如果基础行堆有内容,获取最后一个
+ * 如果目前行组长度 大于基础行,则等待
+ * 
  */
 Window_BattleLog.prototype.waitForNewLine = function() {
     //基础行 = 0
@@ -249,63 +308,113 @@ Window_BattleLog.prototype.waitForNewLine = function() {
         //基础行 = 基础行堆 [ 基础行堆 长度 -1 ]   //最后一个
         baseLine = this._baseLineStack[this._baseLineStack.length - 1];
     }
-    //如果( 行长度 > 基础行)
+    //如果( 行组长度 > 基础行)
     if (this._lines.length > baseLine) {
         //等待()
         this.wait();
     }
 };
-/**跃出伤害 */
+/**跃出伤害
+ * 
+ * @param {Game_Battler} target 目标
+ * 
+ * 
+ */
 Window_BattleLog.prototype.popupDamage = function(target) {
     //目标 开始伤害跃上()
     target.startDamagePopup();
 };
-/**表现动作开始 */
+/**表现动作开始
+ * 
+ * @param {Game_Battler} subject 主体 
+ * @param {Game_Action} action 动作
+ * 
+ * 
+ */
 Window_BattleLog.prototype.performActionStart = function(subject, action) {
     //主体 表现动作开始(动作)
     subject.performActionStart(action);
 };
-/**表现动作 */
+/**表现动作
+ *  
+ * @param {Game_Battler} subject 主体 
+ * @param {Game_Action} action 动作
+ * 
+ * 
+ */
 Window_BattleLog.prototype.performAction = function(subject, action) {
     //主体 表现动作(动作)
     subject.performAction(action);
 };
-/**表现动作结束 */
+/**表现动作结束
+ * 
+ * @param {Game_Battler} subject 主体  
+ * 
+ */
 Window_BattleLog.prototype.performActionEnd = function(subject) {
     //主体 表现动作结束()
     subject.performActionEnd();
 };
-/**表现伤害 */
+/**表现伤害
+ * 
+ * @param {Game_Battler} target 目标
+ *  
+ * 
+ */
 Window_BattleLog.prototype.performDamage = function(target) {
     //目标 表现伤害()
     target.performDamage();
 };
-/**表现未命中 */
+/**表现未命中 
+ *
+ * @param {Game_Battler} target 目标
+ * 
+ */
 Window_BattleLog.prototype.performMiss = function(target) {
     //目标 表现未命中()
     target.performMiss();
 };
-/**表现恢复 */
+/**表现恢复
+ * 
+ * @param {Game_Battler} target 目标
+ * 
+ */
 Window_BattleLog.prototype.performRecovery = function(target) {
     //目标 表现恢复()
     target.performRecovery();
 };
-/**表现回避 */
+/**表现回避
+ * 
+ * @param {Game_Battler} target 目标
+ * 
+ */
 Window_BattleLog.prototype.performEvasion = function(target) {
     //目标 表现回避()
     target.performEvasion();
 };
-/**表现魔法回避 */
+/**表现魔法回避
+ * 
+ * @param {Game_Battler} target 目标
+ *  
+ */
 Window_BattleLog.prototype.performMagicEvasion = function(target) {
     //目标 表现魔法回避()
     target.performMagicEvasion();
 };
-/**表现反击 */
+/**表现反击
+ * 
+ * @param {Game_Battler} target 目标
+ * 
+ */
 Window_BattleLog.prototype.performCounter = function(target) {
     //目标 表现反击()
     target.performCounter();
 };
-/**表现反射 */
+/**表现反射
+ * 
+ * @param {Game_Battler} target 目标
+ * 
+ */
 Window_BattleLog.prototype.performReflection = function(target) {
     //目标 表现反射()
     target.performReflection();
@@ -623,7 +732,8 @@ Window_BattleLog.prototype.displayActionResults = function(subject, target) {
 };
 /**显示失败
  * @param {Game_Battler}  target 目标
- *  */
+ *  
+ */
 Window_BattleLog.prototype.displayFailure = function(target) {
     //如果(目标 结果() 是命中() 并且  不是 目标 结果() 成功)
     if (target.result().isHit() && !target.result().success) {
@@ -633,7 +743,8 @@ Window_BattleLog.prototype.displayFailure = function(target) {
 };
 /**显示会心
  * @param {Game_Battler}  target 目标
- *  */
+ *  
+ */
 Window_BattleLog.prototype.displayCritical = function(target) {
     //如果(目标 结果() 会心)
     if (target.result().critical) {
