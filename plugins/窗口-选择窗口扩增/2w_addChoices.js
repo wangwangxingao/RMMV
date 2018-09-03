@@ -15,7 +15,7 @@
  * @help
  * 在显示选项之前调用脚本 
  * 
- * this.setChoices(n)
+ * this.addChoices(n)
  * 拼接下面的显示选项及以下的n个显示选项
  * (如n为2,则为下面的显示选项 + 往后的显示选项 , 共3个显示选项拼在一起)
  * 
@@ -27,7 +27,7 @@
 
 
 
-Game_Interpreter.prototype.addChoicesClear =  Game_Interpreter.prototype.clear  
+Game_Interpreter.prototype.addChoicesClear = Game_Interpreter.prototype.clear
 
 Game_Interpreter.prototype.clear = function () {
     this.addChoicesClear()
@@ -39,11 +39,18 @@ Game_Interpreter.prototype.clear = function () {
  * @param {number} n
  */
 Game_Interpreter.prototype.addChoices = function (n) {
-    this._addChoices = n  
-    delete this._choicesBranch[this._indent] 
+    this._addChoices = n
+    delete this._choicesBranch[this._indent]
 };
 
  
+/**增加显示选项
+ * @param {number} n
+ */
+Game_Interpreter.prototype.setChoices = function (list) {
+    this._setChoices = list 
+};
+
 /** Show Text 显示文本*/
 Game_Interpreter.prototype.command101 = function () {
     if (!$gameMessage.isBusy()) {
@@ -76,7 +83,7 @@ Game_Interpreter.prototype.command101 = function () {
 };
 
 /** Show Choices 显示选择*/
-Game_Interpreter.prototype.command102 = function () { 
+Game_Interpreter.prototype.command102 = function () {
     if (this._choicesBranch[this._indent] && this._choicesBranch[this._indent].length) {
         var n = this._choicesBranch[this._indent].shift()
         this._branch[this._indent] -= n
@@ -92,7 +99,7 @@ Game_Interpreter.prototype.command102 = function () {
 };
 
 
- 
+
 /** 安装增加显示选项*/
 Game_Interpreter.prototype.setupAddChoices = function () {
     //当前索引
@@ -102,16 +109,16 @@ Game_Interpreter.prototype.setupAddChoices = function () {
     //当前命令层级 
     var indent = command.indent
     //添加长度
-    var addLength = [] 
+    var addLength = []
     //添加选项
     var addNumber = this._addChoices
     this._addChoices = 0
     //选项组
     var choices = []
 
-    var params = this.currentCommand().parameters 
+    var params = this.currentCommand().parameters
     addLength.push(params[0].length)
-    choices = choices.concat(params[0]) 
+    choices = choices.concat(params[0])
 
     var addParams = []
     for (var i = 0; i < params.length; i++) {
@@ -144,4 +151,52 @@ Game_Interpreter.prototype.setupAddChoices = function () {
 };
 
 
+
+
+
+/**安装选择组*/
+Game_Interpreter.prototype.setupChoices = function (params) {
+
+    var choices = params[0].clone();
  
+    var setChoices = this._setChoices
+    if ( setChoices && setChoices.length > 0) { 
+        var l = [] ;
+        for (var i = 0; i < setChoices.length; i++) {
+            l.push(choices[setChoices[i]]) 
+        } 
+    }
+    choices = l
+    this._setChoices = null
+
+    //选择组 = 参数组[0] 克隆()
+    //取消种类 = 参数组[1]
+    var cancelType = params[1];
+    //默认种类 = 参数组 长度 > 2  ? 参数组[2] : 0
+    var defaultType = params.length > 2 ? params[2] : 0;
+    //位置种类 =  参数组 长度 > 3  ? 参数组[3] : 2
+    var positionType = params.length > 3 ? params[3] : 2;
+    //背景 =  参数组 长度 > 4  ? 参数组[4] : 0
+    var background = params.length > 4 ? params[4] : 0;
+    //如果(取消种类 >= 选择组 长度 )
+    if (cancelType >= choices.length) {
+        //取消种类 = -2
+        cancelType = -2;
+    }
+    //游戏消息 设置选择组 (选择组 ,默认种类 , 取消种类 )
+    $gameMessage.setChoices(choices, defaultType, cancelType);
+    //游戏消息 设置选择背景 (背景)
+    $gameMessage.setChoiceBackground(background);
+    //游戏消息 设置选择位置种类 (位置种类)
+    $gameMessage.setChoicePositionType(positionType);
+    //游戏消息 设置选择呼回  方法(n)
+    $gameMessage.setChoiceCallback(function (n) { 
+        if(setChoices){ 
+            this._branch[this._indent] = setChoices[n]; 
+        }else{
+            this._branch[this._indent] = n; 
+        }
+        //分支[缩进] = n
+        //绑定(this) )
+    }.bind(this));
+};
