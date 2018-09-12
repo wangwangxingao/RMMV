@@ -23,8 +23,8 @@ Bitmap._reuseImages = [];
 /**
  * Bitmap states(Bitmap._loadingState):
  *
- * none:
- * Empty Bitmap
+ * none: 
+ * Empty Bitmap 空图片
  *
  * pending:
  * Url requested, but pending to load until startRequest called
@@ -42,17 +42,22 @@ Bitmap._reuseImages = [];
  * requesting encrypted data from supplied URI or decrypting it.
  *
  * decryptCompleted:
- * Decrypt completed
+ * Decrypt completed   
  *
  * loaded:
- * loaded. isReady() === true, so It's usable.
+ * loaded. isReady() === true, so It's usable. 是读取后的 
  *
  * error:
- * error occurred
+ * error occurred  是错误的
  *
  */
 
-
+/**
+ * 创建画布
+ * @param {number} width 宽
+ * @param {number} height 高
+ * 
+ */
 Bitmap.prototype._createCanvas = function(width, height){
     this.__canvas = this.__canvas || document.createElement('canvas');
     this.__context = this.__canvas.getContext('2d');
@@ -72,7 +77,12 @@ Bitmap.prototype._createCanvas = function(width, height){
 
     this._setDirty();
 };
-//创建基础纹理
+
+/**
+ * 创建基础纹理
+ * @param {Image} source 图片
+ * 
+ */
 Bitmap.prototype._createBaseTexture = function(source){
     this.__baseTexture = new PIXI.BaseTexture(source);
     this.__baseTexture.mipmap = false;
@@ -85,6 +95,7 @@ Bitmap.prototype._createBaseTexture = function(source){
         this._baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
     }
 };
+
 /**清除图像实例 */
 Bitmap.prototype._clearImgInstance = function(){
     this._image.src = "";
@@ -101,12 +112,14 @@ Bitmap.prototype._clearImgInstance = function(){
 //We don't want to waste memory, so creating canvas is deferred.
 //
 Object.defineProperties(Bitmap.prototype, {
+    /**画布 */
     _canvas: {
         get: function(){
             if(!this.__canvas)this._createCanvas();
             return this.__canvas;
         }
     },
+    /**环境 */
     _context: {
         get: function(){
             if(!this.__context)this._createCanvas();
@@ -114,6 +127,7 @@ Object.defineProperties(Bitmap.prototype, {
         }
     },
 
+    /**基础纹理 */
     _baseTexture: {
         get: function(){
             if(!this.__baseTexture) this._createBaseTexture(this._image || this.__canvas);
@@ -122,6 +136,10 @@ Object.defineProperties(Bitmap.prototype, {
     }
 });
 
+/**
+ * 更换新画布 
+ * 
+*/
 Bitmap.prototype._renewCanvas = function(){
     var newImage = this._image;
     if(newImage && this.__canvas && (this.__canvas.width < newImage.width || this.__canvas.height < newImage.height)){
@@ -221,15 +239,20 @@ Bitmap.prototype.initialize = function(width, height) {
  *
  * @static
  * @method load
- * @param {string} url The image url of the texture
+ * @param {string} url The image url of the texture 纹理的图像网址
  * @return Bitmap
  */
 Bitmap.load = function(url) {
+    //位图 = 创建位图
     var bitmap = Object.create(Bitmap.prototype);
+    //延缓 = true 
     bitmap._defer = true;
+    //初始化
     bitmap.initialize();
 
+    //请求后解码 = true 
     bitmap._decodeAfterRequest = true;
+    //请求图片(url)
     bitmap._requestImage(url);
 
     return bitmap;
@@ -242,7 +265,7 @@ Bitmap.load = function(url) {
  *
  * @static
  * @method snap
- * @param {Stage} stage The stage object
+ * @param {Stage} stage The stage object 舞台对象
  * @return Bitmap
  */ 
 Bitmap.snap = function(stage) {
@@ -280,6 +303,7 @@ Bitmap.snap = function(stage) {
  * @return {boolean} True if the bitmap is ready to render
  */ 
 Bitmap.prototype.isReady = function() {
+    //返回 读取中状态 === 'loaded' //读取后 || 读取中状态 ===  'none' //无
     return this._loadingState === 'loaded' || this._loadingState === 'none';
 };
 
@@ -291,6 +315,7 @@ Bitmap.prototype.isReady = function() {
  * @return {boolean} True if a loading error has occurred
  */ 
 Bitmap.prototype.isError = function() {
+    //返回 读取中状态 === 'error' //错误的 
     return this._loadingState === 'error';
 };
 
@@ -300,7 +325,9 @@ Bitmap.prototype.isError = function() {
  * @method touch
  */ 
 Bitmap.prototype.touch = function() {
+    //如果(缓存条目)
     if (this.cacheEntry) {
+        //缓存条目 触摸()
         this.cacheEntry.touch();
     }
 };
@@ -332,6 +359,7 @@ Object.defineProperty(Bitmap.prototype, 'url', {
 Object.defineProperty(Bitmap.prototype, 'baseTexture', {
     //获得 
     get: function() {
+        //返回 基础纹理
         return this._baseTexture;
     },
     configurable: true
@@ -347,6 +375,7 @@ Object.defineProperty(Bitmap.prototype, 'baseTexture', {
 Object.defineProperty(Bitmap.prototype, 'canvas', {
     //获得 
     get: function() {
+        //返回 画布
         return this._canvas;
     },
     configurable: true
@@ -362,6 +391,7 @@ Object.defineProperty(Bitmap.prototype, 'canvas', {
 Object.defineProperty(Bitmap.prototype, 'context', {
     //获得 
     get: function() {
+        //返回 环境
         return this._context;
     },
     configurable: true
@@ -422,7 +452,7 @@ Object.defineProperty(Bitmap.prototype, 'rect', {
 
 /**平滑
  * 是否应用平滑缩放
- * Whether the smooth scaling is applied.
+ * Whether the smooth scaling is  .
  *
  * @property smooth
  * @type Boolean
@@ -1026,10 +1056,11 @@ Bitmap.prototype._onLoad = function() {
 Bitmap.prototype.decode = function(){
     //检查((读取状态))
     switch(this._loadingState){
+        //当 "请求已完成" : 当 "解密已完成" :
         case 'requestCompleted': case 'decryptCompleted':
             //读取状态 = "读取后"
             this._loadingState = 'loaded';
-            //如果(! 画布) 
+            //如果(! 画布) 创建基础纹理()
             if(!this.__canvas) this._createBaseTexture(this._image);
             //设置发生更改()
             this._setDirty();
@@ -1037,7 +1068,9 @@ Bitmap.prototype.decode = function(){
             this._callLoadListeners();
             break;
 
+        //当 请求中  当 解密中
         case 'requesting': case 'decrypting':
+            //解码后请求 = true 
             this._decodeAfterRequest = true;
             if (!this._loader) {
                 this._loader = ResourceHandler.createLoader(this._url, this._requestImage.bind(this, this._url), this._onError.bind(this));
@@ -1046,7 +1079,9 @@ Bitmap.prototype.decode = function(){
             }
             break;
 
+        //当 
         case 'pending': case 'purged': case 'error':
+            //解码后请求 = true 
             this._decodeAfterRequest = true;
             this._requestImage(this._url);
             break;

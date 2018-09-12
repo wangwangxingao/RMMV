@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>uploadFile</title>
+    <script src="http://lib04.xesimg.com/lib/jQuery/1.11.1/jquery.min.js?1514549590"></script>
+    <style type="text/css">
+        .upload-default {
+            border: 1px dashed red;
+        }
+
+        .upload-default.upload_drag_hover {
+            border: 1px dashed green;
+        }
+
+        input {
+            appearance: textfield;
+            -moz-appearance: textfield;
+            -webkit-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="number" min="1" max="10000" step="1">
+    <input title="点击选择多个文件" id="h5Input1" multiple="" accept="*/*" type="file" name="html5uploader">
+    <input title="点击选择文件夹" id="h5Input2" multiple="multiple" webkitdirectory="" directory accept="*/*" type="file" name="html5uploader">
+    <input title="点击选择单个文件" id="h5Input3" accept="*/*" type="file" name="file" webkitRelativePath>
+    <div id="fileDragArea" style="float: left;width: 300px;height: 300px;" class="upload-default">或者将图片拖到此处</div>
+
+    <table><tr><td t="s" id="sjs-A1">&quot;1&quot;</td><td t="s" id="sjs-B1">厕所</td><td t="s" id="sjs-C1">他身上地方</td><td t="n" id="sjs-D1">4</td><td t="n" id="sjs-E1">5</td><td t="n" id="sjs-F1">6</td><td t="n" id="sjs-G1">7</td><td t="n" id="sjs-H1">8</td></tr><tr><td t="n" id="sjs-A2">2</td><td t="z" id="sjs-B2"></td><td t="z" id="sjs-C2"></td><td t="z" id="sjs-D2"></td><td t="z" id="sjs-E2"></td><td t="z" id="sjs-F2"></td><td t="z" id="sjs-G2"></td><td t="z" id="sjs-H2"></td></tr><tr><td t="n" id="sjs-A3">3</td><td t="n" id="sjs-B3">43457</td><td t="z" id="sjs-C3"></td><td t="z" id="sjs-D3"></td><td t="z" id="sjs-E3"></td><td t="z" id="sjs-F3"></td><td t="n" id="sjs-G3">0</td><td t="n" id="sjs-H3">1</td></tr><tr><td t="n" id="sjs-A4">4</td><td t="z" id="sjs-B4"></td><td t="n" id="sjs-C4">8152</td><td t="n" id="sjs-D4">555</td><td t="n" id="sjs-E4">498</td><td t="n" id="sjs-F4">6250</td><td t="n" id="sjs-G4">413</td><td t="n" id="sjs-H4">398</td></tr><tr><td t="n" id="sjs-A5">5</td><td t="z" id="sjs-B5"></td><td t="n" id="sjs-C5">2973</td><td t="n" id="sjs-D5">3898</td><td t="n" id="sjs-E5">2067</td><td t="n" id="sjs-F5">2282</td><td t="n" id="sjs-G5">3214</td><td t="n" id="sjs-H5">1553</td></tr><tr><td t="n" id="sjs-A6">6</td><td t="z" id="sjs-B6"></td><td t="n" id="sjs-C6">8250</td><td t="n" id="sjs-D6">1063</td><td t="z" id="sjs-E6"></td><td t="n" id="sjs-F6">6450</td><td t="n" id="sjs-G6">844</td><td t="z" id="sjs-H6"></td></tr><tr><td t="n" id="sjs-A7">7</td><td t="z" id="sjs-B7"></td><td t="n" id="sjs-C7">8715</td><td t="n" id="sjs-D7">101</td><td t="z" id="sjs-E7"></td><td t="n" id="sjs-F7">6950</td><td t="n" id="sjs-G7">81</td><td t="z" id="sjs-H7"></td></tr><tr><td t="n" id="sjs-A8">8</td><td t="z" id="sjs-B8"></td><td t="n" id="sjs-C8">2595</td><td t="z" id="sjs-D8"></td><td t="z" id="sjs-E8"></td><td t="n" id="sjs-F8">2129</td><td t="z" id="sjs-G8"></td><td t="z" id="sjs-H8"></td></tr><tr><td t="n" id="sjs-A9">9</td><td t="z" id="sjs-B9"></td><td t="n" id="sjs-C9">8689</td><td t="n" id="sjs-D9">100</td><td t="z" id="sjs-E9"></td><td t="n" id="sjs-F9">6899</td><td t="n" id="sjs-G9">80</td><td t="z" id="sjs-H9"></td></tr><tr><td t="n" id="sjs-A10">10</td><td t="z" id="sjs-B10"></td><td t="n" id="sjs-C10">6681</td><td t="n" id="sjs-D10">69</td><td t="z" id="sjs-E10"></td><td t="n" id="sjs-F10">5290</td><td t="n" id="sjs-G10">59</td><td t="z" id="sjs-H10"></td></tr><tr><td t="n" id="sjs-A11">11</td><td t="z" id="sjs-B11"></td><td t="n" id="sjs-C11">8417</td><td t="z" id="sjs-D11"></td><td t="z" id="sjs-E11"></td><td t="n" id="sjs-F11">6864</td><td t="z" id="sjs-G11"></td><td t="z" id="sjs-H11"></td></tr><tr><td t="n" id="sjs-A12">12</td><td t="z" id="sjs-B12"></td><td t="n" id="sjs-C12">8690</td><td t="z" id="sjs-D12"></td><td t="z" id="sjs-E12"></td><td t="n" id="sjs-F12">7136</td><td t="z" id="sjs-G12"></td><td t="z" id="sjs-H12"></td></tr><tr><td t="n" id="sjs-A13">13</td><td t="z" id="sjs-B13"></td><td t="n" id="sjs-C13">8087</td><td t="z" id="sjs-D13"></td><td t="z" id="sjs-E13"></td><td t="n" id="sjs-F13">6503</td><td t="z" id="sjs-G13"></td><td t="z" id="sjs-H13"></td></tr><tr><td t="n" id="sjs-A14">14</td><td t="n" id="sjs-B14">115</td><td t="n" id="sjs-C14">7430</td><td t="n" id="sjs-D14">278</td><td t="z" id="sjs-E14"></td><td t="n" id="sjs-F14">5939</td><td t="n" id="sjs-G14">231</td><td t="z" id="sjs-H14"></td></tr><tr><td t="n" id="sjs-A15">15</td><td t="z" id="sjs-B15"></td><td t="n" id="sjs-C15">5959</td><td t="n" id="sjs-D15">171</td><td t="z" id="sjs-E15"></td><td t="n" id="sjs-F15">4993</td><td t="n" id="sjs-G15">141</td><td t="z" id="sjs-H15"></td></tr><tr><td t="n" id="sjs-A16">16</td><td t="z" id="sjs-B16"></td><td t="n" id="sjs-C16">2589</td><td t="n" id="sjs-D16">2739</td><td t="z" id="sjs-E16"></td><td t="n" id="sjs-F16">2130</td><td t="n" id="sjs-G16">2183</td><td t="z" id="sjs-H16"></td></tr><tr><td t="n" id="sjs-A17">17</td><td t="z" id="sjs-B17"></td><td t="n" id="sjs-C17">5742</td><td t="n" id="sjs-D17">466</td><td t="z" id="sjs-E17"></td><td t="n" id="sjs-F17">4424</td><td t="n" id="sjs-G17">350</td><td t="z" id="sjs-H17"></td></tr><tr><td t="n" id="sjs-A18">18</td><td t="z" id="sjs-B18"></td><td t="n" id="sjs-C18">2295</td><td t="n" id="sjs-D18">574</td><td t="z" id="sjs-E18"></td><td t="n" id="sjs-F18">1801</td><td t="n" id="sjs-G18">456</td><td t="z" id="sjs-H18"></td></tr><tr><td t="n" id="sjs-A19">19</td><td t="z" id="sjs-B19"></td><td t="n" id="sjs-C19">7179</td><td t="n" id="sjs-D19">89</td><td t="z" id="sjs-E19"></td><td t="n" id="sjs-F19">5952</td><td t="n" id="sjs-G19">76</td><td t="z" id="sjs-H19"></td></tr><tr><td t="n" id="sjs-A20">20</td><td t="z" id="sjs-B20"></td><td t="n" id="sjs-C20">2784</td><td t="z" id="sjs-D20"></td><td t="z" id="sjs-E20"></td><td t="n" id="sjs-F20">2193</td><td t="z" id="sjs-G20"></td><td t="z" id="sjs-H20"></td></tr><tr><td t="n" id="sjs-A21">21</td><td t="z" id="sjs-B21"></td><td t="n" id="sjs-C21">7979</td><td t="n" id="sjs-D21">506</td><td t="z" id="sjs-E21"></td><td t="n" id="sjs-F21">6386</td><td t="n" id="sjs-G21">405</td><td t="z" id="sjs-H21"></td></tr><tr><td t="n" id="sjs-A22">22</td><td t="z" id="sjs-B22"></td><td t="n" id="sjs-C22">6910</td><td t="n" id="sjs-D22">201</td><td t="z" id="sjs-E22"></td><td t="n" id="sjs-F22">5767</td><td t="n" id="sjs-G22">165</td><td t="z" id="sjs-H22"></td></tr><tr><td t="n" id="sjs-A23">23</td><td t="z" id="sjs-B23"></td><td t="n" id="sjs-C23">548</td><td t="z" id="sjs-D23"></td><td t="z" id="sjs-E23"></td><td t="n" id="sjs-F23">431</td><td t="z" id="sjs-G23"></td><td t="z" id="sjs-H23"></td></tr><tr><td t="n" id="sjs-A24">24</td><td t="z" id="sjs-B24"></td><td t="n" id="sjs-C24">1638</td><td t="z" id="sjs-D24"></td><td t="z" id="sjs-E24"></td><td t="n" id="sjs-F24">1285</td><td t="z" id="sjs-G24"></td><td t="z" id="sjs-H24"></td></tr><tr><td t="n" id="sjs-A25">25</td><td t="z" id="sjs-B25"></td><td t="n" id="sjs-C25">2678</td><td t="z" id="sjs-D25"></td><td t="z" id="sjs-E25"></td><td t="n" id="sjs-F25">2202</td><td t="z" id="sjs-G25"></td><td t="z" id="sjs-H25"></td></tr><tr><td t="n" id="sjs-A26">26</td><td t="z" id="sjs-B26"></td><td t="n" id="sjs-C26">2348</td><td t="z" id="sjs-D26"></td><td t="z" id="sjs-E26"></td><td t="n" id="sjs-F26">1870</td><td t="z" id="sjs-G26"></td><td t="z" id="sjs-H26"></td></tr><tr><td t="n" id="sjs-A27">27</td><td t="z" id="sjs-B27"></td><td t="n" id="sjs-C27">1706</td><td t="z" id="sjs-D27"></td><td t="z" id="sjs-E27"></td><td t="n" id="sjs-F27">1328</td><td t="z" id="sjs-G27"></td><td t="z" id="sjs-H27"></td></tr><tr><td t="n" id="sjs-A28">28</td><td t="z" id="sjs-B28"></td><td t="n" id="sjs-C28">193</td><td t="z" id="sjs-D28"></td><td t="z" id="sjs-E28"></td><td t="n" id="sjs-F28">154</td><td t="z" id="sjs-G28"></td><td t="z" id="sjs-H28"></td></tr><tr><td t="n" id="sjs-A29">29</td><td t="z" id="sjs-B29"></td><td t="n" id="sjs-C29">127</td><td t="z" id="sjs-D29"></td><td t="z" id="sjs-E29"></td><td t="n" id="sjs-F29">104</td><td t="z" id="sjs-G29"></td><td t="z" id="sjs-H29"></td></tr><tr><td t="n" id="sjs-A30">30</td><td t="z" id="sjs-B30"></td><td t="n" id="sjs-C30">77</td><td t="z" id="sjs-D30"></td><td t="z" id="sjs-E30"></td><td t="n" id="sjs-F30">62</td><td t="z" id="sjs-G30"></td><td t="z" id="sjs-H30"></td></tr><tr><td t="n" id="sjs-A31">31</td><td t="z" id="sjs-B31"></td><td t="n" id="sjs-C31">3442</td><td t="z" id="sjs-D31"></td><td t="z" id="sjs-E31"></td><td t="n" id="sjs-F31">2748</td><td t="z" id="sjs-G31"></td><td t="z" id="sjs-H31"></td></tr><tr><td t="n" id="sjs-A32">32</td><td t="z" id="sjs-B32"></td><td t="n" id="sjs-C32">2441</td><td t="z" id="sjs-D32"></td><td t="z" id="sjs-E32"></td><td t="n" id="sjs-F32">1957</td><td t="z" id="sjs-G32"></td><td t="z" id="sjs-H32"></td></tr><tr><td t="n" id="sjs-A33">33</td><td t="z" id="sjs-B33"></td><td t="n" id="sjs-C33">46</td><td t="z" id="sjs-D33"></td><td t="z" id="sjs-E33"></td><td t="n" id="sjs-F33">39</td><td t="z" id="sjs-G33"></td><td t="z" id="sjs-H33"></td></tr><tr><td t="n" id="sjs-A34">34</td><td t="z" id="sjs-B34"></td><td t="n" id="sjs-C34">1235</td><td t="z" id="sjs-D34"></td><td t="z" id="sjs-E34"></td><td t="n" id="sjs-F34">988</td><td t="z" id="sjs-G34"></td><td t="z" id="sjs-H34"></td></tr><tr><td t="n" id="sjs-A35">35</td><td t="z" id="sjs-B35"></td><td t="n" id="sjs-C35">162</td><td t="z" id="sjs-D35"></td><td t="z" id="sjs-E35"></td><td t="n" id="sjs-F35">134</td><td t="z" id="sjs-G35"></td><td t="z" id="sjs-H35"></td></tr><tr><td t="n" id="sjs-A36">36</td><td t="z" id="sjs-B36"></td><td t="n" id="sjs-C36">98</td><td t="z" id="sjs-D36"></td><td t="z" id="sjs-E36"></td><td t="n" id="sjs-F36">78</td><td t="z" id="sjs-G36"></td><td t="z" id="sjs-H36"></td></tr><tr><td t="n" id="sjs-A37">37</td><td t="n" id="sjs-B37">43572</td><td t="n" id="sjs-C37">136855</td><td t="n" id="sjs-D37">10810</td><td t="n" id="sjs-E37">2565</td><td t="n" id="sjs-F37">109718</td><td t="n" id="sjs-G37">8698</td><td t="n" id="sjs-H37">1951</td></tr></table>
+
+</body>
+
+</html>
+<script type="text/javascript">
+    window.onload = function () {
+        document.getElementById('h5Input2').addEventListener('change', function (ev) {
+            console.log(ev)
+            //预览，主要是文件转换为base64，或者blob，或者canvas
+            //file -> base64
+            // file为前面获得的 
+            console.log(ev.target.files)
+            var file = ev.target.files[0]
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var img = new Image;
+                img.src = this.result;  // this.result 为base64
+                console.log(this.result)
+                // 加到dom
+            };
+            reader.readAsDataURL(file);
+
+            //file -> blob
+
+            // file为前面获得的
+            var url = window.URL.createObjectURL(file);
+            var img = new Image;
+            img.src = url;
+            //console.log(img)
+            // 加到dom
+            console.log(file)
+            // 上传 需要用到FormData模拟表单数据 或直接form上传
+            // var formData = new FormData();
+            // formData.append('resourceId', '');
+            // // formData.append('file', '');
+            // // formData.append('filename', file)
+            // formData.append("file", file);
+            // var xhr = new XMLHttpRequest();
+            // //上传文件进度条
+            // xhr.upload.addEventListener("progress", function(e){
+            //   console.log('9999')
+            //   if (e.total > 0) {
+            //     console.log('----进度-----')
+            //     console.log(e.loaded, e.total)
+            //       e.percent = Math.round(e.loaded / e.total * 100);
+            //       console.log( e.percent)
+            //       console.log('----进度-----')
+            //   } 
+            // }, false); 
+            // var url = 'http://courseware.xesv5.com/api/OnlineEdit/upload'
+            // xhr.open('post', url, true);
+            // xhr.onload = function () {
+            //   console.log(4566666)
+            // }
+            // xhr.send(formData);
+            /*********************************************尝试分片，创建多个上传的xhr对象****************************************/
+            var bytesPerPiece = 1024 * 1024; // 每个文件切片大小定为1MB
+            var totalPieces;
+            var blob = file;
+            var start = 0;
+            var end;
+            var index = 0;
+            var filesize = blob.size;
+            var filename = blob.name;
+
+            //计算文件切片总数
+            totalPieces = Math.ceil(filesize / bytesPerPiece);
+            while (start < filesize) {
+                //判断是否是最后一片文件，如果是最后一篇就说明整个文件已经上传完成
+                if (index == totalPieces) {
+                    console.log('整个文件上传完成');
+                    return false;
+                }
+                end = start + bytesPerPiece;
+                if (end > filesize) {
+                    end = filesize;
+                }
+                var chunk = blob.slice(start, end);//切割文件   
+                var sliceIndex = index;
+                var formData = new FormData();
+                formData.append("file", chunk, filename);
+                formData.append("total", totalPieces);  //总片数
+                formData.append("index", sliceIndex);   //当前是第几片
+                var xhr = new XMLHttpRequest();
+                //上传文件进度条
+                xhr.upload.addEventListener("progress", function (e) {
+                    if (e.total > 0) {
+                        console.log('----进度-----')
+                        //e.percent = Math.round(e.loaded / e.total * 100);
+                        //(e.loaded当前片文件上传的上传的进度 start是前面分片已经上传完成的文件大小
+                        e.percent = 100 * (e.loaded + start) / file.size;
+                        if (e.pecent > 100) {
+                            e.percent = 100;
+                        }
+                        console.log(e.percent)
+                        console.log('----进度-----')
+                    }
+                }, false);
+                var url = 'http://courseware.xesv5.com/api/OnlineEdit/upload'
+                xhr.open('post', url, true);
+                console.log(5)
+                xhr.onload = function () {
+                    console.log(45)
+                }
+                xhr.send(formData);
+                start = end;
+                index++;
+            }
+
+            /*********************************************尝试分片****************************************/
+        })
+    }
+    var dragDrop = document.getElementById('fileDragArea');
+
+    //拖拽上传文件
+    dragDrop.addEventListener("dragover", function (e) {
+        e.stopPropagation();
+        //必须阻止默认事件
+        e.preventDefault();
+        $(this).addClass("upload_drag_hover");
+    }, false);
+    dragDrop.addEventListener("dragleave", function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $(this).removeClass("upload_drag_hover");
+    }, false);
+    dragDrop.addEventListener("drop", function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        //取消鼠标经过样式
+        $(this).removeClass("upload_drag_hover");
+        //获取文件列表对象和文件相对路径
+        var files = e.target.files || e.dataTransfer.files;
+        var dragDrop = document.getElementById('fileDragArea')
+        var items = e.dataTransfer.items
+        console.log(items.length)
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i].webkitGetAsEntry();
+            console.log(item)
+            if (item) {
+                //判断是否为文件夹
+                if (item.isDirectory) {
+                    traverseFileTree(item)
+                } else {
+                    //  this.$alert('只支持上传文件夹', '提示', {
+                    //      confirmButtonText: '确定'
+                    // })
+                }
+            }
+        }
+
+    }, false);
+    function traverseFileTree(item, path) {
+        path = path || ''
+        if (item.isFile) {
+            // Get file
+            item.file((file) => {
+                let obj = {
+                    file: file,
+                    path: path + file.name
+                }
+            })
+        } else if (item.isDirectory) {
+            // Get folder contents
+            var dirReader = item.createReader()
+            readDir(dirReader, item, path)
+        }
+    }
+    function readDir(dirReader, item, path) {
+        dirReader.readEntries((entries) => {
+            console.log(entries.length)
+            if (entries.length) {
+                let obj = {
+                    name: item.name,
+                    process: 0,
+                    total: entries.length
+                }
+                for (let i = 0; i < entries.length; i++) {
+                    console.log(entries[i])
+                    traverseFileTree(entries[i], path + item.name + '/')
+                }
+                // entries长度不为0，继续调用解析，直至长度为0。因为chrome浏览器只支持一次解析100个
+                readDir(dirReader, item, path)
+            }
+        }, function (e) {
+            console.log(e)
+        })
+    }
+
+    dragDrop.addEventListener("dragend", function (e) {
+        console.log(9999999999999999999999)
+        console.log(e)
+    })
+</script>

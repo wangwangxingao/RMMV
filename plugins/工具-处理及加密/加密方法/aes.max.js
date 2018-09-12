@@ -265,7 +265,7 @@ Aes.Ctr.encrypt = function(plaintext, password, nBits, to) {
     }
 
     // Array.join is more efficient than repeated string concatenation in IE
-    var ciphertext = !to ? ciphertxt.join('') : ciphertxt
+    var ciphertext = !to ? Base64.encode(ciphertxt.join('')) : ciphertxt
 
     //alert((new Date()) - t);
     return ciphertext;
@@ -283,7 +283,8 @@ Aes.Ctr.decrypt = function(ciphertext, password, nBits, to) {
     var blockSize = 16; // block size fixed at 16 bytes / 128 bits (Nb=4) for AES
     if (!(nBits == 128 || nBits == 192 || nBits == 256)) return ''; // standard allows 128/192/256 bit keys
     var st = typeof(ciphertext) == "string"
-        //var t = new Date();  // timer
+    ciphertext = st ? Base64.decode(ciphertext) : ciphertext;
+    //var t = new Date();  // timer
 
     var charCodeAt = st ? function(id) { return ciphertext.charCodeAt(id) } : function(id) { return ciphertext[id] }
     var fromCharCode = !to ? function(id) { return String.fromCharCode(id) } : function(id) { return id }
