@@ -19,23 +19,30 @@
  * @default  ["获得物品%1 x %2","失去物品%1 x %2","获得金钱%1G","失去金钱%1G"]
  * 
  * @param  tbxy
- * @desc  文字和图片的xy
- * @default  [0,0,-10,-10]
+ * @desc  图片xy ,文字xy 和文字背景图片的xy
+ * @default  [0,0,0,0,-10,-10]
+ *  
+ * @param  tboxy
+ * @desc  图片xy ,文字xy 和文字背景图片的锚xy
+ * @default  [0,0,0.5,0.5,0.5,0.5]
+ * 
+ * 
+ * @param  base
+ * @desc  图片背景,长宽,最大长倍数,文字头
+ * @default  ["Base_OR",148,25,3,"\\}[8]"]
+ * 
  * 
  * @param  n
  * @desc  默认数量,总共4条
  * @default  4
  * 
- * @param  base
- * @desc  背景,长宽,最大长倍数,文字头
- * @default  ["Base_OR",148,25,3,"\\}[8]"]
  * 
  * @param  xybac
- * @desc  弹出的xy的基础位置及变化,淡入淡出增加量
+ * @desc  弹出的xy的基础位置及xy变化,淡入淡出增加量
  * @default  [0,0,0,-1,10]
  *  
  * @param  uwt
- * @desc  弹出及等待时间
+ * @desc  弹出时间, 等待时间
  * @default  [25,25]
  * 
  *   
@@ -44,17 +51,17 @@
  * @default  true
  * 
  * @param  inputnext
- * @desc  输入才进行下一个
- * @default  true
+ * @desc  0 等待结束进行下一个, 1 等待结束或输入进行下一个, 2 必须输入才进行下一个 , 3 等待结束并且输入才进行下一个
+ * @default  1
  * 
  * 
  * @param  inputfast
- * @desc  输入加快
+ * @desc  输入加快,值为按下ok键时增加的倍数
  * @default  1
  * 
  * 
  * @param  busy
- * @desc  信息繁忙
+ * @desc  信息繁忙,如果信息繁忙会阻断事件
  * @default  true
  * 
  * 
@@ -63,13 +70,26 @@
  * 
  * */
 
- 
 
 
- 
-var   ww = ww || {}
- 
+ImageManager.loadPictureItem = function (filename, hue) {
+    //返回 读取图片
+    return this.loadBitmap('img/pictures/items/', filename, hue, true, "0");
+};
 
+ImageManager.loadPictureWeapon = function (filename, hue) {
+    //返回 读取图片
+    return this.loadBitmap('img/pictures/weapons/', filename, hue, true, "0");
+};
+
+ImageManager.loadPictureArmor = function (filename, hue) {
+    //返回 读取图片
+    return this.loadBitmap('img/pictures/armors/', filename, hue, true, "0");
+};
+
+
+
+var ww = ww || {}
 ww.PluginManager = {}
 ww.PluginManager.get = function (n) {
     var find = function (n) {
@@ -86,8 +106,8 @@ ww.PluginManager.get = function (n) {
     return o
 }
 
-ww.pushMessage = {}
 
+ww.pushMessage = {}
 ww.pushMessage = ww.PluginManager.get('2w_pushMessage');/*
 ww.pushMessage.pos = JSON.parse(ww.pushMessage.parameters['pos'] || '[3,0]');
 ww.pushMessage.xybac = JSON.parse(ww.pushMessage.parameters['xybac'] || '[0,0,0,1,5]'); 
@@ -322,16 +342,14 @@ Sprite_LongList.prototype.update = function () {
     Sprite_UIBase.prototype.update.call(this);
 
 
-
     this.updateType()
-
     var inputfast = ww.pushMessage.inputfast
     //向上移动
     if (inputfast) {
         if (Input.isPressed("ok") || TouchInput.isPressed("ok")) {
             for (var i = 0; i < inputfast; i++) {
-                this.updateType() 
-            } 
+                this.updateType()
+            }
         }
     }
 
@@ -359,7 +377,9 @@ Sprite_LongList.prototype.addSet = function () {
     for (var i = 0; i < arguments.length; i++) {
         this._set.push(arguments[i])
     }
+    console.log("addset", this._type)
     if (!this._type) {
+        this.push()
         this.up()
     }
 };
@@ -391,17 +411,12 @@ Sprite_LongList.prototype.waitend = function () {
     this.up()
 };
 
-Sprite_LongList.prototype.waitend = function () {
 
-    var inputnext = ww.pushMessage.inputnext
-    //向上移动
-    if (inputnext) {
-        if (Input.isPressed("ok") || TouchInput.isPressed("ok")) {
-            this.up()
-        }
-    } else {
-        this.up()
-    }
+
+
+
+Sprite_LongList.prototype.waitend = function () {
+    this.up()
 };
 
 
@@ -412,7 +427,7 @@ Sprite_LongList.prototype.upend = function () {
     this.shift()
 
     //取消精灵是正在显示
-    this.end()
+    var mustwait = this.end()
 
     //添加新精灵
     this.push()
@@ -422,12 +437,46 @@ Sprite_LongList.prototype.upend = function () {
         this.noType()
         //否则
     } else {
-        //等待
-        this.wait()
+        //等待 
+
+        console.log(mustwait)
+        if (mustwait) {
+            this.wait()
+        } else {
+            this.waitend()
+        }
     }
 };
 
 
+
+/**删除第一个 */
+Sprite_LongList.prototype.shift = function () {
+    var s = this._show[0]
+    if (s && s.listtype == "shifting") {
+        s.listtype = ""
+        this.removeChild(s)
+        this._show.shift()
+        this._noshow.push(s)
+    }
+}
+
+
+/**结束 */
+Sprite_LongList.prototype.end = function () {
+    var re = false
+    //取消精灵是正在显示
+    for (var i = 0; i < this._show.length; i++) {
+        var s = this._show[i]
+        if (s.listtype == "pushing") {
+            re = true
+        }
+        s.listtype = ""
+    }
+    return re
+}
+
+/**添加新精灵 */
 Sprite_LongList.prototype.push = function () {
     //添加新精灵
     //如果有下一项并且有未显示的对象
@@ -462,37 +511,46 @@ Sprite_LongList.prototype.push = function () {
     }
 }
 
-/**删除第一个 */
-Sprite_LongList.prototype.shift = function () {
-    var s = this._show[0]
-    if (s && s.listtype == "shifting") {
-        s.listtype = ""
-        this.removeChild(s)
-        this._show.shift()
-        this._noshow.push(s)
-    }
-}
-
-/**结束 */
-Sprite_LongList.prototype.end = function () {
-    //取消精灵是正在显示
-    for (var i = 0; i < this._show.length; i++) {
-        var s = this._show[i]
-        s.listtype = ""
-    }
-}
-
 
 
 /**更新等待 */
 Sprite_LongList.prototype.updateWait = function () {
+
+
+    var inputre = false
+    var inputnext = ww.pushMessage.inputnext
+    //向上移动
+    if (inputnext) {
+        if (Input.isPressed("ok") || TouchInput.isPressed("ok")) {
+            inputre = true
+        }
+    }
+
+    var waitre = false
     if (this._duration <= 0) {
         this._duration = 0
         //等待结束
-        this.waitend()
+        waitre = true
     } else {
-
         this._duration--
+    }
+
+    if (inputnext == 1) {
+        if (inputre || waitre) {
+            this.waitend()
+        }
+    } else if (inputnext == 2) {
+        if (inputre) {
+            this.waitend()
+        }
+    } else if (inputre == 3) {
+        if (inputre && waitre) {
+            this.waitend()
+        }
+    } else {
+        if (waitre) {
+            this.waitend()
+        }
     }
 };
 
@@ -535,7 +593,6 @@ Sprite_LongList.prototype.updateMove = function () {
 Sprite_LongList.prototype.updatePlacement2 = function () {
     this.x = Graphics._width * 0.5
     this.y = Graphics._height * 0.5
-
 }
 
 
@@ -789,7 +846,6 @@ Sprite_LongString.prototype = Object.create(Sprite.prototype);
 Sprite_LongString.prototype.constructor = Sprite_LongString;
 
 
-
 Sprite_LongString.prototype.initialize = function () {
     Sprite.prototype.initialize.call(this)
     this.createSprites()
@@ -797,38 +853,63 @@ Sprite_LongString.prototype.initialize = function () {
 
 Sprite_LongString.prototype.createSprites = function () {
 
+    this._picture = new Sprite()
+
+    var x = ww.pushMessage.tbxy[0]
+    var y = ww.pushMessage.tbxy[1]
+    this._picture.x = x
+    this._picture.y = y
+    var x = ww.pushMessage.tboxy[0]
+    var y = ww.pushMessage.tboxy[1]
+
+    this._picture.anchor.x = x
+    this._picture.anchor.y = y
+    this.addChild(this._picture)
+
+
+
     this._base = new Sprite()
 
     var name = ww.pushMessage.base[0]
     this._base.bitmap = ImageManager.loadSystem(name)
-    this._base.anchor.x = 0.5
 
-    var x = ww.pushMessage.tbxy[2]
-    var y = ww.pushMessage.tbxy[3]
+    var x = ww.pushMessage.tbxy[4]
+    var y = ww.pushMessage.tbxy[5]
 
     this._base.x = x
     this._base.y = y
+    var x = ww.pushMessage.tboxy[4]
+    var y = ww.pushMessage.tboxy[5]
 
+    this._base.anchor.x = x
+    this._base.anchor.y = y
 
     this.addChild(this._base)
-    this._string = new Sprite()
 
+
+
+    this._string = new Sprite()
 
     this._w = ww.pushMessage.base[1]
     this._h = ww.pushMessage.base[2]
     this._l = ww.pushMessage.base[3]
     this._t = ww.pushMessage.base[4]
 
-
     this._string.bitmap = new Bitmap(this._w * this._l, this._h)
-    this._string.anchor.x = 0.5
 
-    var x = ww.pushMessage.tbxy[0]
-    var y = ww.pushMessage.tbxy[1]
+
+
+    var x = ww.pushMessage.tbxy[2]
+    var y = ww.pushMessage.tbxy[3]
 
     this._string.x = x
     this._string.y = y
 
+    var x = ww.pushMessage.tboxy[2]
+    var y = ww.pushMessage.tboxy[3]
+
+    this._string.anchor.x = x
+    this._string.anchor.y = y
 
 
     this.addChild(this._string)
@@ -837,20 +918,75 @@ Sprite_LongString.prototype.createSprites = function () {
 }
 
 Sprite_LongString.prototype.setText = function (t) {
-    var t = t === undefined ? "" : this._t + t
+
+
     if (this._text != t) {
         this._text = t
-        var b = this._string.bitmap
-        b.clear()
-        var w = b.window()
-        var l = w.drawTextEx(this._text, 0, 0, this._w * this._l, this._h, 1)
-        if (l <= this._w) {
-            this._base.scale.x = 1
-        } else if (l >= this._w * this._l) {
-            this._base.scale.x = this._l
+
+        if (t === undefined) {
+            this._string.bitmap.clear()
+            this._base.visible = false
+            this._picture.bitmap = ImageManager.loadEmptyBitmap()
         } else {
-            this._base.scale.x = Math.ceil(l * 100 / this._w) / 100
+
+            if (typeof t == "string") {
+                var b = this._string.bitmap
+                b.clear()
+                var w = b.window()
+                var l = w.drawTextEx(this._text, 0, 0, this._w * this._l, this._h, 1)
+
+                if (l <= this._w) {
+                    this._base.scale.x = 1
+                } else if (l >= this._w * this._l) {
+                    this._base.scale.x = this._l
+                } else {
+                    this._base.scale.x = Math.ceil(l * 100 / this._w) / 100
+                }
+                this._picture.bitmap = ImageManager.loadEmptyBitmap()
+
+                this._base.visible = true
+            } else if (Array.isArray(t)) {
+                var type = t[0]
+                var filename = t[1]
+                var text = t[2]
+
+                if (type == 0) {
+
+                } else if (type == 1) {
+                    this._picture.bitmap = ImageManager.loadPictureItem(filename)
+
+                } else if (type == 2) {
+                    this._picture.bitmap = ImageManager.loadPictureWeapon(filename)
+
+                } else if (type == 3) {
+                    this._picture.bitmap = ImageManager.loadPictureArmor(filename)
+                }
+
+                if (text) {
+                    var b = this._string.bitmap
+                    b.clear()
+                    var w = b.window()
+                    var l = w.drawTextEx(text, 0, 0, this._w * this._l, this._h, 1)
+
+                    if (l <= this._w) {
+                        this._base.scale.x = 1
+                    } else if (l >= this._w * this._l) {
+                        this._base.scale.x = this._l
+                    } else {
+                        this._base.scale.x = Math.ceil(l * 100 / this._w) / 100
+                    }
+                    this._base.visible = true
+                } else {
+                    this._string.bitmap.clear()
+                    this._base.visible = false
+                }
+
+            }
+
+
         }
+
+
     }
 }
 
@@ -893,17 +1029,19 @@ Game_Message.prototype.pushMessage = function () {
 
 
 
- 
 
 
-Game_Message.prototype.isPushBusy = function () { 
-    var re2 = false 
-    if (ww.pushMessage.busy  ){ 
+
+Game_Message.prototype.isPushBusy = function () {
+    var re2 = false
+    if (ww.pushMessage.busy) {
         var p = this.getPushMessage()
         var re2 = p && p.haveShow()
-    } 
-    return   re2 ;
+    }
+    return re2;
 };
+
+
 
 
 ww.pushMessage.Game_Message_prototype_isBusy = Game_Message.prototype.isBusy
@@ -911,11 +1049,10 @@ ww.pushMessage.Game_Message_prototype_isBusy = Game_Message.prototype.isBusy
 Game_Message.prototype.isBusy = function () {
 
     var re = ww.pushMessage.Game_Message_prototype_isBusy.call(this)
-    
-    //返回 有文本 或者 是选择 或者 是数字输入 或者 是物品选择
-    return re || this.isPushBusy() ;
-};
 
+    //返回 有文本 或者 是选择 或者 是数字输入 或者 是物品选择
+    return re || this.isPushBusy();
+};
 
 
 
@@ -925,7 +1062,6 @@ Game_Message.prototype.pushGold = function (value) {
 
     if (ww.pushMessage.use && value) {
         var get = ww.pushMessage.get || []
-
         if (value > 0) {
             get = get[2] || ""
         } else {
@@ -935,14 +1071,32 @@ Game_Message.prototype.pushGold = function (value) {
         $gameMessage.pushMessage(it)
     }
 
+};
 
+
+
+DataManager.isIWAType = function (item) {
+
+    if (!item) {
+        return 0
+    } else if (DataManager.isItem(item)) {
+        return 1
+    } else if (DataManager.isWeapon(item)) {
+        return 2
+    } else if (DataManager.isArmor(item)) {
+        return 3
+    }
+    return 0;
 };
 
 
 
 
+
 Game_Message.prototype.pushItem = function (item, value) {
+
     if (ww.pushMessage.use && item && value) {
+        var type = DataManager.isIWAType(item) 
         var get = ww.pushMessage.get || []
         if (value > 0) {
             get = get[0] || ""
@@ -950,20 +1104,10 @@ Game_Message.prototype.pushItem = function (item, value) {
             get = get[1] || ""
         }
         var it = get.format(item.name, value)
-        this.pushMessage(it)
+        this.pushMessage([type, item.id, it])
     }
+
 };
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -980,7 +1124,6 @@ Game_Interpreter.prototype.command125 = function () {
 
 
     $gameMessage.pushGold(value)
-
 
 
     //返回 true
@@ -1010,7 +1153,9 @@ Game_Interpreter.prototype.command127 = function () {
 
 
 
+
     $gameMessage.pushItem($dataWeapons[this._params[0]], value)
+
 
 
 
