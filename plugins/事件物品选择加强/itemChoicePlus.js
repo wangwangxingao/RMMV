@@ -15,8 +15,8 @@
  * 
  * 
  * 
- * 
- * $gameMessage.setAllItemsType = type
+ * 获取的全部物品的基础,
+ * $gameMessage.setAllItemsType(type)
  *  type
  *  0   全部物品
  *  1   可变装备
@@ -24,25 +24,49 @@
  *  3   全部 装备
  *  4   全部物品+装备
  * 
- * weapon :武器  如果后面有值则为 wtypeid 值
- * item :普通物品  如果后面有值则为 itypeId 值 
- * armor :防具  如果后面有值则为 atypeId 值
  * 
- * $gameMessage.setItemChoice(1,"weapon" )
+ *  
+ * 
+ * 设置是否自动获得失去 
+ * $gamegameMessage.setReGet( true / false )  ,如果为true 则为 自动获得失去,false 为不进行操作
+ * 
+ *  
  * 显示武器物品窗口
+ * $gameMessage.setItemChoice(id ,type )
+ * id 为 保存结果的
+ *   
  * 返回值为 物品的id 
  * 
  * 
- * $gameMessage.setItemChoice(1,["weapon1","item","armor"])
+ * tyoe  显示在窗口中的物品的种类:
+ *  
+ * item :普通物品  如果后面有值则为 itypeId 值 如 item1
+ * keyItem :关键物品
+ * weapon :武器  如果后面有值则为 wtypeid 值 如 weapon1  否则为全部武器
+ * armor :防具  如果后面有值则为 atypeId 值  如 armor1   否则为全部防具
+ * etype :装备种类 后面的值为种类 etypeId 值 如 etype1  ,此时返回值为 [种类,id] 种类为 "i", "w" ,"a" ,""  
+ * itemall :全部物品
+ * all : 全部物品+装备  此时返回值为 [种类,id] 种类为 "i", "w" ,"a" ,"" 
+ *  
+ *  
  * 
+ * type也可以为数组 如
+ * $gameMessage.setItemChoice(1,["weapon","item","armor"])
  * 
- * 武器物品防具三种类窗口
+ * 此时返回值为 [种类,id] 种类为 "i", "w" ,"a" ,"" 
+ *  
+ *  
+ * type也可以为对象 如
+ * $gameMessage.setItemChoice(1,{"weapon":[1,2,3],"item":[1,2,3],"armor":[1,2,3]})
+ * 在这些种类的基础上判断是否在后面数组所定义的id内
  * 
- * 种类 "w" 武器 "i" 物品 "a" 防具 其他为其他
- * 返回值为 [种类,物品的id ]
+ * 此时返回值为 [种类,id] 种类为 "i", "w" ,"a" ,"" 
+ *  
  *  
  * 
  */
+
+
 DataManager.includesString = function (item, type) {
     var type = type || ""
     switch (type) {
@@ -214,14 +238,22 @@ Game_Party.prototype.armorsByAllObject = function (o) {
  * 
  */
 Game_Message.prototype.setAllItemsType = function (type) {
-    this._allItemsType = type
-
+    return this._allItemsType = type 
 }
 
 Game_Message.prototype.getAllItemsType = function () {
     return this._allItemsType
-
 }
+
+Game_Message.prototype.getReGet = function () {
+    return this._reGet
+}
+
+
+Game_Message.prototype.setReGet = function (get) {
+    return this._reGet = get
+}
+
 
 
 Window_EventItem.prototype.getAllItems = function () {
@@ -229,7 +261,7 @@ Window_EventItem.prototype.getAllItems = function () {
 
     var o = { items: {}, weapons: {}, armors: {} }
 
-    var type = $gameMessage._allItemsType
+    var type = $gameMessage.getAllItemsType()
 
     if (!type) {
 
@@ -342,9 +374,7 @@ Window_ItemList.prototype.numItems = function (item) {
         return this._itemContainer ? this._itemContainer.armors[item.id] : 0;
     } else {
         return 0;
-    }
-
-
+    } 
 };
 
 Window_ItemList.prototype.drawItemNumber = function (item, x, y, width) {
@@ -380,6 +410,12 @@ Window_EventItem.prototype.onOk = function () {
     var item = this.item();
     var itemId = this.getItemId(item);
     $gameVariables.setValue($gameMessage.itemChoiceVariableId(), itemId);
+ 
+    if ($gameMessage.getReGet()) { 
+        $gameParty.gainItem(item, -1, true)
+        $gameParty.gainItem(item, 1, true) 
+    }
+ 
     this._messageWindow.terminateMessage();
     this.close();
 };
