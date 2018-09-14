@@ -289,7 +289,7 @@ Window_Base.prototype.makeIcon = function (textState) {
 
 /**测试文字增强 */
 Window_Base.prototype.testTextEx = function (text, x, y, w, h, wt, ht, facepos, wz, aw, ah) {
-    if (text) {
+        var text = text ||""
         var draw = { x: x || 0, y: y || 0 }
         var pageset = {
             w: w || Infinity,
@@ -322,12 +322,8 @@ Window_Base.prototype.testTextEx = function (text, x, y, w, h, wt, ht, facepos, 
 
         this.testMakeList(textState)
 
-        //console.log(textState)
         this.resetFontSettings();
         return textState;
-    } else {
-        return null;
-    }
 };
 
 

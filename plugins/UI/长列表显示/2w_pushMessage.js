@@ -932,9 +932,7 @@ Game_Message.prototype.pushGold = function (value) {
         }
         var it = get.format(value)
         $gameMessage.pushMessage(it)
-    }
-
-
+    } 
 };
 
 

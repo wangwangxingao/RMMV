@@ -15,10 +15,14 @@ Window_ChoiceList.prototype = Object.create(Window_Command.prototype);
 Window_ChoiceList.prototype.constructor = Window_ChoiceList;
 /**初始化 */
 Window_ChoiceList.prototype.initialize = function(messageWindow) {
+    //消息窗口
     this._messageWindow = messageWindow;
     Window_Command.prototype.initialize.call(this, 0, 0);
+    //开放性 = 0
     this.openness = 0;
+    //不活动()
     this.deactivate();
+    //背景 = 0
     this._background = 0;
 };
 /**开始 */
@@ -59,7 +63,9 @@ Window_ChoiceList.prototype.updatePlacement = function() {
 };
 /**更新背景 */
 Window_ChoiceList.prototype.updateBackground = function() {
+    //背景 = 游戏消息 选择背景()
     this._background = $gameMessage.choiceBackground();
+    //设置背景种类(背景)
     this.setBackgroundType(this._background);
 };
 /**窗口宽 */
