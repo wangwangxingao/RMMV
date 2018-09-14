@@ -244,25 +244,25 @@ Sprite.prototype.worldToLocalXY = function (x, y, sprite) {
 */
 Sprite.prototype.isTouchThis = function (x, y, type, c) {
     if (this.visible) {
-        var loc = this.worldToLocalXY(x, y)
-        var x = loc.x
-        var y = loc.y
-        var v = loc.visible
-
-        if (v) {
+        var loc = this.worldToLocalXY(x,y)
+        var lx = loc.x 
+        var ly = loc.y
+        var lv = loc.visible 
+      
+        if(lv){
             if (c) {
                 for (var i = 0; i < this.children.length; i++) {
                     var s = this.children[i]
-                    if (s && s.isTouchThis && s.isTouchThis(x, y, type, c)) {
+                    if (s && s.isTouchThis && s.isTouchThis(x, y, type,c)) {
                         return true
                     }
                 }
-            }
-
-            if (this.isTouchIn && this.isTouchIn(x, y, type)) {
+            } 
+ 
+            if (this.isTouchIn && this.isTouchIn(lx, ly, type)) {
                 return true
             }
-        }
+        } 
     }
     return false
 }

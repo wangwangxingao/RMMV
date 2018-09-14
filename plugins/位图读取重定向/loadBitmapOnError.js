@@ -182,7 +182,7 @@ ImageManager.loadBitmapOnError = function (bitmap, folder, filename2) {
 }
 
 
- 
+
 
 
 
@@ -197,6 +197,55 @@ Bitmap.prototype._requestImage = function (url) {
 
         console.log("useother", url)
         this._otherUrl = ""
+    }
+    //如果(位图 请求图像组 长度 !== 0)
+    if (Bitmap._reuseImages.length !== 0) {
+        //图像 = 位图 请求图像组 末尾()
+        this._image = Bitmap._reuseImages.pop();
+    } else {
+        //图像 = 新 图像()
+        this._image = new Image();
+    }
+
+    if (this._decodeAfterRequest && !this._loader) {
+        this._loader = ResourceHandler.createLoader(url, this._requestImage.bind(this, url), this._onError.bind(this));
+    }
+
+    this._image = new Image();
+    this._url = url;
+    this._loadingState = 'requesting';
+
+    if (!Decrypter.checkImgIgnore(url) && Decrypter.hasEncryptedImages) {
+        this._loadingState = 'decrypting';
+        Decrypter.decryptImg(url, this);
+    } else {
+        this._image.src = url;
+
+        this._image.addEventListener('load', this._loadListener = Bitmap.prototype._onLoad.bind(this));
+        this._image.addEventListener('error', this._errorListener = this._loader || Bitmap.prototype._onError.bind(this));
+    }
+
+    this._otherUrlmust = !this._otherUrlmust
+};
+
+
+
+
+Bitmap.prototype._requestImage = function (url) {
+
+    if (this._otherUrlmust) {
+
+        if (this._otherUrl) {
+
+            var url = this._otherUrl
+            this._otherUrl = ""
+            console.log("useother", url)
+        } else { 
+            this.initialize()
+            return
+
+        }
+
     }
     //如果(位图 请求图像组 长度 !== 0)
     if (Bitmap._reuseImages.length !== 0) {

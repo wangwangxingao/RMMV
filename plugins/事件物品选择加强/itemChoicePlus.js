@@ -28,7 +28,7 @@
  *  
  * 
  * 设置是否自动获得失去 
- * $gamegameMessage.setReGet( true / false )  ,如果为true 则为 自动获得失去,false 为不进行操作
+ * $gameMessage.setReGet( true / false )  ,如果为true 则为 自动获得失去,false 为不进行操作
  * 
  *  
  * 显示武器物品窗口
@@ -238,7 +238,7 @@ Game_Party.prototype.armorsByAllObject = function (o) {
  * 
  */
 Game_Message.prototype.setAllItemsType = function (type) {
-    return this._allItemsType = type 
+    return this._allItemsType = type
 }
 
 Game_Message.prototype.getAllItemsType = function () {
@@ -374,7 +374,7 @@ Window_ItemList.prototype.numItems = function (item) {
         return this._itemContainer ? this._itemContainer.armors[item.id] : 0;
     } else {
         return 0;
-    } 
+    }
 };
 
 Window_ItemList.prototype.drawItemNumber = function (item, x, y, width) {
@@ -410,12 +410,20 @@ Window_EventItem.prototype.onOk = function () {
     var item = this.item();
     var itemId = this.getItemId(item);
     $gameVariables.setValue($gameMessage.itemChoiceVariableId(), itemId);
- 
-    if ($gameMessage.getReGet()) { 
+    console.log(item,1)
+
+    if ($gameMessage.getReGet()) {
         $gameParty.gainItem(item, -1, true)
-        $gameParty.gainItem(item, 1, true) 
-    }
+        $gameParty.gainItem(item, 1, true)
+
  
+        console.log(item,1)
+
+
+
+
+    }
+
     this._messageWindow.terminateMessage();
     this.close();
 };

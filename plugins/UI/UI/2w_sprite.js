@@ -49,11 +49,11 @@ Sprite.prototype.worldToLocalXY  = function ( x,y,sprite) {
 Sprite.prototype.isTouchThis = function (x, y, type, c) {
     if (this.visible) {
         var loc = this.worldToLocalXY(x,y)
-        var x = loc.x 
-        var y = loc.y
-        var v = loc.visible 
+        var lx = loc.x 
+        var ly = loc.y
+        var lv = loc.visible 
       
-        if(v){
+        if(lv){
             if (c) {
                 for (var i = 0; i < this.children.length; i++) {
                     var s = this.children[i]
@@ -63,14 +63,13 @@ Sprite.prototype.isTouchThis = function (x, y, type, c) {
                 }
             } 
  
-            if (this.isTouchIn && this.isTouchIn(x, y, type)) {
+            if (this.isTouchIn && this.isTouchIn(lx, ly, type)) {
                 return true
             }
         } 
     }
     return false
 }
-
  
 
 /**是在之中 
