@@ -236,12 +236,13 @@ Bitmap.prototype._requestImage = function (url) {
     if (this._otherUrlmust) {
 
         if (this._otherUrl) {
+            console.log("useother", url,this._otherUrl)
 
             var url = this._otherUrl
             this._otherUrl = ""
-            console.log("useother", url)
         } else { 
-            this.initialize()
+            console.log("none", url)
+            this.initialize() 
             return
 
         }
