@@ -1,47 +1,39 @@
 
+wwMarked = function (src, opt, callback) {
+    var renderer = new marked.Renderer();
+    // Override function
+    renderer.linkbase = renderer.link
 
-; (function (root) {
-    'use strict';
-
-
-    function wwMarked(src, opt, callback) {
-
-
-
-        var myMarked = marked;
-
-        // Get reference
-        var renderer = new myMarked.Renderer();
-
-        // Override function
-        renderer.link = function (text, level) {
-            var escapedText = text.toLowerCase().replace(/[^\w]+/g, '-');
-
-            return `
-                  <h${level}>
-                    <a name="${escapedText}" class="anchor" href="#${escapedText}">
-                      <span class="header-link"></span>
-                    </a>
-                    ${text}
-                  </h${level}>`;
-        };
-
-        // Run marked
-        console.log(myMarked('# heading+', { renderer: renderer }));
-
+    renderer.changeLink =  function(href,text){
+        var href = href || ""
+        if (!href) {
+            href = text
+        } else {
+            if (text && typeof href == "string") { 
+                var match = href.match(/^(\$*)(.*)/) //(/^(\$*)(\@*)(.*)/) 
+                if (match) {
+                    var l1 = match[1].replace(/\$/g, "..\/") 
+                    var l2 = match[2]
+                    if (l2) {
+                        var match = l2.match(/(.*)\#(.*)/) 
+                        if (match) {
+                            l2 = (match[1] ? match[1] : text) + "#" + (match[2] ? match[2] : text)
+                        } 
+                    } else {
+                        l2 = text
+                    } 
+                    href = l1 + l2 
+                }  
+            }
+        } 
+        return href
     }
-
-
-    /**
-     * Expose
-     */
-
-
-    if (typeof module !== 'undefined' && typeof exports === 'object') {
-        module.exports = marked;
-    } else if (typeof define === 'function' && define.amd) {
-        define(function () { return wwmarked; });
-    } else {
-        root.wwmarked = wwmarked;
-    }
-})(this || (typeof window !== 'undefined' ? window : global));
+    renderer.link = function (href, title, text) {
+        var href = this.changeLink(href,text) 
+        return this.linkbase(href, title, text);
+    }; 
+    // Run marked
+    var opt = opt ||{}
+    opt.renderer  = opt.renderer ?  opt.renderer  :renderer
+    return marked(src, opt ,callback) 
+}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>marked</title>
+</head>
+
+<body>
+    <script type="text/javascript" src="..\marked.min.js"></script>
+    <script type="text/javascript" src="..\ww_marked.js"></script>
+    <script>
+
+
+
+        webFile = {}
+        webFile.get = function (url, type, loaded, progress, error, abort) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url);
+            xhr.responseType = (typeof (type) == "string") ? type : "arraybuffer"
+            xhr.onload = function () {
+                if (xhr.status < 400) {
+                    if (typeof loaded == "function") {
+                        loaded(xhr.response, xhr)
+                    }
+                }
+            };
+            xhr.onprogress = progress
+            xhr.onerror = error
+            xhr.onabort = abort
+            xhr.send()
+            return xhr
+        }
+
+
+
+
+        webFile.get = function (url, type, loaded, progress, error, abort) {
+            img.src = url
+            console.log(url)
+            img.onload = function () {
+                console.log(img)
+                // wwonload( iframe.contentDocument.body.innerText)
+            };
+            img.onprogress = progress
+            img.onerror = error
+            img.onabort = abort
+            document.body.appendChild(img);
+        }
+
+
+
+        webFile.get = function (url, type, loaded, progress, error, abort) {
+            console.log(url)
+            iframe.onload = function () {
+                console.log(iframe)
+                console.log(iframe.contentDocument.body.innerText)
+                wwonload(iframe.contentDocument.body.innerText)
+            };
+            iframe.src = url
+            iframe.onprogress = progress
+            iframe.onerror = error
+            iframe.onabort = abort
+        }
+
+
+        wwonload = function (re) {
+            var md = wwMarked(re)
+            console.log(md)
+ 
+            //iframe2.contentDocument.body.innerHTML = md
+            div.innerHTML = md
+        }
+
+        re = function (value) {
+            input.value = value
+            webFile.get(value, "text", wwonload)
+        }
+
+
+        /* 
+         context = document.createElement("canvas")
+           context.getContext("2d").drawImage(img, 0, 0)
+   
+           context.toBlob(function (blob) {
+               console.log(blob)
+               // code...
+           }, "image/jpeg", 1);
+        */
+
+        window.onload = function () {
+
+            input = document.createElement("input")
+            input.type = "text"
+            input.value = "marked.md"
+            document.body.appendChild(input);
+
+
+            button = document.createElement("input")
+            button.type = "button"
+            button.value = "打开"
+
+            document.body.appendChild(button);
+
+
+            div = document.createElement("div")
+            document.body.appendChild(div);
+
+            iframe = document.createElement("iframe")
+            iframe.hidden = "hidden"
+            document.body.appendChild(iframe);
+
+
+
+            //iframe2 = document.createElement("iframe")
+            //document.body.appendChild(iframe2);
+
+
+            img = document.createElement("img")
+            img.hidden = "hidden"
+            document.body.appendChild(img);
+
+
+            // img.onload()
+ 
+
+
+            button.onclick = function () {
+                // alert(input.value)
+                if (input.value) {
+                    re(input.value)
+                }
+            }
+
+
+        }
+
+    </script>
+
+</body>
+
+</html>

@@ -27,6 +27,10 @@ rmmv中,让战斗开始有三种情况,
 # RMMV战斗的初始化
 
 传入参数后,会进行 [BattleManager.initMembers 初始化成员](#BattleManager.initMembers) 
+[$gameTroop.setup  游戏敌群 安装(地群id)](#gameTroop.setup) 
+[$gameScreen.onBattleStart 游戏画面 当战斗开始](#gameScreen.onBattleStart)
+[BattleManager.makeEscapeRatio 制作逃跑概率](#BattleManager.makeEscapeRatio)
+
  
 ```
     //阶段 = "init" 初始化
