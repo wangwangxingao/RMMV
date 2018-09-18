@@ -261,7 +261,7 @@ Scene_Battle.prototype.createPartyCommandWindow = function() {
     this._partyCommandWindow.setHandler('fight',  this.commandFight.bind(this));
     //队伍命令窗口 设置处理 ('escape' ,  命令逃跑 )
     this._partyCommandWindow.setHandler('escape', this.commandEscape.bind(this));
-    //队伍命令窗口 取消选定
+    //队伍命令窗口 取消选择()
     this._partyCommandWindow.deselect();
     //添加窗口(队伍命令窗口) 
     this.addWindow(this._partyCommandWindow);
@@ -372,7 +372,7 @@ Scene_Battle.prototype.refreshStatus = function() {
 Scene_Battle.prototype.startPartyCommandSelection = function() {
 	//刷新状态()
     this.refreshStatus();
-    //状态窗口 取消选定()
+    //状态窗口 取消选择()
     this._statusWindow.deselect();
     //状态窗口 打开()
     this._statusWindow.open();
@@ -621,6 +621,6 @@ Scene_Battle.prototype.endCommandSelection = function() {
     this._partyCommandWindow.close();
     //角色命令窗口 关闭()
     this._actorCommandWindow.close();
-    //状态命令窗口 取消选定()
+    //状态命令窗口 取消选择()
     this._statusWindow.deselect();
 };

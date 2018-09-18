@@ -75,6 +75,9 @@
  * @default {"":""}
  * 
  * 
+ * @param default
+ * @desc 如果没有设置读取空图片 
+ * @default true
  * 
  * 
 */
@@ -146,7 +149,6 @@ ImageManager.requestBitmap = function (folder, filename, hue, smooth, filename2)
 
         ImageManager.loadBitmapOnError(bitmap, folder, filename2)
 
-
         return bitmap;
     } else {
         return this.loadEmptyBitmap();
@@ -158,8 +160,8 @@ ImageManager.requestBitmap = function (folder, filename, hue, smooth, filename2)
 ImageManager.loadBitmapOnError = function (bitmap, folder, filename2) {
 
     var filename2 = filename2 || ""
+    var names = ww.loadBitmapOnError
     if (!filename2) {
-        var names = ww.loadBitmapOnError
         if (typeof names == "object") {
             var name = names[folder]
             if (name) {
@@ -178,7 +180,13 @@ ImageManager.loadBitmapOnError = function (bitmap, folder, filename2) {
     if (filename2) {
         var path2 = folder + encodeURIComponent(filename2) + '.png';
         bitmap._otherUrl = path2;
+    } else {
+        if (names.default) {
+            bitmap._otherUrl = "none"
+        }
     }
+    bitmap._otherUrlmust = false
+
 }
 
 
@@ -193,10 +201,16 @@ ImageManager.loadBitmapOnError = function (bitmap, folder, filename2) {
 Bitmap.prototype._requestImage = function (url) {
 
     if (this._otherUrlmust && this._otherUrl) {
-        var url = this._otherUrl
-
-        console.log("useother", url)
-        this._otherUrl = ""
+        if (this._otherUrl == "none") {
+            console.log("useother", url, this._otherUrl)
+            var url = this._otherUrl
+            this._otherUrl = ""
+        } else {
+            console.log("usenone", url)
+            this._otherUrl = ""
+            this.initialize()
+            return
+        }
     }
     //如果(位图 请求图像组 长度 !== 0)
     if (Bitmap._reuseImages.length !== 0) {
@@ -236,13 +250,13 @@ Bitmap.prototype._requestImage = function (url) {
     if (this._otherUrlmust) {
 
         if (this._otherUrl) {
-            console.log("useother", url,this._otherUrl)
+            console.log("useother", url, this._otherUrl)
 
             var url = this._otherUrl
             this._otherUrl = ""
-        } else { 
+        } else {
             console.log("none", url)
-            this.initialize() 
+            this.initialize()
             return
 
         }

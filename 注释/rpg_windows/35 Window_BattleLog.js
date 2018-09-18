@@ -471,7 +471,12 @@ Window_BattleLog.prototype.showActorAttackAnimation = function(subject, targets)
     //显示正常动画(目标组 ,主体 攻击动画id2 ,true )
     this.showNormalAnimation(targets, subject.attackAnimationId2(), true);
 };
-/**显示敌人攻击动画 */
+/**显示敌人攻击动画
+ * 
+ * @param {Game_Battler} subject 主体
+ * @param {[Game_Battler]} targets 目标组
+ * 
+ */
 Window_BattleLog.prototype.showEnemyAttackAnimation = function(subject, targets) {
     //声音管理器 播放敌人攻击()
     SoundManager.playEnemyAttack();

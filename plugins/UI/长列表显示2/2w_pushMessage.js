@@ -9,15 +9,32 @@
  * @param 2w_pushMessage
  * @desc 插件 弹出信息
  * @default 汪汪
+ * 
+ *  
+ * @param  use
+ * @desc  是否使用显示
+ * @default  true
  *   
+ * 
+ * @param  usePicture
+ * @desc  是否使用显示图片,图片为种类 type(i,w,a) + id ,如第一个物品,为 i1 ,获取金钱为 gold
+ * @default  false
+ * 
+ * 
+ * @param  useBase
+ * @desc  是否使用显示背景图片
+ * @default  true
+ * 
+ * 
  * @param  pos
  * @desc  默认位置
  * @default  [3,0]
+ *
  * 
- * @param  get
- * @desc  获取信息的显示内容
- * @default  ["%1 x %2","%1 - %2","获得金钱%1","失去金钱%1"]
- * 
+ * @param  spritelength
+ * @desc  默认数量,总共4条
+ * @default  4 
+ *  
  * @param  tbxy
  * @desc  图片xy ,文字xy 和文字背景图片的xy
  * @default  [0,0,0,0,0,0]
@@ -26,17 +43,17 @@
  * @desc  图片xy ,文字xy 和文字背景图片的锚xy
  * @default  [0.5,0.5,0.5,0.5,0.5,0.5]
  * 
- * 
+ *  
  * @param  base
  * @desc  图片背景,长宽,最大长倍数,文字头
  * @default  ["Base_OR",148,25,3,"\\}[8]"]
  * 
  * 
- * @param  n
- * @desc  默认数量,总共4条
- * @default  4
+ * @param  getFormat
+ * @desc  获取信息的显示内容
+ * @default  ["%1 x %2","%1 - %2","获得金钱%1","失去金钱%1"]
  * 
- * 
+ *   
  * @param  xybac
  * @desc  弹出的xy的基础位置及xy变化,淡入淡出增加量
  * @default  [0,0,0,-1.25,10]
@@ -45,10 +62,6 @@
  * @desc  弹出时间, 等待时间
  * @default  [25,10]
  * 
- * 
- * @param  use
- * @desc  是否使用显示
- * @default  true
  * 
  * @param  inputnext
  * @desc  0 等待结束进行下一个, 1 等待结束或输入进行下一个, 2 必须输入才进行下一个 , 3 等待结束并且输入才进行下一个
@@ -72,28 +85,6 @@
 
 
 
-ImageManager.loadPictureItem = function (filename, hue) {
-    var bitmap = this.loadBitmap('img/pictures/items/', filename, hue, true)
-    ImageManager.loadBitmapOnError(bitmap, 'img/pictures/items/', "0")
-    //返回 读取图片
-    return bitmap;
-};
-
-ImageManager.loadPictureWeapon = function (filename, hue) {
-    //返回 读取图片
-
-    var bitmap = this.loadBitmap('img/pictures/weapons/', filename, hue, true)
-    ImageManager.loadBitmapOnError(bitmap, 'img/pictures/weapons/', "0")
-    return bitmap;
-};
-
-ImageManager.loadPictureArmor = function (filename, hue) {
-
-    //返回 读取图片 
-    var bitmap = this.loadBitmap('img/pictures/armors/', filename, hue, true)
-    ImageManager.loadBitmapOnError(bitmap, 'img/pictures/armors/', "0")
-    return bitmap;
-};
 
 
 
@@ -116,13 +107,8 @@ ww.PluginManager.get = function (n) {
 
 
 ww.pushMessage = {}
-ww.pushMessage = ww.PluginManager.get('2w_pushMessage');/*
-ww.pushMessage.pos = JSON.parse(ww.pushMessage.parameters['pos'] || '[3,0]');
-ww.pushMessage.xybac = JSON.parse(ww.pushMessage.parameters['xybac'] || '[0,0,0,1,5]'); 
-ww.pushMessage.uwt = JSON.parse(ww.pushMessage.parameters['uwt'] || '[60,60]'); 
-ww.pushMessage.n = JSON.parse(ww.pushMessage.parameters['n'] || '4');
-ww.pushMessage.base = JSON.parse(ww.pushMessage.parameters['base'] || '["Base_OR",148,25,444,"\}[8]"]');
- */
+ww.pushMessage = ww.PluginManager.get('2w_pushMessage'); 
+
 
 /**添加到信息显示2 */
 ww.pushMessage.push2message2 = function (n) {
@@ -141,6 +127,16 @@ ww.pushMessage.push2 = function () {
 
 
 
+Bitmap._window = null
+Bitmap.prototype.window = function () {
+    if (!Bitmap._window) {
+        Bitmap._window = new Window_Base()
+    }
+    Bitmap._window.contents = this
+    return Bitmap._window
+}
+
+
 
 function Sprite_LongList() {
     this.initialize.apply(this, arguments);
@@ -150,30 +146,32 @@ function Sprite_LongList() {
 
 
 /**设置原形  */
-Sprite_LongList.prototype = Object.create(Sprite_UIBase.prototype);
+Sprite_LongList.prototype = Object.create(Sprite.prototype);
 /**设置创造者 */
 Sprite_LongList.prototype.constructor = Sprite_LongList;
 /**初始化 */
-Sprite_LongList.prototype.initialize = function () {
-    Sprite_UIBase.prototype.initialize.call(this);
+Sprite_LongList.prototype.initialize = function (pushMessage) {
+    Sprite.prototype.initialize.call(this);
+
+    this._pushMessage = pushMessage
     this._set = []
     this._show = []
     this._noshow = []
 
     this._duration = 0
 
-    this._postype = ww.pushMessage.pos
-    var xybac = ww.pushMessage.xybac
+    this._postype = this._pushMessage.pos
+    var xybac = this._pushMessage.xybac
     this._baseX = xybac[0]
     this._baseY = xybac[1]
     this._addX = xybac[2]
     this._addY = xybac[3]
     this._changeO = xybac[4]
-    var uwt = ww.pushMessage.uwt
+    var uwt = this._pushMessage.uwt
     this._upTime = uwt[0] || 10
     this._waitTime = uwt[1] || 10
 
-    this._mustinput = ww.pushMessage.input
+    this._mustinput = this._pushMessage.input
 
     this.make()
 
@@ -182,9 +180,9 @@ Sprite_LongList.prototype.initialize = function () {
 
 /**制作 */
 Sprite_LongList.prototype.make = function () {
-    var i = ww.pushMessage.n || 4
+    var i = this._pushMessage.spritelength || 4
     while (i--) {
-        var s = new Sprite_LongString()
+        var s = new Sprite_LongString(this._pushMessage)
         this._noshow.push(s)
     }
 }
@@ -222,11 +220,11 @@ Sprite_LongList.prototype.haveShow = function () {
 
 /**更新 */
 Sprite_LongList.prototype.update = function () {
-    Sprite_UIBase.prototype.update.call(this);
+    Sprite.prototype.update.call(this);
 
 
     this.updateType()
-    var inputfast = ww.pushMessage.inputfast
+    var inputfast = this._pushMessage.inputfast
     //向上移动
     if (inputfast) {
         if (Input.isPressed("ok") || TouchInput.isPressed("ok")) {
@@ -254,8 +252,8 @@ Sprite_LongList.prototype.updateType = function () {
 
 
 Sprite_LongList.prototype.addPush = function () {
-    var l = ww.pushMessage.list
-    ww.pushMessage.list = []
+    var l = this._pushMessage.list
+    this._pushMessage.list = []
     if (Array.isArray(l)) {
         this.addSet.apply(this, l)
     } else {
@@ -270,7 +268,7 @@ Sprite_LongList.prototype.addSet = function () {
         var n = arguments[i]
         if (n) {
             this._set.push(arguments[i])
-            ww.pushMessage.push2message2(arguments[i])
+            this._pushMessage.push2message2(arguments[i])
         }
     }
     if (!this._type) {
@@ -278,7 +276,7 @@ Sprite_LongList.prototype.addSet = function () {
         this.up()
     }
 
-    ww.pushMessage.busy ||  ww.pushMessage.push2()
+    this._pushMessage.busy || this._pushMessage.push2()
 };
 
 
@@ -287,7 +285,7 @@ Sprite_LongList.prototype.noType = function () {
     this._type = ""
     this._duration = 0
 
-    ww.pushMessage.busy &&  ww.pushMessage.push2()
+    this._pushMessage.busy && this._pushMessage.push2()
 };
 
 /**开始等待 */
@@ -337,7 +335,7 @@ Sprite_LongList.prototype.upend = function () {
         //否则
     } else {
         //等待 
- 
+
         if (mustwait) {
             this.wait()
         } else {
@@ -416,7 +414,7 @@ Sprite_LongList.prototype.updateWait = function () {
 
 
     var inputre = false
-    var inputnext = ww.pushMessage.inputnext
+    var inputnext = this._pushMessage.inputnext
     //向上移动
     if (inputnext) {
         if (Input.isPressed("ok") || TouchInput.isPressed("ok")) {
@@ -744,8 +742,9 @@ Sprite_LongString.prototype = Object.create(Sprite.prototype);
 Sprite_LongString.prototype.constructor = Sprite_LongString;
 
 
-Sprite_LongString.prototype.initialize = function () {
+Sprite_LongString.prototype.initialize = function (pushMessage) {
     Sprite.prototype.initialize.call(this)
+    this._pushMessage = pushMessage
     this.createSprites()
 };
 
@@ -753,31 +752,33 @@ Sprite_LongString.prototype.createSprites = function () {
 
     this._picture = new Sprite()
 
-    var x = ww.pushMessage.tbxy[0]
-    var y = ww.pushMessage.tbxy[1]
+    var x = this._pushMessage.tbxy[0]
+    var y = this._pushMessage.tbxy[1]
     this._picture.x = x
     this._picture.y = y
-    var x = ww.pushMessage.tboxy[0]
-    var y = ww.pushMessage.tboxy[1]
+    var x = this._pushMessage.tboxy[0]
+    var y = this._pushMessage.tboxy[1]
 
     this._picture.anchor.x = x
     this._picture.anchor.y = y
-    //this.addChild(this._picture)
+
+
+    this.addChild(this._picture)
 
 
 
     this._base = new Sprite()
 
-    var name = ww.pushMessage.base[0]
+    var name = this._pushMessage.base[0]
     this._base.bitmap = ImageManager.loadSystem(name)
 
-    var x = ww.pushMessage.tbxy[4]
-    var y = ww.pushMessage.tbxy[5]
+    var x = this._pushMessage.tbxy[4]
+    var y = this._pushMessage.tbxy[5]
 
     this._base.x = x
     this._base.y = y
-    var x = ww.pushMessage.tboxy[4]
-    var y = ww.pushMessage.tboxy[5]
+    var x = this._pushMessage.tboxy[4]
+    var y = this._pushMessage.tboxy[5]
 
     this._base.anchor.x = x
     this._base.anchor.y = y
@@ -788,23 +789,23 @@ Sprite_LongString.prototype.createSprites = function () {
 
     this._string = new Sprite()
 
-    this._w = ww.pushMessage.base[1]
-    this._h = ww.pushMessage.base[2]
-    this._l = ww.pushMessage.base[3]
-    this._t = ww.pushMessage.base[4]
+    this._w = this._pushMessage.base[1]
+    this._h = this._pushMessage.base[2]
+    this._l = this._pushMessage.base[3]
+    this._t = this._pushMessage.base[4]
 
     this._string.bitmap = new Bitmap(this._w * this._l, this._h)
 
 
 
-    var x = ww.pushMessage.tbxy[2]
-    var y = ww.pushMessage.tbxy[3]
+    var x = this._pushMessage.tbxy[2]
+    var y = this._pushMessage.tbxy[3]
 
     this._string.x = x
     this._string.y = y
 
-    var x = ww.pushMessage.tboxy[2]
-    var y = ww.pushMessage.tboxy[3]
+    var x = this._pushMessage.tboxy[2]
+    var y = this._pushMessage.tboxy[3]
 
     this._string.anchor.x = x
     this._string.anchor.y = y
@@ -826,12 +827,13 @@ Sprite_LongString.prototype.setText = function (t) {
             this._base.visible = false
             this._picture.bitmap = ImageManager.loadEmptyBitmap()
         } else {
-
-            if (typeof t == "string") {
+            var tt = typeof t
+            if (tt == "string" || tt == "mumber") {
+                var t = "" + t
                 var b = this._string.bitmap
                 b.clear()
                 var w = b.window()
-                var l = w.drawTextEx(this._text, 0, 0, this._w * this._l, this._h, 1)
+                var l = w.drawTextEx(this._t + this._text, 0, 0, this._w * this._l, this._h, 1)
 
                 if (l <= this._w) {
                     this._base.scale.x = 1
@@ -840,31 +842,37 @@ Sprite_LongString.prototype.setText = function (t) {
                 } else {
                     this._base.scale.x = Math.ceil(l * 100 / this._w) / 100
                 }
+
                 this._picture.bitmap = ImageManager.loadEmptyBitmap()
 
-                this._base.visible = true
+                this._base.visible = !!this._pushMessage.useBase
             } else if (Array.isArray(t)) {
                 var type = t[0]
                 var filename = t[1]
                 var text = t[2]
 
-                if (type == 0) {
-
-                } else if (type == 1) {
-                    this._picture.bitmap = ImageManager.loadPictureItem(filename)
-
-                } else if (type == 2) {
-                    this._picture.bitmap = ImageManager.loadPictureWeapon(filename)
-
-                } else if (type == 3) {
-                    this._picture.bitmap = ImageManager.loadPictureArmor(filename)
+                if (this._pushMessage.usePicture) {
+                    if (type == 1) {
+                        this._picture.bitmap = ImageManager.loadPicture("i" + filename)
+                    } else if (type == 2) {
+                        this._picture.bitmap = ImageManager.loadPicture("w" + filename)
+                    } else if (type == 3) {
+                        this._picture.bitmap = ImageManager.loadPicture("a" + filename)
+                    } else if (type == 4) {
+                        this._picture.bitmap = ImageManager.loadPicture(filename)
+                    } else {
+                        this._picture.bitmap = ImageManager.loadEmptyBitmap()
+                    }
+                } else {
+                    this._picture.bitmap = ImageManager.loadEmptyBitmap()
                 }
+
 
                 if (text) {
                     var b = this._string.bitmap
                     b.clear()
                     var w = b.window()
-                    var l = w.drawTextEx(text, 0, 0, this._w * this._l, this._h, 1)
+                    var l = w.drawTextEx(this._t + text, 0, 0, this._w * this._l, this._h, 1)
 
                     if (l <= this._w) {
                         this._base.scale.x = 1
@@ -873,7 +881,8 @@ Sprite_LongString.prototype.setText = function (t) {
                     } else {
                         this._base.scale.x = Math.ceil(l * 100 / this._w) / 100
                     }
-                    this._base.visible = true
+
+                    this._base.visible = !!this._pushMessage.useBase
                 } else {
                     this._string.bitmap.clear()
                     this._base.visible = false
@@ -881,9 +890,7 @@ Sprite_LongString.prototype.setText = function (t) {
 
             }
 
-
-        }
-
+        } 
 
     }
 }
@@ -894,24 +901,9 @@ Sprite_LongString.prototype.setText = function (t) {
 
 
 
-/**创建显示对象 */
-ww.pushMessage.createDisplayObjects = Scene_Map.prototype.createDisplayObjects
 
 
-
-Scene_Map.prototype.createDisplayObjects = function () {
-    ww.pushMessage.createDisplayObjects.call(this)
-    this._pushMessage = new Sprite_LongList()
-    this.addChild(this._pushMessage)
-};
-
-
-
-
-
-
-
-Game_Message.prototype.getPushMessage = function () {
+ww.pushMessage.getPushMessage = function () {
     if (SceneManager._scene && SceneManager._scene._pushMessage) {
         return SceneManager._scene._pushMessage
     } else {
@@ -920,12 +912,12 @@ Game_Message.prototype.getPushMessage = function () {
 };
 
 
-Game_Message.prototype.pushMessage2 = function () {
+ww.pushMessage.addPush = function () {
     var p = $gameMessage.getPushMessage()
     p && p.addPush()
 }
 
-Game_Message.prototype.pushMessage = function () {
+ww.pushMessage.addSet = function () {
     var p = this.getPushMessage()
     p && p.addSet.apply(p, arguments)
 };
@@ -935,7 +927,7 @@ Game_Message.prototype.pushMessage = function () {
 
 
 
-Game_Message.prototype.isPushBusy = function () {
+ww.pushMessage.isPushBusy = function () {
     var re2 = false
     if (ww.pushMessage.busy) {
         var p = this.getPushMessage()
@@ -946,24 +938,45 @@ Game_Message.prototype.isPushBusy = function () {
 
 
 
- 
 
 
-Game_Message.prototype.pushGold = function (value) {
 
-
+ww.pushMessage.pushGold = function (value) {
     if (ww.pushMessage.use && value) {
-        var get = ww.pushMessage.get || []
+        var get = ww.pushMessage.getFormat || []
         if (value >= 0) {
             get = get[2] || ""
         } else {
             get = get[3] || ""
         }
         var it = get.format(value)
-        $gameMessage.pushMessage([4, "money", it])
+        ww.pushMessage.addSet([4, "gold", it])
     }
 
 };
+
+
+
+
+
+ww.pushMessage.pushItem = function (item, value) {
+
+    if (ww.pushMessage.use && item && value) {
+        var type = DataManager.isIWAType(item)
+        var get = ww.pushMessage.getFormat || []
+        if (value >= 0) {
+            get = get[0] || ""
+        } else {
+            get = get[1] || ""
+        }
+        var it = get.format(item.name, value)
+        ww.pushMessage.addSet([type, item.id, it])
+    }
+
+};
+
+
+
 
 
 
@@ -983,29 +996,6 @@ DataManager.isIWAType = function (item) {
 
 
 
-
-
-Game_Message.prototype.pushItem = function (item, value) {
-
-    if (ww.pushMessage.use && item && value) {
-        var type = DataManager.isIWAType(item)
-        var get = ww.pushMessage.get || []
-        if (value >= 0) {
-            get = get[0] || ""
-        } else {
-            get = get[1] || ""
-        }
-        var it = get.format(item.name, value)
-        this.pushMessage([type, item.id, it])
-    }
-
-};
-
-
-
-
-
-
 /** Change Gold 改变金钱*/
 Game_Interpreter.prototype.command125 = function () {
     //值 = 操作数值(参数组[0] ,参数组[1],参数组[2] )
@@ -1015,11 +1005,11 @@ Game_Interpreter.prototype.command125 = function () {
 
 
     // if (ww.pushMessage.use) { 
-    $gameMessage.pushGold(value)
- 
+    ww.pushMessage.pushGold(value)
 
 
-    if(this.nextEventCode() <125 || this.nextEventCode()>128 ){
+
+    if (this.nextEventCode() < 125 || this.nextEventCode() > 128) {
         this.setWaitMode('message')
         this._index++
         return false
@@ -1035,14 +1025,11 @@ Game_Interpreter.prototype.command126 = function () {
     var value = this.operateValue(this._params[1], this._params[2], this._params[3]);
     //游戏队伍 获得物品(数据物品组[参数组[0]],值 )
     $gameParty.gainItem($dataItems[this._params[0]], value);
-    //if (ww.pushMessage.use) {
 
-    $gameMessage.pushItem($dataItems[this._params[0]], value)
-
-    
+    ww.pushMessage.pushItem($dataItems[this._params[0]], value)
 
 
-    if(this.nextEventCode() <125 || this.nextEventCode()>128 ){
+    if (this.nextEventCode() < 125 || this.nextEventCode() > 128) {
         this.setWaitMode('message')
         this._index++
         return false
@@ -1062,10 +1049,10 @@ Game_Interpreter.prototype.command127 = function () {
 
     //if (ww.pushMessage.use) {
 
-    $gameMessage.pushItem($dataWeapons[this._params[0]], value)
+    ww.pushMessage.pushItem($dataWeapons[this._params[0]], value)
 
-    
-    if(this.nextEventCode() <125 || this.nextEventCode()>128 ){
+
+    if (this.nextEventCode() < 125 || this.nextEventCode() > 128) {
         this.setWaitMode('message')
         this._index++
         return false
@@ -1083,23 +1070,16 @@ Game_Interpreter.prototype.command128 = function () {
     //游戏队伍 获得物品(数据防具组[ 参数组[0] ] ,值, 参数组[4] )
     $gameParty.gainItem($dataArmors[this._params[0]], value, this._params[4]);
 
-    //if (ww.pushMessage.use) {
-    $gameMessage.pushItem($dataArmors[this._params[0]], value)
-    //this.setWaitMode('message');
-    //    this._index++;
 
-    //   return false
-    // }
+    ww.pushMessage.pushItem($dataArmors[this._params[0]], value)
 
-    if(this.nextEventCode() <125 || this.nextEventCode()>128 ){
+
+    if (this.nextEventCode() < 125 || this.nextEventCode() > 128) {
         this.setWaitMode('message')
         this._index++
         return false
     }
-    //this.setWaitMode('message');
-    
-    //this._index++; 
-    //return false
+
 
     //返回 true
     return true;
@@ -1109,43 +1089,24 @@ Game_Interpreter.prototype.command128 = function () {
 
 
 
-Game_Party.prototype.gainRandomItem = function (type, id, min, max, includeEquip) {
-    var num = max - min
-    var amount = min + Math.randomInt(num)
-    if (type) {
-        var item = null
-        if (type == 1) {
-            var item = $dataItems[id];
-        } else if (type == 2) {
-            var item = $dataWeapons[id];
-        } else if (type == 3) {
-            var item = $dataArmors[id];
-        }
-        if (item && amount) {
-            this.gainItem(item, amount, includeEquip)
-
-            $gameMessage.gainItem(item, amount)
-        }
-    } else {
-        if (amount) {
-            this.gainGold(amount)
-
-            $gameMessage.pushGold(amount)
-        }
-    }
-    // $gameMessage.pushMessage2() 
-};
 
 
- 
- 
- 
- 
-ww.pushMessage.Game_Message_prototype_isBusy = Game_Message.prototype.isBusy 
+
+ww.pushMessage.Game_Message_prototype_isBusy = Game_Message.prototype.isBusy
 Game_Message.prototype.isBusy = function () {
 
-    var re = ww.pushMessage.Game_Message_prototype_isBusy.call(this) 
+    var re = ww.pushMessage.Game_Message_prototype_isBusy.call(this)
     //返回 有文本 或者 是选择 或者 是数字输入 或者 是物品选择
-    return re || this.isPushBusy() ;
+    return re || ww.pushMessage.isPushBusy();
 };
- 
+
+
+
+/**创建显示对象 */
+ww.pushMessage.createDisplayObjects = Scene_Map.prototype.createDisplayObjects
+
+Scene_Map.prototype.createDisplayObjects = function () {
+    ww.pushMessage.createDisplayObjects.call(this)
+    this._pushMessage = new Sprite_LongList(ww.pushMessage)
+    this.addChild(this._pushMessage)
+};

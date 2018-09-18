@@ -60,7 +60,7 @@ Object.defineProperty(AudioManager, 'bgmVolume', {
     },
     //设置
     set: function(value) {
-	    //bgm大小设为 value
+	    //bgm大小 = value
         this._bgmVolume = value;
         //更新bgm参数(当前的bgm)
         this.updateBgmParameters(this._currentBgm);
@@ -184,7 +184,7 @@ AudioManager.updateBgmParameters = function(bgm) {
 };
 /**更新当前的bgm(bgm,位置) */
 AudioManager.updateCurrentBgm = function(bgm, pos) {
-	//当前的bgm 设为
+	//当前的bgm = {
     this._currentBgm = {
 	    //名字 bgm的名字
         name: bgm.name,
@@ -196,6 +196,7 @@ AudioManager.updateCurrentBgm = function(bgm, pos) {
         pan: bgm.pan,
         //位置 位置
         pos: pos
+    // }
     };
 };
 /**停止bgm */
@@ -204,9 +205,9 @@ AudioManager.stopBgm = function() {
     if (this._bgmBuffer) {
 	    //bgm缓存 停止
         this._bgmBuffer.stop();
-        //bgm缓存 设为 null
+        //bgm缓存  =  null
         this._bgmBuffer = null;
-        //当前的bgm 设为 null
+        //当前的bgm  =  null
         this._currentBgm = null;
     }
 };
@@ -216,7 +217,7 @@ AudioManager.fadeOutBgm = function(duration) {
     if (this._bgmBuffer && this._currentBgm) {
 	    //bgm缓存 淡出(持续时间)
         this._bgmBuffer.fadeOut(duration);
-        //当前的bgm 设为 null
+        //当前的bgm  =  null
         this._currentBgm = null;
     }
 };
@@ -282,7 +283,7 @@ AudioManager.updateBgsParameters = function(bgs) {
 };
 /**更新当前的bgs(bgs,位置) */
 AudioManager.updateCurrentBgs = function(bgs, pos) {
-	//当前的bgs 设为
+	//当前的bgs = {
     this._currentBgs = {
 	    //名字 bgs的名字
         name: bgs.name,
@@ -294,6 +295,7 @@ AudioManager.updateCurrentBgs = function(bgs, pos) {
         pan: bgs.pan,
         //位置 位置
         pos: pos
+    //  }
     };
 };
 /**停止bgs */
@@ -302,9 +304,9 @@ AudioManager.stopBgs = function() {
     if (this._bgsBuffer) {
 	    //bgs缓存 停止
         this._bgsBuffer.stop();
-        //bgs缓存 设为 null
+        //bgs缓存  =  null
         this._bgsBuffer = null;
-        //当前的bgs 设为 null
+        //当前的bgs  =  null
         this._currentBgs = null;
     }
 };
@@ -314,7 +316,7 @@ AudioManager.fadeOutBgs = function(duration) {
     if (this._bgsBuffer && this._currentBgs) {
 	    //bgs缓存 淡出(持续时间)
         this._bgsBuffer.fadeOut(duration);
-        //当前的bgs 设为 null
+        //当前的bgs  =  null
         this._currentBgs = null;
     }
 };

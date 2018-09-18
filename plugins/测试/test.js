@@ -60,9 +60,6 @@ s()
 
 
 
-
-
-
 var canvas = document.getElementById('rvo-test')
     , canvasSize = 800
     , center = [canvasSize / 2, canvasSize / 2]

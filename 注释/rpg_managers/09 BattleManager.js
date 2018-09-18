@@ -8,7 +8,12 @@ function BattleManager() {
     throw new Error('This is a static class');
 }
 
-/**安装 */
+/**
+ * 安装
+ * @param {number} troopId 敌群id
+ * @param {boolean} canEscape 能逃跑
+ * @param {boolean} canLose 能失败
+ */
 BattleManager.setup = function(troopId, canEscape, canLose) {
     //初始化成员
     this.initMembers();
@@ -68,7 +73,7 @@ BattleManager.initMembers = function() {
     this._escaped = false;
     //奖励 = {}
     this._rewards = {};
-    
+    //回合强制的 = false
     this._turnForced = false;
 };
 /**是战斗测试 */
