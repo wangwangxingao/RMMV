@@ -1,51 +1,4 @@
 
-wwMarked = function (src, opt, callback) {
-
-
-
-    console.log(marked.Lexer.lex(src, opt))
-    var renderer = new marked.Renderer();
-    // Override function
-    renderer.linkbase = renderer.link
-
-    renderer.changeLink = function (href, text) {
-        /*    var href = href || ""
-            if (!href) {
-                href = text
-            } else {
-                if (text && typeof href == "string") { 
-                    var match = href.match(/^(\$*)(.*)/) //(/^(\$*)(\@*)(.*)/) 
-                    if (match) {
-                        var l1 = match[1].replace(/\$/g, "..\/") 
-                        var l2 = match[2]
-                        if (l2) {
-                            var match = l2.match(/(.*)\#(.*)/) 
-                            if (match) {
-                                l2 = (match[1] ? match[1] : text) + "#" + (match[2] ? match[2] : text)
-                            } 
-                        } else {
-                            l2 = text
-                        } 
-                        href = l1 + l2 
-                    }  
-                }
-            } */
-        return href
-    }
-    renderer.link = function (href, title, text) {
-        var href = this.changeLink(href, text)
-        return this.linkbase(href, title, text);
-    };
-    // Run marked
-    var opt = opt || {}
-    opt.renderer = opt.renderer ? opt.renderer : renderer
-    return marked(src, opt, callback)
-};
-
-
-
-
-
 (function () {
 
     /** 
@@ -67,14 +20,22 @@ wwMarked = function (src, opt, callback) {
         }
     }
 
+    /**清除 */
     Highlighter.prototype.clear = function (node, keywords) {
 
         this._oldnode = node || null
         this._oldword = keywords || ""
         this._searchIndex = 0
-        this.dehighlight()
+        this.clearRealues()
     }
 
+
+    /**
+     * 搜索
+     * @param {*} node 节点 
+     * @param {*} keywords 关键词
+     * @param {*} index 索引
+     */
     Highlighter.prototype.search = function (node, keywords, index) {
 
         if (this._oldword == keywords && this._oldnode == node) {
@@ -94,7 +55,8 @@ wwMarked = function (src, opt, callback) {
     }
 
 
-    Highlighter.prototype.dehighlight = function () {
+    /**取消高亮显示及结果 */
+    Highlighter.prototype.clearRealues = function () {
 
         var result
         while (result = this._results.pop()) {
@@ -116,6 +78,10 @@ wwMarked = function (src, opt, callback) {
         } */
     }
 
+    /**
+     * 搜索结果
+     * 
+     */
     Highlighter.prototype.searchResult = function () {
 
         var list = []
@@ -132,6 +98,10 @@ wwMarked = function (src, opt, callback) {
         return list
     }
 
+    /**
+     * 转到索引
+     * @param {*} i 
+     */
     Highlighter.prototype.searchIndex = function (i) {
 
         i = i || 0
@@ -171,7 +141,7 @@ wwMarked = function (src, opt, callback) {
         } else {
             keywords = this.parsewords(keywords);
         }
-        this.dehighlight()
+        this.clearRealues()
         if (!keywords) {
             return this._results
         };
@@ -219,6 +189,7 @@ wwMarked = function (src, opt, callback) {
     }
 
 
+    /**高亮内容 */
     Highlighter.prototype.span = function (keyword) {
 
         var span = '<span ' +
@@ -271,6 +242,7 @@ wwMarked = function (src, opt, callback) {
     }
 
 
+    /**正则转化 */
     function RegexParser(input, type) {
         // Validate input
         if (typeof input !== "string") {
@@ -294,5 +266,4 @@ wwMarked = function (src, opt, callback) {
 
 
 })();
-
 

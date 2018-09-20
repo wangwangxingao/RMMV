@@ -14,6 +14,10 @@ WebAudio._standAlone = (function(top){
     return !top.ResourceHandler;
 })(this);
 
+/**
+ * 初始化
+ * @param {*} url 
+ */
 WebAudio.prototype.initialize = function(url) {
     if (!WebAudio._initialized) {
         WebAudio.initialize();
@@ -84,11 +88,13 @@ WebAudio.canPlayM4a = function() {
 };
 
 /**
+ * 设置主音量
+ * 设置所有音频的主音量。
  * Sets the master volume of the all audio.
  *
  * @static
- * @method setMasterVolume
- * @param {Number} value Master volume (min: 0, max: 1)
+ * @method setMasterVolume 
+ * @param {Number} value 主音量（最小值：0，最大值：1） Master volume (min: 0, max: 1)
  */
 WebAudio.setMasterVolume = function(value) {
     this._masterVolume = value;

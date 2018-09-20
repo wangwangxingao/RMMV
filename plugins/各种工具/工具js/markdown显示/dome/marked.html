@@ -67,9 +67,14 @@
         wwonload = function (re) {
             var md = wwMarked(re)
             console.log(md)
- 
+
             //iframe2.contentDocument.body.innerHTML = md
             div.innerHTML = md
+            searchHighlighter.clear()
+            
+            //window.location.hash = "#test"
+
+
         }
 
         re = function (value) {
@@ -99,12 +104,15 @@
             button = document.createElement("input")
             button.type = "button"
             button.value = "打开"
-
+            button.onclick = function () {
+                // alert(input.value)
+                if (input.value) {
+                    re(input.value)
+                }
+            }
             document.body.appendChild(button);
 
 
-            div = document.createElement("div")
-            document.body.appendChild(div);
 
             iframe = document.createElement("iframe")
             iframe.hidden = "hidden"
@@ -121,19 +129,36 @@
             document.body.appendChild(img);
 
 
-            // img.onload()
- 
 
 
-            button.onclick = function () {
-                // alert(input.value)
-                if (input.value) {
-                    re(input.value)
-                }
+
+
+
+            input2 = document.createElement("input")
+            input2.type = "text"
+            input2.value = "mark"
+            document.body.appendChild(input2);
+
+
+            button2 = document.createElement("input")
+            button2.type = "button"
+            button2.value = "搜索"
+            button2.onclick = function () {
+
+               console.log( searchHighlighter.search(div, input2.value))
+                searchHighlighter.searchResult()
+
             }
 
+            document.body.appendChild(button2);
+
+
+
+            div = document.createElement("div")
+            document.body.appendChild(div);
 
         }
+
 
     </script>
 

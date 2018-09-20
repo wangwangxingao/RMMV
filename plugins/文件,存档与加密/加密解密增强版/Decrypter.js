@@ -5,9 +5,14 @@
  * @plugindesc 仿mv加密
  * @author wangwang
  *
+ * 
  * @param Decrypter
  * @desc 仿mv加密解密
  * @default 1.0
+ * 
+ * @param mvheader
+ * @desc 使用原本的头
+ * @default true
  * 
  * @param SIGNATURE
  * @desc 游戏签名:
@@ -173,19 +178,19 @@ var Utf8 = {}; // Utf8 namespace
  * @param {String} strUni Unicode string to be encoded as UTF-8
  * @returns {String} encoded string
  */
-Utf8.encode = function(strUni) {
+Utf8.encode = function (strUni) {
     // use regular expressions & String.replace callback function for better efficiency 
     // than procedural approaches
     var strUtf = strUni.replace(
         /[\u0080-\u07ff]/g, // U+0080 - U+07FF => 2 bytes 110yyyyy, 10zzzzzz
-        function(c) {
+        function (c) {
             var cc = c.charCodeAt(0);
             return String.fromCharCode(0xc0 | cc >> 6, 0x80 | cc & 0x3f);
         }
     );
     strUtf = strUtf.replace(
         /[\u0800-\uffff]/g, // U+0800 - U+FFFF => 3 bytes 1110xxxx, 10yyyyyy, 10zzzzzz
-        function(c) {
+        function (c) {
             var cc = c.charCodeAt(0);
             return String.fromCharCode(0xe0 | cc >> 12, 0x80 | cc >> 6 & 0x3F, 0x80 | cc & 0x3f);
         }
@@ -199,18 +204,18 @@ Utf8.encode = function(strUni) {
  * @param {String} strUtf UTF-8 string to be decoded back to Unicode
  * @returns {String} decoded string
  */
-Utf8.decode = function(strUtf) {
+Utf8.decode = function (strUtf) {
     // note: decode 3-byte chars first as decoded 2-byte strings could appear to be 3-byte char!
     var strUni = strUtf.replace(
         /[\u00e0-\u00ef][\u0080-\u00bf][\u0080-\u00bf]/g, // 3-byte chars
-        function(c) { // (note parentheses for precence)
+        function (c) { // (note parentheses for precence)
             var cc = ((c.charCodeAt(0) & 0x0f) << 12) | ((c.charCodeAt(1) & 0x3f) << 6) | (c.charCodeAt(2) & 0x3f);
             return String.fromCharCode(cc);
         }
     );
     strUni = strUni.replace(
         /[\u00c0-\u00df][\u0080-\u00bf]/g, // 2-byte chars
-        function(c) { // (note parentheses for precence)
+        function (c) { // (note parentheses for precence)
             var cc = (c.charCodeAt(0) & 0x1f) << 6 | c.charCodeAt(1) & 0x3f;
             return String.fromCharCode(cc);
         }
@@ -404,6 +409,13 @@ PluginManager.start = function () {
 
 
 
+
+
+Decrypter.log = function () {
+    return
+}
+
+
 /** 
  * 解密部分  
  * */
@@ -485,7 +497,7 @@ Decrypter.listname = function () {
  */
 Decrypter.localURL = function () {
     if (!this._localURL) {
-        var path = null ;// require &&typeof(require) =="function" && require('path');  
+        var path = null;// require &&typeof(require) =="function" && require('path');  
         if (path) {
             this._localURL = path.dirname(process.mainModule.filename)
         } else {
@@ -611,7 +623,7 @@ Decrypter.extToEncryptExt = function (url, t) {
     Decrypter._encryptExt = v(z, "encryptExt", {})
     Decrypter._encryptType = v(z, "encryptType", {})
     var l = Decrypter._encryptList = v(z, "encryptList", {})
-    //console.log(l, c)
+    //Decrypter.log(l, c)
     Decrypter.hasEncryptedData = c(l, "data")
     Decrypter.hasEncryptedImages = c(l, "img")
     Decrypter.hasEncryptedAudio = c(l, "audio")
@@ -690,14 +702,14 @@ Decrypter.getEncryptMust = function (url) {
 /**生成加密 */
 Decrypter.startEncrypt = function () {
     if (!Utils.isNwjs()) {
-        console.log("not is Nwjs")
+        Decrypter.log("not is Nwjs")
         return {}
     }
     var o = {}
     var o2 = {}
 
     var nt = Date.now()
-    console.log(nt)
+    Decrypter.log(nt)
     var pro = 0
     Decrypter.ennum = 0
 
@@ -728,12 +740,12 @@ Decrypter.startEncrypt = function () {
     }
     var proall = pro
     var nt2 = Date.now()
-    console.log("读取列表时间", nt2 - nt)
-    console.log(o, pro, list)
+    Decrypter.log("读取列表时间", nt2 - nt)
+    Decrypter.log(o, pro, list)
     pro = 0
     for (var n in o) {
         var nt2 = Date.now()
-        console.log(n)
+        Decrypter.log(n)
         var v = o[n]
         var url = this.localFileName(n)
 
@@ -747,12 +759,12 @@ Decrypter.startEncrypt = function () {
         o2[n] = md5
 
         Decrypter.saveFile(n, buffer)
-        console.log(n, v, url, md5)
+        Decrypter.log(n, v, url, md5)
         pro++
 
         var nt3 = Date.now()
-        console.log(n, "使用时间", nt3 - nt2)
-        console.log(pro, "/", proall, Math.floor((pro / proall) * 100) + "%", nt3 - nt)
+        Decrypter.log(n, "使用时间", nt3 - nt2)
+        Decrypter.log(pro, "/", proall, Math.floor((pro / proall) * 100) + "%", nt3 - nt)
 
     }
     var data = JSON.stringify(o2)
@@ -761,10 +773,10 @@ Decrypter.startEncrypt = function () {
     if (n) {
         Decrypter.saveFile(n, buffer)
     }
-    console.log(o2, n)
+    Decrypter.log(o2, n)
 
     var nt3 = Date.now()
-    console.log("完成", "使用时间", nt3 - nt)
+    Decrypter.log("完成", "使用时间", nt3 - nt)
 
 
     //this.saveMY()
@@ -846,7 +858,7 @@ Decrypter.getwebList = function () {
 /**制作本地列表 */
 Decrypter.makelist = function () {
     if (!Utils.isNwjs()) {
-        console.log("not is Nwjs")
+        Decrypter.log("not is Nwjs")
         return {}
     }
     var o2 = {}
@@ -923,16 +935,16 @@ Decrypter.getLocalList = function () {
 Decrypter.onLoadList = function () {
     if (this._weblist && this._locallist) {
         if (this._weblist == "err") {
-            console.log("找不到网络更新列表")
+            Decrypter.log("找不到网络更新列表")
             this.endUpdate()
             Decrypter.updateUL("web", "err")
             Decrypter.updateUL("loc", "end")
             return
         }
         if (this._locallist == "err") {
-            console.log("找不到本地更新列表")
+            Decrypter.log("找不到本地更新列表")
             this._locallist = Decrypter.makelist(-1)
-            console.log("创建本地更新列表")
+            Decrypter.log("创建本地更新列表")
         }
         var l = this._locallist
         var w = this._weblist
@@ -1016,7 +1028,7 @@ Decrypter.updateUL = function (n, st) {
     if (o.all <= 0) {
         this.endUL()
     }
-    console.log(o)
+    Decrypter.log(o)
 };
 
 
@@ -1034,7 +1046,7 @@ Decrypter.saveweb = function (n) {
         }
     };
     xhr.onerror = function () {
-        console.log("找不到" + url)
+        Decrypter.log("找不到" + url)
         Decrypter.updateUL(n, "err")
     };
     xhr.send();
@@ -1098,13 +1110,20 @@ Decrypter.isLocalMode = function () {
     };
 
 
+    w.mh = function (h) {  
+        var b = new Buffer(16); 
+        for (i = 0; i < h.length; i+=2) {
+            b[i] = parseInt("0x" + h.substr(i, 2), 16);
+        } 
+        return b
+    }
 
     /**
      * 读取头
      * @param {string} h 
      */
     w.rh = function (h) {
-        return h || w.h
+        return h ||  w.h
     };
 
 
@@ -1141,11 +1160,11 @@ Decrypter.isLocalMode = function () {
     };
 
 
-   /**
-    * 长度
-    * @param {[]|ArrayBuffer} b 
-    * @return {number}
-    */
+    /**
+     * 长度
+     * @param {[]|ArrayBuffer} b 
+     * @return {number}
+     */
     w.l = function (b) {
         return b ? b.length || b.byteLength || 0 : 0
     };
@@ -1199,13 +1218,13 @@ Decrypter.isLocalMode = function () {
 
     /**
      * 加头
-     * @param {Uint8Array} a Uint8Arry数据
+     * @param {Uint8Array} b Uint8Arry数据
      * @param {[]} k 密钥
      * @param {[]} h 文件头
      * 
      */
     w.d.header = function (b, k, h) {
-        var a = w.rh(k)
+        var a = w.rh(h)
         if (b) {
             var c = w.l(b)
             var d = w.l(a)
@@ -1384,7 +1403,7 @@ Decrypter.isLocalMode = function () {
         var l = w.l(m)
         for (var i = 0; i < l; i++) {
             if (!b) { return false }
-            console.log(b,m[i]) 
+            //Decrypter.log(b, m[i])
             var b = !!this[m[i]] && this[m[i]](b, k, h)
         }
         return b
@@ -1397,6 +1416,8 @@ Decrypter.isLocalMode = function () {
      * @param {Array} a 数据
      * @param {Boolean} t 种类
      * @param {[]} m 加密方法
+     * @param {} k 密码
+     * @param {} h 头
      */
     w.decrypt = function (a, t, m, k, h) {
         if (!a) { return null }
@@ -1411,9 +1432,9 @@ Decrypter.isLocalMode = function () {
 
 
     /**读取 */
-    w.load = function () { 
+    w.load = function () {
         w.m = JSON.parse(w.m2)
-        w.h = w.t2b(w.h2)
+        w.h = w.un ? w.mh(w.h2) : w.t2b(w.h2)
         w.k = w.t2b(w.k2)
     }
 
@@ -1426,17 +1447,18 @@ Decrypter.isLocalMode = function () {
         return false
         var k = v || window.prompt("输入", "");
         var r = w.s.data
-        //console.log(r, k)
+        //Decrypter.log(r, k)
         var d = w.decrypt(r, 1, ["ex"], w.t2b(k), [])
-        //console.log(d)
+        //Decrypter.log(d)
         var l = JSON.parse(d)
         w.m2 = l[0]
         w.k2 = l[1]
         w.h2 = l[2]
+        w.uh = l[3]
         w.load()
 
         return true
-        //console.log(w.m2, w.h2, w.k2)
+        //Decrypter.log(w.m2, w.h2, w.k2)
     };
 
 
@@ -1465,15 +1487,16 @@ Decrypter.isLocalMode = function () {
         w.m2 = g(z, "mode")
         w.k2 = MD5(g(z, "miyao"))
         w.h2 = g(z, "SIGNATURE") + g(z, "VER") + g(z, "REMAIN")
+        w.uh = g(z, "mvhearder")
 
         w.load()
-        //console.log(w)
+        //Decrypter.log(w)
     })();
 
 
 
 
-    //console.log(k = w)
+    //Decrypter.log(k = w)
 
     /**加密部分 */
 
@@ -1562,65 +1585,67 @@ Decrypter.isLocalMode = function () {
     w.e.zlib = function (b, k, h) {
         if (b) {
             if (Zlib) {
-                console.log("Zlib压缩:")
+                Decrypter.log("Zlib压缩:")
                 var l1 = w.l(b)
                 var t1 = Date.now()
-                console.log( "原大小:", l1)
-                
+                Decrypter.log("原大小:", l1)
+
                 var b = new Zlib.Deflate(b).compress();
 
                 var l2 = w.l(b)
                 var t2 = Date.now()
-                console.log("压缩后:", l2)
+                Decrypter.log("压缩后:", l2)
                 var l3 = l1 - l2
                 Decrypter.ennum += l3
-                console.log("压缩量", l3, "压缩比例:" , l1/l2,"压缩时间",t2-t1 ,  "总压缩量", Decrypter.ennum)
+                Decrypter.log("压缩量", l3, "压缩比例:", l1 / l2, "压缩时间", t2 - t1, "总压缩量", Decrypter.ennum)
             }
         }
         return b;
     };
 
 
+    /** */
     w.e.pako = function (b, k, h, v) {
         if (b) {
             if (pako) {
-                console.log("pako压缩:") 
+                Decrypter.log("pako压缩:")
                 var l1 = w.l(b)
                 var t1 = Date.now()
-                console.log( "原大小:", l1)
+                Decrypter.log("原大小:", l1)
 
-                var b = pako.deflate(b,{level:v||9}  )
+                var b = pako.deflate(b, { level: v || 9 })
 
 
                 var l2 = w.l(b)
                 var t2 = Date.now()
-                console.log("压缩后:", l2)
+                Decrypter.log("压缩后:", l2)
                 var l3 = l1 - l2
                 Decrypter.ennum += l3
-                console.log("压缩量", l3, "压缩比例:" , l1/l2,"压缩时间",t2-t1 ,  "总压缩量", Decrypter.ennum)
+                Decrypter.log("压缩量", l3, "压缩比例:", l1 / l2, "压缩时间", t2 - t1, "总压缩量", Decrypter.ennum)
             }
         }
         return b;
     };
 
 
+    /**用lzma加密 */
     w.e.lzma = function (b, k, h, v) {
         if (b) {
             if (LZMA) {
-                console.log("lzma压缩:")
+                Decrypter.log("lzma压缩:")
                 var l1 = w.l(b)
                 var t1 = Date.now()
-                console.log( "原大小:", l1)
+                Decrypter.log("原大小:", l1)
 
-                var b = w.u(LZMA.compress(b, v||9))
-                
+                var b = w.u(LZMA.compress(b, v || 9))
+
 
                 var l2 = w.l(b)
                 var t2 = Date.now()
-                console.log("压缩后:", l2)
+                Decrypter.log("压缩后:", l2)
                 var l3 = l1 - l2
                 Decrypter.ennum += l3
-                console.log("压缩量", l3, "压缩比例:" , l1/l2,"压缩时间",t2-t1 ,  "总压缩量", Decrypter.ennum)
+                Decrypter.log("压缩量", l3, "压缩比例:", l1 / l2, "压缩时间", t2 - t1, "总压缩量", Decrypter.ennum)
             }
         }
         return b;
@@ -1633,15 +1658,15 @@ Decrypter.isLocalMode = function () {
     w.e.aes = function (b, k, h) {
         if (b) {
             if (Aes) {
-                console.log("aes加密:")
+                Decrypter.log("aes加密:")
                 var l1 = w.l(b)
-                console.log("原大小:", l1)
+                Decrypter.log("原大小:", l1)
                 var b = Aes.Ctr.encrypt(b, w.rk(k), 256, 2)
                 var l2 = w.l(b)
-                console.log("压缩后:", l2)
+                Decrypter.log("压缩后:", l2)
                 var l3 = l1 - l2
                 Decrypter.ennum += l3
-                console.log("压缩量", l3, "总压缩量", Decrypter.ennum)
+                Decrypter.log("压缩量", l3, "总压缩量", Decrypter.ennum)
             }
         }
         return b;
@@ -1698,40 +1723,50 @@ Decrypter.isLocalMode = function () {
         return t;
     };
 
-    /**使用各种加密手段 */
-    w.e.use = function (b, m, k, h,v) {
+    /**
+     * 使用各种加密手段
+     * 
+     * @param {Uint8Array} b Uint8Arry数据
+     * @param {[string]} m 模式
+     * @param {null|[]} k 密钥
+     * @param {null|[]} h 文件头
+     * 
+     */
+    w.e.use = function (b, m, k, h, v) {
         var l = w.l(m)
         for (var i = l - 1; i >= 0; i--) {
             if (!b) { return false }
-            console.log(b,m[i])
-            var b = !!this[m[i]] && this[m[i]](b, k, h ,v)
+            //Decrypter.log(b, m[i])
+            var b = !!this[m[i]] && this[m[i]](b, k, h, v)
         }
         return b
     };
 
-    w.encrypt = function (b, f, m, k, h , v) {
+    /**加密 */
+    w.encrypt = function (b, f, m, k, h, v) {
         var b = f ? w.bbu(b) : b
         var b = w.bub(b)
         var m = w.rm(m)
         if (m) {
-            b = w.e.use(b, m, k, h ,v)
+            b = w.e.use(b, m, k, h, v)
             if (!b) { throw new Error("Encrypt is wrong"); return null }
         }
         return w.bbu(b)
     };
 
 
+    /**保存密钥 */
     w.saveMY = function (k, n) {
         var k = k || window.prompt("输入", "");
-        var t = w.e.tl64(JSON.stringify([w.m2, w.k2, w.h2]))
+        var t = w.e.tl64(JSON.stringify([w.m2, w.k2, w.h2, w.uh]))
         var t2 = w.encrypt(t, 1, ["ex"], w.t2b(k), [])
         var t2 = JSON.stringify(t2)
 
         var t1 = '(function(){var b={d:{},e:{},ei:function(a,d,c){var e=b.l(a);c=c||0;for(var g=0,f=0,h=0>=c?c-2:0;h<c;h++)g+=d,f+=a[g%e];return f%d},rm:function(a){return"string"==typeof a?b.m[a]||b.m:a||b.m},rk:function(a){return a||b.k},rh:function(a){return a||b.h},t2b:function(a){for(var d=b.l(a)/2,c=[],e=0;e<d;e++)if(c[e]=parseInt(a.substr(e+e,2),16),isNaN(c[e]))return b.tb(a);return c},u:function(a){return new Uint8Array(a)},l:function(a){return a?a.length||a.byteLength||0:0},bt:function(a){for(var d=b.l(a),c=[],e=0;e<d;e++)c[e]=String.fromCharCode(a[e]);return c.join("")},tb:function(a){for(var d=b.l(a),c=b.u(d),e=0;e<d;e++)c[e]=a.charCodeAt(e);return c},ab:function(a){return b.u(a)},ba:function(a){return(a||b.u()).buffer}};b.d.header=function(a,d,c){d=b.rh(d);if(a){b.l(a);c=b.l(d);for(var e=0;e<c;e++)if(a[e]!=d[e])return!1;return b.u(a.subarray(c))}return!1};b.d.mv=function(a,d,c){if(a)for(d=b.rk(d),c=b.l(d),i=0;i<c;i++)a[i]^=d[i];return a};b.d.exb=function(a,d,c,e){if(a){d=b.rk(d);c=b.l(a);var g=b.l(d);if(c&&g){var f=b.ei(d,c,e);e=a[f];e^=d[f%g];a[f]=e;for(var h=0;h<c;h++)if(h!=f){var k=d[e%g];e=a[h];e^=k;a[h]=e}}}return a};b.d.ex=function(a,b,c){return this.exb(a,b,c)};b.d.zlib=function(a,b,c){a&&Zlib&&(a=(new Zlib.Inflate(a)).decompress());return a};b.d.lzma=function(a,d,c){a&&LZMA&&(a=b.u(LZMA.decompress(a)));return a};b.d.aes=function(a,d,c){a&&Aes&&(a=Aes.Ctr.decrypt(a,b.rk(d),256,2));return a};b.d.tl64=function(a,b,c){return LZString.decompressFromBase64(a)};b.d.tl=function(a,b,c){return LZString.compress(a)};b.d.taes=function(a,d,c){a&&Aes&&(a=Aes.Ctr.decrypt(a,b.rk(d),256,0));return a};b.d.tu=function(a,b,c){Utf8&&(a=Utf8.decode(a));return a};b.d.t64=function(a,b,c){a&&(a=Base64.decode(a));return a};b.d.use=function(a,d,c,e){for(var g=b.l(d),f=0;f<g;f++){if(!a)return!1;a=!!this[d[f]]&&this[d[f]](a,c,e)}return a};b.decrypt=function(a,d,c,e,g){if(!a)return null;c=b.rm(c);a=b.ab(a);if(c&&(a=b.d.use(a,c,e,g),!a))throw Error("Decrypt is wrong");return d?1==d?b.d.tu(b.bt(a)):a:b.ba(a)};b.load=function(){b.m=JSON.parse(b.m2);b.h=b.t2b(b.h2);b.k=b.t2b(b.k2)};Decrypter.decrypt=b.decrypt.bind(b);b.s='
 
         var t3 = ';b.loadMY=function(a){a=a||window.prompt("\u8f93\u5165","");a=b.decrypt(b.s.data,1,["ex"],b.t2b(a),[]);a=b.d.tl64(a);a=JSON.parse(a);b.m2=a[0];b.k2=a[1];b.h2=a[2];b.load()};b.loadMY()})();'
-        console.log(t1, t2, t3)
-        console.log(t1 + t2 + t3)
+        Decrypter.log(t1, t2, t3)
+        Decrypter.log(t1 + t2 + t3)
 
         var n = n || window.prompt("输入", "") || "miyao"
         var n = Decrypter.localFileName("js/plugins/" + n + ".js")
@@ -1739,7 +1774,7 @@ Decrypter.isLocalMode = function () {
         fs.writeFileSync(n, t1 + t2 + t3);
     }
 
-    console.log(encrypt = w)
+    Decrypter.log(encrypt = w)
 
     Decrypter.encrypt = w.encrypt.bind(w)
     Decrypter.saveMY = w.saveMY.bind(w)

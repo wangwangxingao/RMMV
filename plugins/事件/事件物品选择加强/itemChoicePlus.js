@@ -3,11 +3,11 @@
 //=============================================================================
 
 /*:
- * @plugindesc 弹出信息
+ * @plugindesc 物品选项加强
  * @author wangwang
  *   
  * @param itemChoicePlus
- * @desc 插件 弹出信息
+ * @desc 插件 物品选项加强
  * @default 汪汪
  *
  * @help
@@ -165,7 +165,6 @@ Game_Party.prototype.allItemsPlus = function (use, change) {
         for (var i in this._weapons) {
             o.weapons[i] = o.weapons[i] || 0
             o.weapons[i] += this._weapons[i]
-
         }
 
 
@@ -362,7 +361,7 @@ Window_EventItem.prototype.getItemType = function (item) {
 }
 
 
-Window_ItemList.prototype.numItems = function (item) {
+Window_EventItem.prototype.numItems = function (item) {
 
     if (!item) {
         return 0;
@@ -377,7 +376,7 @@ Window_ItemList.prototype.numItems = function (item) {
     }
 };
 
-Window_ItemList.prototype.drawItemNumber = function (item, x, y, width) {
+Window_EventItem.prototype.drawItemNumber = function (item, x, y, width) {
     if (this.needsNumber()) {
         this.drawText(':', x, y, width - this.textWidth('00'), 'right');
         this.drawText(this.numItems(item), x, y, width, 'right');
