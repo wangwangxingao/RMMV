@@ -98,7 +98,9 @@ WebAudio.canPlayM4a = function() {
  */
 WebAudio.setMasterVolume = function(value) {
     this._masterVolume = value;
+    //如果(主增益节点)  
     if (this._masterGainNode) {
+
         this._masterGainNode.gain.setValueAtTime(this._masterVolume, this._context.currentTime);
     }
 };
@@ -126,9 +128,13 @@ WebAudio._createContext = function() {
  * @private
  */
 WebAudio._detectCodecs = function() {
+    //音频 = 文件 创建元素(音频)
     var audio = document.createElement('audio');
+    //音频 能播放类型
     if (audio.canPlayType) {
+        //可以播放ogg = 音频 能播放种类('audio/ogg')
         this._canPlayOgg = audio.canPlayType('audio/ogg');
+        //可以播放m4a = 音频 能播放种类('audio/mp4') 
         this._canPlayM4a = audio.canPlayType('audio/mp4');
     }
 };
@@ -141,8 +147,12 @@ WebAudio._detectCodecs = function() {
 WebAudio._createMasterGainNode = function() {
     var context = WebAudio._context;
     if (context) {
-        this._masterGainNode = context.createGain();
+        //主增益节点 = 环境 创建增益()
+        this._masterGainNode = context.createGain(); 
+        //主增益节点 增益 设定值在时间(主音量,环境 当前时间)  
         this._masterGainNode.gain.setValueAtTime(this._masterVolume, context.currentTime);
+
+        //主增益节点  连 (环境 目的地)  //context.destination 声音数据传输给扬声器或者耳机
         this._masterGainNode.connect(context.destination);
     }
 };
@@ -154,7 +164,9 @@ WebAudio._createMasterGainNode = function() {
  */
 WebAudio._setupEventHandlers = function() {
     var resumeHandler = function() {
+        //环境 = 网络音频 环境
         var context = WebAudio._context;
+        //如果 环境 并且 环境 状态 如果暂停 并且 类型 环境 恢复 ==="function" // 方法 
         if (context && context.state === "suspended" && typeof context.resume === "function") {
             context.resume().then(function() {
                 WebAudio._onTouchStart();
@@ -171,10 +183,10 @@ WebAudio._setupEventHandlers = function() {
 };
 
 /**当触摸开始
- * @static
+ * @static   
  * @method _onTouchStart
  * @private
- */
+ */ 
 WebAudio._onTouchStart = function() {
     var context = WebAudio._context;
     if (context && !this._unlocked) {

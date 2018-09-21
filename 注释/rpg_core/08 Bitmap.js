@@ -1155,7 +1155,9 @@ Bitmap.prototype._requestImage = function(url){
         this._image = new Image();
     }
 
+    //如果 (请求后解码 并且 不是 装载机 )
     if (this._decodeAfterRequest && !this._loader) {
+        
         this._loader = ResourceHandler.createLoader(url, this._requestImage.bind(this, url), this._onError.bind(this));
     }
 
