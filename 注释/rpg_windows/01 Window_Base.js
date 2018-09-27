@@ -322,7 +322,7 @@ Window_Base.prototype.drawTextEx = function(text, x, y) {
 };
 /**转换换码字符 */
 Window_Base.prototype.convertEscapeCharacters = function(text) {
-	//替换\\为\xlb
+	//替换\为\xlb
     text = text.replace(/\\/g, '\x1b');
  	//替换\xlb\xlb 为 \\
     text = text.replace(/\x1b\x1b/g, '\\');
