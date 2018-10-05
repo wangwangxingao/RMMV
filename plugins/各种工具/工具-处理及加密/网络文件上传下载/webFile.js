@@ -8,25 +8,27 @@ webFile = {}
  * 
  * @param {string} url 地址
  * @param {""|"arraybuffer"|"blob"|"document"|"text"} type 种类
- * @param {function(response,xhr)} loaded 
+ * @param {function(response,xhr)} load 
  * @param {function(ProgressEvent)} progress 
  * @param {function(Error)} error 
  * @param {function(abort)} abort 
+ * @param {function} onloadend 
  */
-webFile.get = function (url, type, loaded, progress, error, abort) {
+webFile.get = function (url, type, load, progress, error, abort,onloadend) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url);
     xhr.responseType = (typeof (type) == "string") ? type : "arraybuffer"
     xhr.onload = function () {
         if (xhr.status < 400) {
-            if (typeof loaded == "function") {
-                loaded(xhr.response, xhr)
+            if (typeof load == "function") {
+                load(xhr.response, xhr)
             }
         }
     };
     xhr.onprogress = progress
     xhr.onerror = error
     xhr.onabort = abort
+    xhr.onloadend = onloadend
     xhr.send()
     return xhr
 }
