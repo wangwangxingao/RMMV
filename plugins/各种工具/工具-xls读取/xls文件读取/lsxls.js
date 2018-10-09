@@ -1,3 +1,21 @@
+
+//=============================================================================
+// lsxls.js
+//=============================================================================
+/*:
+ * @plugindesc 表格文件读取
+ * @author wangwang
+ * 
+ * @param  lsxls 
+ * @desc 插件 表格文件读取 ,作者:汪汪
+ * @default  汪汪
+ *
+ * @help 
+ * 表格的读取
+ * 
+ */
+
+
 var ww = ww || {}
 
 
@@ -29,7 +47,6 @@ ww.lsxls.save = function (sheet, name, list) {
 ww.lsxls.down = function (sheet, name, list) {
     var sheet = ww.lsxls.toSheet(sheet, list)
     var blob = ww.lsxls.sheet2Blob(sheet)
-    console.log(blob)
     ww.lsxls.downBlob(blob, name)
 }
 
@@ -45,26 +62,19 @@ ww.lsxls.load = function (url, onload) {
     xhr.open('GET', url);
     xhr.responseType = "arraybuffer"
     var onload = onload || ww.lsxls.onload
-    xhr.onloadend = function () {
-        if (xhr.status < 400) {
-            try {
-                var result = ww.lsxls.onloadxls(xhr.response, xhr)
-                if (typeof onload == "function") {
-                    onload(result, url)
-                } else {
-                    console.log(result)
-                }
-            } catch (error) {
-                console.error("未能读取")
-            }
-            return
+    xhr.onloadend = function () { 
+        try {
+            var result = ww.lsxls.onloadxls(xhr.response, xhr) 
+        } catch (error) {
+            var result = null
+            console.error("未能读取")
+        } 
+        if (typeof onload == "function") {
+            onload(result, url)
+        } else {
+            console.log(result)
         }
-        console.error("未能读取")
     };
-    /* xhr.onerror = function () {
-        console.error("未能读取")
-    } */
-    //xhr. = onloadend
     xhr.send()
     return xhr
 }
@@ -325,7 +335,7 @@ ww.lsxls.localFileName = function (name) {
     }
 }
 
- 
+
 ww.lsxls.writeFileSync = function (file, data, options) {
     var fs = require("fs")
     return fs.writeFileSync(ww.lsxls.localFileName(file), data, options)

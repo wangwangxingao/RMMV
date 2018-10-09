@@ -1,7 +1,38 @@
+
+//=============================================================================
+// data2xls.js
+//=============================================================================
+/*:
+ * @plugindesc 表格与对象的转换
+ * @author wangwang
+ * 
+ * @param  data2xls 
+ * @desc 插件 表格与对象的转换 ,作者:汪汪
+ * @default  汪汪
+ *
+ * @help 
+ * 表格与对象的转换
+ * 
+ */
+
 var ww = ww || {}
 
 
 ww.data2xls = {}
+ww.data2xls.stringify = function (that) {
+
+    return that || ""
+
+
+    return JSON.stringify(that)
+
+}
+
+ww.data2xls.parse = function (that) {
+
+    return that || ""
+    return JSON.parse(that)
+}
 
 /**
  * 深度复制 
@@ -18,7 +49,7 @@ ww.data2xls.copyo2l = function (that, obj, setslist, father) {
     var father = father || []
     if (typeof (that) === "object") {
         if (that === null) {
-            obj.push([JSON.stringify(father), JSON.stringify(that)])
+            obj.push([JSON.stringify(father), ww.data2xls.stringify(that)])
         } else if (Array.isArray(that)) {
             for (var i = 0; i < that.length; i++) {
                 this.check(that, obj, setslist, father, i)
@@ -29,7 +60,7 @@ ww.data2xls.copyo2l = function (that, obj, setslist, father) {
             }
         }
     } else {
-        obj.push([JSON.stringify(father), JSON.stringify(that)])
+        obj.push([JSON.stringify(father), ww.data2xls.stringify(that)])
     }
     return obj;
 };
@@ -61,7 +92,7 @@ ww.data2xls.check = function (that, obj, setslist, father, i) {
     if (ch) {
         if (ch == 2) {
             father.push(i)
-            obj.push([JSON.stringify(father), JSON.stringify(that[i])])
+            obj.push([JSON.stringify(father), ww.data2xls.stringify(that[i])])
             father.pop()
         } else {
             father.push(i)
@@ -106,50 +137,67 @@ ww.data2xls.checksets = function (that, father, i, sets) {
 ww.data2xls.checkset = function (that, father, i, set) {
     if (!set) {
         return true
-    } else if (typeof set == "string") {
-        if (set == i) {
-            return true
-        } else {
-            return false
-        }
-    } else if (typeof set == "object") {
-        var type = this.checktype(that[i])
-
-        if (set.nameTypes) {
-            if (set.nameTypes.indexOf(this.checktype(i)) < 0) {
-                return false
-            }
-        }
-        if (set.names) {
-            if (set.names.indexOf(i) < 0) {
-                return false
-            }
-        }
-        if (set.types) {
-            if (set.types.indexOf(type) < 0) {
-                return false
-            }
-        }
-        if (set.values) {
-            if (set.values.indexOf(that[i]) < 0) {
-                return false
-            }
-        }
-        if (set.has) {
-            if (type == "object" || type == "array") {
-                for (var name in set.has) {
-                    if (!(name in that[i] && this.checkset(that[i], 0, name, set.has[name]))) {
-                        return false
-                    }
-                }
+    } else {
+        var stype = this.checktype(set)
+        if (stype == "string") {
+            if (set == i) {
+                return true
             } else {
                 return false
             }
-        }
-        if (set.re) {
-            return set.re
-        } else {
+        } else if (stype == "array") {
+            if (set.indexOf(i) >= 0) {
+                return true
+            }
+        } else if (stype == "object") {
+            var type = this.checktype(that[i])
+
+            //当前 参数 种类
+            if (set.nameTypes) {
+                if (set.nameTypes.indexOf(this.checktype(i)) < 0) {
+                    return false
+                }
+            }
+            //当前 参数 名称
+            if (set.names) {
+                if (set.names.indexOf(i) < 0) {
+                    return false
+                }
+            }
+            //子值 种类
+            if (set.types) {
+                if (set.types.indexOf(type) < 0) {
+                    return false
+                }
+            }
+            //子值 值
+            if (set.values) {
+                if (set.values.indexOf(that[i]) < 0) {
+                    return false
+                }
+            }
+            /**有这个参数 */
+            if (set.has) {
+                if (type == "object" || type == "array") {
+                    for (var name in set.has) {
+                        if (!(name in that[i] && this.checkset(that[i], 0, name, set.has[name]))) {
+                            return false
+                        }
+                    }
+                } else {
+                    return false
+                }
+            }
+            if (set.re) {
+                return set.re
+            } else {
+                return true
+            }
+        } else if (set == 1 && that[i]) {
             return true
+        } else if (set = 2 && typeof (that[i]) == "string") {
+            return true
+
         }
     }
     return false
@@ -171,7 +219,7 @@ ww.data2xls.checktype = function (that) {
     }
     return type
 };
- 
+
 
 
 
@@ -183,14 +231,26 @@ ww.data2xls.checktype = function (that) {
  * @param {*} type 
  * @param {*} lang 
  */
-ww.data2xls.copyl2o = function (list, obj, type,lang) {
+ww.data2xls.copyl2o = function (list, obj, type, lang) {
     var obj = obj || {}
-    for (var i = 0; i < list.length; i++) {
-        var save = list[i]
-        var key = JSON.parse(save[0]) 
-        this.copyKeyValue(key, save , obj, type,lang)
+    if (Array.isArray(list)) {
+
+        for (var i = 0; i < list.length; i++) {
+            var save = list[i]
+
+            if (save) {
+                try {
+                    var key = JSON.parse(save[0])
+                    this.copyKeyValue(key, save, obj, type, lang)
+                } catch (error) {
+
+                }
+            }
+
+        }
     }
-}; 
+    return obj
+};
 
 /**
  * 拷贝 键 值
@@ -200,7 +260,7 @@ ww.data2xls.copyl2o = function (list, obj, type,lang) {
  * @param {*} type 
  * @param {*} lang 语言
  */
-ww.data2xls.copyKeyValue = function (key, save, obj, type,lang) {
+ww.data2xls.copyKeyValue = function (key, save, obj, type, lang) {
     if (Array.isArray(key) && key.length) {
         var o = obj
         for (var i = 0; i < key.length - 1; i++) {
@@ -216,17 +276,21 @@ ww.data2xls.copyKeyValue = function (key, save, obj, type,lang) {
         }
         var n = key[i]
         if (typeof o == "object") {
-            var lang = lang|| 0 
+            var lang = lang || 0
             var value
             try {
-                value = JSON.parse(save[lang +1]) 
+                if (save[lang + 1] === undefined) {
+                    value = ww.data2xls.parse(save[1])
+                } else {
+                    value = ww.data2xls.parse(save[lang + 1])
+                }
             } catch (e) {
-                try{
-                    value = JSON.parse(save[1]) 
-                }catch(e2){ 
+                try {
+                    value = ww.data2xls.parse(save[1])
+                } catch (e2) {
                     value = ""
-                } 
-            } 
+                }
+            }
             o[n] = value
         }
     }
@@ -293,13 +357,12 @@ ww.data2xls.getBase = function () {
     var l = []
     var o = {}
     for (var i = 0; i < files.length; i++) {
-        var name = files[i].name; 
+        var name = files[i].name;
         o[name] = window[name]
     }
     ww.data2xls.copyo2l(o, l, [{ types: ["string", "object", "array"] }])
     return l
 }
-
 
 ww.data2xls.saveBase = function () {
     var l = this.getBase()
@@ -307,108 +370,3 @@ ww.data2xls.saveBase = function () {
 }
 
 
-
-
-/**
-  "$dataActors",
-[0,"name"]
-[0,"nickname"]
-[0,"note"]
-[0,"profile"]
-
-"$dataClasses",
-[0,"name"]
-[0,"note"]
-
-"$dataSkills",
-[0,"description"]
-[0,"message1"]
-[0,"message2"]
-[0,"name"]
-[0,"note"]
-
-
-"$dataItems",
-[0,"description"]
-[0,"name"]
-[0,"note"]
-
-"$dataWeapons",
-[0,"description"]
-[0,"name"]
-[0,"note"]
-
-
-"$dataArmors",
-[0,"description"]
-[0,"name"]
-[0,"note"]
-
-
-"$dataEnemies",
-[0,"name"]
-[0,"note"]
-
-
-"$dataTroops",
-[0,"name"]
-
-
-"$dataStates",
-[0,"description"]
-[0,"message1"]
-[0,"message2"]
-[0,"message3"]
-[0,"message4"]
-[0,"name"]
-
-"$dataSystem",
-["armorTypes",0]
-
-
-"$dataSystem",
-
-["currencyUnit"]
-["elements",0]
-["equipTypes",0]
-["gameTitle"]
-["locale"] 
-["skillTypes",0] 
-["terms","basic",0]
-["terms","commands",0]
-["terms","params",0]
-["terms","messages",0]  
-["weaponTypes",0]
- 
-
-//显示名称
-["displayName"]
-//事件名称
-["events",0,"name"]
-
-  
-    //选项
-    ["events", { has: {} }, "pages", 0, "list", {
-        has: { code: { values: [102] } }
-    }, "parameters", { names: [0] }],
-    //文本
-    ["events", { has: {} }, "pages", 0, "list", {
-        has: { code: { values: [401,405] } }
-    },"parameters"]
-
-
-
-
-
-
- 
-    [ 0, "list", {
-        has: { code: { values: [102] } }
-    }, "parameters", { names: [0] }],
-    //文本
-    [ 0, "list", {
-        has: { code: { values: [401,405] } }
-    },"parameters"]
-
- 
- */
