@@ -1,14 +1,12 @@
 ## chide/mark.md
 
 [test](#test)
-[marked](javascript:re("marked.md"))
+[marked](../marked.md)
 
---[marked](javascript:parent.re("marked.md"))
+--![marked](../menu_end.png)
 
-```
-
-
-
+--[marked]( ../marked.md )
+``` 
 
 
 

@@ -12,7 +12,7 @@
  * 
  * @param mvheader
  * @desc 使用原本的头
- * @default true
+ * @default false
  * 
  * @param SIGNATURE
  * @desc 游戏签名:
@@ -1111,9 +1111,9 @@ Decrypter.isLocalMode = function () {
 
 
     w.mh = function (h) {  
-        var b = new Buffer(16); 
+        var b = []; 
         for (i = 0; i < h.length; i+=2) {
-            b[i] = parseInt("0x" + h.substr(i, 2), 16);
+            b.push( parseInt("0x" + h.substr(i, 2), 16));
         } 
         return b
     }
@@ -1402,9 +1402,9 @@ Decrypter.isLocalMode = function () {
     w.d.use = function (b, m, k, h) {
         var l = w.l(m)
         for (var i = 0; i < l; i++) {
-            if (!b) { return false }
-            //Decrypter.log(b, m[i])
+            if (!b) { return false } 
             var b = !!this[m[i]] && this[m[i]](b, k, h)
+
         }
         return b
     };
@@ -1434,7 +1434,7 @@ Decrypter.isLocalMode = function () {
     /**读取 */
     w.load = function () {
         w.m = JSON.parse(w.m2)
-        w.h = w.un ? w.mh(w.h2) : w.t2b(w.h2)
+        w.h = w.uh ? w.mh(w.h2) : w.t2b(w.h2)
         w.k = w.t2b(w.k2)
     }
 
@@ -1450,7 +1450,7 @@ Decrypter.isLocalMode = function () {
         //Decrypter.log(r, k)
         var d = w.decrypt(r, 1, ["ex"], w.t2b(k), [])
         //Decrypter.log(d)
-        var l = JSON.parse(d)
+        var l = JSON.parse(w.d.tl64(d))
         w.m2 = l[0]
         w.k2 = l[1]
         w.h2 = l[2]
@@ -1487,7 +1487,7 @@ Decrypter.isLocalMode = function () {
         w.m2 = g(z, "mode")
         w.k2 = MD5(g(z, "miyao"))
         w.h2 = g(z, "SIGNATURE") + g(z, "VER") + g(z, "REMAIN")
-        w.uh = g(z, "mvhearder")
+        w.uh = v(z, "mvheader")
 
         w.load()
         //Decrypter.log(w)
@@ -1762,9 +1762,12 @@ Decrypter.isLocalMode = function () {
         var t2 = w.encrypt(t, 1, ["ex"], w.t2b(k), [])
         var t2 = JSON.stringify(t2)
 
-        var t1 = '(function(){var b={d:{},e:{},ei:function(a,d,c){var e=b.l(a);c=c||0;for(var g=0,f=0,h=0>=c?c-2:0;h<c;h++)g+=d,f+=a[g%e];return f%d},rm:function(a){return"string"==typeof a?b.m[a]||b.m:a||b.m},rk:function(a){return a||b.k},rh:function(a){return a||b.h},t2b:function(a){for(var d=b.l(a)/2,c=[],e=0;e<d;e++)if(c[e]=parseInt(a.substr(e+e,2),16),isNaN(c[e]))return b.tb(a);return c},u:function(a){return new Uint8Array(a)},l:function(a){return a?a.length||a.byteLength||0:0},bt:function(a){for(var d=b.l(a),c=[],e=0;e<d;e++)c[e]=String.fromCharCode(a[e]);return c.join("")},tb:function(a){for(var d=b.l(a),c=b.u(d),e=0;e<d;e++)c[e]=a.charCodeAt(e);return c},ab:function(a){return b.u(a)},ba:function(a){return(a||b.u()).buffer}};b.d.header=function(a,d,c){d=b.rh(d);if(a){b.l(a);c=b.l(d);for(var e=0;e<c;e++)if(a[e]!=d[e])return!1;return b.u(a.subarray(c))}return!1};b.d.mv=function(a,d,c){if(a)for(d=b.rk(d),c=b.l(d),i=0;i<c;i++)a[i]^=d[i];return a};b.d.exb=function(a,d,c,e){if(a){d=b.rk(d);c=b.l(a);var g=b.l(d);if(c&&g){var f=b.ei(d,c,e);e=a[f];e^=d[f%g];a[f]=e;for(var h=0;h<c;h++)if(h!=f){var k=d[e%g];e=a[h];e^=k;a[h]=e}}}return a};b.d.ex=function(a,b,c){return this.exb(a,b,c)};b.d.zlib=function(a,b,c){a&&Zlib&&(a=(new Zlib.Inflate(a)).decompress());return a};b.d.lzma=function(a,d,c){a&&LZMA&&(a=b.u(LZMA.decompress(a)));return a};b.d.aes=function(a,d,c){a&&Aes&&(a=Aes.Ctr.decrypt(a,b.rk(d),256,2));return a};b.d.tl64=function(a,b,c){return LZString.decompressFromBase64(a)};b.d.tl=function(a,b,c){return LZString.compress(a)};b.d.taes=function(a,d,c){a&&Aes&&(a=Aes.Ctr.decrypt(a,b.rk(d),256,0));return a};b.d.tu=function(a,b,c){Utf8&&(a=Utf8.decode(a));return a};b.d.t64=function(a,b,c){a&&(a=Base64.decode(a));return a};b.d.use=function(a,d,c,e){for(var g=b.l(d),f=0;f<g;f++){if(!a)return!1;a=!!this[d[f]]&&this[d[f]](a,c,e)}return a};b.decrypt=function(a,d,c,e,g){if(!a)return null;c=b.rm(c);a=b.ab(a);if(c&&(a=b.d.use(a,c,e,g),!a))throw Error("Decrypt is wrong");return d?1==d?b.d.tu(b.bt(a)):a:b.ba(a)};b.load=function(){b.m=JSON.parse(b.m2);b.h=b.t2b(b.h2);b.k=b.t2b(b.k2)};Decrypter.decrypt=b.decrypt.bind(b);b.s='
 
-        var t3 = ';b.loadMY=function(a){a=a||window.prompt("\u8f93\u5165","");a=b.decrypt(b.s.data,1,["ex"],b.t2b(a),[]);a=b.d.tl64(a);a=JSON.parse(a);b.m2=a[0];b.k2=a[1];b.h2=a[2];b.load()};b.loadMY()})();'
+        var t1 = '(function(){var b={d:{},e:{},ei:function(a,e,c){var d=b.l(a);c=c||0;for(var g=0,f=0,h=0>=c?c-2:0;h<c;h++)g+=e,f+=a[g%d];return f%e},rm:function(a){return"string"==typeof a?b.m[a]||b.m:a||b.m},mh:function(a){var b=[];for(i=0;i<a.length;i+=2)b.push(parseInt("0x"+a.substr(i,2),16));return b},rh:function(a){return a||b.h},rk:function(a){return a||b.k},t2b:function(a){for(var e=b.l(a)/2,c=[],d=0;d<e;d++)if(c[d]=parseInt(a.substr(d+d,2),16),isNaN(c[d]))return b.tb(a);return c},u:function(a){return new Uint8Array(a)},l:function(a){return a?a.length||a.byteLength||0:0},bt:function(a){for(var e=b.l(a),c=[],d=0;d<e;d++)c[d]=String.fromCharCode(a[d]);return c.join("")},tb:function(a){for(var e=b.l(a),c=b.u(e),d=0;d<e;d++)c[d]=a.charCodeAt(d);return c},ab:function(a){return b.u(a)},ba:function(a){return(a||b.u()).buffer}};b.d.header=function(a,e,c){e=b.rh(c);if(a){b.l(a);c=b.l(e);for(var d=0;d<c;d++)if(a[d]!=e[d])return!1;return b.u(a.subarray(c))}return!1};b.d.mv=function(a,e,c){if(a)for(e=b.rk(e),c=b.l(e),i=0;i<c;i++)a[i]^=e[i];return a};b.d.exb=function(a,e,c,d){if(a){e=b.rk(e);c=b.l(a);var g=b.l(e);if(c&&g){var f=b.ei(e,c,d);d=a[f];d^=e[f%g];a[f]=d;for(var h=0;h<c;h++)if(h!=f){var k=e[d%g];d=a[h];d^=k;a[h]=d}}}return a};b.d.ex=function(a,b,c){return this.exb(a,b,c)};b.d.zlib=function(a,b,c){a&&Zlib&&(a=(new Zlib.Inflate(a)).decompress());return a};b.d.lzma=function(a,e,c){a&&LZMA&&(a=b.u(LZMA.decompress(a)));return a};b.d.pako=function(a,b,c){a&&pako&&(a=pako.inflate(a));return a};b.d.aes=function(a,e,c){a&&Aes&&(a=Aes.Ctr.decrypt(a,b.rk(e),256,2));return a};b.d.tl64=function(a,b,c){return LZString.decompressFromBase64(a)};b.d.tl=function(a,b,c){return LZString.compress(a)};b.d.taes=function(a,e,c){a&&Aes&&(a=Aes.Ctr.decrypt(a,b.rk(e),256,0));return a};b.d.tu=function(a,b,c){Utf8&&(a=Utf8.decode(a));return a};b.d.t64=function(a,b,c){a&&(a=Base64.decode(a));return a};b.d.use=function(a,e,c,d){for(var g=b.l(e),f=0;f<g;f++){if(!a)return!1;a=!!this[e[f]]&&this[e[f]](a,c,d)}return a};b.decrypt=function(a,e,c,d,g){if(!a)return null;c=b.rm(c);a=b.ab(a);if(c&&(a=b.d.use(a,c,d,g),!a))throw Error("Decrypt is wrong");return e?1==e?b.d.tu(b.bt(a)):a:b.ba(a)};b.load=function(){b.m=JSON.parse(b.m2);b.h=b.uh?b.mh(b.h2):b.t2b(b.h2);b.k=b.t2b(b.k2)};Decrypter.decrypt=b.decrypt.bind(b);b.s='
+         
+        
+        
+        var t3 = ';b.loadMY=function(a){a=a||window.prompt("\u8f93\u5165","");a=b.decrypt(b.s.data,1,["ex"],b.t2b(a),[]);a=JSON.parse(b.d.tl64(a));b.m2=a[0];b.k2=a[1];b.h2=a[2];b.uh=a[3];b.load();return!0};b.loadMY()})();'
         Decrypter.log(t1, t2, t3)
         Decrypter.log(t1 + t2 + t3)
 

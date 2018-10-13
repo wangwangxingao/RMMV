@@ -1,11 +1,11 @@
 ## marked
 
 [test](#test)
-[mark](javascript:re("mark.md"))
+[mark](./mark.md)
 
 
---[mark](javascript:parent.re("mark.md"))
+--[mark](./mark.md)
 
-![mark](menu_end.png)
+![mark](./menu_end.png)
 
 ## test

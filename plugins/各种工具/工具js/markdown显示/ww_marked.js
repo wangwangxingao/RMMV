@@ -1,49 +1,80 @@
 
-wwMarked = function (src, opt, callback) {
+
+var ww = ww || {};
 
 
 
-    console.log(marked.Lexer.lex(src, opt))
-    var renderer = new marked.Renderer();
-    // Override function
-    renderer.linkbase = renderer.link
 
-    renderer.changeLink = function (href, text) {
-        /*    var href = href || ""
-            if (!href) {
-                href = text
-            } else {
-                if (text && typeof href == "string") { 
-                    var match = href.match(/^(\$*)(.*)/) //(/^(\$*)(\@*)(.*)/) 
-                    if (match) {
-                        var l1 = match[1].replace(/\$/g, "..\/") 
-                        var l2 = match[2]
-                        if (l2) {
-                            var match = l2.match(/(.*)\#(.*)/) 
-                            if (match) {
-                                l2 = (match[1] ? match[1] : text) + "#" + (match[2] ? match[2] : text)
-                            } 
-                        } else {
-                            l2 = text
-                        } 
-                        href = l1 + l2 
-                    }  
+(function () { 
+    ww.hrefchange = function (href) {
+        if (!ww.baseUrl) {
+            ww.baseUrl = ""
+        }
+        if (href) {
+            var bl = ww.baseUrl.split("/")
+            bl.pop()
+            var rex = /^((\.+\/)+)((.*))/
+            var match = href.match(rex)
+            if (match) {
+                var l = href.split("./")
+                var h = l.pop()
+                for (var i = 0; i < l.length; i++) {
+                    if (l[i] == ".") {
+                        bl.pop()
+                    }
                 }
-            } */
+                bl.push(h)
+                var href = bl.join("/")
+            }
+        }
         return href
     }
-    renderer.link = function (href, title, text) {
-        var href = this.changeLink(href, text)
-        return this.linkbase(href, title, text);
+
+ 
+    ww.markMarked = function (src, opt, callback) {
+ 
+        var renderer = new marked.Renderer();
+        // Override function
+        renderer.linkbase = renderer.link
+
+        renderer.changeLink = function (href, text) {
+            var href = href || ""
+
+            var match = href.match(/^((\.*\/)+)((.*))/)
+            if (match) {
+                var href = ww.hrefchange(href) 
+                return 'javascript:ww.open("' + href + '")'
+            }
+            return href
+        }
+        renderer.link = function (href, title, text) {
+            var href = this.changeLink(href, text)
+            return this.linkbase(href, title, text);
+        };
+
+        renderer.image = function (href, title, text) {
+            if (this.options.baseUrl && !originIndependentUrl.test(href)) {
+                href = resolveUrl(this.options.baseUrl, href);
+            }
+
+            var href = ww.hrefchange(href)
+            var out = '<img src="' + href + '" alt="' + text + '"';
+            if (title) {
+                out += ' title="' + title + '"';
+            }
+            out += this.options.xhtml ? '/>' : '>';
+            return out;
+        };
+        // Run marked
+        var opt = opt || {}
+        opt.renderer = opt.renderer ? opt.renderer : renderer
+
+        return function (src) {
+            return marked(src, opt, callback)
+        }
     };
-    // Run marked
-    var opt = opt || {}
-    opt.renderer = opt.renderer ? opt.renderer : renderer
-    return marked(src, opt, callback)
-};
 
-
-
+})();
 
 
 (function () {
@@ -60,10 +91,19 @@ wwMarked = function (src, opt, callback) {
         this._colors = colors;
         if (!this._colors) {
             //默认颜色  
-            this._colors = ['#ffff00,#000000', '#dae9d1,#000000', '#eabcf4,#000000',
-                '#c8e5ef,#000000', '#f3e3cb, #000000', '#e7cfe0,#000000',
-                '#c5d1f1,#000000', '#deeee4, #000000', '#b55ed2,#000000',
-                '#dcb7a0,#333333', '#7983ab,#000000', '#6894b5, #000000'];
+            this._colors = [
+                '#ffff00,#000000',
+                '#dae9d1,#000000',
+                '#eabcf4,#000000',
+                '#c8e5ef,#000000',
+                '#f3e3cb, #000000',
+                '#e7cfe0,#000000',
+                '#c5d1f1,#000000',
+                '#deeee4, #000000',
+                '#b55ed2,#000000',
+                '#dcb7a0,#333333',
+                '#7983ab,#000000',
+                '#6894b5, #000000'];
         }
     }
 
@@ -290,7 +330,7 @@ wwMarked = function (src, opt, callback) {
         return new RegExp(m[2], type);
     };
 
-    searchHighlighter = new Highlighter()
+    ww.Highlighter = new Highlighter()
 
 
 })();

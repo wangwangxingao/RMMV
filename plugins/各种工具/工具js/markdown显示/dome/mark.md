@@ -4,9 +4,11 @@
 [test](#test)
 
 
-[chide/mark](javascript:re("chide/mark.md"))
+[chide/mark](./chide/mark.md)
  
---[chide/mark](javascript:parent.re("chide/mark.md"))
+--[chide/mark](./chide/mark.md)
+--[chide/mark](./mark.md)
+--[chide/mark](./marked.md)
 
 
 ![mark](menu_end.png)

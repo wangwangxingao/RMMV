@@ -12,9 +12,13 @@
     <script>
 
 
+        var ww = ww || {}
+        ww.marked = ww.markMarked()
 
-        webFile = {}
-        webFile.get = function (url, type, loaded, progress, error, abort) {
+
+
+     
+        ww.get = function (url, type, loaded, progress, error, abort) {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url);
             xhr.responseType = (typeof (type) == "string") ? type : "arraybuffer"
@@ -34,52 +38,55 @@
 
 
 
-
-        webFile.get = function (url, type, loaded, progress, error, abort) {
-            img.src = url
-            console.log(url)
-            img.onload = function () {
-                console.log(img)
-                // wwonload( iframe.contentDocument.body.innerText)
-            };
-            img.onprogress = progress
-            img.onerror = error
-            img.onabort = abort
-            document.body.appendChild(img);
-        }
-
-
-
-        webFile.get = function (url, type, loaded, progress, error, abort) {
-            console.log(url)
-            iframe.onload = function () {
-                console.log(iframe)
-                console.log(iframe.contentDocument.body.innerText)
-                wwonload(iframe.contentDocument.body.innerText)
-            };
-            iframe.src = url
-            iframe.onprogress = progress
-            iframe.onerror = error
-            iframe.onabort = abort
-        }
-
-
-        wwonload = function (re) {
-            var md = wwMarked(re)
-            console.log(md)
-
-            //iframe2.contentDocument.body.innerHTML = md
-            div.innerHTML = md
-            searchHighlighter.clear()
-            
-            //window.location.hash = "#test"
+        /*
+                webFile.get = function (url, type, loaded, progress, error, abort) {
+                    img.src = url
+                    console.log(url)
+                    img.onload = function () {
+                        console.log(img)
+                        // wwonload( iframe.contentDocument.body.innerText)
+                    };
+                    img.onprogress = progress
+                    img.onerror = error
+                    img.onabort = abort
+                    document.body.appendChild(img);
+                }
+        
+        
+        
+                webFile.get = function (url, type, loaded, progress, error, abort) {
+                    console.log(url)
+                    iframe.onload = function () {
+                        console.log(iframe)
+                        console.log(iframe.contentDocument.body.innerText)
+                        wwonload(iframe.contentDocument.body.innerText)
+                    };
+                    iframe.src = url
+                    iframe.onprogress = progress
+                    iframe.onerror = error
+                    iframe.onabort = abort
+                }
+        
+        */
 
 
-        }
-
-        re = function (value) {
+        ww.open = function (value) {
+            console.log(value)
             input.value = value
-            webFile.get(value, "text", wwonload)
+            ww.baseUrl = value
+            var hash = value.split("#")[1]
+
+            ww.get(value, "text", 
+            function (re) {
+                var md = ww.marked(re)
+                //console.log(md) 
+                //iframe2.contentDocument.body.innerHTML = md
+                div.innerHTML = md
+                ww.Highlighter.clear() 
+                if(hash){
+                    window.location.hash = "#" + hash 
+                }
+            })
         }
 
 
@@ -107,7 +114,7 @@
             button.onclick = function () {
                 // alert(input.value)
                 if (input.value) {
-                    re(input.value)
+                    ww.open(input.value)
                 }
             }
             document.body.appendChild(button);
@@ -145,15 +152,14 @@
             button2.value = "搜索"
             button2.onclick = function () {
 
-               console.log( searchHighlighter.search(div, input2.value))
-                searchHighlighter.searchResult()
+                console.log(ww.Highlighter.search(div, input2.value))
+                ww.Highlighter.searchResult()
 
             }
 
             document.body.appendChild(button2);
 
-
-
+ 
             div = document.createElement("div")
             document.body.appendChild(div);
 
