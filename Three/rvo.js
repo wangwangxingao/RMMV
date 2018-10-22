@@ -1247,7 +1247,7 @@ RVO.Vector = {};
 /**
  * 求反
  * @param {[number,number]}a
- * @return {[nmuber,number]}
+ * @return {[number,number]}
  */
 RVO.Vector.invert = function (a) {
     return [- a[0], - a[1]];
@@ -1256,7 +1256,7 @@ RVO.Vector.invert = function (a) {
 /**数量积
  * @param {[number,number]} a
  * @param {[number,number]} b
- * @return {nmuber}
+ * @return {number}
  * 
 */
 RVO.Vector.dotProduct = function (a, b) {
@@ -1266,7 +1266,7 @@ RVO.Vector.dotProduct = function (a, b) {
 /**相乘
  * @param {[number,number]} a
  * @param {number} b
- * @returns {[nmuber,number]} 
+ * @returns {[number,number]} 
  * 
 */
 RVO.Vector.multiply = function (a, b) {
@@ -1276,7 +1276,7 @@ RVO.Vector.multiply = function (a, b) {
 /**相除
  * @param {[number,number]} a
  * @param {number} b
- * @returns {[nmuber,number]} 
+ * @returns {[number,number]} 
  * 
 */
 RVO.Vector.divide = function (a, b) {
@@ -1286,7 +1286,7 @@ RVO.Vector.divide = function (a, b) {
 /**加
  * @param {[number,number]} a
  * @param {[number,number]} b 
- * @return {[nmuber,number]} 
+ * @return {[number,number]} 
  */
 RVO.Vector.add = function (a, b) {
     return [a[0] + b[0], a[1] + b[1]];
@@ -1295,7 +1295,7 @@ RVO.Vector.add = function (a, b) {
 /**减
  * @param {[number,number]} a
  * @param {[number,number]} b 
- * @return {[nmuber,number]} 
+ * @return {[number,number]} 
  */
 RVO.Vector.subtract = function (a, b) {
     return [a[0] - b[0], a[1] - b[1]];
@@ -1305,7 +1305,7 @@ RVO.Vector.subtract = function (a, b) {
 /**移动
  * @param {[number,number]} a
  * @param {[number,number]} b 
- * @return {[nmuber,number]} 
+ * @return {[number,number]} 
  */
 RVO.Vector.shift = function (a, b) {
     a[0] += b[0];
@@ -1316,7 +1316,7 @@ RVO.Vector.shift = function (a, b) {
 /**设置
  * @param {[number,number]} a
  * @param {[number,number]} b 
- * @return {[nmuber,number]} 
+ * @return {[number,number]} 
  */
 RVO.Vector.set = function (a, b) {
     a[0] = b[0];
@@ -1330,7 +1330,7 @@ RVO.Vector.set = function (a, b) {
  * 数量积平方根
  * @param {[number,number]} a
  * @param {[number,number]} b 
- * @return {nmuber} 
+ * @return {number} 
  */
 RVO.Vector.abs = function (a) {
     return Math.sqrt(RVO.Vector.dotProduct(a, a));
@@ -1340,7 +1340,7 @@ RVO.Vector.abs = function (a) {
  * 数量积 
  * @param {[number,number]} a
  * @param {[number,number]} b 
- * @return {nmuber} 
+ * @return {number} 
  * */
 RVO.Vector.absSq = function (a) {
     return RVO.Vector.dotProduct(a, a);
@@ -1349,7 +1349,7 @@ RVO.Vector.absSq = function (a) {
 /**向量积(拟叉积)
  * @param {[number,number]} a
  * @param {[number,number]} b 
- * @return {nmuber}  
+ * @return {number}  
  * */
 RVO.Vector.det = function (a, b) {
     /**返回 向量的面积(顺逆时针) */
@@ -1359,7 +1359,7 @@ RVO.Vector.det = function (a, b) {
 
 /**法向量 
  * @param {[number,number]} a 
- * @returns {[nmuber,number]} 
+ * @returns {[number,number]} 
  *  
  */
 RVO.Vector.normalize = function (a) {
@@ -1372,7 +1372,7 @@ RVO.Vector.normalize = function (a) {
  * @param {[number,number]} a 
  * @param {[number,number]} b 
  * @param {[number,number]} c
- * @return {nmuber}  向量积(c在ab左边>0)
+ * @return {number}  向量积(c在ab左边>0)
 */
 RVO.Vector.leftOf = function (a, b, c) {
     /**返回 拟叉积( ca ab )*/
@@ -1384,7 +1384,7 @@ RVO.Vector.leftOf = function (a, b, c) {
  * @param {[number,number]} a 
  * @param {[number,number]} b 
  * @param {[number,number]} c
- * @returns {[nmuber,number]} 
+ * @returns {[number,number]} 
 */
 RVO.Vector.distSqPointLineSegment = function (a, b, c) {
     /**ba =  b减a */
