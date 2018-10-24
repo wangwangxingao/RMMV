@@ -51,38 +51,198 @@ Input.keyShortPress = 20
  */
 
 
+/**时间按键比较 
+ * 
+ * @param {number} time 时间
+ * @param {number} type 0 == 1> 2 >= 3< 4 <= 5 !=  6 %= 7 %!= 
+ * @param {number} value  值
+ * 
+ * 
+*/
+Input.isTimeValue = function (time, type, value) {
+    var value = value || 0
+    if (type == 0) {
+        return time == value
+    } else if (type == 1) {
+        return time > value
+    } else if (type == 2) {
+        return time >= value
+    } else if (type == 3) {
+        return time < value
+    } else if (type == 4) {
+        return time <= value
+    } else if (type == 5) {
+        return time != value
+    } else if (type == 6) {
+        return time % value == 0
+    } else if (type == 7) {
+        return time % value != 0
+    }
+    return false
+}
+
+
+
 /**
- * 是长按结束时 
+ * 是按键判断 
+ * @param {number} type 0 == 1> 2 >= 3< 4 <= 5 !=  6 %= 7 %!=  
+ * @param {number} value  值
+*/
+TouchInput.isTimeTriggered = function (type, value) {
+    return this.isPressed() && Input.isTimeValue(this._pressedTime, type, value)
+};
+
+ 
+
+
+/**
+ * 是按下时 大于 
+ * 
+ * 
+*/
+TouchInput.isTimeLong = function (value) {
+    return this.isTimeTriggered(2, value);
+};
+
+/** 
+ * 是按下时 小于 
+ *  
+ */
+TouchInput.isTimeShort = function (value) {
+    return this.isTimeTriggered(3, value);
+};
+
+
+/**
+ * 是按下时 长按 
  * 
  * 
 */
 TouchInput.isLongTriggered = function () {
-    return this.isReleased() && this._pressedTime >= this.keyLongPress;
-};
-/**
- * 是短按结束时 
- * 
- * 
- */
-TouchInput.isShortTriggered = function () {
-    return this.isReleased() && this._pressedTime <= this.keyShortPress;
+    return this.isTimeTriggered(2, this.keyLongPress);
 };
 
-/**是短按 */
+
+/**
+ * 是按下时 短按
+ *  
+ */
+TouchInput.isShortTriggered = function () {
+    return this.isKeyTime(4, this.keyShortPress);
+};
+
+
+
+/**
+ * 是短按 并且无移动
+ * 
+ * 
+*/
 TouchInput.isShortTouch = function () {
     return this.isShortTriggered() && !this.isMoveLong();
 };
 
-/**是长按 */
+/**
+ * 是长按 并且无移动
+ * 
+ */
 TouchInput.isLongTouch = function () {
-
     return this.isLongTriggered() && !this.isMoveLong();
 };
 
-/**是结束按键 */
+
+
+/**
+ * 
+ * 按键结束时 按的时间
+*/
+TouchInput.isEndTime = function () {
+    return this.isReleased() && this._pressedTime
+};
+
+
+/**
+ * 是结束按键 
+ * */
 TouchInput.isEndTriggered = function () {
     return this.isReleased();
 };
+
+
+/**
+ * 是按键判断  
+ * 按键结束时
+ * @param {number} type 0 == 1> 2 >= 3< 4 <= 5 !=  6 %= 7 %!=  
+ * @param {number} value  值
+*/
+TouchInput.isEndTimeTriggered = function (type, value) {
+    return this.isReleased() && Input.isTimeValue(this._pressedTime, type, value)
+};
+
+
+
+
+
+/**
+ * 结束时 是 大于等于 value 时间
+ *  @param {number} value 值
+ * 
+ * 
+*/
+TouchInput.isEndTimeLong = function (value) {
+    return this.isEndTimeTriggered(2, value);
+};
+
+/** 
+ * 结束时 是 小于等于  value 时间
+ *  @param {number} value 值
+ */
+TouchInput.isEndTimeShort = function (value) {
+    return this.isEndTimeTriggered(3, value);
+};
+
+
+/**
+ * 结束时是 长按 
+ *    
+ * 
+*/
+TouchInput.isEndLongTriggered = function () {
+    return this.isEndTimeTriggered(2, this.keyLongPress);
+};
+
+
+/**
+ * 结束时是短按
+ *  
+ */
+TouchInput.isEndShortTriggered = function () {
+    return this.isEndTimeTriggered(4, this.keyShortPress);
+};
+
+
+
+/**
+ * 结束时是短按 并且无移动
+ *  @param {number} value 值
+ * 
+ * 
+*/
+TouchInput.isEndShortTouch = function () {
+    return this.isEndShortTriggered() && !this.isMoveLong();
+};
+
+/**
+ * 结束时是长按 并且无移动
+ * 
+ */
+TouchInput.isEndLongTouch = function () {
+    return this.isEndLongTriggered() && !this.isMoveLong();
+};
+
+
+
+
 
 
 /**
@@ -92,12 +252,39 @@ TouchInput.isPressMove = function () {
     return this.isPressed() && this.isMoved()
 };
 
-/**是移动长距离 */
+
+/**
+ * 是移动长距离 
+ * 
+*/
 TouchInput.isMoveLong = function () {
     return this._touchMoveLong
 };
 
 
+
+TouchInput.__clear = TouchInput.clear
+TouchInput.clear = function () {
+    TouchInput.__clear.call(this)
+    this._deltX = 0
+    this._deltY = 0
+    this._lastXY = undefined
+}
+TouchInput.__update = TouchInput.update
+TouchInput.update = function () {
+    TouchInput.__update.call(this)
+
+    if (this._lastXY) {
+        this._deltX = this._x - this._lastXY[0]
+        this._deltY = this._y - this._lastXY[1]
+    } else {
+        this._lastXY = []
+        this._deltX = 0
+        this._deltY = 0
+    }
+    this._lastXY[0] = this._x
+    this._lastXY[1] = this._y
+}
 
 
 TouchInput.__TouchInput_onMouseMove = TouchInput._onMouseMove
@@ -132,7 +319,6 @@ TouchInput.__TouchInput_onTrigger = TouchInput._onTrigger
 /**当触发时 */
 TouchInput._onTrigger = function (x, y) {
     TouchInput.__TouchInput_onTrigger.call(this, x, y)
-
     this._tirggerX = x
     this._tirggerY = y
     this._touchMoveLong = false
@@ -153,9 +339,6 @@ TouchInput._onPressedMove = function (x, y) {
 
 
 
-
-
-
 /**
  * 
  * 按键增强 
@@ -163,44 +346,186 @@ TouchInput._onPressedMove = function (x, y) {
  * 
  */
 
-Input.__Input_clear = Input.clear
+
+/**
+ * 是按键改变
+ * @param {number} keyCode
+ */
+Input.isKeyChange = function (keyCode) {
+    return this._changeKeys[keyCode]
+}
+/**
+ * 是键当前时间
+ * @param {number} keyCode
+ */
+Input.isKeyCurrent = function (keyCode) {
+    return this._currentKeys[keyCode]
+}
+
+
+/**
+ * 是键按下
+ * @param {number} keyCode
+ */
+Input.isKeyPressed = function (keyCode) {
+    return this._currentKeys[keyCode] > 0
+}
+
+
+
+
+/**
+ * 是键按下瞬间
+ * @param {number} keyCode
+ */
+Input.isKeyTriggered = function (keyCode) {
+    return this._currentKeys[keyCode] == this.keyTime
+}
+
+
+/**
+ * 按下键时间
+ * @param {number} keyCode
+ */
+Input.isTimeTriggered = function (keyCode, type, value) {
+    return this.isKeyPressed() && Input.isTimeValue(this._currentKeys[keyCode], type, value)
+}
+
+/**
+ * 是按键结束时间判断
+ * @param {number} keyCode
+ */
+Input.isTimeLong = function (keyCode, value) {
+    return this.isTimeTriggered(keyCode, 4, this.keyTime - value)
+}
+
+/**
+ * 是按键结束瞬间
+ * @param {number} keyCode
+ */
+Input.isTimeShort = function (keyCode, value) {
+    return this.isTimeTriggered(keyCode, 2, this.keyTime - value)
+}
+
+
+/**
+ * 是按下时 长按 
+ * 
+ * 
+*/
+Input.isLongTriggered = function (keyCode) {
+    return this.isTimeTriggered(keyCode, 4, this.keyTime - this.keyLongPress);
+};
+
+
+
+/**
+ * 是按下时 短按
+ *  
+ */
+Input.isShortTriggered = function (keyCode) {
+    return this.isTimeTriggered(keyCode, 2, this.keyTime - this.keyShortPress);
+};
+
+
+
+Input.isEndTriggered = function (keyCode) {
+    var v = Input.isKeyChange(keyCode)
+    return v && v > 0
+}
+
+
+
+/**
+ * 按键结束时 按下的时间
+ * @param {number} keyCode
+ * @param {number} value 按下时间长于的值
+ */
+Input.isEndTime = function (keyCode) {
+    var v = Input.isKeyChange(keyCode)
+    return v && v > 0 && v
+}
+
+Input.isEndTimeTriggered = function (keyCode, type, value) {
+    var v = Input.isKeyChange(keyCode)
+    return v && v > 0 && Input.isTimeValue(v, type, value)
+}
+
+Input.isEndTimeLong = function (keyCode, value) {
+    return Input.isEndTimeTriggered(keyCode, 4, this.keyTime - value)
+}
+
+Input.isEndTimeShort = function (keyCode, value) {
+    return Input.isEndTimeTriggered(keyCode, 2, this.keyTime - value)
+}
+
+
+Input.isEndLongTouch = function (keyCode) {
+    return Input.isEndTimeTriggered(keyCode, 4, this.keyTime - this.keyLongPress)
+}
+
+Input.isEndLongTriggered = function (keyCode) {
+    return Input.isEndTimeTriggered(keyCode, 4, this.keyTime - this.keyLongPress)
+}
+
+Input.isEndShortTouch = function (keyCode) {
+    return Input.isEndTimeTriggered(keyCode, 2, this.keyTime - this.keyShortPress)
+}
+
+Input.isEndShortTriggered = function (keyCode) {
+    return Input.isEndTimeTriggered(keyCode, 2, this.keyTime - this.keyShortPress)
+}
+
+
+ 
+
+
+
+Input.__clear = Input.clear
 /**清除 */
 Input.clear = function () {
-    Input.__Input_clear.call(this)
+    Input.__clear.call(this)
 
+    //过去的键(保存全部)
     this._previousKeys = {}
+    //当前所有键
     this._currentChangeKeys = {}
+    //当前键
     this._currentKeys = {}
 };
 
-Input.__Input_update = Input.update
-
-/**更新 */
+Input.__update = Input.update
+/**输入
+ * 更新 */
 Input.update = function () {
-    Input.__Input_update.call(this)
+    Input.__update.call(this)
+    //添加按键计时
     this.keyTime++
+    //对所有改变进行
     for (var i in this._currentChangeKeys) {
         this._currentKeys[i] = this._previousKeys[i] ? this.keyTime : -this.keyTime
     }
+    //改变的键保存
     this._changeKeys = this._currentChangeKeys
+    //当前改变键清空
     this._currentChangeKeys = {}
 };
 
 
 
-Input.__Input_onKeyDown = Input._onKeyDown
+Input.__onKeyDown = Input._onKeyDown
 /**当键按下 */
 Input._onKeyDown = function (event) {
     Input._onKeyChange(event.keyCode, 1)
-    Input.__Input_onKeyDown.call(this, event)
+    Input.__onKeyDown.call(this, event)
 };
 
 
-Input.__Input_onKeyUp = Input._onKeyUp
+Input.__onKeyUp = Input._onKeyUp
 /**当键抬起 */
 Input._onKeyUp = function (event) {
     Input._onKeyChange(event.keyCode, 0)
-    Input.__Input_onKeyUp.call(this, event)
+    Input.__onKeyUp.call(this, event)
 };
 
 /**键添加 */
@@ -211,69 +536,9 @@ Input._onKeyChange = function (keyCode, type) {
     this._previousKeys[keyCode] = type
 };
 
-/**
- * 是键按下
- * @param {number} keyCode
- */
-Input.isKeyPressed = function (keyCode) {
-    return this._currentKeys[keyCode] > 0
-}
-
-/**
- * 是键按下瞬间
- * @param {number} keyCode
- */
-Input.isKeyTriggered = function (keyCode) {
-    return this._currentKeys[keyCode] == this.keyTime
-}
-
-/**
- * 是按键改变
- * @param {number} keyCode
- */
-Input.isKeyChange = function (keyCode) {
-    return this._changeKeys[keyCode]
-}
-
-
-/**
- * 是按键结束
- * @param {number} keyCode
- */
-Input.isKeyEndTriggered = function (keyCode) {
-    var v = Input.isKeyChange(keyCode)
-    return v && v > 0 //&& (this.keyTime > v + Input.keyLongTime)
-}
-
-/**
- * 是长按结束
- * @param {number} keyCode
- */
-Input.isKeyLong =
-    Input.isKeyLongTouch =
-    Input.isKeyLongTriggered = function (keyCode) {
-        var v = Input.isKeyChange(keyCode)
-        return v && v > 0 && this.keyTime >= v + this.keyLongPress
-    }
-
-/**
- * 是短按结束
- * @param {number} keyCode
- */
-Input.isKeyShort =
-    Input.isKeyShortTouch =
-    Input.isKeyShortTriggered = function (keyCode) {
-        var v = Input.isKeyChange(keyCode)
-        return v && v > 0 && this.keyTime <= v + this.keyShortPress
-    }
-
-
-
-
 
 
 /*
- 
 event.keyCode 值大全
     8 = BackSpace BackSpace 
     9 = Tab Tab 
@@ -324,7 +589,7 @@ event.keyCode 值大全
     76 = l L 
     77 = m M mu 
     78 = n N 
-     79 = o O 
+    79 = o O 
     80 = p P 
     81 = q Q at 
     82 = r R 
@@ -337,8 +602,8 @@ event.keyCode 值大全
     89 = y Y 
     90 = z Z 
     96 = KP_0 KP_0 
-     97 = KP_1 KP_1 
-     98 = KP_2 KP_2 
+    97 = KP_1 KP_1 
+    98 = KP_2 KP_2 
     99 = KP_3 KP_3 
     100 = KP_4 KP_4 
     101 = KP_5 KP_5 
@@ -358,7 +623,5 @@ event.keyCode 值大全
     115 = F4 
     116 = F5 
     117 = F6 
-
 */
-
 
