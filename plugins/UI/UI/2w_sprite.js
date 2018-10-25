@@ -1,105 +1,120 @@
- 
 
 
 
-/**画布到局部x 
-* @param {number} x x
-* @return {number}  
-*/
-Sprite.prototype.spriteToLocalX = function ( x,sprite) {
+
+/**
+ * 世界到局部xy
+ * @param {number} y y
+ * @return {number}  
+ */
+Sprite.prototype.worldToLocalXY = function (x, y, sprite) {
     var node = sprite || this;
-    while (node) {
-        x -= node.x;
-        node = node.parent;
-    }
-    return x;
+    return node.worldTransform.applyInverse({ x: x, y: y }, { visible: node.worldVisible });
 };
-/**画布到局部y
-* @param {number} y y
-* @return {number}  
+
+
+/**
+* 是触摸输入自己 
+* @param {boolean|number} b 是否不检查位图(每层-1)
+* @param {boolean|number} c 是否检查子图(每层-1 ) 
+* @param {boolean} up 是否是从上往下判断 
+* 
 */
-Sprite.prototype.priteToLocalY = function ( y,sprite) {
-    var node = sprite || this;
-    while (node) {
-        y -= node.y;
-        node = node.parent;
-    }
-    return y;
-};
-
-
-
-
-Sprite.prototype.worldToLocalXY  = function ( x,y,sprite) {
-    var node = sprite || this;  
-    return node.worldTransform.applyInverse({x:x,y:y},{visible:node.worldVisible});
-};
-
+Sprite.prototype.isTouchInputThis = function (b, c, up) {
+    var x = TouchInput.x
+    var y = TouchInput.y
+    var b = b === true ? -1 : b
+    var c = c === true ? -1 : c
+    this.isTouchThis(x, y, b, c, up)
+}
 
 
 /**
 * 是触摸自己
 * @param {number} x x坐标
 * @param {number} y y坐标
-* @param {boolean} type 是否不检查位图(true 为不检查 )
-* @param {bolean}c 是否检查子图(true 为 检查 )
-* 
+* @param {boolean|number} b 是否不检查位图(每层-1)
+* @param {boolean|number} c 是否检查子图(每层-1 ) 
+* @param {boolean} up 是否是从上往下判断 
 * 
 */
-Sprite.prototype.isTouchThis = function (x, y, type, c) {
+Sprite.prototype.isTouchThis = function (x, y, b, c, up) {
     if (this.visible) {
-        var loc = this.worldToLocalXY(x,y)
-        var lx = loc.x 
+        var loc = this.worldToLocalXY(x, y)
+        var lx = loc.x
         var ly = loc.y
-        var lv = loc.visible 
-      
-        if(lv){
+        var lv = loc.visible
+        if (lv) {
             if (c) {
-                for (var i = 0; i < this.children.length; i++) {
-                    var s = this.children[i]
-                    if (s && s.isTouchThis && s.isTouchThis(x, y, type,c)) {
+                var b2 = b ? b - 1 : 0
+                var c2 = c - 1
+                var l = this.children.length
+                if (up) {
+                    for (var i = l - 1; i >= 0; i--) {
+                        var s = this.children[i]
+                        if (s && s.isTouchThis && s.isTouchThis(x, y, b2, c2, up)) {
+                            return true
+                        }
+                    }
+                    if (this.isTouchIn && this.isTouchIn(lx, ly, b)) {
                         return true
                     }
+                } else {
+                    if (this.isTouchIn && this.isTouchIn(lx, ly, b)) {
+                        return true
+                    }
+                    for (var i = 0; i < l; i++) {
+                        var s = this.children[i]
+                        if (s && s.isTouchThis && s.isTouchThis(x, y, b2, c2, up)) {
+                            return true
+                        }
+                    }
                 }
-            } 
- 
-            if (this.isTouchIn && this.isTouchIn(lx, ly, type)) {
-                return true
             }
-        } 
+        }
     }
     return false
 }
- 
 
-/**是在之中 
-* @param {boolean} type 不检查图片
-* 
-*/
-Sprite.prototype.isTouchIn = function (x, y, type) { 
+
+/**
+ * 是在之中 
+ * @param {number} x x坐标
+ * @param {number} y y坐标
+ * @param {boolean} type 不检查图片
+ * 
+ */
+Sprite.prototype.isTouchIn = function (x, y, b) {
     if (this.anchor) {
         var x = x + this.anchor.x * this.width
         var y = y + this.anchor.y * this.height
     }
-    if (this.isTouchInFrame(x, y, type)) {
-        return type || this.isTouchInBitamp(x, y)
-    } else {
-        return false
-    }
+    return this.isTouchInFrame(x, y, b) && (b || this.isTouchInBitamp(x, y))
 }
 
 
-/**是在区域中 */
-Sprite.prototype.isTouchInFrame = function (x, y, type) {
+/**
+ * 是在区域中
+ * @param {number} x  x
+ * @param {number} y  y
+ * 
+ * 
+ */
+Sprite.prototype.isTouchInFrame = function (x, y) {
     return x >= 0 && y >= 0 && x < this.width && y < this.height;
 };
 
 
-/**是在位图上不透明点 */
+/**
+ * 是在位图上不透明点
+ * @param {number} x  x
+ * @param {number} y  y
+ * 
+ */
 Sprite.prototype.isTouchInBitamp = function (x, y) {
     if (this._realFrame) {
-        var x = x + this._realFrame.x 
-        var y = y + this._realFrame.y 
+        var x = x + this._realFrame.x
+        var y = y + this._realFrame.y
     }
     if (this.bitmap && this.bitmap.getAlphaPixel(x, y)) {
         return true
