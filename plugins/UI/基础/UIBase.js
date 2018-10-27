@@ -1,8 +1,29 @@
-
+DataManager.deepClone = function (that) {
+    var that = that
+    var obj, i;
+    if (typeof (that) === "object") {
+        if (that === null) {
+            obj = null;
+        } else if (Array.isArray(that)) {  //Object.prototype.toString.call(that) === '[object Array]') { 
+            obj = [];
+            for (var i = 0; i < that.length; i++) {
+                obj.push(this.deepClone(that[i]));
+            }
+        } else {
+            obj = {}
+            for (i in that) {
+                obj[i] = this.deepClone(that[i])
+            }
+        }
+    } else {
+        obj = that
+    }
+    return obj;
+};
 
 /**值的赋予 */
 
-Sprite.prototype.getSpriteValue = function (o1, name1) {
+Sprite.prototype.__getSpriteValue = function (o1, name1) {
     if (Array.isArray(name1)) {
         for (var i = 0; i < name1.length - 1; i++) {
             var n = name1[i]
@@ -20,7 +41,7 @@ Sprite.prototype.getSpriteValue = function (o1, name1) {
 
 }
 
-Sprite.prototype.setSpriteValue = function (s, set, oa, anmobj, type, name1, name2) {
+Sprite.prototype.__setSpriteValue = function (s, set, oa, anmobj, type, name1, name2) {
     var js = 0
     var t1 = 0
     var t2 = 0
@@ -97,7 +118,7 @@ Sprite.prototype.setSpriteValue = function (s, set, oa, anmobj, type, name1, nam
 }
 
 /**值的比较 */
-Sprite.prototype.setEvalValue = function (time, type, value) {
+Sprite.prototype.__setEvalValue = function (time, type, value) {
     var value = value || 0
     if (type == 0) {
         return value
@@ -114,6 +135,58 @@ Sprite.prototype.setEvalValue = function (time, type, value) {
     }
     return 0
 }
+
+
+Sprite.prototype.__setEvalValue = function (time, type, value) {
+    var value = value || 0
+    if (type == 0) {
+        return value
+    } else if (type == 1) {
+        return time + value
+    } else if (type == 2) {
+        return time - value
+    } else if (type == 3) {
+        return time * value
+    } else if (type == 4) {
+        return time / value
+    } else if (type == 5) {
+        return time % value
+    }else if (type == 6) {
+        return value + time
+    } else if (type == 7) {
+        return value - time 
+    } else if (type == 8 ) {
+        return value * time
+    } else if (type == 9) {
+        return value /time
+    } else if (type == 10) {
+        return value % time 
+    }
+    return 0
+}
+
+Sprite.prototype.__isEvalValue = function (time, type, value) { 
+    var value = value || 0
+    if (type == 0) {
+        return time == value
+    } else if (type == 1) {
+        return time > value
+    } else if (type == 2) {
+        return time >= value
+    } else if (type == 3) {
+        return time < value
+    } else if (type == 4) {
+        return time <= value
+    } else if (type == 5) {
+        return time != value
+    } else if (type == 6) {
+        return time % value == 0
+    } else if (type == 7) {
+        return time % value != 0
+    }
+    return false
+}
+
 
 
 var Sprite_prototype_initialize = Sprite.prototype.initialize
@@ -175,7 +248,7 @@ Sprite.prototype.anmPlaying = function (name, c) {
         }
     }
     if (c && this.children) {
-        var c = c - 1 
+        var c = c - 1
         for (var i = 0; i < this.children.length; i++) {
             if (this.children[i] && this.children[i].anmPlaying && this.children[i].anmPlaying(name)) {
                 return true
@@ -185,12 +258,12 @@ Sprite.prototype.anmPlaying = function (name, c) {
     return false
 }
 
-Sprite.prototype.anmTo = function (obj) {
+Sprite.prototype.anmTo = function (obj) { 
     var tl = typeof obj
     if (tl == "number") {
         return { t: obj }
-    } else if (tl == "object") {
-        return obj
+    } else if (tl && tl == "object") {
+        return DataManager.deepClone(obj)
     } else {
         return 0
     }
@@ -222,7 +295,7 @@ Sprite.prototype.anmSt = function (name, list, re) {
     var oa = l[0]
     if (!oa) {
         return this.anmClear(name, l)
-    } 
+    }
     var anmobj = {
         name: name,
         index: 0,
@@ -235,7 +308,7 @@ Sprite.prototype.anmSt = function (name, list, re) {
     this._anm[name] = anmobj
     this._anming = true
 
-    this.runAnmSt(name)
+    this.__runAnmSt(name)
 };
 
 Sprite.prototype.anmRe = function (name, re) {
@@ -276,16 +349,16 @@ Sprite.prototype.anmAdd = function (name, list) {
 
 /**单个动画更新 */
 Sprite.prototype.anmUpdate = function (name) {
-    if (this.runAnmRun(name)) {
-        this.runAnmUpdate(name)
+    if (this.__runAnmRun(name)) {
+        this.__runAnmUpdate(name)
         return
     }
     this.anmEnd(name)
 }
 
-Sprite.prototype.anmEnd= function (name) {
-     
-    this.runAnmEnd(name)  
+Sprite.prototype.anmEnd = function (name) {
+
+    this.__runAnmEnd(name)
 }
 
 /**
@@ -307,7 +380,7 @@ Sprite.prototype.anmClear = function (name, list) {
  * 
  * 
  */
-Sprite.prototype.evalini = function (s, set, n, n2, oa, anmobj) {
+Sprite.prototype.__evalini = function (s, set, n, n2, oa, anmobj) {
     if (set) {
         var v = set[n]
         var t = typeof v
@@ -337,7 +410,7 @@ Sprite.prototype.evalini = function (s, set, n, n2, oa, anmobj) {
  * 
  * 
  */
-Sprite.prototype.evalReturn = function (s, set, n, n2, oa, anmobj) {
+Sprite.prototype.__evalReturn = function (s, set, n, n2, oa, anmobj) {
     if (set) {
         var v = set[n]
         var t = typeof v
@@ -365,7 +438,7 @@ Sprite.prototype.evalReturn = function (s, set, n, n2, oa, anmobj) {
                     var vz = s[n2]
                     var vil = v
                     for (var vi = 0; vi < vil.length; vi + 2) {
-                        if (!this.isEvalValue(vz, vil[vi], vil[vi + 1])) {
+                        if (!this.__isEvalValue(vz, vil[vi], vil[vi + 1])) {
                             return false
                         }
                     }
@@ -375,7 +448,7 @@ Sprite.prototype.evalReturn = function (s, set, n, n2, oa, anmobj) {
                         var vil = v[i]
                         if (Array.isArray(vil)) {
                             for (var vi = 0; vi < vil.length; vi + 2) {
-                                if (!this.isEvalValue(vz, vil[vi], vil[vi + 1])) {
+                                if (!this.__isEvalValue(vz, vil[vi], vil[vi + 1])) {
                                     return false
                                 }
                             }
@@ -389,7 +462,7 @@ Sprite.prototype.evalReturn = function (s, set, n, n2, oa, anmobj) {
                     var vil = v[i]
                     if (Array.isArray(vil)) {
                         for (var vi = 0; vi < vil.length; vi + 2) {
-                            if (!this.isEvalValue(vz, vil[vi], vil[vi + 1])) {
+                            if (!this.__isEvalValue(vz, vil[vi], vil[vi + 1])) {
                                 return false
                             }
                         }
@@ -427,7 +500,7 @@ Sprite.prototype.evalUpdate = function (s, set, n, n2, oa, anmobj) {
         //为数值时,判断值
         if (t == "number") {
             if (n2) {
-                s[n2] += v 
+                s[n2] += v
             }
             //没有时,永远运行
         } else if (t == "function") {
@@ -438,7 +511,7 @@ Sprite.prototype.evalUpdate = function (s, set, n, n2, oa, anmobj) {
                     var vz = s[n2]
                     var vil = v
                     for (var vi = 0; vi < vil.length; vi + 2) {
-                        vz = this.setEvalValue(vz, vil[vi + 1], vil[vi])
+                        vz = this.__setEvalValue(vz, vil[vi + 1], vil[vi])
                     }
                     s[n2] = vz
 
@@ -448,7 +521,7 @@ Sprite.prototype.evalUpdate = function (s, set, n, n2, oa, anmobj) {
                         var vil = v[i]
                         if (Array.isArray(vil)) {
                             for (var vi = 0; vi < vil.length; vi + 2) {
-                                vz = this.setEvalValue(vz, vil[vi + 1], vil[vi])
+                                vz = this.__setEvalValue(vz, vil[vi + 1], vil[vi])
                             }
                             s[n2] = vz
                         } else {
@@ -464,7 +537,7 @@ Sprite.prototype.evalUpdate = function (s, set, n, n2, oa, anmobj) {
                     var vil = v[i]
                     if (Array.isArray(vil)) {
                         for (var vi = 0; vi < vil.length; vi + 2) {
-                            vz = this.setEvalValue(vz, vil[vi + 1], vil[vi])
+                            vz = this.__setEvalValue(vz, vil[vi + 1], vil[vi])
                         }
                         s[i] = vz
                     } else {
@@ -480,15 +553,15 @@ Sprite.prototype.evalUpdate = function (s, set, n, n2, oa, anmobj) {
     }
 }
 
- 
 
-Sprite.prototype.runAnmSt = function (name) {
+
+Sprite.prototype.__runAnmSt = function (name) {
     var name = name
     this._anm = this._anm || {}
     var anmobj = this._anm[name]
     var list = anmobj.list
-    var index = anmobj.index 
-    var oa = list[index] 
+    var index = anmobj.index
+    var oa = list[index]
     var s = this
     if (oa) {
         oa.value = {}
@@ -496,7 +569,7 @@ Sprite.prototype.runAnmSt = function (name) {
         if (typeof oa.set == "object") {
             for (var i in oa.set) {
                 var set = oa.set[i]
-                this.evalini(s, set, "fr", i, oa, anmobj)
+                this.__evalini(s, set, "fr", i, oa, anmobj)
             }
         }
     } else {
@@ -504,7 +577,7 @@ Sprite.prototype.runAnmSt = function (name) {
     }
 };
 
-Sprite.prototype.runAnmRun = function (name) {
+Sprite.prototype.__runAnmRun = function (name) {
     var name = name
     this._anm = this._anm || {}
     var anmobj = this._anm[name]
@@ -513,12 +586,12 @@ Sprite.prototype.runAnmRun = function (name) {
     var oa = list[index]
     var s = this
     if (oa) {
-        return this.evalReturn(s, oa, "t", "", oa, anmobj)
+        return this.__evalReturn(s, oa, "t", "", oa, anmobj)
     }
     return false
 }
 
-Sprite.prototype.runAnmUpdate = function (name) {
+Sprite.prototype.__runAnmUpdate = function (name) {
     var name = name
     this._anm = this._anm || {}
     var anmobj = this._anm[name]
@@ -527,14 +600,14 @@ Sprite.prototype.runAnmUpdate = function (name) {
     var oa = list[index]
     var s = this
     if (oa) {
-        if (this.evalReturn(s, oa, "d", "", oa, anmobj)
+        if (this.__evalReturn(s, oa, "d", "", oa, anmobj)
         ) {
-            this.evalUpdate(s, oa, "up", "", oa, anmobj)
+            this.__evalUpdate(s, oa, "up", "", oa, anmobj)
             if (typeof oa.set == "object") {
                 for (var i in oa.set) {
                     var set = oa.set[i]
-                    if (this.evalReturn(s, set, "d", i, oa, anmobj)) {
-                        this.evalUpdate(s, set, "up", i, oa, anmobj)
+                    if (this.__evalReturn(s, set, "d", i, oa, anmobj)) {
+                        this.__evalUpdate(s, set, "up", i, oa, anmobj)
                     }
                 }
             }
@@ -545,7 +618,7 @@ Sprite.prototype.runAnmUpdate = function (name) {
 
 
 /**动画结束 */
-Sprite.prototype.runAnmEnd = function (name) {
+Sprite.prototype.__runAnmEnd = function (name) {
     var name = name
     this._anm = this._anm || {}
     var anmobj = this._anm[name]
@@ -554,19 +627,19 @@ Sprite.prototype.runAnmEnd = function (name) {
     var oa = list[index]
     var s = this
     if (oa) {
-        this.evalini(s, oa, "ed", "", s, oa, anmobj)
+        this.__evalini(s, oa, "ed", "", s, oa, anmobj)
         if (typeof oa.set == "object") {
             for (var i in oa.set) {
                 var set = oa.set[i]
-                this.evalini(s, set, "ed", i, s, oa, anmobj)
+                this.__evalini(s, set, "ed", i, s, oa, anmobj)
             }
         }
     }
     anmobj.index++
     if (anmobj.re && list.length) {
-        anmobj.index =  anmobj.index % list.length 
+        anmobj.index = anmobj.index % list.length
     }
-    this.runAnmSt(name)
+    this.__runAnmSt(name)
 };
 
 
