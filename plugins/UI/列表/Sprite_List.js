@@ -1,30 +1,4 @@
 
-/**
- * 数组去重
-*/
-Array.prototype.unique = function () {
-    var re = []
-    var l = this.splice(0)
-    l.sort();
-    var re = [l[0]];
-    for (var i = 1; i < l.length; i++) {
-        if (l[i] !== re[re.length - 1]) {
-            re.push(l[i]);
-        }
-    }
-    return re;
-}
-
-/**移除某元素 */
-Array.prototype.remove = function (value) {
-    var index = this.indexOf(value)
-    while (index >= 0) {
-        this.splice(index, 1)
-        var index = this.indexOf(value)
-    }
-    return this
-}
-
 
 
 
@@ -38,130 +12,127 @@ Sprite_UIList.prototype.constructor = Sprite_UIList;
 
 Sprite_UIList.prototype.initialize = function (w, h) {
     Sprite.prototype.initialize.call(this)
-    this._index = 0
+    this._index = -1
     this._showX = 0
     this._showY = 0
     this._showW = w || 0
     this._showH = h || 0
+
+    this.width = w || 0
+    this.height = h || 0
+
+
+    this._allW = 0
+    this._allH = 0
+
+
     this._objectsList = []
-    this._objectsMap = {}
-    this._objectsMapIn = {}
-    this._showMapX = 0
-    this._showMapY = 0
+
+    this._showSprite = new Sprite()
+    this._showSprite.x = 0
+    this._showSprite.y = 0
+
+
+    var b = new Bitmap(5, h)
+    this._pagePosSprite = new Sprite()
+    this._pagePosSprite.bitmap = b
+    b.fillAll("#ffffff")  
+
+    this._pagePosSprite.visible = false // = new Bitmap(10,h)
+    this._pagePosSprite.x = this.width - 5 
+
+    this.addChild(this._showSprite)
+    this.addChild(this._pagePosSprite)
+    this.makeMask(0, 0, w, h)
     // this._evalInMapIndex = []
 };
 
 
-Sprite_UIList.prototype.spriteInMapXYIndex = function (sprite) {
-    if (sprite) {
-        return this.inMapXYIndex(sprite.x, sprite.y, sprite.width, sprite.height)
+Sprite_UIList.prototype.addSpriteToEnd = function (s, h) {
+    if (h !== undefined) {
+        s.x = s.x
+        s.y = this._showSprite.height
+        this._allH = this._showSprite.height += h
     } else {
-        return 0
+        s.x = s.x
+        s.y = this._showSprite.height
+        this._allH = this._showSprite.height += s.height
     }
-}
+    if (this._allH > this._showH) { 
+        var scale = this._showH / this._allH
+        this._pagePosSprite.scale.y = scale 
+        this._pagePosSprite.visible = true 
+    }else{
+        this._pagePosSprite.visible = false
+    } 
+    this.addSprite(s)
+};
 
-/**xywh数组 */
-Sprite_UIList.prototype.xywhInMapXYIndex = function (xywh) {
-    if (xywh) {
-        return this.inMapXYIndex(xywh[0], xywh[1], xywh[2], xywh[3])
-    } else {
-        return 0
-    }
-}
 
-/**在区域地图的xy索引 */
-Sprite_UIList.prototype.inMapXYIndex = function (x, y, w, h) {
-    if (this._showW != 0) {
-        var xi1 = Math.floor(x / this._showW);
-        if (w > 0) {
-            var xi2 = Math.floor((x + w) / this._showW);
-        } else {
-            var xi2 = xi1;
-        }
-    } else {
-        var xi1 = 0;
-        var xi2 = xi1;
+Sprite_UIList.prototype.addSprite = function (s) {
+    this._objectsList.push(s)
+    this._showSprite.addChild(s)
+};
+
+ 
+ 
+ 
+Sprite_UIList.prototype.__updateInput = function () {
+    if (Input.isKeyTriggered("touch2")) {
+        console.log("click,click")
     }
-    if (this._showH != 0) {
-        var yi1 = Math.floor(y / this._showH);
-        if (h > 0) {
-            var yi2 = Math.floor((y + h) / this._showH);
-        } else {
-            var yi2 = yi1;
-        }
-    } else {
-        var yi1 = 0;
-        var yi2 = yi1;
-    }
-    //this._evalInMapIndex[0] = xi1;
-    //this._evalInMapIndex[1] = yi1;
-    //this._evalInMapIndex[2] = xi2-xi1;
-    //this._evalInMapIndex[3] = yi2-yi1;
-    return [xi1, yi1, xi2 - xi1, yi2 - yi1];
+    this.TouchInputisTouchIn()
+    this.TouchInputisTouchInPressMove()
 }
 
 
-/**添加精灵到列表 */
-Sprite_UIList.prototype.addSpriteToList = function (sprite, xywh) {
-    if (sprite) {
-        var index = this._objectsList.indexOf(sprite)
-        if (index < 0) {
-            var index = this._objectsList.index
-            this._objectsList.push(sprite)
-        }
-        this.addSpriteToMap(index, sprite, xywh)
-
+Sprite_UIList.prototype.__pagetoO = [{fr:{opacity:255} , t:0},60,{t:255,up:{opacity:-1}}]
+Sprite_UIList.prototype.showSpriteToY = function (y) {
+    this._showSprite.y = Math.min(Math.max(y, -this._allH + this._showH), 0)
+    this._showY = -this._showSprite.y
+ 
+    if(this._allH){
+        var y   = ( this._showH  / this._allH ) * this._showY 
+        this._pagePosSprite.y = y  
+        this._pagePosSprite.anmSt("o",this.__pagetoO)
+    }else{
+        this._pagePosSprite.visible = false   
     }
 }
 
 
-
-/**添加精灵到区域地图 */
-Sprite_UIList.prototype.addSpriteToMap = function (index, sprite, xywh) {
-    if (sprite) {
-        var l = this._objectsMapIn[index]
-        if (l) {
-            for (var i = 0; i < l.length; i++) {
-                var n = l[i]
-                var map = this._objectsMap[n]
-                if (map) {
-                    var id = map.indexOf(index)
-                    while (id >= 0) {
-                        map.splice(id, 1)
-                        var id = map.indexOf(index) 
-                    }
-                }
-            }
-        } 
-        if (xywh) {
-            var mapindexs = this.xywhInMapXYIndex(xywh)
-        } else {
-            var mapindexs = this.spriteInMapXYIndex(sprite)
-        }
-        if (mapindexs) {
-            var xi1 = mapindexs[0]
-            var yi1 = mapindexs[1]
-            var xi2 = mapindexs[2]
-            var yi2 = mapindexs[3]
-            for (var xi = xi1; xi <= xi2; xi++) {
-                for (var yi = yi1; yi <= yi2; yi++) {
+Sprite_UIList.prototype.showToY = function (y) {
+    this.showSpriteToY(-y)
+}
 
 
-                }
 
-            }
-        } else {
-            this.addToMap(0, index)
-        }
+Sprite_UIList.prototype.__TouchInputisTouchInPressMove = function (x, y) {
+    if (y) {
+        this.showSpriteToY(this._showSprite.y + y)
+        console.log(y)
     }
-}
-
-/**添加到区域地图 */
-Sprite_UIList.prototype.addToMap = function (mapindex, index) {
-    this._objectsMap[mapindex] = this._objectsMap[mapindex] || []
-    this._objectsMapIn[index] = this._objectsMapIn[index] || []
-    this._objectsMap[mapindex].push(index)
-    this._objectsMap[index].push(mapindex)
-}
+} 
 
 
+
+/**
+
+var s = new Sprite_UIList(300,400)
+SceneManager._scene.addChild(s)
+
+b = ImageManager.loadEnemy("actor1_3") 
+
+a = new Sprite(b)
+
+
+a = new Sprite(b) ; s.addSpriteToEnd(a)
+a = new Sprite(b) ; s.addSpriteToEnd(a)
+a = new Sprite(b) ; s.addSpriteToEnd(a)
+a = new Sprite(b) ; s.addSpriteToEnd(a)
+a = new Sprite(b) ; s.addSpriteToEnd(a)
+a = new Sprite(b) ; s.addSpriteToEnd(a)
+a = new Sprite(b) ; s.addSpriteToEnd(a)
+a = new Sprite(b) ; s.addSpriteToEnd(a)
+
+  */

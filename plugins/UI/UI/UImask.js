@@ -1,4 +1,8 @@
 
+
+
+(function(){
+
 Sprite.prototype.setMask = function (s) {
     if (this.mask) {
         this.removeChild(this.mask)
@@ -20,3 +24,4 @@ Sprite.prototype.makeMask = function (x, y, w, h) {
 };
 
 
+})()

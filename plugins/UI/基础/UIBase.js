@@ -188,6 +188,28 @@ Sprite.prototype.__isEvalValue = function (time, type, value) {
 }
 
 
+Sprite.prototype.setMask = function (s) {
+    if (this.mask) {
+        this.removeChild(this.mask)
+    }
+    this.mask = s
+    if (this.mask) {
+        this.addChild(this.mask)
+    }
+}
+
+
+Sprite.prototype.makeMask = function (x, y, w, h) { 
+    var b = new Bitmap(w,h)
+    b.fillAll("#ffffff") 
+    var s = new Sprite(b)
+    s.x = x 
+    s.y = y
+    this.setMask(s) 
+};
+
+
+
 
 var Sprite_prototype_initialize = Sprite.prototype.initialize
 /**初始化 */
