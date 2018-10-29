@@ -310,7 +310,6 @@
             value: {},
             re: re
         }
-        console.log(anmobj)
         this.__anm = this.__anm || {}
         this.__anm[name] = anmobj
         this.__anming = true
