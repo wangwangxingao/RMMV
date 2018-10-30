@@ -60,15 +60,26 @@ Graphics._inputType = {
     "week": {}
 }
 
-   /* overflow: hidden;
-    white-space: nowrap;*/
+/* overflow: hidden;
+ white-space: nowrap;*/
 
-Graphics._disableTextSelection = function () {
-    var body = document.body;
-    body.style.userSelect = '';
-    body.style.webkitUserSelect = '';
-    body.style.msUserSelect = '';
-    body.style.mozUserSelect = '';
+Graphics._disableTextSelection = function (body, type) {
+    if (type) {
+        var v = ""
+    } else {
+        var v = "none"
+    }
+    var body = body || document.body;
+    body.style.userSelect = v;
+    body.style.webkitUserSelect = v;
+    body.style.msUserSelect = v;
+    body.style.mozUserSelect = v
+
+    /* -webkit-user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    user-select: none;}
+ */
 };
 
 
@@ -261,6 +272,7 @@ Graphics._addElementToBody = function (e) {
 
 /**添加元素到 */
 Graphics._addElement2 = function (e, body) {
+    Graphics._disableTextSelection(e, true)
     var body = this._getElementById(body)
     var body = body || this._elementsBody
     body.appendChild(e);
@@ -380,8 +392,8 @@ Graphics._isElement = function (element) {
     try {
         if (element && this._elements[element.id] == element) {
             return true
-        } 
-    } catch (error) {}
+        }
+    } catch (error) { }
     return false
 };
 
@@ -555,7 +567,7 @@ Graphics.pageToCanvasX2 = function (x, y) {
     return Graphics.pageToCanvasX(x)
 }
 
-/**页到画布Y2 */ 
+/**页到画布Y2 */
 Graphics.pageToCanvasY2 = function (x, y) {
     if (this._rotate == 1 || this._rotate == 3) {
         y = x
@@ -661,14 +673,14 @@ TouchInput._onRightButtonDown = function (event) {
  */
 TouchInput._onMouseMove = function (event) {
     //如果 鼠标按下
-    if (this._mousePressed) {
-        //画布x 
-        var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
-        //y  = 画布y
-        var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
-        //当移动(x,y)
-        this._onMove(x, y);
-    }
+    //if (this._mousePressed) {
+    //画布x 
+    var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
+    //y  = 画布y
+    var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
+    //当移动(x,y)
+    this._onMove(x, y);
+    //}
 };
 
 
@@ -716,9 +728,9 @@ TouchInput._onTouchStart = function (event) {
         //触摸 =  事件改变触摸组[i]
         var touch = event.changedTouches[i];
         //x  = 画布x 
-        var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
+        var x = Graphics.pageToCanvasX2(touch.pageX, touch.pageY);
         //y  = 画布y
-        var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
+        var y = Graphics.pageToCanvasY2(touch.pageX, touch.pageY);
         if (Graphics.isInsideCanvas(x, y)) {
             //屏幕按下 = true
             this._screenPressed = true;
@@ -734,17 +746,16 @@ TouchInput._onTouchStart = function (event) {
             }
             //避免默认
 
-            if (!Graphics._isElement(event.target)) {
-                event.preventDefault();
-            }
+
         }
+
     }
-    if (window.cordova || window.navigator.standalone) {
-        //避免默认
-        if (!Graphics._isElement(event.target)) {
-            event.preventDefault();
-        }
+    //if (window.cordova || window.navigator.standalone) {
+    //避免默认
+    if (!Graphics._isElement(event.target)) {
+        event.preventDefault();
     }
+    //}
 };
 
 /**当触摸移动
@@ -759,9 +770,9 @@ TouchInput._onTouchMove = function (event) {
         //触摸 = 事件改变触摸组[i]
         var touch = event.changedTouches[i];
         //x  = 画布x
-        var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
+        var x = Graphics.pageToCanvasX2(touch.pageX, touch.pageY);
         //y  = 画布y
-        var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
+        var y = Graphics.pageToCanvasY2(touch.pageX, touch.pageY);
 
         this._onMove(x, y);
     }
@@ -779,9 +790,9 @@ TouchInput._onTouchEnd = function (event) {
         //触摸 = 事件改变触摸组[i]
         var touch = event.changedTouches[i];
         //x  = 画布x
-        var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
+        var x = Graphics.pageToCanvasX2(touch.pageX, touch.pageY);
         //y  = 画布y
-        var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
+        var y = Graphics.pageToCanvasY2(touch.pageX, touch.pageY);
         //屏幕按下 = false
         this._screenPressed = false;
         //当释放(x,y)
