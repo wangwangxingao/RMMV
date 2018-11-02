@@ -27,6 +27,25 @@ localFile.localdir = function () {
             this._localdir = decodeURIComponent(path);
         }
     }
+
+    /***
+      
+       var canpath = require &&typeof(require) =="function" && require('path')
+    if (canpath) {
+        var path = require('path');
+        var base = path.dirname(process.mainModule.filename);
+        return path.join(base, 'save/');
+    } else {
+        var path = require('path');
+        var base = path.dirname(process.mainModule.filename)
+        var fa = path.basename(base)
+        if (fa == "www") {
+            var base = path.dirname(base);
+        }
+        return path.join(base, 'save/');
+    } 
+
+     */
     return this._localdir
 };
 

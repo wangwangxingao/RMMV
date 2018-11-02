@@ -40,14 +40,18 @@
  * 9 人数 有 id 以上
  * 当id 为 0 时, 则下一个判断变成  不符合条件 的判断
  * 
+ * 当id为 "a" 时,则为判断是否有 actor 
+ * 当id为 "b" 时,则为判断是否没有有 actor (注意双引号)
+ * 
  *  
  * 如果符合对应条件,则转化为 替换内容 ,否则为 ""
  * 
  * 对于多个参数,只要有一个成立就使用替换内容
  * 
  * type 也可以用   1x , 2x , 3x
- *  
- * 为 1x 时, 只要有一个成立,则不显示替换内容
+ * 
+ * 为 0x 时, 只要有一个成立,则显示替换内容,如果全部不成立,则不显示替换内容
+ * 为 1x 时, 只要有一个成立,则不显示替换内容,如果全部不成立,则显示替换内容
  * 为 2x 时, 全部成立时 , 显示替换内容 
  * 为 3x 时, 全部成立时 , 不显示替换内容
  * 
@@ -56,9 +60,9 @@
  * 
  * 写法示例:
  * 注释中这样写
- * 剑的测试#[0,1,\c[1]]##[10,1,\c[2]]#状态1
+ * 剑的测试#[0,"a",1,\c[1]]##[10,1,\c[2]]#状态1
  *
- * 当存在状态1(死亡状态时)
+ * 当 存在角色 并且 存在状态1(死亡状态时)
  * 注释为 剑的测试\c[1]状态1
  * 
  * 当不存在状态1(死亡状态时)
@@ -101,24 +105,24 @@ var ww = ww || {}
 
 ww.changeDescriptionByActor = {}
 
-ww.changeDescriptionByActor.rex = /\#\[((\s*\d+\s*,){2,})(.*?)\]\#/g 
+ww.changeDescriptionByActor.rex = /\#\[(((\s*\d+\s*,)|("[ab]",)){2,})(.*?)\]\#/g
 ww.changeDescriptionByActor.changeDescription = function () {
 
-  
+
     var actor = this._actor
 
     var cs = arguments[1]
-    var show = arguments[3]
+    var show = arguments[5]
 
-    var csl = JSON.parse("[" + cs + "0]") 
+    var csl = JSON.parse("[" + cs + "0]")
     var type = csl.shift()
     csl.pop()
-   
+
     var xf = Math.floor(type * 0.1)
     type = type - xf * 10
 
     var last = -1
- 
+
     var zh = 0
     for (var i = 0; i < csl.length; i++) {
         var n = csl[i]
@@ -127,58 +131,69 @@ ww.changeDescriptionByActor.changeDescription = function () {
             continue
         }
         var change = 0
-        if (actor) {
-            if (type == 0) {
-                change = actor.isStateAffected(n)
-            } else if (type == 1) {
-                change = actor.isClass($dataClasses[n]);
-            } else if (type == 2) {
-                change = actor.hasSkill(n);
-            } else if (type == 3) {
-                change = actor.hasWeapon($dataWeapons[n]);
-            } else if (type == 4) {
-                change = actor.hasArmor($dataArmors[n]);
+        if (n == "a") {
+            change = !!actor
+        }else if (n == "b") {
+            change = !actor
+        } else { 
+            if (actor) {
+                if (type == 0) {
+                    change = actor.isStateAffected(n)
+                } else if (type == 1) {
+                    change = actor.isClass($dataClasses[n]);
+                } else if (type == 2) {
+                    change = actor.hasSkill(n);
+                } else if (type == 3) {
+                    change = actor.hasWeapon($dataWeapons[n]);
+                } else if (type == 4) {
+                    change = actor.hasArmor($dataArmors[n]);
+                }
+            }
+            if (type == 5) {
+                change = $gameParty.hasItem($dataItems[n])
+            } else if (type == 6) {
+                change = $gameParty.members().contains($gameActors.actor(n))
+            } else if (type == 7) {
+                change = $gameParty.gold() >= n
+            } else if (type == 8) {
+                change = $gameParty.steps() >= n
+            } else if (type == 9) {
+                change = $gameParty.size() >= n
             }
         }
-        if (type == 5) {
-            change = $gameParty.hasItem($dataItems[n])
-        } else if (type == 6) {
-            change = $gameParty.members().contains($gameActors.actor(n))
-        } else if (type == 7) {
-            change = $gameParty.gold() >= n
-        } else if (type == 8) {
-            change = $gameParty.steps() >= n
-        } else if (type == 9) {
-            change = $gameParty.size() >= n
-        }
- 
         if (zh == 1) {
             change = !change
             zh = 0
+        } else {
+            change = !!change
         }
- 
+
         if (last == -1) {
             last = change
         } else {
+            //只要有一个成立
             if (!xf) {
                 last = last || change
+                //只要有一个成立
             } else if (xf == 1) {
                 last = last || change
+                //全部成立时
             } else if (xf == 2) {
                 last = last && change
+                //全部成立时
             } else if (xf == 3) {
                 last = last && change
             }
         }
-    } 
-    if(last == -1){
+        console.log(n, change, last)
+    }
+    if (last == -1) {
         last = 0
-    } 
-
+    }
     if (xf == 1 || xf == 3) {
         last = !last
     }
- 
+
     if (last) {
         return show
     } else {
@@ -196,7 +211,7 @@ Window_EquipSlot.prototype.setHelpWindowItem = function (item) {
         var rex = ww.changeDescriptionByActor.rex
 
         var description = description.replace(rex, ww.changeDescriptionByActor.changeDescription.bind(this))
-        var description = description.replace(/\\n/,"\n" )
+        var description = description.replace(/\\n/, "\n")
 
         this._helpWindow.setItem({ description: description });
     }
@@ -210,7 +225,7 @@ Window_ItemList.prototype.setHelpWindowItem = function (item) {
         var rex = ww.changeDescriptionByActor.rex
 
         var description = description.replace(rex, ww.changeDescriptionByActor.changeDescription.bind(this))
-        var description = description.replace(/\\n/,"\n" )
+        var description = description.replace(/\\n/, "\n")
 
         this._helpWindow.setItem({ description: description });
     }
@@ -224,7 +239,7 @@ Window_SkillList.prototype.setHelpWindowItem = function (item) {
         var rex = ww.changeDescriptionByActor.rex
 
         var description = description.replace(rex, ww.changeDescriptionByActor.changeDescription.bind(this))
-        var description = description.replace(/\\n/,"\n" )
+        var description = description.replace(/\\n/, "\n")
 
         this._helpWindow.setItem({ description: description });
     }
@@ -239,8 +254,8 @@ Window_ShopBuy.prototype.setHelpWindowItem = function (item) {
         var rex = ww.changeDescriptionByActor.rex
 
         var description = description.replace(rex, ww.changeDescriptionByActor.changeDescription.bind(this))
-        var description = description.replace(/\\n/,"\n" )
-        
+        var description = description.replace(/\\n/, "\n")
+
         this._helpWindow.setItem({ description: description });
     }
 };
