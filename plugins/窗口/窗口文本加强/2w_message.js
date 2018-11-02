@@ -278,7 +278,7 @@ Window_Base.prototype.makePage = function (textState) {
     return page
 };
 Window_Base.prototype.makeLine = function (textState) {
-    return { "type": "line", "list": [], "test": { "x": 0, "y": 0, "w": 0, "h": 0 } }
+    return { "type": "line", "list": [], "texts": [], "test": { "x": 0, "y": 0, "w": 0, "h": 0 } }
 };
 Window_Base.prototype.makeText = function (textState) {
     return { "type": "text", "text": "", "test": { "x": 0, "y": 0, "w": 0, "h": 0 } }
@@ -586,6 +586,9 @@ Window_Base.prototype.testPushLine = function (textState, line, cs) {
     if (page) {
         /**有上一行时 */
         if (line0) {
+            var must = page.set
+
+            //有限定行数时 
             var ph = page.test.h
             var lh = line0.test.h
             //间隔
@@ -595,7 +598,6 @@ Window_Base.prototype.testPushLine = function (textState, line, cs) {
             page.test.h = line0.test.h + line0.test.y
 
             page.test.w = Math.max(page.test.w, line0.test.w)
-            var must = page.set
             var fw = Window_Base._faceWidth + 24
             var w = must.w - (page.set.facepos == 3 ? fw * 2 : page.set.facepos ? fw : 0)
             var h = must.h
@@ -636,13 +638,13 @@ Window_Base.prototype.testPushLine = function (textState, line, cs) {
 
 Window_Base.prototype.testPushLCFText = function (textState, lcftext) {
     var lcftext = lcftext || this.makeLCFText()
- 
+
     var list = lcftext.list
 
     if (!list.length) {
         return
     }
- 
+
 
     var lcf = lcftext.lcf
 
@@ -690,7 +692,7 @@ Window_Base.prototype.testPushLCFText = function (textState, lcftext) {
             text.test.x = lw + jw
             line.test.w = text.test.x + tw
             line.test.h = Math.max(line.test.h, text.test.h)
-            this.testPushOther(textState, text)
+            this.testPushLineText(textState, text)
 
             //====处理行====
             var ph = page.test.h
@@ -713,6 +715,14 @@ Window_Base.prototype.testPushLCFText = function (textState, lcftext) {
             }
             rei = 0
         } else {
+            //判断是否添加新页
+            if (pageset.hl && page.list.length >= pageset.hl) {
+                textState.line = null
+                var page2 = this.makePage(textState)
+                page2.type = "addpage"
+                page2.set = Window_Base.deepCopy(page.set)
+                this.testPushPage(textState, page2)
+            }
             //添加新行
             var line2 = this.makeLine()
             line2.type = "addline"
@@ -729,7 +739,7 @@ Window_Base.prototype.testPushLCFText = function (textState, lcftext) {
             text.test.x = lw + jw
             line.test.w = text.test.x + tw
             line.test.h = Math.max(line.test.h, text.test.h)
-            this.testPushOther(textState, text)
+            this.testPushLineText(textState, text)
 
         }
         //如果不是到达最后一个
@@ -742,8 +752,8 @@ Window_Base.prototype.testPushLCFText = function (textState, lcftext) {
             text.test.x = lw + jw
             line.test.w = text.test.x + tw
             line.test.h = Math.max(line.test.h, text.test.h)
-            this.testPushOther(textState, text) 
-        } 
+            this.testPushLineText(textState, text)
+        }
         //====处理行====
         var ph = page.test.h
         var lh = line.test.h
@@ -762,21 +772,21 @@ Window_Base.prototype.testPushLCFText = function (textState, lcftext) {
             this.testPushPage(textState, page2)
             //行添加到新页
             this.testPushLine(textState, line)
-        } 
+        }
     }
 
-    
+
     var lclist2 = []
-    for(var i= rei+1;i<list.length;i++){
+    for (var i = rei + 1; i < list.length; i++) {
         lclist2.push(list[i])
     }
-    if(lclist2.length){
+    if (lclist2.length) {
         var lcftext2 = this.makeLCFText()
-        lcftext2.lcf = lcf 
-        lcftext2.lcfwh = lcfwh 
-        lcftext2.list = lclist2 
+        lcftext2.lcf = lcf
+        lcftext2.lcfwh = lcfwh
+        lcftext2.list = lclist2
         //处理下一个
-        this.testPushLCFText(textState,lcftext2)  
+        this.testPushLCFText(textState, lcftext2)
     }
 };
 
@@ -795,13 +805,18 @@ Window_Base.prototype.testPushText = function (textState, text) {
     var sw = pageset.w
     var fw = Window_Base._faceWidth + 24
     var fw = page.set.facepos == 3 ? fw * 2 : page.set.facepos ? fw : 0
+
+    var wlp = pageset.wl && line.texts.length >= pageset.wl
     //行可以放开字  或者 第一个
-    if (lw + jw + tw <= sw - fw || lw == 0) {
+    if (!wlp && (lw + jw + tw <= sw - fw || lw == 0)) {
         //添加字符 
         text.test.x = lw + jw
         line.test.w = text.test.x + tw
         line.test.h = Math.max(line.test.h, text.test.h)
-        this.testPushOther(textState, text)
+        this.testPushLineText(textState, text)
+
+
+        var hlp = pageset.hl && page.list.length >= pageset.hl
 
         //====处理行====
         var ph = page.test.h
@@ -810,7 +825,7 @@ Window_Base.prototype.testPushText = function (textState, text) {
         var jh = (ph == 0 || lh == 0) ? 0 : this.getHjg() || 0
         var sh = pageset.h
         //行能放到页中 
-        if (ph + jh + lh <= sh || ph == 0) {
+        if (!hlp && (ph + jh + lh <= sh || ph == 0)) {
             //不能放到页中 或者 不是第一行
         } else {
             //添加新页
@@ -819,13 +834,13 @@ Window_Base.prototype.testPushText = function (textState, text) {
             page2.type = "addpage"
             page2.set = Window_Base.deepCopy(page.set)
             this.testPushPage(textState, page2)
-            //行添加到新页
+            //行添加到新页 
             this.testPushLine(textState, line)
-
         }
     }
     //行放不开
     else {
+
         /**单个空格的话不添加到新行 */
         if (text.ge && text.text == " ") {
             //添加新行
@@ -847,6 +862,12 @@ Window_Base.prototype.testPushText = function (textState, text) {
 
 /**添加其他 */
 Window_Base.prototype.testPushOther = function (textState, obj) {
+    textState.line.list.push(obj)
+};
+
+
+Window_Base.prototype.testPushLineText = function (textState, obj) {
+    textState.line.texts.push(obj)
     textState.line.list.push(obj)
 };
 
@@ -898,7 +919,7 @@ Window_Base.prototype.tslPushEscapeCharacter = function (textState, code) {
         case 'C':
             this.tslPushTextColor(textState, this.tslPushTextColorEscapeParam(textState));
             break;
-        
+
         case 'T':
             this.tslPushPicParam(textState)
             break;
@@ -1868,9 +1889,6 @@ Window_Message.prototype.tslPushNewPage = function (textState) {
     var type = this.positionType()
     page.set.wz = type
     if (type == 0) {
-        page.set.wtype = 1
-        page.set.htype = 0
-    } else {
         page.set.wtype = 0
         page.set.htype = 0
     }
@@ -1937,11 +1955,23 @@ Window_Message.prototype.tslPushNewPageY = function (textState) {
         var type = arr//[0] * 1
         page.set.wz = type
 
-        page.set.wtype = 0
-        page.set.htype = 0
-        page.set.autoh = 1
-        page.set.autow = 1
-
+        if (arr[0] == 10 || arr[0] == 11 || arr[0] == 12) {
+            page.set.wtype = 0
+            page.set.htype = 0
+            page.set.autoh = 1
+            page.set.autow = 1
+            page.set.hl = 1
+        } else if (arr[0] >= 3) {
+            page.set.wtype = 0
+            page.set.htype = 0
+            page.set.autoh = 1
+            page.set.autow = 1
+        } else {
+            page.set.wtype = 0
+            page.set.htype = 0
+            page.set.autoh = 0
+            page.set.autow = 0
+        }
     }
     //console.log(arr)
     this.tslPushPage(textState, page)
@@ -2158,6 +2188,7 @@ Window_Message.prototype.updatePlacement = function () {
 
             var ah = set && set.autoh
 
+            console.log(aw, ah)
             var sp2 = this.standardPadding()
             sp2 += sp2 //窗口间隔 
             if (aw == 2) {
@@ -2169,7 +2200,7 @@ Window_Message.prototype.updatePlacement = function () {
                 w += sp2
             }
             if (ah == 2) {
-                h = page.set.w + sp2
+                h = page.set.h + sp2
             }
             if (ah == 1 || h == Infinity) {
                 var h = page.test.y + page.test.h
@@ -2199,7 +2230,28 @@ Window_Message.prototype.updatePlacement = function () {
         var ry = 0
         var rw = 1
         var rh = 1
-        if (type == 8) {
+        if (type == 12) {
+            var rw = Graphics.boxWidth
+            var rh = Graphics.boxHeight
+            var cex = 0.5
+            var cey = 1
+            var wex = 0.5;
+            var wey = 1;
+        } else if (type == 11) {
+            var rw = Graphics.boxWidth
+            var rh = Graphics.boxHeight
+            var cex = 0.5
+            var cey = 0.5
+            var wex = 0.5;
+            var wey = 0.5;
+        } else if (type == 10) {
+            var rw = Graphics.boxWidth
+            var rh = Graphics.boxHeight
+            var cex = 0.5
+            var cey = 0
+            var wex = 0.5;
+            var wey = 0;
+        } else if (type == 8) {
             if (id == 4) {
                 var rx = 0
                 var ry = 0
@@ -2375,11 +2427,9 @@ Window_Message.prototype.updatePlacement = function () {
 
             }
         }
-
-
-
         var x = rx + cex * rw - w * wex + wdx
         var y = ry + cey * rh - h * wey + wdx
+
     }
 
 
@@ -2393,6 +2443,7 @@ Window_Message.prototype.updatePlacement = function () {
 
 
 
+    console.log(x, y, w, h)
 
     var zx = l
     var zy = u + trueh - h

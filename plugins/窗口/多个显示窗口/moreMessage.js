@@ -37,6 +37,8 @@ Window_MessageClone.prototype.constructor = Window_MessageClone;
 Window_MessageClone.prototype.update = function () {
     if (!this._messagestop) {
         Window_Message.prototype.update.call(this);
+    }else{
+        Window_Base.prototype.update.call(this)
     }
 }
 

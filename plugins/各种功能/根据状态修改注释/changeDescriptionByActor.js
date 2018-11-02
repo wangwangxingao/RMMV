@@ -36,8 +36,8 @@
  * 5 队伍 有 id 的物品
  * 6 队伍 有 id 的角色
  * 7 金钱 有 id 以上
- * 8 步数 有 id 以上
- * 9 人数 有 id 以上
+ * 8 开关 的 id 为开 
+ * 9 变量 的 id 不为0
  * 当id 为 0 时, 则下一个判断变成  不符合条件 的判断
  * 
  * 当id为 "a" 时,则为判断是否有 actor 
@@ -156,9 +156,9 @@ ww.changeDescriptionByActor.changeDescription = function () {
             } else if (type == 7) {
                 change = $gameParty.gold() >= n
             } else if (type == 8) {
-                change = $gameParty.steps() >= n
+                change = !!$gameSwitches.value(n)
             } else if (type == 9) {
-                change = $gameParty.size() >= n
+                change = !!$gameVariables.value(n)
             }
         }
         if (zh == 1) {
