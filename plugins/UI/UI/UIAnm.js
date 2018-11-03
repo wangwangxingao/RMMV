@@ -623,13 +623,12 @@
         var oa = list[index]
         var s = this
         if (oa) {
-            if (this.__evalReturn(s, oa, "d", "", oa, anmobj)
-            ) {
+            if (!oa.d || this.__evalReturn(s, oa, "d", "", oa, anmobj)) {
                 this.__evalUpdate(s, oa, "up", "", oa, anmobj)
                 if (typeof oa.set == "object") {
                     for (var i in oa.set) {
                         var set = oa.set[i]
-                        if (this.__evalReturn(s, set, "d", i, oa, anmobj)) {
+                        if (!set.d || this.__evalReturn(s, set, "d", i, oa, anmobj)) {
                             this.__evalUpdate(s, set, "up", i, oa, anmobj)
                         }
                     }
