@@ -207,11 +207,11 @@ Scene_Battle.prototype.createDisplayObjects = function() {
     //记录窗口 设置精灵组(精灵组)
     this._logWindow.setSpriteset(this._spriteset);
 };
-/**创建画面 */
+/**创建精灵组 */
 Scene_Battle.prototype.createSpriteset = function() {
-	//设置 战斗画面
+	//精灵组 = 新 精灵组战斗()
     this._spriteset = new Spriteset_Battle();
-    //画面 添加到 子代
+    //添加子代(精灵组)
     this.addChild(this._spriteset);
 };
 /**创建所有窗口  */

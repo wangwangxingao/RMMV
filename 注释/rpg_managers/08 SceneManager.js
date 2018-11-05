@@ -296,8 +296,9 @@ SceneManager.changeScene = function() {
         //场景 = 下一个场景
         this._scene = this._nextScene;
         if (this._scene) {
+            //场景 附加预订()
 	        this._scene.attachReservation();
-            //场景 创建
+            //场景 创建()
             this._scene.create();
             //下一个场景 = null
             this._nextScene = null;

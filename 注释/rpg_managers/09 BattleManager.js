@@ -164,7 +164,9 @@ BattleManager.replayBgmAndBgs = function() {
         AudioManager.replayBgs(this._mapBgs);
     }
 };
-/**制作逃跑概率 */
+/**制作逃跑概率
+ * @returns {number} 0.5 * 游戏队伍 敏捷() / 游戏敌群 敏捷()
+ */
 BattleManager.makeEscapeRatio = function() {
     //逃跑概率 = 0.5 * 游戏队伍 敏捷() / 游戏敌群 敏捷()
     this._escapeRatio = 0.5 * $gameParty.agility() / $gameTroop.agility();

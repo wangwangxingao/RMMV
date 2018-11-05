@@ -30,7 +30,10 @@ Game_Screen.prototype.clear = function() {
     //清除图片()
     this.clearPictures();
 };
-/**当战斗开始*/
+/**当战斗开始
+ * 
+ * @description 清除淡入淡出,清除闪烁,清除震动,清除缩放,抹去战斗图片
+*/
 Game_Screen.prototype.onBattleStart = function() {
     //清除淡入淡出()
     this.clearFade();

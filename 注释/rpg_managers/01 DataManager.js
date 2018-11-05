@@ -319,7 +319,7 @@ DataManager.setupNewGame = function() {
     //图形 帧计数 = 0
     Graphics.frameCount = 0;
 };
-/**设置战斗测试 */
+/**安装战斗测试 */
 DataManager.setupBattleTest = function() {
 	//创建游戏对象()
     this.createGameObjects();

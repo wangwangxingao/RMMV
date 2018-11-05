@@ -71,7 +71,10 @@ Game_Troop.prototype.troop = function() {
     //返回 数据敌群组[敌群id]
     return $dataTroops[this._troopId];
 };
-/**安装*/
+/**安装
+ * @param {number} troopId 敌群id
+ * @description 清除内容,设置敌群id,然后根据敌群数据安装每一个敌人,然后制作唯一名称
+*/
 Game_Troop.prototype.setup = function(troopId) {
     //清除()
     this.clear();

@@ -112,28 +112,46 @@ Sprite_Enemy.prototype.setupEffect = function() {
         this.startEffect('disappear');
     }
 };
-/**开始效果 */
+/**开始效果 
+ * 
+ * @param {string} effectType 效果种类  
+ *当 'appear' //出现  
+ *当 'disappear' //消失  
+ *当 'whiten'//变白  
+ *当 'blink'//闪烁  
+ *当 'collapse'//崩溃  
+ *当 'bossCollapse'//boss崩溃   
+ *当 'instantCollapse'//立即崩溃   
+ *  
+*/
 Sprite_Enemy.prototype.startEffect = function(effectType) {
     this._effectType = effectType;
     switch (this._effectType) {
+        //当 'appear'//出现: 
         case 'appear':
             this.startAppear();
             break;
+        //当 'disappear'//消失 : 
         case 'disappear':
             this.startDisappear();
             break;
+        //当 'whiten'//变白 : 
         case 'whiten':
             this.startWhiten();
             break;
+        //当 'blink'//闪烁 : 
         case 'blink':
             this.startBlink();
             break;
+        //当 'collapse'//崩溃 : 
         case 'collapse':
             this.startCollapse();
             break;
+        //当 'bossCollapse'//boss崩溃 : 
         case 'bossCollapse':
             this.startBossCollapse();
             break;
+        //当 'instantCollapse'//立即崩溃 : 
         case 'instantCollapse':
             this.startInstantCollapse();
             break;
@@ -158,17 +176,17 @@ Sprite_Enemy.prototype.startWhiten = function() {
 Sprite_Enemy.prototype.startBlink = function() {
     this._effectDuration = 20;
 };
-/**开始死亡 */
+/**开始崩溃 */
 Sprite_Enemy.prototype.startCollapse = function() {
     this._effectDuration = 32;
     this._appeared = false;
 };
-/**开始boss死亡 */
+/**开始boss崩溃 */
 Sprite_Enemy.prototype.startBossCollapse = function() {
     this._effectDuration = this.bitmap.height;
     this._appeared = false;
 };
-/**开始立即死亡 */
+/**开始立即崩溃 */
 Sprite_Enemy.prototype.startInstantCollapse = function() {
     this._effectDuration = 16;
     this._appeared = false;
@@ -234,13 +252,13 @@ Sprite_Enemy.prototype.updateAppear = function() {
 Sprite_Enemy.prototype.updateDisappear = function() {
     this.opacity = 256 - (32 - this._effectDuration) * 10;
 };
-/**更新死亡 */
+/**更新崩溃 */
 Sprite_Enemy.prototype.updateCollapse = function() {
     this.blendMode = Graphics.BLEND_ADD;
     this.setBlendColor([255, 128, 128, 128]);
     this.opacity *= this._effectDuration / (this._effectDuration + 1);
 };
-/**更新boss死亡 */
+/**更新boss崩溃 */
 Sprite_Enemy.prototype.updateBossCollapse = function() {
     this._shake = this._effectDuration % 2 * 4 - 2;
     this.blendMode = Graphics.BLEND_ADD;
@@ -250,7 +268,7 @@ Sprite_Enemy.prototype.updateBossCollapse = function() {
         SoundManager.playBossCollapse2();
     }
 };
-/**更新迅速死亡 */
+/**更新立即崩溃 */
 Sprite_Enemy.prototype.updateInstantCollapse = function() {
     this.opacity = 0;
 };
