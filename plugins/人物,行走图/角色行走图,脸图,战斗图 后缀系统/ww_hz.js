@@ -123,11 +123,19 @@
  	ww_hz.filesload = function (url,fuc) {
 	 	var fs = require('fs');
 	 	
-		var path = window.location.pathname.replace(/(\/|)\/[^\/]*$/, "/"+ url );
-		if (path.match(/^\/([A-Z]\:)/)) {
-			path = path.slice(1);
+		if (typeof require === 'function' && typeof process === 'object') {
+            var path = require('path');
+            var base = path.dirname(process.mainModule.filename);
+            /* 打包时 
+            if (path.basename(base) == "www") {
+                var base = path.dirname(base);
+            } 
+            */
+            var path = base;
+        }else{
+            var path = ""
 		}
-		path = decodeURIComponent(path);
+		var path = path + url
 		fs.readdir(
 			path,
 			function(err, files){
@@ -137,11 +145,14 @@
 	}
 	ww_hz.saveJSON = function(json,url) {
 		var data = JSON.stringify(json);
-		var path = window.location.pathname.replace(/(\/|)\/[^\/]*$/,  "/"+ url  )   
-		if (path.match(/^\/([A-Z]\:)/)) {
-				path = path.slice(1);
-			}
-		path = decodeURIComponent(path);
+		var path = require('path');
+        var path = path.dirname(process.mainModule.filename);
+        /* 打包时 
+        if (path.basename(base) == "www") {
+            var base = path.dirname(base);
+        } 
+        */ 
+        
 		var fs = require('fs');
 		fs.writeFile(path, data);
 		return data;

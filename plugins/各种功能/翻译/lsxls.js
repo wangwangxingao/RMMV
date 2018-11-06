@@ -25,15 +25,14 @@ ww.lsxls = {}
  * 保存
  * @param {*} sheet 表格/二维数组
  * @param {*} name 名称
- * @param {*} list 合并设置
  */
-ww.lsxls.save = function (sheet, name, list) {
+ww.lsxls.save = function (sheet, name) {
     var fs = require("fs")
     if (!fs) {
-        ww.lsxls.down(sheet, name, list);
+        ww.lsxls.down(sheet, name);
         return
     }
-    var sheet = ww.lsxls.toSheet(sheet, list)
+    var sheet = ww.lsxls.toSheet(sheet)
     var data = new Buffer(ww.lsxls.sheet2Uint8Array(sheet))
     ww.lsxls.writeFileSync(name, data)
 }
@@ -44,8 +43,8 @@ ww.lsxls.save = function (sheet, name, list) {
  * @param {*} name 名称
  * @param {*} list 合并设置
  */
-ww.lsxls.down = function (sheet, name, list) {
-    var sheet = ww.lsxls.toSheet(sheet, list)
+ww.lsxls.down = function (sheet, name) {
+    var sheet = ww.lsxls.toSheet(sheet)
     var blob = ww.lsxls.sheet2Blob(sheet)
     ww.lsxls.downBlob(blob, name)
 }
@@ -62,13 +61,13 @@ ww.lsxls.load = function (url, onload) {
     xhr.open('GET', url);
     xhr.responseType = "arraybuffer"
     var onload = onload || ww.lsxls.onload
-    xhr.onloadend = function () { 
+    xhr.onloadend = function () {
         try {
-            var result = ww.lsxls.onloadxls(xhr.response, xhr) 
+            var result = ww.lsxls.onloadxls(xhr.response, xhr)
         } catch (error) {
             var result = null
             console.error("未能读取")
-        } 
+        }
         if (typeof onload == "function") {
             onload(result, url)
         } else {
@@ -118,13 +117,13 @@ ww.lsxls.sheetMerges = function (sheet, list) {
 
 
 /**转化为表格 */
-ww.lsxls.toSheet = function (object, type) {
+ww.lsxls.toSheet = function (object) {
     if (Array.isArray(object)) {
         return XLS.utils.aoa_to_sheet(object)
         //: 这个工具类最强大也最实用了，将一个二维数组转成sheet，会自动处理number、string、boolean、date等类型数据； 
     } else if (typeof object == "object") {
         if (object.tagName == "TABLE") {
-            XLS.utils.table_to_sheet(Object) //: 将一个table dom直接转成sheet，会自动识别colspan和rowspan并将其转成对应的单元格合并； 
+            XLS.utils.table_to_sheet(object) //: 将一个table dom直接转成sheet，会自动识别colspan和rowspan并将其转成对应的单元格合并； 
         } else if (object["!ref"]) {
             return object
         } else {
@@ -287,17 +286,18 @@ ww.lsxls.downBlob = function (url, saveName) {
  */
 
 ww.lsxls.localdir = function () {
-    if (!ww.lsxls._localdir) {
-        var path = null;// require &&typeof(require) =="function" && require('path');  
-        if (path) {
-            ww.lsxls._localdir = path.dirname(process.mainModule.filename)
-        } else {
-            var pathname = window.location.pathname
-            var path = pathname.replace(/(\/www|)\/[^\/]*$/, "");
-            if (path.match(/^\/([A-Z]\:)/)) {
-                path = path.slice(1);
-            }
-            ww.lsxls._localdir = decodeURIComponent(path);
+    if (ww.lsxls._localdir === undefined) {
+        if (typeof require === 'function' && typeof process === 'object') {
+            var path = require('path');
+            var base = path.dirname(process.mainModule.filename);
+            /* 打包时 
+            if (path.basename(base) == "www") {
+                var base = path.dirname(base);
+            } 
+            */
+            ww.lsxls._localdir = base;
+        }else{
+            ww.lsxls._localdir = ""
         }
     }
     return ww.lsxls._localdir

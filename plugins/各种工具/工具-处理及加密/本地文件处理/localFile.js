@@ -14,15 +14,19 @@ var fs = require("fs")
  * @returns {string}
  */
 localFile.localdir = function () {
-    if (!this._localdir) {
-        // require &&typeof(require) =="function" && require('path');
-        var path = require('path');
-        var base = path.dirname(process.mainModule.filename)
-        var fa = path.basename(base)
-        if (fa == "www") {
-            var base = path.dirname(base);
+    if (this._localdir === undefined) {
+        if (typeof require === 'function' && typeof process === 'object') {
+            var path = require('path');
+            var base = path.dirname(process.mainModule.filename);
+            /* 打包时 
+            if (path.basename(base) == "www") {
+                var base = path.dirname(base);
+            } 
+            */
+            this._localdir = base;
+        }else{
+            this._localdir = ""
         }
-        this._localdir =  base;
         /*  
              var pathname = window.location.pathname
              var path = pathname.replace(/(\/www|)\/[^\/]*$/, "");

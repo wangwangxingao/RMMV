@@ -293,16 +293,15 @@ Tilemap.prototype._paintTiles2 = function (bitmap, startX, startY, x, y) {
 ww.tilemapOut._localURL = null
 ww.tilemapOut.localURL = function () {
     if (!this._localURL) {
-        var path = null// require &&typeof(require) =="function" && require('path');  
-        if (path) {
-            this._localURL = path.dirname(process.mainModule.filename)
-        } else {
-            var pathname = window.location.pathname
-            var path = pathname.replace(/(\/www|)\/[^\/]*$/, "");
-            if (path.match(/^\/([A-Z]\:)/)) {
-                path = path.slice(1);
-            }
-            this._localURL = decodeURIComponent(path);
+        if (typeof require === 'function' && typeof process === 'object') {
+            var path = require('path');
+            var base = path.dirname(process.mainModule.filename);
+            /* 打包时 
+            if (path.basename(base) == "www") {
+                var base = path.dirname(base);
+            } 
+            */
+            this._localdir = base;
         }
     }
     return this._localURL
