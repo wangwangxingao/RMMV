@@ -15,37 +15,23 @@ var fs = require("fs")
  */
 localFile.localdir = function () {
     if (!this._localdir) {
-        var path = null;// require &&typeof(require) =="function" && require('path');  
-        if (path) {
-            this._localdir = path.dirname(process.mainModule.filename)
-        } else {
-            var pathname = window.location.pathname
-            var path = pathname.replace(/(\/www|)\/[^\/]*$/, "");
-            if (path.match(/^\/([A-Z]\:)/)) {
-                path = path.slice(1);
-            }
-            this._localdir = decodeURIComponent(path);
-        }
-    }
-
-    /***
-      
-       var canpath = require &&typeof(require) =="function" && require('path')
-    if (canpath) {
-        var path = require('path');
-        var base = path.dirname(process.mainModule.filename);
-        return path.join(base, 'save/');
-    } else {
+        // require &&typeof(require) =="function" && require('path');
         var path = require('path');
         var base = path.dirname(process.mainModule.filename)
         var fa = path.basename(base)
         if (fa == "www") {
             var base = path.dirname(base);
         }
-        return path.join(base, 'save/');
-    } 
-
-     */
+        this._localdir =  base;
+        /*  
+             var pathname = window.location.pathname
+             var path = pathname.replace(/(\/www|)\/[^\/]*$/, "");
+             if (path.match(/^\/([A-Z]\:)/)) {
+                 path = path.slice(1);
+             }
+            this._localdir = decodeURIComponent(path);
+        */
+    }
     return this._localdir
 };
 
@@ -205,8 +191,8 @@ localFile.copyFileSync = function (src, dest) {
 * @param {*} oldPath  
 * @param {*} newPath 
 */
-localFile.copyFileSync = function (oldPath, newPath) {
-    return fs.copyFileSync(oldPath, newPath)
+localFile.renameSyncSync = function (oldPath, newPath) {
+    return fs.renameSyncSync(oldPath, newPath)
 }
 
 
@@ -264,7 +250,7 @@ localFile.loadDirListSync = function (dirpath, type) {
 
 
 
- 
+
 
 /**获取所有文件状态 */
 localFile.getAllfile = function (path) {
@@ -291,9 +277,6 @@ localFile.getAllfile = function (path) {
 
 
 
-
-
- 
 
 
 

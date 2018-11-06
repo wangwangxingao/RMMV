@@ -55,7 +55,7 @@ RVO.Agent = function (sim) {
     this.newVelocity = [0, 0];
     /**障碍邻居组 */
     this.obstacleNeighbors = [];
-    /**线组 */
+    /**最优交互避碰线组 */
     this.orcaLines = [];
     /**位置 */
     this.position = [0, 0];
@@ -96,12 +96,12 @@ RVO.Agent.prototype.computeNeighbors = function () {
  * 计算新速度
  */
 RVO.Agent.prototype.computeNewVelocity = function () {
-    /**线组 */
+    /**最优交互避碰线组 */
     this.orcaLines = [];
     /**求逆时间跨度障碍 = 1/时间跨度障碍 */
     var invTimeHorizonObst = 1 / this.timeHorizonObst;
 
-    /** */
+    /**在碰撞邻居组中循环 */
     for (var i = 0, ilen = this.obstacleNeighbors.length; i < ilen; ++i) {
         /**障碍1 障碍邻居组[i][1]*/
         var obstacle1 = this.obstacleNeighbors[i][1]
@@ -114,9 +114,9 @@ RVO.Agent.prototype.computeNewVelocity = function () {
             /**已经涵盖 = false */
             , alreadyCovered = false;
 
-        /**  线组  */
+        /**  最优交互避碰线组  */
         for (var j = 0, jlen = this.orcaLines.length; j < jlen; ++j) {
-            //向量积(相乘(相对位置1, 线组[j][0], 求逆时间跨度障碍), 线组[j][1])
+            //向量积(相乘(相对位置1, 最优交互避碰线组[j][0], 求逆时间跨度障碍), 最优交互避碰线组[j][1])
             if (
                 RVO.Vector.det(
                     RVO.Vector.multiply(
@@ -127,7 +127,7 @@ RVO.Agent.prototype.computeNewVelocity = function () {
                     ),
                     this.orcaLines[j][1]
                 ) - invTimeHorizonObst * this.radius >= - RVO.EPSILON &&
-                //向量积(相乘(相对位置2, 线组[j][0], 求逆时间跨度障碍), 线组[j][0])
+                //向量积(相乘(相对位置2, 最优交互避碰线组[j][0], 求逆时间跨度障碍), 最优交互避碰线组[j][0])
                 RVO.Vector.det(
                     RVO.Vector.multiply(
                         RVO.Vector.subtract(
@@ -1338,8 +1338,8 @@ RVO.Vector.abs = function (a) {
 
 /** 
  * 数量积 
- * @param {[number,number]} a
- * @param {[number,number]} b 
+ * @param {[number,number]} a a点
+ * @param {[number,number]} b b点
  * @return {number} 
  * */
 RVO.Vector.absSq = function (a) {
@@ -1369,9 +1369,9 @@ RVO.Vector.normalize = function (a) {
 
 /**在左边 
  * c在ab左边时>0 
- * @param {[number,number]} a 
- * @param {[number,number]} b 
- * @param {[number,number]} c
+ * @param {[number,number]} a 线段a点[x,y]
+ * @param {[number,number]} b 线段b点[x,y]
+ * @param {[number,number]} c c点[x,y]
  * @return {number}  向量积(c在ab左边>0)
 */
 RVO.Vector.leftOf = function (a, b, c) {
@@ -1380,11 +1380,11 @@ RVO.Vector.leftOf = function (a, b, c) {
 }
 
 /**点线段距离 
- * 
- * @param {[number,number]} a 
- * @param {[number,number]} b 
- * @param {[number,number]} c
- * @returns {[number,number]} 
+ * c点 到 ab线段的距离
+ * @param {[number,number]} a 线段a点[x,y]
+ * @param {[number,number]} b 线段b点[x,y]
+ * @param {[number,number]} c c点[x,y]
+ * @returns {number} 距离值
 */
 RVO.Vector.distSqPointLineSegment = function (a, b, c) {
     /**ba =  b减a */

@@ -495,8 +495,20 @@ Decrypter.listname = function () {
 /**本地地址
  * 
  */
-Decrypter.localURL = function () {
+Decrypter.localURL = function () { 
     if (!this._localURL) {
+        if(Utils.isNwjs()){
+            var path = require('path');
+            var base = path.dirname(process.mainModule.filename)
+            var fa = path.basename(base)
+            if (fa == "www") {
+                var base = path.dirname(base);
+            }
+            this._localURL =  base;
+        }else {
+            this._localURL =  "";
+        } 
+        /* 
         var path = null;// require &&typeof(require) =="function" && require('path');  
         if (path) {
             this._localURL = path.dirname(process.mainModule.filename)
@@ -507,7 +519,7 @@ Decrypter.localURL = function () {
                 path = path.slice(1);
             }
             this._localURL = decodeURIComponent(path);
-        }
+        } */
     }
     return this._localURL
 };
@@ -807,7 +819,7 @@ Decrypter.updateList = function () {
 
 /**开始更新 */
 Decrypter.startUpdate = function () {
-    this.param()
+    //this.param()
     if (this._webURL && this.isLocalMode()) {
         this.initUL()
         this._weblist = null

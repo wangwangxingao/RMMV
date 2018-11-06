@@ -14,7 +14,7 @@ Graphics.rotateTo = function (type) {
     if (this._rotate != type) {
         var list = [0, -90, -180, 90]
         var set = this._getRotateSet(list[type])
-        this._setElementSet(this._base, set, "style")
+        this._setElement(this._base, set, "style")
         this._rotate = type
         Graphics._updateAllElements()
     }
