@@ -52,11 +52,18 @@ GameUpdate.webURL = function () {
 GameUpdate._localURL = ""
 GameUpdate.localURL = function () {
     if (!this._localURL) {
-        var path = window.location.pathname.replace(/(\/www|)\/[^\/]*$/, "");
-        if (path.match(/^\/([A-Z]\:)/)) {
-            path = path.slice(1);
+        if (typeof require === 'function' && typeof process === 'object') {
+            var path = require('path');
+            var base = path.dirname(process.mainModule.filename);
+            /* 打包时 
+            if (path.basename(base) == "www") {
+                var base = path.dirname(base);
+            } 
+            */
+            this._localURL = base;
+        }else{
+            this._localURL = ""
         }
-        this._localURL = decodeURIComponent(path);
     }
     return this._localURL
 };
