@@ -31,7 +31,9 @@ NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 MODIFICATIONS.
 */
 
-/**Reciprocal Velocity Obstacles 相互速度障碍 */
+/**Reciprocal Velocity Obstacles 
+ * 相互速度障碍 
+ * */
 var RVO = RVO || {};
 
 
@@ -40,34 +42,34 @@ var RVO = RVO || {};
  * @param {*} sim 模拟电脑
  */
 RVO.Agent = function (sim) {
-    /**模拟电脑 */
+    //模拟电脑 
     this.sim = sim;
 
-    /**代理邻居组 */
+    //代理邻居组 
     this.agentNeighbors = [];
-    /**最大邻居数 */
+    //最大邻居数 
     this.maxNeighbors = 0;
-    /**最大速度 */
+    //最大速度 
     this.maxSpeed = 0;
-    /**邻居距离 */
+    //邻居距离 
     this.neighborDist = 0;
-    /**新速度 */
+    //新速度 
     this.newVelocity = [0, 0];
-    /**障碍邻居组 */
+    //障碍邻居组 
     this.obstacleNeighbors = [];
-    /**最优交互避碰线组 */
+    //最优交互避碰线组 
     this.orcaLines = [];
-    /**位置 */
+    //位置 
     this.position = [0, 0];
-    /**模拟电脑 */
+    //模拟电脑 
     this.sim = sim;
-    /**时间跨度 */
+    //时间跨度 
     this.timeHorizon = 0;
-    /**时间跨度障碍 */
+    //时间跨度障碍 
     this.timeHorizonObst = 0;
-    /**速度 */
+    //速度 
     this.velocity = [0, 0];
-    /**id */
+    //id 
     this.id = 0;
 }
 
@@ -75,19 +77,19 @@ RVO.Agent = function (sim) {
  * 计算邻居组
  */
 RVO.Agent.prototype.computeNeighbors = function () {
-    /**障碍邻居组 */
+    //障碍邻居组 
     this.obstacleNeighbors = [];
-    /**距离平方 = 平方( 时间跨度障碍 * 最大速度 + 半径 ) */
+    //距离平方 = 平方( 时间跨度障碍 * 最大速度 + 半径 ) 
     var rangeSq = RVO.sqr(this.timeHorizonObst * this.maxSpeed + this.radius);
-    /**模拟电脑 kd树 计算障碍邻居组(this ,距离平方 )*/
+    //模拟电脑 kd树 计算障碍邻居组(this ,距离平方 )
     this.sim.kdTree.computeObstacleNeighbors(this, rangeSq);
-    /**代理邻居组 */
+    //代理邻居组 
     this.agentNeighbors = [];
-    /**如果(最大邻居数 > 0) */
+    //如果(最大邻居数 > 0) 
     if (this.maxNeighbors > 0) {
         //距离平方 =  平方( 邻居距离 )
         rangeSq = RVO.sqr(this.neighborDist);
-        /**模拟电脑 kd树 计算代理邻居组(this ,距离平方 )*/
+        //模拟电脑 kd树 计算代理邻居组(this ,距离平方 )
         this.sim.kdTree.computeAgentNeighbors(this, rangeSq);
     }
 }
@@ -96,25 +98,25 @@ RVO.Agent.prototype.computeNeighbors = function () {
  * 计算新速度
  */
 RVO.Agent.prototype.computeNewVelocity = function () {
-    /**最优交互避碰线组 */
+    //最优交互避碰线组 
     this.orcaLines = [];
-    /**求逆时间跨度障碍 = 1/时间跨度障碍 */
+    //求逆时间跨度障碍 = 1/时间跨度障碍 
     var invTimeHorizonObst = 1 / this.timeHorizonObst;
 
-    /**在碰撞邻居组中循环 */
+    //在碰撞邻居组中循环 
     for (var i = 0, ilen = this.obstacleNeighbors.length; i < ilen; ++i) {
-        /**障碍1 障碍邻居组[i][1]*/
-        var obstacle1 = this.obstacleNeighbors[i][1]
-            /**障碍2 = 障碍1 下一个障碍 */
-            , obstacle2 = obstacle1.nextObstacle
-            /**相对位置1 = 减去(障碍1 点 , 位置) */
-            , relativePosition1 = RVO.Vector.subtract(obstacle1.point, this.position)
-            /** 相对位置2 = 减去(障碍2 点 , 位置)*/
-            , relativePosition2 = RVO.Vector.subtract(obstacle2.point, this.position)
-            /**已经涵盖 = false */
-            , alreadyCovered = false;
+        //障碍1 障碍邻居组[i][1]
+        var obstacle1 = this.obstacleNeighbors[i][1],
+            //障碍2 = 障碍1 下一个障碍 
+            obstacle2 = obstacle1.nextObstacle,
+            //相对位置1 = 减去(障碍1 点 , 位置) 
+            relativePosition1 = RVO.Vector.subtract(obstacle1.point, this.position),
+            // 相对位置2 = 减去(障碍2 点 , 位置)
+            relativePosition2 = RVO.Vector.subtract(obstacle2.point, this.position),
+            //已经涵盖 = false 
+            alreadyCovered = false;
 
-        /**  最优交互避碰线组  */
+        //  最优交互避碰线组  
         for (var j = 0, jlen = this.orcaLines.length; j < jlen; ++j) {
             //向量积(相乘(相对位置1, 最优交互避碰线组[j][0], 求逆时间跨度障碍), 最优交互避碰线组[j][1])
             if (
@@ -136,49 +138,49 @@ RVO.Agent.prototype.computeNewVelocity = function () {
                         invTimeHorizonObst
                     ),
                     this.orcaLines[j][1]
-                // - 求逆时间跨度障碍  * 半径  >= - 小量
+                    // - 求逆时间跨度障碍  * 半径  >= - 小量
                 ) - invTimeHorizonObst * this.radius >= - RVO.EPSILON
             ) {
-                /**已经涵盖 = true  */
+                //已经涵盖 = true  
                 alreadyCovered = true;
                 break;
             }
         }
 
-        /**已经涵盖 = true  */
+        //已经涵盖 = true  
         if (alreadyCovered) {
-            /**下一个 */
+            //下一个 
             continue;
         }
 
-        /**距离平方1 =平方 相对位置1 */
-        var distSq1 = RVO.Vector.absSq(relativePosition1)
-        /**距离平方2 =平方 相对位置2 */
-            , distSq2 = RVO.Vector.absSq(relativePosition2)
-            /**半径平方 = 平方 半径 */
-            , radiusSq = RVO.sqr(this.radius)
-            /**相对向量 = 相对位置1 - 相对位置2 */
-            , obstacleVector = RVO.Vector.subtract(obstacle2.point, obstacle1.point)
-            /**s = 数量积 / 相对向量平方 */
-            , s = RVO.Vector.dotProduct(
-                /**相反 相对位置1 */
-                RVO.Vector.invert(relativePosition1), 
-                /**相对向量 */
-                obstacleVector ) /
-                /**相对向量 平方 */
-                RVO.Vector.absSq(obstacleVector)
-            /**到线距离平方 =   相反 相对位置1*/
-            , distSqLine = RVO.Vector.absSq( 
-                /**相减 */
+        //距离平方1 =平方 相对位置1 
+        var distSq1 = RVO.Vector.absSq(relativePosition1),
+            //距离平方2 =平方 相对位置2 
+            distSq2 = RVO.Vector.absSq(relativePosition2),
+            //半径平方 = 平方 半径 
+            radiusSq = RVO.sqr(this.radius),
+            //相对向量 = 相对位置1 - 相对位置2 
+            obstacleVector = RVO.Vector.subtract(obstacle2.point, obstacle1.point),
+            //s = 数量积 / 相对向量平方 
+            s = RVO.Vector.dotProduct(
+                //相反 相对位置1 
+                RVO.Vector.invert(relativePosition1),
+                //相对向量 
+                obstacleVector) /
+                //相对向量 平方 
+                RVO.Vector.absSq(obstacleVector),
+            //到线距离平方 =   相反 相对位置1
+            distSqLine = RVO.Vector.absSq(
+                //相减 
                 RVO.Vector.subtract(
-                     /**相反 相对位置1 */
-                    RVO.Vector.invert(relativePosition1), 
-                    /**相对向量 相乘 s */
+                    //相反 相对位置1 
+                    RVO.Vector.invert(relativePosition1),
+                    //相对向量 相乘 s 
                     RVO.Vector.multiply(obstacleVector, s)
                 )
-            )
-            /**线  = [] */
-            , line = new Array(2);
+            ),
+            //线  = [] 
+            line = new Array(2);
 
         if (s < 0 && distSq1 <= radiusSq) {
             if (obstacle1.isConvex) {
@@ -245,9 +247,9 @@ RVO.Agent.prototype.computeNewVelocity = function () {
             }
         }
 
-        var leftNeighbor = obstacle1.prevObstacle
-            , isLeftLegForeign = false
-            , isRightLegForeign = false;
+        var leftNeighbor = obstacle1.prevObstacle,
+            isLeftLegForeign = false,
+            isRightLegForeign = false;
 
         if (obstacle1.isConvex && RVO.Vector.det(leftLegDirection, RVO.Vector.invert(leftNeighbor.unitDir)) >= 0) {
             leftLegDirection = RVO.Vector.invert(leftNeighbor.unitDir);
@@ -259,12 +261,12 @@ RVO.Agent.prototype.computeNewVelocity = function () {
             isRightLegForeign = true;
         }
 
-        var leftCutoff = RVO.Vector.multiply(RVO.Vector.subtract(obstacle1.point, this.position), invTimeHorizonObst)
-            , rightCutoff = RVO.Vector.multiply(RVO.Vector.subtract(obstacle2.point, this.position), invTimeHorizonObst)
-            , cutoffVec = RVO.Vector.subtract(rightCutoff, leftCutoff)
-            , t = (obstacle1 == obstacle2) ? .5 : RVO.Vector.dotProduct(RVO.Vector.subtract(this.velocity, leftCutoff), cutoffVec) / RVO.Vector.absSq(cutoffVec)
-            , tLeft = RVO.Vector.dotProduct(RVO.Vector.subtract(this.velocity, leftCutoff), leftLegDirection)
-            , tRight = RVO.Vector.dotProduct(RVO.Vector.subtract(this.velocity, rightCutoff), rightLegDirection);
+        var leftCutoff = RVO.Vector.multiply(RVO.Vector.subtract(obstacle1.point, this.position), invTimeHorizonObst),
+            rightCutoff = RVO.Vector.multiply(RVO.Vector.subtract(obstacle2.point, this.position), invTimeHorizonObst),
+            cutoffVec = RVO.Vector.subtract(rightCutoff, leftCutoff),
+            t = (obstacle1 == obstacle2) ? .5 : RVO.Vector.dotProduct(RVO.Vector.subtract(this.velocity, leftCutoff), cutoffVec) / RVO.Vector.absSq(cutoffVec),
+            tLeft = RVO.Vector.dotProduct(RVO.Vector.subtract(this.velocity, leftCutoff), leftLegDirection),
+            tRight = RVO.Vector.dotProduct(RVO.Vector.subtract(this.velocity, rightCutoff), rightLegDirection);
 
         if ((t < 0 && tLeft < 0) || (obstacle1 == obstacle2 && tLeft < 0 && tRight < 0)) {
             var unitW = RVO.Vector.normalize(RVO.Vector.subtract(this.velocity, leftCutoff));
@@ -281,9 +283,15 @@ RVO.Agent.prototype.computeNewVelocity = function () {
             continue;
         }
 
-        var distSqCutoff = (t < 0 || t > 1 || obstacle1 == obstacle2) ? Infinity : RVO.Vector.absSq(RVO.Vector.subtract(this.velocity, RVO.Vector.add(leftCutoff, RVO.Vector.multiply(cutoffVec, t))))
-            , distSqLeft = tLeft < 0 ? Infinity : RVO.Vector.absSq(RVO.Vector.subtract(this.velocity, RVO.Vector.add(leftCutoff, RVO.Vector.multiply(leftLegDirection, tLeft))))
-            , distSqRight = tRight < 0 ? Infinity : RVO.Vector.absSq(RVO.Vector.subtract(this.velocity, RVO.Vector.add(rightCutoff, RVO.Vector.multiply(rightLegDirection, tRight))));
+        var distSqCutoff = (t < 0 || t > 1 || obstacle1 == obstacle2) ?
+            Infinity :
+            RVO.Vector.lineSq(this.velocity, RVO.Vector.add(leftCutoff, RVO.Vector.multiply(cutoffVec, t))),
+            distSqLeft = tLeft < 0 ?
+                Infinity :
+                RVO.Vector.lineSq(this.velocity, RVO.Vector.add(leftCutoff, RVO.Vector.multiply(leftLegDirection, tLeft))),
+            distSqRight = tRight < 0 ?
+                Infinity :
+                RVO.Vector.lineSq((this.velocity, RVO.Vector.add(rightCutoff, RVO.Vector.multiply(rightLegDirection, tRight))));
 
         if (distSqCutoff <= distSqLeft && distSqCutoff <= distSqRight) {
             line[1] = RVO.Vector.invert(obstacle1.unitDir);
@@ -313,27 +321,27 @@ RVO.Agent.prototype.computeNewVelocity = function () {
         }
     }
 
-    var numObstLines = this.orcaLines.length
-        , invTimeHorizon = 1 / this.timeHorizon;
+    var numObstLines = this.orcaLines.length,
+        invTimeHorizon = 1 / this.timeHorizon;
 
     for (var i = 0, len = this.agentNeighbors.length; i < len; ++i) {
-        var other = this.agentNeighbors[i][1]
-            , relativePosition = RVO.Vector.subtract(other.position, this.position)
-            , relativeVelocity = RVO.Vector.subtract(this.velocity, other.velocity)
-            , distSq = RVO.Vector.absSq(relativePosition)
-            , combinedRadius = this.radius + other.radius
-            , combinedRadiusSq = RVO.sqr(combinedRadius)
-            , line = new Array(2);
+        var other = this.agentNeighbors[i][1],
+            relativePosition = RVO.Vector.subtract(other.position, this.position),
+            relativeVelocity = RVO.Vector.subtract(this.velocity, other.velocity),
+            distSq = RVO.Vector.absSq(relativePosition),
+            combinedRadius = this.radius + other.radius,
+            combinedRadiusSq = RVO.sqr(combinedRadius),
+            line = new Array(2);
 
         if (distSq > combinedRadiusSq) {
-            var w = RVO.Vector.subtract(relativeVelocity, RVO.Vector.multiply(relativePosition, invTimeHorizon))
-                , wLengthSq = RVO.Vector.absSq(w)
-                , dotProduct1 = RVO.Vector.dotProduct(w, relativePosition);
+            var w = RVO.Vector.subtract(relativeVelocity, RVO.Vector.multiply(relativePosition, invTimeHorizon)),
+                wLengthSq = RVO.Vector.absSq(w),
+                dotProduct1 = RVO.Vector.dotProduct(w, relativePosition);
 
             if (dotProduct1 < 0 && RVO.sqr(dotProduct1) > combinedRadiusSq * wLengthSq) {
-                var wLength = Math.sqrt(wLengthSq)
-                    , unitW = RVO.Vector.divide(w, wLength)
-                    , u = RVO.Vector.multiply(unitW, combinedRadius * invTimeHorizon - wLength);
+                var wLength = Math.sqrt(wLengthSq),
+                    unitW = RVO.Vector.divide(w, wLength),
+                    u = RVO.Vector.multiply(unitW, combinedRadius * invTimeHorizon - wLength);
 
                 line[1] = [unitW[1], - unitW[0]];
             }
@@ -347,16 +355,16 @@ RVO.Agent.prototype.computeNewVelocity = function () {
                     line[1] = RVO.Vector.divide(RVO.Vector.invert([relativePosition[0] * leg - relativePosition[1] * combinedRadius, relativePosition[0] * combinedRadius + relativePosition[1] * leg]), distSq)
                 }
 
-                var dotProduct2 = RVO.Vector.dotProduct(relativeVelocity, line[1])
-                    , u = RVO.Vector.multiply(RVO.Vector.subtract(line[1], relativeVelocity), dotProduct2);
+                var dotProduct2 = RVO.Vector.dotProduct(relativeVelocity, line[1]),
+                    u = RVO.Vector.multiply(RVO.Vector.subtract(line[1], relativeVelocity), dotProduct2);
             }
         }
         else {
-            var invTimeStep = 1 / this.sim.timeStep
-                , w = RVO.Vector.subtract(relativeVelocity, RVO.Vector.multiply(relativePosition, invTimeStep))
-                , wLength = RVO.Vector.abs(w)
-                , unitW = RVO.Vector.divide(w, wLength)
-                , u = RVO.Vector.multiply(unitW, combinedRadius * invTimeStep - wLength);
+            var invTimeStep = 1 / this.sim.timeStep,
+                w = RVO.Vector.subtract(relativeVelocity, RVO.Vector.multiply(relativePosition, invTimeStep)),
+                wLength = RVO.Vector.abs(w),
+                unitW = RVO.Vector.divide(w, wLength),
+                u = RVO.Vector.multiply(unitW, combinedRadius * invTimeStep - wLength);
 
             line[1] = [unitW[1], - unitW[0]];
         }
@@ -379,7 +387,7 @@ RVO.Agent.prototype.computeNewVelocity = function () {
  */
 RVO.Agent.prototype.insertAgentNeighbor = function (agent, rangeSq) {
     if (this != agent) {
-        var distSq = RVO.Vector.absSq(RVO.Vector.subtract(this.position, agent.position));
+        var distSq = RVO.Vector.lineSq(this.position, agent.position);
 
         if (distSq < rangeSq) {
             if (this.agentNeighbors.length < this.maxNeighbors) {
@@ -409,14 +417,14 @@ RVO.Agent.prototype.insertAgentNeighbor = function (agent, rangeSq) {
  */
 RVO.Agent.prototype.insertObstacleNeighbor = function (obstacle, rangeSq) {
     //下一个障碍 = 障碍 下一个障碍
-    var nextObstacle = obstacle.nextObstacle
-    //距离平方 = 点线段距离(障碍 点 , 下一个障碍 点 , 位置)
-        , distSq = RVO.Vector.distSqPointLineSegment(obstacle.point, nextObstacle.point, this.position);
+    var nextObstacle = obstacle.nextObstacle,
+        //距离平方 = 点线段距离(障碍 点 , 下一个障碍 点 , 位置)
+        distSq = RVO.Vector.distSqPointLineSegment(obstacle.point, nextObstacle.point, this.position);
 
-    
+
     //如果 距离平方 < 区域平方
     if (distSq < rangeSq) {
-        /**障碍邻居 添加 [距离平方,障碍] */
+        //障碍邻居 添加 [距离平方,障碍] 
         this.obstacleNeighbors.push([distSq, obstacle]);
 
         var i = this.obstacleNeighbors.length - 1;
@@ -430,10 +438,10 @@ RVO.Agent.prototype.insertObstacleNeighbor = function (obstacle, rangeSq) {
 
 /**更新 */
 RVO.Agent.prototype.update = function () {
-    /**速度 = 新速度*/
+    //速度 = 新速度
     this.velocity = this.newVelocity;
 
-    /**移动 位置  = 速度 * 时间步数  */
+    //移动 位置  = 速度 * 时间步数  
     RVO.Vector.shift(this.position, RVO.Vector.multiply(this.velocity, this.sim.timeStep));
 }
 
@@ -447,20 +455,20 @@ RVO.Agent.prototype.update = function () {
  * @param {*} result 
  */
 RVO.Agent.linearProgram1 = function (lines, lineNo, radius, optVelocity, directionOpt, result) {
-    var dotProduct = RVO.Vector.dotProduct(lines[lineNo][0], lines[lineNo][1])
-        , discriminant = RVO.sqr(dotProduct) + RVO.sqr(radius) - RVO.Vector.absSq(lines[lineNo][0]);
+    var dotProduct = RVO.Vector.dotProduct(lines[lineNo][0], lines[lineNo][1]),
+        discriminant = RVO.sqr(dotProduct) + RVO.sqr(radius) - RVO.Vector.absSq(lines[lineNo][0]);
 
     if (discriminant < 0) {
         return false;
     }
 
-    var sqrtDiscriminant = Math.sqrt(discriminant)
-        , tLeft = - dotProduct - sqrtDiscriminant
-        , tRight = - dotProduct + sqrtDiscriminant;
+    var sqrtDiscriminant = Math.sqrt(discriminant),
+        tLeft = - dotProduct - sqrtDiscriminant,
+        tRight = - dotProduct + sqrtDiscriminant;
 
     for (var i = 0; i < lineNo; ++i) {
-        var denominator = RVO.Vector.det(lines[lineNo][1], lines[i][1])
-            , numerator = RVO.Vector.det(lines[i][1], RVO.Vector.subtract(lines[lineNo][0], lines[i][0]));
+        var denominator = RVO.Vector.det(lines[lineNo][1], lines[i][1]),
+            numerator = RVO.Vector.det(lines[i][1], RVO.Vector.subtract(lines[lineNo][0], lines[i][0]));
 
         if (Math.abs(denominator) <= RVO.EPSILON) {
             if (numerator < 0) {
@@ -558,8 +566,8 @@ RVO.Agent.linearProgram3 = function (lines, numObstLines, beginLine, radius, res
             var projLines = lines.slice(0, numObstLines);
 
             for (var j = numObstLines; j < i; ++j) {
-                var line = new Array(2)
-                    , determinant = RVO.Vector.det(lines[i][1], lines[j][1]);
+                var line = new Array(2),
+                    determinant = RVO.Vector.det(lines[i][1], lines[j][1]);
 
                 if (Math.abs(determinant) <= RVO.EPSILON) {
                     if (RVO.Vector.dotProduct(lines[i][1], lines[j][1]) > 0) {
@@ -595,11 +603,11 @@ var RVO = RVO || {};
  */
 RVO.KdTree = function (sim) {
     this.sim = sim;
-    /**代理组 = [] */
+    //代理组 = [] 
     this.agents = [];
-    /**代理树 = [] */
+    //代理树 = [] 
     this.agentTree = [];
-    /**障碍树 = 0 */
+    //障碍树 = 0 
     this.obstacleTree = 0;
 }
 
@@ -609,18 +617,18 @@ RVO.KdTree.MAX_LEAF_SIZE = 10;
  * 构建代理树
  */
 RVO.KdTree.prototype.buildAgentTree = function () {
-    /**如果 代理数 < sim 代理数 */
+    //如果 代理数 < sim 代理数 
     if (this.agents.length < this.sim.agents.length) {
         for (var i = this.agents.length, len = this.sim.agents.length; i < len; ++i) {
-            /**添加 代理 */
+            //添加 代理 
             this.agents.push(this.sim.agents[i]);
         }
     }
 
-    /**代理树 = [] */
+    //代理树 = [] 
     this.agentTree = [];
     if (this.agents.length) {
-        /** 构建代理树递归 */
+        // 构建代理树递归 
         this.buildAgentTreeRecursive(0, this.agents.length, 0);
     }
 }
@@ -647,10 +655,10 @@ RVO.KdTree.prototype.buildAgentTreeRecursive = function (begin, end, node) {
     }
 
     if (end - begin > RVO.KdTree.MAX_LEAF_SIZE) {
-        var isVertical = agent.maxX - agent.minX > agent.maxY - agent.minY
-            , splitValue = isVertical ? .5 * (agent.maxX + agent.minX) : .5 * (agent.maxY + agent.minY)
-            , left = begin
-            , right = end - 1;
+        var isVertical = agent.maxX - agent.minX > agent.maxY - agent.minY,
+            splitValue = isVertical ? .5 * (agent.maxX + agent.minX) : .5 * (agent.maxY + agent.minY),
+            left = begin,
+            right = end - 1;
 
         while (true) {
             while (left <= right && (isVertical ? this.agents[left].position[0] : this.agents[left].position[1]) < splitValue) {
@@ -697,11 +705,11 @@ RVO.KdTree.prototype.buildObstacleTree = function () {
     var obstacles = [];
 
     for (var i = 0, len = this.sim.obstacles.length; i < len; ++i) {
-        /**障碍组 [i] = 障碍组[i] */
+        //障碍组 [i] = 障碍组[i] 
         obstacles[i] = this.sim.obstacles[i];
     }
 
-    /**障碍树 = 创建障碍树递归(障碍组) */
+    //障碍树 = 创建障碍树递归(障碍组) 
     this.obstacleTree = this.buildObstacleTreeRecursive(obstacles);
 }
 
@@ -719,25 +727,25 @@ RVO.KdTree.prototype.buildObstacleTreeRecursive = function (obstacles) {
     //否则
     else {
         //节点 = 新 障碍树节点 
-        var node = new RVO.KdTree.ObstacleTreeNode
-        //
-            , optimalSplit = 0
-            , obstaclesLength = obstacles.length
-            , minLeft = obstaclesLength
-            , minRight = obstaclesLength;
+        var node = new RVO.KdTree.ObstacleTreeNode,
+
+            optimalSplit = 0,
+            obstaclesLength = obstacles.length,
+            minLeft = obstaclesLength,
+            minRight = obstaclesLength;
 
         for (var i = 0; i < obstaclesLength; ++i) {
-            var leftSize = 0
-                , rightSize = 0
-                , obstacleI1 = obstacles[i]
-                , obstacleI2 = obstacleI1.nextObstacle;
+            var leftSize = 0,
+                rightSize = 0,
+                obstacleI1 = obstacles[i],
+                obstacleI2 = obstacleI1.nextObstacle;
 
             for (var j = 0; j < obstaclesLength; ++j) {
                 if (i != j) {
-                    var obstacleJ1 = obstacles[j]
-                        , obstacleJ2 = obstacleJ1.nextObstacle
-                        , j1LeftOfI = RVO.Vector.leftOf(obstacleI1.point, obstacleI2.point, obstacleJ1.point)
-                        , j2LeftOfI = RVO.Vector.leftOf(obstacleI1.point, obstacleI2.point, obstacleJ2.point);
+                    var obstacleJ1 = obstacles[j],
+                        obstacleJ2 = obstacleJ1.nextObstacle,
+                        j1LeftOfI = RVO.Vector.leftOf(obstacleI1.point, obstacleI2.point, obstacleJ1.point),
+                        j2LeftOfI = RVO.Vector.leftOf(obstacleI1.point, obstacleI2.point, obstacleJ2.point);
 
                     if (j1LeftOfI >= - RVO.EPSILON && j2LeftOfI >= - RVO.EPSILON) {
                         ++leftSize;
@@ -763,18 +771,18 @@ RVO.KdTree.prototype.buildObstacleTreeRecursive = function (obstacles) {
             }
         }
 
-        var leftObstacles = []
-            , rightObstacles = []
-            , i = optimalSplit
-            , obstacleI1 = obstacles[i]
-            , obstacleI2 = obstacleI1.nextObstacle;
+        var leftObstacles = [],
+            rightObstacles = [],
+            i = optimalSplit,
+            obstacleI1 = obstacles[i],
+            obstacleI2 = obstacleI1.nextObstacle;
 
         for (var j = 0, len = obstacles.length; j < len; ++j) {
             if (i != j) {
-                var obstacleJ1 = obstacles[j]
-                    , obstacleJ2 = obstacleJ1.nextObstacle
-                    , j1LeftOfI = RVO.Vector.leftOf(obstacleI1.point, obstacleI2.point, obstacleJ1.point)
-                    , j2LeftOfI = RVO.Vector.leftOf(obstacleI1.point, obstacleI2.point, obstacleJ2.point);
+                var obstacleJ1 = obstacles[j],
+                    obstacleJ2 = obstacleJ1.nextObstacle,
+                    j1LeftOfI = RVO.Vector.leftOf(obstacleI1.point, obstacleI2.point, obstacleJ1.point),
+                    j2LeftOfI = RVO.Vector.leftOf(obstacleI1.point, obstacleI2.point, obstacleJ2.point);
 
                 if (j1LeftOfI >= - RVO.EPSILON && j2LeftOfI >= - RVO.EPSILON) {
                     leftObstacles.push(obstacles[j]);
@@ -783,9 +791,9 @@ RVO.KdTree.prototype.buildObstacleTreeRecursive = function (obstacles) {
                     rightObstacles.push(obstacles[j]);
                 }
                 else {
-                    var t = RVO.Vector.det(RVO.Vector.subtract(obstacleI2.point, obstacleI1.point), RVO.Vector.subtract(obstacleJ1.point, obstacleI1.point)) / RVO.Vector.det(RVO.Vector.subtract(obstacleI2.point, obstacleI1.point), RVO.Vector.subtract(obstacleJ1.point, obstacleJ2.point))
-                        , splitPoint = RVO.Vector.add(RVO.Vector.multiply(RVO.Vector.subtract(obstacleJ1.point, obstacleJ2.point), t), obstacleJ1.point)
-                        , newObstacle = new RVO.Obstacle();
+                    var t = RVO.Vector.det(RVO.Vector.subtract(obstacleI2.point, obstacleI1.point), RVO.Vector.subtract(obstacleJ1.point, obstacleI1.point)) / RVO.Vector.det(RVO.Vector.subtract(obstacleI2.point, obstacleI1.point), RVO.Vector.subtract(obstacleJ1.point, obstacleJ2.point)),
+                        splitPoint = RVO.Vector.add(RVO.Vector.multiply(RVO.Vector.subtract(obstacleJ1.point, obstacleJ2.point), t), obstacleJ1.point),
+                        newObstacle = new RVO.Obstacle();
 
                     newObstacle.point = splitPoint;
                     newObstacle.prevObstacle = obstacleJ1;
@@ -816,7 +824,7 @@ RVO.KdTree.prototype.buildObstacleTreeRecursive = function (obstacles) {
         node.right = this.buildObstacleTreeRecursive(rightObstacles);
         return node;
     }
-    
+
 }
 
 
@@ -847,44 +855,44 @@ RVO.KdTree.prototype.computeObstacleNeighbors = function (agent, rangeSq) {
  * @param {*} node 
  */
 RVO.KdTree.prototype.queryAgentTreeRecursive = function (agent, rangeSq, node) {
-    /**节点代理 = 代理树 节点*/
-    var nodeAgent = this.agentTree[node]
-    /**新范围平方 = 范围平方 */
-        , newRangeSq = rangeSq;
-    /**如果(节点代理 结束 - 节点代理 开始 <= 最大叶片尺寸) */
+    //节点代理 = 代理树 节点
+    var nodeAgent = this.agentTree[node],
+        //新范围平方 = 范围平方 
+        newRangeSq = rangeSq;
+    //如果(节点代理 结束 - 节点代理 开始 <= 最大叶片尺寸) 
     if (nodeAgent.end - nodeAgent.begin <= RVO.KdTree.MAX_LEAF_SIZE) {
-        /**循环  */
+        //循环  
         for (var i = nodeAgent.begin, len = nodeAgent.end; i < len; ++i) {
-            /**新范围平方 = 节点  插入代理邻居(代理,新范围平方 )*/
+            //新范围平方 = 节点  插入代理邻居(代理,新范围平方 )
             newRangeSq = agent.insertAgentNeighbor(this.agents[i], newRangeSq);
         }
     }
     else {
-        /**距离平方左 = 0 */
-        var distSqLeft = 0
-        /**距离平方右 = 0 */
-            , distSqRight = 0
-            /**左代理 = 代理树 节点代理 左 */
-            , leftAgent = this.agentTree[nodeAgent.left]
-            /**右代理 = 代理树 节点代理 右 */
-            , rightAgent = this.agentTree[nodeAgent.right];
+        //距离平方左 = 0 
+        var distSqLeft = 0,
+            //距离平方右 = 0 
+            distSqRight = 0,
+            //左代理 = 代理树 节点代理 左 
+            leftAgent = this.agentTree[nodeAgent.left],
+            //右代理 = 代理树 节点代理 右 
+            rightAgent = this.agentTree[nodeAgent.right];
 
-            /**代理 位置x < 最小x */
+        //代理 位置x < 最小x 
         if (agent.position[0] < leftAgent.minX) {
-            /**距离平方左 += 平方( 左代理 最小x - 代理 位置[0]) */
+            //距离平方左 += 平方( 左代理 最小x - 代理 位置[0]) 
             distSqLeft += RVO.sqr(leftAgent.minX - agent.position[0]);
         }
-            /**代理 位置x > 最大x */
+        //代理 位置x > 最大x 
         else if (agent.position[0] > leftAgent.maxX) {
-            /**距离平方左 += */
+            //距离平方左 += 
             distSqLeft += RVO.sqr(agent.position[0] - leftAgent.maxX);
         }
 
-            /**代理 位置y < 最小y */
+        //代理 位置y < 最小y 
         if (agent.position[1] < leftAgent.minY) {
             distSqLeft += RVO.sqr(leftAgent.minY - agent.position[1]);
         }
-            /**代理 位置y> 最大y */
+        //代理 位置y> 最大y 
         else if (agent.position[1] > leftAgent.maxY) {
             distSqLeft += RVO.sqr(agent.position[1] - leftAgent.maxY);
         }
@@ -902,34 +910,34 @@ RVO.KdTree.prototype.queryAgentTreeRecursive = function (agent, rangeSq, node) {
         else if (agent.position[1] > rightAgent.maxY) {
             distSqRight += RVO.sqr(agent.position[1] - rightAgent.maxY);
         }
-        /**如果 距离左 < 距离右 */ 
+        //如果 距离左 < 距离右 
         if (distSqLeft < distSqRight) {
-            /**如果(距离左 < 范围) */
+            //如果(距离左 < 范围) 
             if (distSqLeft < rangeSq) {
-                /**新范围平方 =  查询代理树递归 */
+                //新范围平方 =  查询代理树递归 
                 newRangeSq = this.queryAgentTreeRecursive(agent, newRangeSq, nodeAgent.left);
-                /**如果 距离右 < 范围平方 */ 
+                //如果 距离右 < 范围平方 
                 if (distSqRight < rangeSq) {
-                    /**新范围平方 =  查询代理树递归 */
+                    //新范围平方 =  查询代理树递归 
                     newRangeSq = this.queryAgentTreeRecursive(agent, newRangeSq, nodeAgent.right);
                 }
             }
         }
-        /**否则 */
+        //否则 
         else {
-            /**如果 距离右 < 范围平方 */ 
+            //如果 距离右 < 范围平方 
             if (distSqRight < rangeSq) {
-                /**新范围平方 =  查询代理树递归 */
+                //新范围平方 =  查询代理树递归 
                 newRangeSq = this.queryAgentTreeRecursive(agent, newRangeSq, nodeAgent.right);
-                /**如果(距离左 < 范围) */
+                //如果(距离左 < 范围) 
                 if (distSqLeft < rangeSq) {
-                    /**新范围平方 =  查询代理树递归 */
+                    //新范围平方 =  查询代理树递归 
                     newRangeSq = this.queryAgentTreeRecursive(agent, newRangeSq, nodeAgent.left);
                 }
             }
         }
     }
-    /**返回 新范围平方 */
+    //返回 新范围平方 
     return newRangeSq;
 }
 
@@ -940,31 +948,31 @@ RVO.KdTree.prototype.queryAgentTreeRecursive = function (agent, rangeSq, node) {
  * @param {*} node 
  */
 RVO.KdTree.prototype.queryObstacleTreeRecursive = function (agent, rangeSq, node) {
-    /**如果(节点 == 0 )*/
+    //如果(节点 == 0 )
     if (node == 0) {
         return;
     }
     else {
-        /**障碍1 */
-        var obstacle1 = node.obstacle
-        /**障碍2 */
-            , obstacle2 = obstacle1.nextObstacle
-            /**代理 在线左边  */
-            , agentLeftOfLine = RVO.Vector.leftOf(obstacle1.point, obstacle2.point, agent.position)
-            /**到线距离的平方 =  */
-            , distSqLine = RVO.sqr(agentLeftOfLine) / RVO.Vector.absSq(RVO.Vector.subtract(obstacle2.point, obstacle1.point));
+        //障碍1 
+        var obstacle1 = node.obstacle,
+            //障碍2 
+            obstacle2 = obstacle1.nextObstacle,
+            //代理 在线左边  
+            agentLeftOfLine = RVO.Vector.leftOf(obstacle1.point, obstacle2.point, agent.position),
+            //到线距离的平方 =  
+            distSqLine = RVO.sqr(agentLeftOfLine) / RVO.Vector.lineSq(obstacle2.point, obstacle1.point);
 
-        /**查询障碍树递归(如果在左侧 左树) */
+        //查询障碍树递归(如果在左侧 左树) 
         this.queryObstacleTreeRecursive(agent, rangeSq, agentLeftOfLine >= 0 ? node.left : node.right);
 
-        /**如果 距离 小于区域距离平方 */
+        //如果 距离 小于区域距离平方 
         if (distSqLine < rangeSq) {
-            /**如果(代理 不在线左方 ) */
+            //如果(代理 不在线左方 ) 
             if (agentLeftOfLine < 0) {
-                /**插入障碍邻居 */
+                //插入障碍邻居 
                 agent.insertObstacleNeighbor(node.obstacle, rangeSq);
             }
-            /**查询障碍树递归(如果在左侧 右树) */ 
+            //查询障碍树递归(如果在左侧 右树) 
             this.queryObstacleTreeRecursive(agent, rangeSq, agentLeftOfLine >= 0 ? node.right : node.left);
         }
     }
@@ -983,50 +991,49 @@ RVO.KdTree.prototype.queryVisibility = function (q1, q2, radius) {
 
 /**
  * 查询可见性递归
- * @param {*} q1 
- * @param {*} q2 
- * @param {*} radius 
- * @param {*} node 
+ * @param {*} q1 点1
+ * @param {*} q2 点2
+ * @param {*} radius 半径
+ * @param {*} node 节点
  */
 RVO.KdTree.prototype.queryVisibilityRecursive = function (q1, q2, radius, node) {
-    /**如果(节点 ) */
+    //如果(节点 ) 
     if (node.obstacleNo == -1) {
-        /**返回 true */
+        //返回 true 
         return true;
     }
     else {
-        /**障碍 = 障碍组[节点 障碍索引]*/
-        var obstacle = this.sim.obstacles[node.obstacleNo]
-        /**点q1 在 i 左边 ? */
-            , q1LeftOfI = RVO.Vector.leftOf(obstacle.point1, obstacle.point2, q1)
-        /**点q2 在 i 左边 ? */
-            , q2LeftOfI = RVO.Vector.leftOf(obstacle.point1, obstacle.point2, q2);
+        //障碍 = 障碍组[节点 障碍索引]
+        var obstacle = this.sim.obstacles[node.obstacleNo],
+            //点q1 在 障碍 左边 ? 
+            q1LeftOfI = RVO.Vector.leftOf(obstacle.point1, obstacle.point2, q1),
+            //点q2 在 障碍 左边 ? 
+            q2LeftOfI = RVO.Vector.leftOf(obstacle.point1, obstacle.point2, q2);
 
-        /**如果(p1 p2 都在左边 ) */
+        //如果(p1 p2 都在左边 ) 
         if (q1LeftOfI >= 0 && q2LeftOfI >= 0) {
-            /**返回 查询可见性递归 左枝 */
+            //返回 查询可见性递归 左枝 
             return this.queryVisibilityRecursive(q1, q2, radius, node.left);
         }
-        /**如果(p1 p2 都在右边 ) */
+        //如果(p1 p2 都在右边 ) 
         else if (q1LeftOfI <= 0 && q2LeftOfI <= 0) {
-            /**返回 查询可见性递归 左枝 */
+            //返回 查询可见性递归 左枝 
             return this.queryVisibilityRecursive(q1, q2, radius, node.right);
         }
         else {
-            /** 障碍点1 在 点1点2左边 */
-            var point1LeftOfQ = RVO.Vector.leftOf(q1, q2, obstacle.point1)
-            /** 障碍点2 在 点1点2左边 */
-                , point2LeftOfQ = RVO.Vector.leftOf(q1, q2, obstacle.point2)
-                /**1/ 点1点2距离 */
-                , invLengthQ = 1 / RVO.Vector.absSq(RVO.Vector.subtract(q2, q1));;
+            // 障碍点1 在 点1点2左边 
+            var point1LeftOfQ = RVO.Vector.leftOf(q1, q2, obstacle.point1),
+                // 障碍点2 在 点1点2左边 
+                point2LeftOfQ = RVO.Vector.leftOf(q1, q2, obstacle.point2),
+                //1/ 点1点2距离 
+                invLengthQ = 1 / RVO.Vector.lineSq(q2, q1);;
 
-            /**返回 不在同一侧 */
-            return point1LeftOfQ * point2LeftOfQ >= 0 && 
-                   
-                   RVO.sqr(point1LeftOfQ) * invLengthQ >= RVO.sqr(radius) && 
-                   RVO.sqr(point2LeftOfQ) * invLengthQ >= RVO.sqr(radius) && 
-                   this.queryVisibilityRecursive(q1, q2, radius, node.left) && 
-                   this.queryVisibilityRecursive(q1, q2, radius, node.right);
+            //返回 不在同一侧 
+            return point1LeftOfQ * point2LeftOfQ >= 0 &&
+                RVO.sqr(point1LeftOfQ) * invLengthQ >= RVO.sqr(radius) &&
+                RVO.sqr(point2LeftOfQ) * invLengthQ >= RVO.sqr(radius) &&
+                this.queryVisibilityRecursive(q1, q2, radius, node.left) &&
+                this.queryVisibilityRecursive(q1, q2, radius, node.right);
         }
     }
 }
@@ -1169,43 +1176,43 @@ RVO.Simulator.prototype.addObstacle = function (vertices) {
         throw new Error('Obstacle created with less than two vertices');
     }
 
-    /**障碍组长度    */
+    //障碍组长度    
     var obstacleNo = this.obstacles.length;
 
     for (var i = 0, len = vertices.length; i < len; ++i) {
-        /**阻碍 = 新 阻碍 */
+        //阻碍 = 新 阻碍 
         var obstacle = new RVO.Obstacle();
-        /**阻碍 点 = 向量组[u] */
+        //阻碍 点 = 向量组[u] 
         obstacle.point = vertices[i];
-        /**如果 i!==0 */
+        //如果 i!==0 
         if (i != 0) {
-            /**障碍 预先障碍 = 障碍组 最后一个 */
+            //障碍 预先障碍 = 障碍组 最后一个 
             obstacle.prevObstacle = this.obstacles[this.obstacles.length - 1];
-            /**障碍 预先障碍 下一个障碍 = 障碍 */
+            //障碍 预先障碍 下一个障碍 = 障碍 
             obstacle.prevObstacle.nextObstacle = obstacle;
         }
-        /**如果 i = 向量组长度 */
+        //如果 i = 向量组长度 
         if (i == vertices.length - 1) {
-            /**障碍 下一个障碍 = 障碍[障碍组长度] */
+            //障碍 下一个障碍 = 障碍[障碍组长度] 
             obstacle.nextObstacle = this.obstacles[obstacleNo];
-            /**障碍 下一个障碍 预先障碍 = 障碍 */
+            //障碍 下一个障碍 预先障碍 = 障碍 
             obstacle.nextObstacle.prevObstacle = obstacle;
         }
-        /**障碍 单位方向 = 法向量(下一个 减当前 ) */
+        //障碍 单位方向 = 法向量(下一个 减当前 ) 
         obstacle.unitDir = RVO.Vector.normalize(RVO.Vector.subtract(vertices[i == vertices.length - 1 ? 0 : i + 1], vertices[i]));
 
-        /**如果 (变量组 长度 == 2) */
+        //如果 (变量组 长度 == 2) 
         if (vertices.length == 2) {
-            /**阻碍 是凸的 = true  */
+            //阻碍 是凸的 = true  
             obstacle.isConvex = true;
         }
         else {
-            /**阻碍 是盒子 =    */
+            //阻碍 是盒子 =    
             obstacle.isConvex = (RVO.Vector.leftOf(vertices[i == 0 ? vertices.length - 1 : i - 1], vertices[i], vertices[i == vertices.length - 1 ? 0 : i + 1]) >= 0);
         }
-        /**阻碍 id  = 阻碍组 长度 */
+        //阻碍 id  = 阻碍组 长度 
         obstacle.id = this.obstacles.length;
-        /**阻碍组 添加 阻碍 */
+        //阻碍组 添加 阻碍 
         this.obstacles.push(obstacle);
     }
     //返回 障碍组长度
@@ -1214,27 +1221,27 @@ RVO.Simulator.prototype.addObstacle = function (vertices) {
 
 /**进行障碍组 */
 RVO.Simulator.prototype.processObstacles = function () {
-    /**kd树 创建障碍树() */
+    //kd树 创建障碍树() 
     this.kdTree.buildObstacleTree();
 }
 
 RVO.Simulator.prototype.doStep = function () {
-    /**kd树 创建代理树() */
+    //kd树 创建代理树() 
     this.kdTree.buildAgentTree();
 
     for (var i = 0, len = this.agents.length; i < len; ++i) {
-        /**代理组[i] 计算邻居组() */
+        //代理组[i] 计算邻居组() 
         this.agents[i].computeNeighbors();
-        /**代理组[i] 计算新速度() */
+        //代理组[i] 计算新速度() 
         this.agents[i].computeNewVelocity();
     }
 
     for (var i = 0, len = this.agents.length; i < len; ++i) {
-        /**代理组[i] 更新() */
+        //代理组[i] 更新() 
         this.agents[i].update();
     }
 
-    /**全球时间模拟 += 时间步数 */
+    //全球时间模拟 += 时间步数 
     this.globalTime += this.timeStep;
 }
 
@@ -1245,54 +1252,54 @@ var RVO = RVO || {};
 RVO.Vector = {};
 
 /**
- * 求反
+ * 求反 返回 相反向量
  * @param {[number,number]}a
- * @return {[number,number]}
+ * @return {[number,number]} [-x,-y]
  */
 RVO.Vector.invert = function (a) {
     return [- a[0], - a[1]];
 }
 
-/**数量积
+/**数量积  
  * @param {[number,number]} a
  * @param {[number,number]} b
- * @return {number}
+ * @return {number} x1*x2+ y1*y2
  * 
 */
 RVO.Vector.dotProduct = function (a, b) {
     return a[0] * b[0] + a[1] * b[1];
 }
 
-/**相乘
+/**相乘  成比例扩大   
  * @param {[number,number]} a
  * @param {number} b
- * @returns {[number,number]} 
+ * @returns {[number,number]} [x * b,y * b]
  * 
 */
 RVO.Vector.multiply = function (a, b) {
     return [a[0] * b, a[1] * b];
 }
 
-/**相除
+/**相除 成比例缩小  
  * @param {[number,number]} a
  * @param {number} b
- * @returns {[number,number]} 
+ * @returns {[number,number]}  [x / b,y / b]
  * 
 */
 RVO.Vector.divide = function (a, b) {
     return [a[0] / b, a[1] / b];
 }
 
-/**加
+/**向量加  两个向量之和
  * @param {[number,number]} a
  * @param {[number,number]} b 
- * @return {[number,number]} 
+ * @return {[number,number]}  [x1+x2,y1+y2]
  */
 RVO.Vector.add = function (a, b) {
     return [a[0] + b[0], a[1] + b[1]];
 }
 
-/**减
+/**向量减  两个向量之差(从b到a的向量)
  * @param {[number,number]} a
  * @param {[number,number]} b 
  * @return {[number,number]} 
@@ -1302,10 +1309,10 @@ RVO.Vector.subtract = function (a, b) {
 }
 
 
-/**移动
+/**移动 a的值加上b
  * @param {[number,number]} a
  * @param {[number,number]} b 
- * @return {[number,number]} 
+ * @return {[number,number]} [x+x1,y+y1]
  */
 RVO.Vector.shift = function (a, b) {
     a[0] += b[0];
@@ -1313,7 +1320,7 @@ RVO.Vector.shift = function (a, b) {
     return a;
 }
 
-/**设置
+/**设置  a的值设置为b
  * @param {[number,number]} a
  * @param {[number,number]} b 
  * @return {[number,number]} 
@@ -1327,9 +1334,8 @@ RVO.Vector.set = function (a, b) {
 
 /**
  * 距离
- * 数量积平方根
- * @param {[number,number]} a
- * @param {[number,number]} b 
+ * 数量积平方根  a向量的长度  
+ * @param {[number,number]} a 
  * @return {number} 
  */
 RVO.Vector.abs = function (a) {
@@ -1337,22 +1343,22 @@ RVO.Vector.abs = function (a) {
 }
 
 /** 
- * 数量积 
+ * 数量积  a向量的长度的平方
  * @param {[number,number]} a a点
- * @param {[number,number]} b b点
  * @return {number} 
  * */
 RVO.Vector.absSq = function (a) {
     return RVO.Vector.dotProduct(a, a);
 }
 
-/**向量积(拟叉积)
+/**向量积(拟叉积)  
+ * 面积*2  当>0 b在a左侧,当<0 b在a右侧
  * @param {[number,number]} a
  * @param {[number,number]} b 
  * @return {number}  
  * */
 RVO.Vector.det = function (a, b) {
-    /**返回 向量的面积(顺逆时针) */
+    //返回 向量的面积(顺逆时针) 
     return a[0] * b[1] - a[1] * b[0];
 }
 
@@ -1363,21 +1369,33 @@ RVO.Vector.det = function (a, b) {
  *  
  */
 RVO.Vector.normalize = function (a) {
-    /**返回   相除( a , 距离(a) ) */
+    //返回   相除( a , 距离(a) ) 
     return RVO.Vector.divide(a, RVO.Vector.abs(a));
 }
 
 /**在左边 
- * c在ab左边时>0 
+ * c在ab左边时>0  //四边形的面积
  * @param {[number,number]} a 线段a点[x,y]
  * @param {[number,number]} b 线段b点[x,y]
  * @param {[number,number]} c c点[x,y]
- * @return {number}  向量积(c在ab左边>0)
+ * @return {number}  向量积(c在ab左边>0) (ab在ca右边)
 */
 RVO.Vector.leftOf = function (a, b, c) {
-    /**返回 拟叉积( ca ab )*/
+    //返回 拟叉积( ca , ab )
     return RVO.Vector.det(RVO.Vector.subtract(a, c), RVO.Vector.subtract(b, a));
 }
+
+
+/**线段距离的平方
+ * @param {[number,number]} a
+ * @param {[number,number]} b 
+ * @return {number} number
+ */
+RVO.Vector.lineSq = function (a, b) {
+    return RVO.Vector.absSq(RVO.Vector.subtract(a, b));
+}
+
+
 
 /**点线段距离 
  * c点 到 ab线段的距离
@@ -1387,25 +1405,25 @@ RVO.Vector.leftOf = function (a, b, c) {
  * @returns {number} 距离值
 */
 RVO.Vector.distSqPointLineSegment = function (a, b, c) {
-    /**ba =  b减a */
+    //ba =  b减a 
     var ba = RVO.Vector.subtract(b, a)
-    /**ca =  c减a */
+    //ca =  c减a 
     var ca = RVO.Vector.subtract(c, a)
-    /**r = 数量积(c-a,b-a) / 数量积 b减a  */
+    //r = 数量积(c-a,b-a) / 数量积 b减a  
     var r = RVO.Vector.dotProduct(ca, ba) / RVO.Vector.absSq(ba);
 
-    /**如果(r<0 ) */
+    //如果(r<0 ) 
     if (r < 0) {
-        /**返回 数量积 c-a */
+        //返回 数量积 c-a 
         return RVO.Vector.absSq(ca);
     }
-    /**如果(r> 1 ) */
+    //如果(r> 1 ) 
     else if (r > 1) {
-        /**返回 数量积 c-b */
-        return RVO.Vector.absSq(RVO.Vector.subtract(c, b));
+        //返回 数量积 c-b 
+        return RVO.Vector.lineSq(c, b);
     }
     else {
-        /**返回 数量积 c- 加 (相乘(ba,r) ,a)*/
-        return RVO.Vector.absSq(RVO.Vector.subtract(c, RVO.Vector.add(RVO.Vector.multiply(ba, r), a)));
+        //返回 数量积 c- 加 (相乘(ba,r) ,a)
+        return RVO.Vector.lineSq(c, RVO.Vector.add(RVO.Vector.multiply(ba, r), a));
     }
 }
