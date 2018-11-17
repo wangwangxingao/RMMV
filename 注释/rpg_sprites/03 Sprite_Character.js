@@ -223,7 +223,12 @@ Sprite_Character.prototype.characterPatternX = function() {
     //返回 人物 图案()
     return this._character.pattern();
 };
-/**人物图案y */
+/**人物图案y
+ * 2 -> 0 
+ * 4 -> 1 
+ * 6 -> 2 
+ * 8 -> 3 
+ */
 Sprite_Character.prototype.characterPatternY = function() {
     //返回 (人物 方向() -2 ) / 2 
     return (this._character.direction() - 2) / 2;
@@ -262,102 +267,159 @@ Sprite_Character.prototype.patternHeight = function() {
 };
 /**更新一半身体精灵 */
 Sprite_Character.prototype.updateHalfBodySprites = function() {
+    //如果 (灌木丛高度 >0 )
     if (this._bushDepth > 0) {
+        //创建一半身体精灵()
         this.createHalfBodySprites();
+        //上层身体 位图 = 位图
         this._upperBody.bitmap = this.bitmap;
+        //上层身体 可见度 = true
         this._upperBody.visible = true;
+        //上层身体 y = - 灌木丛高度
         this._upperBody.y = -this._bushDepth;
+        //下层身体 位图 = 位图
         this._lowerBody.bitmap = this.bitmap;
+        //下层身体 可见度 = false
         this._lowerBody.visible = true;
+        //上层身体 设置合成颜色(获取合成颜色())
         this._upperBody.setBlendColor(this.getBlendColor());
+        //下层身体 设置合成颜色(获取合成颜色())
         this._lowerBody.setBlendColor(this.getBlendColor());
+        //上层身体 设置色调(获取色调())
         this._upperBody.setColorTone(this.getColorTone());
+        //下层身体 设置色调(获取色调())
         this._lowerBody.setColorTone(this.getColorTone());
+    //否则 如果(上层身体)
     } else if (this._upperBody) {
+        //上层身体 可见度 = false
         this._upperBody.visible = false;
+        //下层身体 可见度 = false
         this._lowerBody.visible = false;
     }
 };
 /**创建一半身体精灵 */
 Sprite_Character.prototype.createHalfBodySprites = function() {
+    //如果(没有 上层身体 )
     if (!this._upperBody) {
+        //上层身体 =  新 精灵()
         this._upperBody = new Sprite();
+        //上层身体 锚点 x = 0.5
         this._upperBody.anchor.x = 0.5;
+        //上层身体 锚点 y = 1
         this._upperBody.anchor.y = 1;
+        //添加子项(上层身体)
         this.addChild(this._upperBody);
     }
+    //如果(没有 下层身体 )
     if (!this._lowerBody) {
+        //下层身体 =  新 精灵()
         this._lowerBody = new Sprite();
+        //下层身体 锚点 x = 0.5
         this._lowerBody.anchor.x = 0.5;
+        //下层身体 锚点 y = 1
         this._lowerBody.anchor.y = 1;
+        //下层身体 透明度 = 120
         this._lowerBody.opacity = 128;
+        //添加子项(下层身体)
         this.addChild(this._lowerBody);
     }
 };
 /**更新位置 */
 Sprite_Character.prototype.updatePosition = function() {
+    //x = 角色 画面x()
     this.x = this._character.screenX();
+    //y = 角色 画面y()
     this.y = this._character.screenY();
+    //z = 角色 画面z()
     this.z = this._character.screenZ();
 };
 /**更新动画 */
 Sprite_Character.prototype.updateAnimation = function() {
+    //安装动画()
     this.setupAnimation();
+    //如果(不是 是动画播放中())
     if (!this.isAnimationPlaying()) {
+        //角色 结束动画()
         this._character.endAnimation();
     }
+    //如果(不是 是气球播放中())
     if (!this.isBalloonPlaying()) {
+        //角色 结束气球()
         this._character.endBalloon();
     }
 };
 /**更新其他 */
 Sprite_Character.prototype.updateOther = function() {
+    //透明度 = 角色 透明度()
     this.opacity = this._character.opacity();
+    //合成模式 = 角色 合成模式()
     this.blendMode = this._character.blendMode();
+    //灌木丛深度 = 角色 灌木丛深度()
     this._bushDepth = this._character.bushDepth();
 };
 /**安装动画 */
 Sprite_Character.prototype.setupAnimation = function() {
+    //如果(角色 动画id() > 0)
     if (this._character.animationId() > 0) {
+        //动画 = 数据动画组[角色 动画id()]
         var animation = $dataAnimations[this._character.animationId()];
+        //开始动画(动画,false,0)
         this.startAnimation(animation, false, 0);
+        //角色 开始动画()
         this._character.startAnimation();
     }
 };
 /**安装气球 */
 Sprite_Character.prototype.setupBalloon = function() {
+    //如果 (角色 气球id() 大于 0 )
     if (this._character.balloonId() > 0) {
+        //开始气球()
         this.startBalloon();
+        //角色 开始气球()
         this._character.startBalloon();
     }
 };
 /**开始气球 */
 Sprite_Character.prototype.startBalloon = function() {
+    //如果(不是 气球精灵)
     if (!this._balloonSprite) {
+        //气球精灵 = 新 精灵气球()
         this._balloonSprite = new Sprite_Balloon();
     }
+    //气球精灵 安装(角色 气球id())
     this._balloonSprite.setup(this._character.balloonId());
+    //父类 添加子项(气球精灵)
     this.parent.addChild(this._balloonSprite);
 };
 /**更新气球 */
 Sprite_Character.prototype.updateBalloon = function() {
+    //安装气球()
     this.setupBalloon();
+    //如果(气球精灵)
     if (this._balloonSprite) {
+        //气球精灵 x = x
         this._balloonSprite.x = this.x;
+        //气球精灵 y = y - 高
         this._balloonSprite.y = this.y - this.height;
+        //如果(不是 气球精灵  是播放中())
         if (!this._balloonSprite.isPlaying()) {
+            //结束气球()
             this.endBalloon();
         }
     }
 };
 /**结束气球 */
 Sprite_Character.prototype.endBalloon = function() {
+    //如果(气球精灵)
     if (this._balloonSprite) {
+        //父类 移除子项(气球精灵)
         this.parent.removeChild(this._balloonSprite);
+        //气球精灵 = null
         this._balloonSprite = null;
     }
 };
 /**是气球播放中 */
 Sprite_Character.prototype.isBalloonPlaying = function() {
+    //返回 !!气球精灵
     return !!this._balloonSprite;
 };
