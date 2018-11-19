@@ -161,12 +161,11 @@ Game_Interpreter.prototype.setupChoices = function (params) {
  
     var setChoices = this._setChoices
     if ( setChoices && setChoices.length > 0) { 
-        var l = [] ;
+        var choices = [] ;
         for (var i = 0; i < setChoices.length; i++) {
-            l.push(choices[setChoices[i]]) 
+            choices.push(choices[setChoices[i]]) 
         } 
     }
-    choices = l
     this._setChoices = null
 
     //选择组 = 参数组[0] 克隆()
