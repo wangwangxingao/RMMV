@@ -803,6 +803,10 @@ Window_Base.prototype.tslPushEscapeCharacter = function (textState, code) {
         case '/':
             this.tslPushChangeFontItalic(textState);
             break;
+            
+        case 'COC':
+            this.tslPushColorOutColor(textState, this.tslPushTextColorEscapeParam(textState));
+        break;
         case 'OC':
             this.tslPushOutColor(textState, this.tslPushTextColorEscapeParam(textState));
             break;
@@ -1345,7 +1349,19 @@ Window_Base.prototype.tslPushTextColor = function (textState, color) {
     }
     this.tslPushOther(textState, obj)
 };
-
+Window_Base.prototype.tslPushColorOutColor = function (textState, color) {
+    this.contents.textColor = color;
+    var obj = {
+        "type": "textColor",
+        "value": color
+    }
+    this.tslPushOther(textState, obj)
+    var obj = {
+        "type": "outlineColor",
+        "value": color
+    }
+    this.tslPushOther(textState, obj)
+};
 /**添加描边颜色 */
 Window_Base.prototype.tslPushOutColor = function (textState, color) {
     var obj = {

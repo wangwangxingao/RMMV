@@ -66,6 +66,7 @@ ResourceHandler.createLoader = function(url, retryMethod, resignMethod, retryInt
 
 /**存在 */
 ResourceHandler.exists = function() {
+    //返回 重新加载组 长度 >  0
     return this._reloaders.length > 0;
 };
 

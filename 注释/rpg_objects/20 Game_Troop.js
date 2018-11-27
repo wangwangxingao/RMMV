@@ -248,7 +248,7 @@ Game_Troop.prototype.setupBattleEvent = function() {
             if (this.meetsConditions(page) && !this._eventFlags[i]) {
                 //事件解释器 安装(页 列表)
                 this._interpreter.setup(page.list);
-                //如果(页 跨度 <= 1 //战斗  )
+                //如果(页 跨度 <= 1 //战斗 == 0 回合 == 1   )
                 if (page.span <= 1) {
                     //事件标志[i] = true
                     this._eventFlags[i] = true;
