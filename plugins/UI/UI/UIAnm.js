@@ -193,182 +193,6 @@
 
 
 
-    var Sprite_prototype_initialize = Sprite.prototype.initialize
-    /**初始化 */
-    Sprite.prototype.initialize = function (bitmap) {
-        //精灵 初始化 呼叫(this)
-        Sprite_prototype_initialize.call(this, bitmap);
-        this.__anm = this.__anm || {}
-    };
-
-    var Sprite_prototype_update = Sprite.prototype.update
-    /**更新 */
-    Sprite.prototype.update = function () {
-        //精灵 更新 呼叫(this)
-        Sprite_prototype_update.call(this);
-        this.updateAnm()
-    };
-
-    /**更新所有动画 */
-    Sprite.prototype.updateAnm = function () {
-        this.__anming = false
-        for (var name in this.__anm) {
-            this.__anming = true
-            for (var i = this.getAnmStep(); i >= 0; i--) {
-                //更新动画
-                this.anmUpdate(name, this.__anm[name])
-            }
-        }
-    };
-
-
-
-    /**
-     * 获取动画步数
-     * 
-     */
-    Sprite.prototype.getAnmStep = function () {
-        return this.__anmStep || 0
-    };
-
-    /**
-     * 设置动画步数
-     */
-    Sprite.prototype.setAnmStep = function (i) {
-        return this.__anmStep = i
-    };
-
-
-    /**
-     * 动画播放中
-     * 
-     */
-    Sprite.prototype.anmPlaying = function (name, c) {
-        if (name) {
-            if (this.__anm[name]) {
-                return true
-            }
-        } else {
-            if (this.__anming) {
-                return true
-            }
-        }
-        if (c && this.children) {
-            var c = c - 1
-            for (var i = 0; i < this.children.length; i++) {
-                if (this.children[i] && this.children[i].anmPlaying && this.children[i].anmPlaying(name)) {
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
-
-    /**动画开始 */
-    Sprite.prototype.anmSt = function (name, list, re) {
-        if (!list) {
-            //清除动画
-            return this.anmClear(name, list)
-        }
-        //如果不是数组  
-        var l = []
-
-        if (Array.isArray(list)) {
-            for (var i = 0; i < list.length; i++) {
-                var o = ww.anm.anmToObj(list[i])
-                if (o) {
-                    l.push(o)
-                }
-            }
-        } else {
-            var o = ww.anm.anmToObj(list)
-            if (o) {
-                l.push(o)
-            }
-        }
-
-        var oa = l[0]
-        if (!oa) {
-            return this.anmClear(name, l)
-        }
-        var anmobj = {
-            name: name,
-            index: 0,
-            list: l,
-            value: {},
-            re: re
-        }
-        this.__anm = this.__anm || {}
-        this.__anm[name] = anmobj
-        this.__anming = true
-
-        this.runAnmSt(name)
-    };
-
-    Sprite.prototype.anmRe = function (name, re) {
-        this.__anm = this.__anm || {}
-        var oa = this.__anm[name]
-        if (oa) {
-            oa.type = re
-        }
-    }
-
-
-    Sprite.prototype.anmAdd = function (name, list) {
-        this.__anm = this.__anm || {}
-        var oa = this.__anm[name]
-        if (oa && oa.list.length) {
-            if (list) {
-                var l = []
-                if (Array.isArray(list)) {
-                    for (var i = 0; i < list.length; i++) {
-                        var o = ww.anm.anmToObj(list[i])
-                        if (o) {
-                            l.push(o)
-                        }
-                    }
-                } else {
-                    var o = ww.anm.anmToObj(list)
-                    if (o) {
-                        l.push(o)
-                    }
-                }
-                this.__anm[name] = oa.list.concat(l)
-            }
-        } else {
-            this.anmSt(name, list)
-        }
-    };
-
-
-    /**单个动画更新 */
-    Sprite.prototype.anmUpdate = function (name) {
-        if (this.runAnmRun(name)) {
-            this.runAnmUpdate(name)
-            return
-        }
-        this.anmEnd(name)
-    }
-
-    Sprite.prototype.anmEnd = function (name) {
-        this.runAnmEnd(name)
-    }
-
-    /**
-     * 动画清除
-     */
-    Sprite.prototype.anmClear = function (name, list) {
-        if (name) {
-            this.__anm = this.__anm || {}
-            this.__anm[name] = null
-            delete this.__anm[name]
-        } else {
-            this.__anm = {}
-        }
-    };
-
-
     /**
      * 数值初始化
      * 
@@ -566,14 +390,13 @@
 
 
 
-    Sprite.prototype.runAnmSt = function (name) {
+    ww.anm.runAnmSt = function (name,s) {
         var name = name
-        this.__anm = this.__anm || {}
-        var anmobj = this.__anm[name]
+        s.__anm = s.__anm || {}
+        var anmobj = s.__anm[name]
         var list = anmobj.list
         var index = anmobj.index
         var oa = list[index]
-        var s = this
         if (oa) {
             oa.value = {}
             ww.anm.evalini(s, oa, "fr", "", oa, anmobj)
@@ -584,32 +407,30 @@
                 }
             }
         } else {
-            this.anmClear(name)
+            s.anmClear(name)
         }
     };
 
-    Sprite.prototype.runAnmRun = function (name) {
+    ww.anm.runAnmRun = function (name,s) {
         var name = name
-        this.__anm = this.__anm || {}
-        var anmobj = this.__anm[name]
+        s.__anm = s.__anm || {}
+        var anmobj = s.__anm[name]
         var list = anmobj.list
         var index = anmobj.index
         var oa = list[index]
-        var s = this
         if (oa) {
             return ww.anm.evalReturn(s, oa, "t", "", oa, anmobj)
         }
         return false
     }
 
-    Sprite.prototype.runAnmUpdate = function (name) {
+    ww.anm.runAnmUpdate = function (name,s) {
         var name = name
-        this.__anm = this.__anm || {}
-        var anmobj = this.__anm[name]
+        s.__anm = s.__anm || {}
+        var anmobj = s.__anm[name]
         var list = anmobj.list
         var index = anmobj.index
         var oa = list[index]
-        var s = this
         if (oa) {
             if (!oa.d || ww.anm.evalReturn(s, oa, "d", "", oa, anmobj)) {
                 ww.anm.evalUpdate(s, oa, "up", "", oa, anmobj)
@@ -628,14 +449,13 @@
 
 
     /**动画结束 */
-    Sprite.prototype.runAnmEnd = function (name) {
+    ww.anm.runAnmEnd = function (name,s) {
         var name = name
-        this.__anm = this.__anm || {}
-        var anmobj = this.__anm[name]
+        s.__anm = s.__anm || {}
+        var anmobj = s.__anm[name]
         var list = anmobj.list
         var index = anmobj.index
         var oa = list[index]
-        var s = this
         if (oa) {
             ww.anm.evalini(s, oa, "ed", "", s, oa, anmobj)
             if (typeof oa.set == "object") {
@@ -649,10 +469,181 @@
         if (anmobj.re && list.length) {
             anmobj.index = anmobj.index % list.length
         }
-        this.runAnmSt(name)
+        ww.anm.runAnmSt(name)
     };
 
 
+ 
+
+    
+
+    var Sprite_prototype_initialize = Sprite.prototype.initialize
+    /**初始化 */
+    Sprite.prototype.initialize = function (bitmap) {
+        //精灵 初始化 呼叫(this)
+        Sprite_prototype_initialize.call(this, bitmap);
+        this.__anm = this.__anm || {}
+    };
+
+    var Sprite_prototype_update = Sprite.prototype.update
+    /**更新 */
+    Sprite.prototype.update = function () {
+        //精灵 更新 呼叫(this)
+        Sprite_prototype_update.call(this);
+        this.updateAnm()
+    };
+
+    /**更新所有动画 */
+    Sprite.prototype.updateAnm = function () {
+        this.__anming = false
+        for (var name in this.__anm) {
+            this.__anming = true
+            for (var i = this.getAnmStep(); i >= 0; i--) {
+                //更新动画
+                this.anmUpdate(name, this.__anm[name])
+            }
+        }
+    };
+
+
+
+    /**
+     * 获取动画步数
+     * 
+     */
+    Sprite.prototype.getAnmStep = function () {
+        return this.__anmStep || 0
+    };
+
+    /**
+     * 设置动画步数
+     */
+    Sprite.prototype.setAnmStep = function (i) {
+        return this.__anmStep = i
+    };
+
+
+    /**
+     * 动画播放中
+     * 
+     */
+    Sprite.prototype.anmPlaying = function (name, c) {
+        if (name) {
+            if (this.__anm[name]) {
+                return true
+            }
+        } else {
+            if (this.__anming) {
+                return true
+            }
+        }
+        if (c && this.children) {
+            var c = c - 1
+            for (var i = 0; i < this.children.length; i++) {
+                if (this.children[i] && this.children[i].anmPlaying && this.children[i].anmPlaying(name)) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+
+    /**动画开始 */
+    Sprite.prototype.anmSt = function (name, list, re) {
+        if (!list) {
+            //清除动画
+            return this.anmClear(name, list)
+        }
+        //如果不是数组  
+        var l = []
+
+        if (Array.isArray(list)) {
+            for (var i = 0; i < list.length; i++) {
+                var o = ww.anm.anmToObj(list[i])
+                if (o) {
+                    l.push(o)
+                }
+            }
+        } else {
+            var o = ww.anm.anmToObj(list)
+            if (o) {
+                l.push(o)
+            }
+        }
+
+        var oa = l[0]
+        if (!oa) {
+            return this.anmClear(name, l)
+        }
+        var anmobj = {
+            name: name,
+            index: 0,
+            list: l,
+            value: {},
+            re: re
+        }
+        this.__anm = this.__anm || {}
+        this.__anm[name] = anmobj
+        this.__anming = true
+
+        ww.anm.runAnmSt(name,this)
+    };
+
+
+
+    Sprite.prototype.anmAdd = function (name, list) {
+        this.__anm = this.__anm || {}
+        var oa = this.__anm[name]
+        if (oa && oa.list.length) {
+            if (list) {
+                var l = []
+                if (Array.isArray(list)) {
+                    for (var i = 0; i < list.length; i++) {
+                        var o = ww.anm.anmToObj(list[i])
+                        if (o) {
+                            l.push(o)
+                        }
+                    }
+                } else {
+                    var o = ww.anm.anmToObj(list)
+                    if (o) {
+                        l.push(o)
+                    }
+                }
+                this.__anm[name] = oa.list.concat(l)
+            }
+        } else {
+            this.anmSt(name, list)
+        }
+    };
+
+
+    /**单个动画更新 */
+    Sprite.prototype.anmUpdate = function (name) {
+        if (ww.anm.runAnmRun(name,this)) {
+            ww.anm.runAnmUpdate(name,this)
+            return
+        }
+        this.anmEnd(name)
+    }
+
+    Sprite.prototype.anmEnd = function (name) {
+        ww.anm.runAnmEnd(name,this)
+    }
+
+    /**
+     * 动画清除
+     */
+    Sprite.prototype.anmClear = function (name, list) {
+        if (name) {
+            this.__anm = this.__anm || {}
+            this.__anm[name] = null
+            delete this.__anm[name]
+        } else {
+            this.__anm = {}
+        }
+    };
 
 
 })();
