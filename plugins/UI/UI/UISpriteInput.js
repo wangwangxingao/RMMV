@@ -95,7 +95,7 @@
      * 是在之中 
      * @param {number} x x坐标
      * @param {number} y y坐标
-     * @param {boolean} type 不检查图片
+     * @param {boolean} b 检查图片
      * 
      */
     Sprite.prototype.isTouchIn = function (x, y, b) {

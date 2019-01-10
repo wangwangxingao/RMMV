@@ -392,7 +392,7 @@ AudioManager.playStaticSe = function(se) {
     if (se.name) {
 	    //读取静态se
         this.loadStaticSe(se);
-        //循环 ,i = 0 ,如果 i< 静态缓存的长 ,每次i + 1
+        //循环  i = 0 ,如果 i< 静态缓存的长 ,每次i + 1
         for (var i = 0; i < this._staticBuffers.length; i++) {
 	        // 缓存的 = 静态缓存[i]
             var buffer = this._staticBuffers[i];
@@ -409,7 +409,9 @@ AudioManager.playStaticSe = function(se) {
         }
     }
 };
-/**读取静态se(se) */
+/**读取静态se
+ * @param {{name:string,volume: number,pitch: number, pan: number}} se se
+ */
 AudioManager.loadStaticSe = function(se) {
 	//如果 se 的名字 并且 不是 是静态se
     if (se.name && !this.isStaticSe(se)) {
@@ -419,7 +421,7 @@ AudioManager.loadStaticSe = function(se) {
         buffer._reservedSeName = se.name;
         //静态缓存 添加 缓存的
         this._staticBuffers.push(buffer);
-        //如果 会用到Html5Audio
+        //如果 应该使用Html5Audio()
         if (this.shouldUseHtml5Audio()) {
 	        //Html5Audio 设置静态se(缓存的 地址)
             Html5Audio.setStaticSe(buffer._url);
@@ -470,7 +472,10 @@ AudioManager.saveBgm = function() {
         return this.makeEmptyAudioObject();
     }
 };
-/**保存bgs */
+/**保存bgs 
+ * @returns {{name: string, volume: nuumber, pitch: nuumber,pan:nuumber,pos:nuumber} |{ name: '', volume: 0, pitch: 0 }} bgs设置对象
+ * 
+*/
 AudioManager.saveBgs = function() {
     if (this._currentBgs) {
         var bgs = this._currentBgs;
@@ -485,18 +490,23 @@ AudioManager.saveBgs = function() {
         return this.makeEmptyAudioObject();
     }
 };
-/**制作空音频对象 */
+/**制作空音频对象 
+ * @returns {{ name: '', volume: 0, pitch: 0 }} { name: '', volume: 0, pitch: 0 }
+*/
 AudioManager.makeEmptyAudioObject = function() {
 	//名字 :"" ,大小 0 ,音高 0
     return { name: '', volume: 0, pitch: 0 };
 };
-/**创造缓存 (文件夹 ,名字) */
+/**创造缓存 (文件夹 ,名字)
+ * @param {number} folder  文件夹
+ * @param {number} name 名字
+ */
 AudioManager.createBuffer = function(folder, name) {
 	//提取 = 音频文件提取
     var ext = this.audioFileExt();
     //地址 = 路径 + 文件夹 +"/" + 编码(name) + 提取
     var url = this._path + folder + '/' + encodeURIComponent(name) + ext;
-    //如果 会用到Html5Audio 并且 文件夹 全等于 bgm
+    //如果 应该使用Html5Audio 并且 文件夹 全等于 bgm
     if (this.shouldUseHtml5Audio() && folder === 'bgm') {
         if(this._blobUrl) {
             //Html5Audio安装(地址)
@@ -522,7 +532,11 @@ AudioManager.updateBufferParameters = function(buffer, configVolume, audio) {
         buffer.pan = (audio.pan || 0) / 100;
     }
 };
-/**音频文件提取 */
+/**音频文件提取
+ * @returns {".ogg"|".m4a"}  web音频  
+ * 可以播放ogg 并且 不是 是移动设备时 '.ogg'  
+ * 否则 ".m4a"
+ */
 AudioManager.audioFileExt = function() {
 	//如果 web音频 可以播放ogg 并且 不是 是移动设备
     if (WebAudio.canPlayOgg() && !Utils.isMobileDevice()) {
@@ -531,7 +545,10 @@ AudioManager.audioFileExt = function() {
         return '.m4a';
     }
 };
-/** 会用到Html5Audio  */
+/** 应该使用Html5Audio
+ * 
+ * @returns {false} false
+*/
 AudioManager.shouldUseHtml5Audio = function() {
     // The only case where we wanted html5audio was android/ no encrypt
     // Atsuma-ru asked to force webaudio there too, so just return false for ALL    

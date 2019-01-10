@@ -32,7 +32,7 @@ Window.prototype.initialize = function() {
 
     //填充 = 18 
     this._padding = 18;
-    //边缘 = 4
+    /**边缘  = 4 */
     this._margin = 4;
     //颜色色调 = [0,0,0]
     this._colorTone = [0, 0, 0];
@@ -466,6 +466,7 @@ Window.prototype._refreshAllParts = function() {
  * @private
  */
 Window.prototype._refreshBack = function() {
+    //m = 边缘
     var m = this._margin;
     var w = this._width - m * 2;
     var h = this._height - m * 2;
@@ -475,11 +476,17 @@ Window.prototype._refreshBack = function() {
     this._windowBackSprite.setFrame(0, 0, w, h);
     this._windowBackSprite.move(m, m);
 
+    //如果( w > 0 并且 h > 0 并且 窗口皮肤)
     if (w > 0 && h > 0 && this._windowskin) {
+        //p = 96
         var p = 96;
+        //图片 绘制(窗口皮肤,0,0,96,96,0,0,宽,高 )
         bitmap.blt(this._windowskin, 0, 0, p, p, 0, 0, w, h);
+        //循环(y = 0 ;如果 y < 高 ;每一次 y += p )
         for (var y = 0; y < h; y += p) {
+            //循环(x = 0 ;如果 x < 宽 ;每一次 x += p )
             for (var x = 0; x < w; x += p) {
+                //图片 绘制(窗口,0,p,p,p,)
                 bitmap.blt(this._windowskin, 0, p, p, p, x, y, p, p);
             }
         }

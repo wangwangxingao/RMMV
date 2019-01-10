@@ -503,8 +503,8 @@ Object.defineProperty(Bitmap.prototype, 'paintOpacity', {
  * Resizes the bitmap.
  *
  * @method resize
- * @param {number} width The new width of the bitmap
- * @param {number} height The new height of the bitmap
+ * @param {number} width 位图的新宽度  The new width of the bitmap
+ * @param {number} height 位图的新高度  The new height of the bitmap
  */ 
 Bitmap.prototype.resize = function(width, height) {
     width = Math.max(width || 0, 1);
@@ -520,15 +520,15 @@ Bitmap.prototype.resize = function(width, height) {
  * Performs a block transfer.
  *
  * @method blt
- * @param {Bitmap} source The bitmap to draw
- * @param {number} sx The x coordinate in the source
- * @param {number} sy The y coordinate in the source
- * @param {number} sw The width of the source image
- * @param {number} sh The height of the source image
- * @param {number} dx The x coordinate in the destination
- * @param {number} dy The y coordinate in the destination
- * @param {number} [dw=sw] The width to draw the image in the destination
- * @param {number} [dh=sh] The height to draw the image in the destination
+ * @param {Bitmap} source 要绘制的位图  The bitmap to draw
+ * @param {number} sx 源中的x坐标  The x coordinate in the source
+ * @param {number} sy 源中的y坐标  The y coordinate in the source
+ * @param {number} sw 源图像的宽度  The width of the source image
+ * @param {number} sh 源图像的高度  The height of the source image
+ * @param {number} dx 目标中的y坐标  The x coordinate in the destination
+ * @param {number} dy 目标中的y坐标  The y coordinate in the destination
+ * @param {number} [dw=sw] 在目标中绘制图像的宽度  The width to draw the image in the destination
+ * @param {number} [dh=sh] 在目标中绘制图像的高度  The height to draw the image in the destination
  */ 
 Bitmap.prototype.blt = function(source, sx, sy, sw, sh, dx, dy, dw, dh) {
     dw = dw || sw;
@@ -547,15 +547,15 @@ Bitmap.prototype.blt = function(source, sx, sy, sw, sh, dx, dy, dw, dh) {
  * Performs a block transfer, using assumption that original image was not modified (no hue)
  *
  * @method blt
- * @param {Bitmap} source The bitmap to draw
- * @param {number} sx The x coordinate in the source
- * @param {number} sy The y coordinate in the source
- * @param {number} sw The width of the source image
- * @param {number} sh The height of the source image
- * @param {number} dx The x coordinate in the destination
- * @param {number} dy The y coordinate in the destination
- * @param {number} [dw=sw] The width to draw the image in the destination
- * @param {number} [dh=sh] The height to draw the image in the destination
+ * @param {Bitmap} source 要绘制的位图  The bitmap to draw
+ * @param {number} sx 源中的x坐标  The x coordinate in the source
+ * @param {number} sy 源中的y坐标  The y coordinate in the source
+ * @param {number} sw 源图像的宽度  The width of the source image
+ * @param {number} sh 源图像的高度  The height of the source image
+ * @param {number} dx 目标中的y坐标  The x coordinate in the destination
+ * @param {number} dy 目标中的y坐标  The y coordinate in the destination
+ * @param {number} [dw=sw] 在目标中绘制图像的宽度  The width to draw the image in the destination
+ * @param {number} [dh=sh] 在目标中绘制图像的高度  The height to draw the image in the destination
  */
 Bitmap.prototype.bltImage = function(source, sx, sy, sw, sh, dx, dy, dw, dh) {
     dw = dw || sw;
@@ -573,9 +573,9 @@ Bitmap.prototype.bltImage = function(source, sx, sy, sw, sh, dx, dy, dw, dh) {
  * Returns pixel color at the specified point.
  *
  * @method getPixel
- * @param {number} x The x coordinate of the pixel in the bitmap
- * @param {number} y The y coordinate of the pixel in the bitmap
- * @return {string} The pixel color (hex format)
+ * @param {number} x 位图中像素的x坐标  The x coordinate of the pixel in the bitmap
+ * @param {number} y 位图中像素的y坐标  The y coordinate of the pixel in the bitmap
+ * @return {string}  像素颜色（十六进制格式） The pixel color (hex format)
  */ 
 Bitmap.prototype.getPixel = function(x, y) {
     var data = this._context.getImageData(x, y, 1, 1).data;
@@ -591,9 +591,9 @@ Bitmap.prototype.getPixel = function(x, y) {
  * Returns alpha pixel value at the specified point.
  *
  * @method getAlphaPixel
- * @param {number} x The x coordinate of the pixel in the bitmap
- * @param {number} y The y coordinate of the pixel in the bitmap
- * @return {string} The alpha value
+ * @param {number} x 位图中像素的x坐标 The x coordinate of the pixel in the bitmap
+ * @param {number} y 位图中像素的y坐标 The y coordinate of the pixel in the bitmap
+ * @return {string} 透明像素值  The alpha value
  */ 
 Bitmap.prototype.getAlphaPixel = function(x, y) {
     var data = this._context.getImageData(x, y, 1, 1).data;
@@ -633,11 +633,11 @@ Bitmap.prototype.clear = function() {
  * Fills the specified rectangle.
  *
  * @method fillRect
- * @param {number} x The x coordinate for the upper-left corner
- * @param {number} y The y coordinate for the upper-left corner
- * @param {number} width The width of the rectangle to fill
- * @param {number} height The height of the rectangle to fill
- * @param {string} color The color of the rectangle in CSS format
+ * @param {number} x 左上角的x坐标  The x coordinate for the upper-left corner
+ * @param {number} y 左上角的y坐标  The y coordinate for the upper-left corner
+ * @param {number} width 要填充的矩形的宽度  The width of the rectangle to fill
+ * @param {number} height 要填充的矩形的高度  The height of the rectangle to fill
+ * @param {string} color CSS格式的矩形颜色  The color of the rectangle in CSS format
  */ 
 Bitmap.prototype.fillRect = function(x, y, width, height, color) {
    //环境 = 环境 
@@ -732,12 +732,15 @@ Bitmap.prototype.drawCircle = function(x, y, radius, color) {
  * Draws the outline text to the bitmap.
  *
  * @method drawText
- * @param {string} text The text that will be drawn
- * @param {number} x The x coordinate for the left of the text
- * @param {number} y The y coordinate for the top of the text
- * @param {number} maxWidth The maximum allowed width of the text
- * @param {number} lineHeight The height of the text line
- * @param {string} align The alignment of the text
+ * @param {string} text  将要绘制的文本  The text that will be drawn
+ * @param {number} x  文本左侧的x坐标 The x coordinate for the left of the text
+ * @param {number} y  文本顶部的y坐标 The y coordinate for the top of the text
+ * @param {number} maxWidth 文本的最大允许宽度 The maximum allowed width of the text 
+ * @param {number} lineHeight 文本行的高度 The height of the text line
+ * @param {string} align 文本的对齐方式 The alignment of the text  
+ *  left 	把文本排列到左边。默认值：由浏览器决定。  
+ *  right 	把文本排列到右边。  
+ *  center 	把文本排列到中间。  
  */ 
 Bitmap.prototype.drawText = function(text, x, y, maxWidth, lineHeight, align) {
     // Note: Firefox has a bug with textBaseline: Bug 737852

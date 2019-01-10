@@ -5,6 +5,7 @@
 /*:
  * @plugindesc 显示文本加强
  * @author 汪汪
+ * @version 2.0
  * 
  * @help 
  *  
@@ -12,6 +13,9 @@
  * \{ \}  : 扩展  支持\{[z]  \}[z] 增加减少字号  \{}[z] 设置字号
  * \C : 扩展 支持 \C[#FFFF00]
  * \Y : 一个新页  支持 \Y 和 \Y[n] 设置位置 ,
+ *       0 最上面
+ *       1 中间
+ *       2 最下面
  *       会重置图片,间隔时间,字体,脸图等
  *       n为 3 4 5 6 7 8 时 有多个参数  \Y[n id xc yc ixc iyc xd yd]
  *       3 时id  跟随者序号 操作的本人为 0  
@@ -20,6 +24,9 @@
  *       6 时id  角色编号 
  *       7 时id  敌群中敌人序号 
  *       8 时id  为屏幕位置种类 ( 0 时 [0,0,1,1] 1时 [0,0,屏幕,屏幕] )
+ *       12 时 为2时的位置,但只显示1行
+ *       11 时 为1时的位置,但只显示1行
+ *       10 时 为0时的位置,但只显示1行
  * 
  *       窗口显示位置 为   
  *       选择的图片为 cx,cy,cw,ch 
@@ -212,7 +219,6 @@ Window_Base.prototype.resetFontSettings = function () {
     this.reHjg()
     this.reWjg()
     this.rejiange()
-    this.reKg()
 };
 
 Window_Base.prototype.saveFontSettings = function (bitmap) {
@@ -279,7 +285,7 @@ Window_Base.prototype.makePage = function (textState) {
     return page
 };
 Window_Base.prototype.makeLine = function (textState) {
-    return { "type": "line", "list": [], "test": { "x": 0, "y": 0, "w": 0, "h": 0 } }
+    return { "type": "line", "list": [], "texts": [], "test": { "x": 0, "y": 0, "w": 0, "h": 0 } }
 };
 Window_Base.prototype.makeText = function (textState) {
     return { "type": "text", "text": "", "test": { "x": 0, "y": 0, "w": 0, "h": 0 } }
@@ -287,7 +293,9 @@ Window_Base.prototype.makeText = function (textState) {
 Window_Base.prototype.makeIcon = function (textState) {
     return { "type": "icon", "icon": "", "test": { "x": 0, "y": 0, "w": 0, "h": 0 } }
 };
-
+Window_Base.prototype.makeLCFText = function (textState) {
+    return { "type": "lcf", "lcf": "", "lcfwh": { "w": 0, "h": 0 }, "list": [] }
+};
 /**测试文字增强 */
 Window_Base.prototype.testTextEx = function (text, x, y, w, h, wt, ht, facepos, wz, aw, ah) {
     var text = text || ""
@@ -369,16 +377,9 @@ Window_Base.prototype.testMakePages = function (textState) {
             } else if (type == "icon") {
                 this.testPushText(textState, obj)
             } else if (type == "text") {
-                var obj2 = list[i + 1]
-                var obj3 = list[i + 2]
-                if (obj2 && obj2.type == "text" && obj2.lcf == true) {
-                    if (obj3 && obj3.type == "text") {
-                        this.testPushText(textState, obj, obj2, obj3)
-                        i++
-                    }
-                } else {
-                    this.testPushText(textState, obj)
-                }
+                this.testPushText(textState, obj)
+            } else if (type == "lcf") {
+                this.testPushLCFText(textState, obj)
             } else if (type == "wjg") {
                 this.setWjg(obj.value)
             } else if (type == "hjg") {
@@ -592,6 +593,9 @@ Window_Base.prototype.testPushLine = function (textState, line, cs) {
     if (page) {
         /**有上一行时 */
         if (line0) {
+            var must = page.set
+
+            //有限定行数时 
             var ph = page.test.h
             var lh = line0.test.h
             //间隔
@@ -601,7 +605,6 @@ Window_Base.prototype.testPushLine = function (textState, line, cs) {
             page.test.h = line0.test.h + line0.test.y
 
             page.test.w = Math.max(page.test.w, line0.test.w)
-            var must = page.set
             var fw = Window_Base._faceWidth + 24
             var w = must.w - (page.set.facepos == 3 ? fw * 2 : page.set.facepos ? fw : 0)
             var h = must.h
@@ -640,10 +643,22 @@ Window_Base.prototype.testPushLine = function (textState, line, cs) {
 };
 
 
+Window_Base.prototype.testPushLCFText = function (textState, lcftext) {
+    var lcftext = lcftext || this.makeLCFText()
 
-/**添加字符 */
-Window_Base.prototype.testPushText = function (textState, text, text2, text3) {
-    var text = text || this.makeText()
+    var list = lcftext.list
+
+    if (!list.length) {
+        return
+    }
+
+
+    var lcf = lcftext.lcf
+
+    var lcfwh = lcftext.lcfwh
+    var lcfw = lcfwh.w
+
+
     var line = textState.line
     var page = textState.page
     var pageset = page.set
@@ -651,44 +666,101 @@ Window_Base.prototype.testPushText = function (textState, text, text2, text3) {
     //====处理字====
     var lw = line.test.w
     var tw = text.test.w
-    var tw2 = 0
-    if (text2) {
-        tw2 = text2.test.w
-    }
-    var tw3 = 0
-    if (text3) {
-        tw3 = text3.test.w
-    }
     //宽间隔
     var jw = (lw == 0 || tw == 0) ? 0 : this.getWjg() || 0
     var sw = pageset.w
     var fw = Window_Base._faceWidth + 24
     var fw = page.set.facepos == 3 ? fw * 2 : page.set.facepos ? fw : 0
-    //行可以放开字 
-
-    //可以放开这一个和下一个
-    var canline1 = (lw + jw + tw + tw3 <= sw - fw)
-    //可以放开这一个和连词符
-    var canline2 = (tw2 > 0 && lw + jw + tw + tw2 <= sw - fw)
-    //可以放开这一个或者 在行首 并且 没有下一个
-    var canline3 = (lw + jw + tw <= sw - fw || (tw2 == 0 && tw3 == 0 && lw == 0))
 
 
-    if (canline1 || canline2 || canline3) {
-        //添加字符 
-        text.test.x = lw + jw
-        line.test.w = text.test.x + tw
-        line.test.h = Math.max(line.test.h, text.test.h)
-        this.testPushOther(textState, text)
+    var syw = sw - fw - lw - jw
 
-        //需要连词符
-        if (!canline1 && canline2) {
-            text2.test.x = line.test.w + jw
-            line.test.w = text2.test.x + tw2
-            line.test.h = Math.max(line.test.h, text2.test.h)
-            this.testPushOther(textState, text2)
+    var rel = []
+    var rei = -1
+    var odw = 0
+    var rel2 = []
+    for (var i = 0; i < list.length; i++) {
+        var re = list[i]
+        odw += re.w
+        if (odw + ((i == list.length - 1) ? 0 : lcfw) <= syw) {
+            rei = i
         }
+    }
 
+    //如果第一个都放不下
+    if (rei == -1) {
+        //如果是开头
+        if (lw == 0) {
+            var text = this.makeText()
+            text.text = re[0].text
+            text.test.w = re[0].w
+            text.test.h = re[0].h
+            //添加字符 
+            text.test.x = lw + jw
+            line.test.w = text.test.x + tw
+            line.test.h = Math.max(line.test.h, text.test.h)
+            this.testPushLineText(textState, text)
+
+            //====处理行====
+            var ph = page.test.h
+            var lh = line.test.h
+            //间隔
+            var jh = (ph == 0 || lh == 0) ? 0 : this.getHjg() || 0
+            var sh = pageset.h
+            //行能放到页中 
+            if (ph + jh + lh <= sh || ph == 0) {
+                //不能放到页中 或者 不是第一行
+            } else {
+                //添加新页
+                textState.line = null
+                var page2 = this.makePage(textState)
+                page2.type = "addpage"
+                page2.set = Window_Base.deepCopy(page.set)
+                this.testPushPage(textState, page2)
+                //行添加到新页
+                this.testPushLine(textState, line)
+            }
+            rei = 0
+        } else {
+            //判断是否添加新页
+            if (pageset.hl && page.list.length >= pageset.hl) {
+                textState.line = null
+                var page2 = this.makePage(textState)
+                page2.type = "addpage"
+                page2.set = Window_Base.deepCopy(page.set)
+                this.testPushPage(textState, page2)
+            }
+            //添加新行
+            var line2 = this.makeLine()
+            line2.type = "addline"
+            line2.set = line.set
+            this.testPushLine(textState, line2)
+        }
+    } else {
+        for (var i = 0; i <= rei; i++) {
+            var text = this.makeText()
+            text.text = re[i].text
+            text.test.w = re[i].w
+            text.test.h = re[i].h
+            //添加字符 
+            text.test.x = lw + jw
+            line.test.w = text.test.x + tw
+            line.test.h = Math.max(line.test.h, text.test.h)
+            this.testPushLineText(textState, text)
+
+        }
+        //如果不是到达最后一个
+        if (rei < list.length - 1) {
+            var text = this.makeText()
+            text.text = lcftext.lcf
+            text.test.w = lcftext.lcfwh.w
+            text.test.h = lcftext.lcfwh.h
+            //添加字符 
+            text.test.x = lw + jw
+            line.test.w = text.test.x + tw
+            line.test.h = Math.max(line.test.h, text.test.h)
+            this.testPushLineText(textState, text)
+        }
         //====处理行====
         var ph = page.test.h
         var lh = line.test.h
@@ -707,13 +779,77 @@ Window_Base.prototype.testPushText = function (textState, text, text2, text3) {
             this.testPushPage(textState, page2)
             //行添加到新页
             this.testPushLine(textState, line)
+        }
+    }
 
+
+    var lclist2 = []
+    for (var i = rei + 1; i < list.length; i++) {
+        lclist2.push(list[i])
+    }
+    if (lclist2.length) {
+        var lcftext2 = this.makeLCFText()
+        lcftext2.lcf = lcf
+        lcftext2.lcfwh = lcfwh
+        lcftext2.list = lclist2
+        //处理下一个
+        this.testPushLCFText(textState, lcftext2)
+    }
+};
+
+/**添加字符 */
+Window_Base.prototype.testPushText = function (textState, text) {
+    var text = text || this.makeText()
+    var line = textState.line
+    var page = textState.page
+    var pageset = page.set
+
+    //====处理字====
+    var lw = line.test.w
+    var tw = text.test.w
+    //宽间隔
+    var jw = (lw == 0 || tw == 0) ? 0 : this.getWjg() || 0
+    var sw = pageset.w
+    var fw = Window_Base._faceWidth + 24
+    var fw = page.set.facepos == 3 ? fw * 2 : page.set.facepos ? fw : 0
+
+    var wlp = pageset.wl && line.texts.length >= pageset.wl
+    //行可以放开字  或者 第一个
+    if (!wlp && (lw + jw + tw <= sw - fw || lw == 0)) {
+        //添加字符 
+        text.test.x = lw + jw
+        line.test.w = text.test.x + tw
+        line.test.h = Math.max(line.test.h, text.test.h)
+        this.testPushLineText(textState, text)
+
+
+        var hlp = pageset.hl && page.list.length >= pageset.hl
+
+        //====处理行====
+        var ph = page.test.h
+        var lh = line.test.h
+        //间隔
+        var jh = (ph == 0 || lh == 0) ? 0 : this.getHjg() || 0
+        var sh = pageset.h
+        //行能放到页中 
+        if (!hlp && (ph + jh + lh <= sh || ph == 0)) {
+            //不能放到页中 或者 不是第一行
+        } else {
+            //添加新页
+            textState.line = null
+            var page2 = this.makePage(textState)
+            page2.type = "addpage"
+            page2.set = Window_Base.deepCopy(page.set)
+            this.testPushPage(textState, page2)
+            //行添加到新页 
+            this.testPushLine(textState, line)
         }
     }
     //行放不开
     else {
-        /**空格的话不进行新行 */
-        if (text.text[0] == " ") {
+
+        /**单个空格的话不添加到新行 */
+        if (text.ge && text.text == " ") {
             //添加新行
             var line2 = this.makeLine()
             line2.type = "addline"
@@ -733,6 +869,12 @@ Window_Base.prototype.testPushText = function (textState, text, text2, text3) {
 
 /**添加其他 */
 Window_Base.prototype.testPushOther = function (textState, obj) {
+    textState.line.list.push(obj)
+};
+
+
+Window_Base.prototype.testPushLineText = function (textState, obj) {
+    textState.line.texts.push(obj)
     textState.line.list.push(obj)
 };
 
@@ -785,6 +927,9 @@ Window_Base.prototype.tslPushEscapeCharacter = function (textState, code) {
             this.tslPushTextColor(textState, this.tslPushTextColorEscapeParam(textState));
             break;
 
+        case 'T':
+            this.tslPushPicParam(textState)
+            break;
         case 'K':
             this.tslPushKongGe(textState);
             break;
@@ -803,10 +948,6 @@ Window_Base.prototype.tslPushEscapeCharacter = function (textState, code) {
         case '/':
             this.tslPushChangeFontItalic(textState);
             break;
-            
-        case 'COC':
-            this.tslPushColorOutColor(textState, this.tslPushTextColorEscapeParam(textState));
-        break;
         case 'OC':
             this.tslPushOutColor(textState, this.tslPushTextColorEscapeParam(textState));
             break;
@@ -1071,6 +1212,14 @@ Window_Base.prototype.reHjg = function () {
 };
 
 
+Window_Base.prototype.setKg = function (jg) {
+    this._kg = jg || 0
+};
+Window_Base.prototype.reKg = function () {
+    this.setKg(0)
+};
+
+
 Window_Base.prototype.rejg = function () {
     this.reWjg()
     this.reHjg()
@@ -1224,64 +1373,55 @@ Window_Base.prototype.tslPushNormalCharacter = function (textState) {
     //c = 文本状态 [文本状态 索引++]
 
 
-
-    var z = 0
-    /*while (textState.textindex < textState.text.length) {
-        var c = textState.text[textState.textindex]
-        if( c === '\n'  ){
-            break
-        }else if( c === '\f') {
-            break
-        }else if( c === '\x1b' ) {
-            break
-        }else if( c === ' ' ) {
-            if(z == 0){
-                
-                textState.textindex++
-            }else{
-
+    if (this._kg) {
+        var regExp = /^(\w+-?)+/i;
+        var arr = regExp.exec(textState.text.slice(textState.index));
+        if (arr) {
+            if (arr[0]) {
+                var t = arr[0]
+                textState.textindex += t.length
+                var tl = t.split("-")
+                if (tl.length > 1) {
+                    var obj = this.makeLCFText()
+                    obj.lcfwh = this.loadText("-")
+                    for (var i = 0; i < tl.length; i++) {
+                        var fc = tl[i]
+                        var re = this.loadText(fc)
+                        var o = { text: fc }
+                        o.w = re.w
+                        o.h = re.h
+                        obj.list.push(o)
+                    }
+                    this.tslPushOther(textState, obj)
+                    return
+                } else {
+                    var re = this.loadText(t)
+                    var text = this.makeText()
+                    text.text = t
+                    text.test.w = re.w
+                    text.test.h = re.h
+                    this.tslPushOther(textState, text)
+                }
+                return
             }
-            break
-        } else{
-           var rex =  /([A-Z|0-9|a-z])+/i
- 
-        } 
-                var c = textState.text[textState.textindex++];
-                var re = this.loadText(c)
-                break;
         }
-    }*/
+        var regExp = /^ +/i;
+        var arr = regExp.exec(textState.text.slice(textState.index));
+        if (arr) {
+            if (arr[0]) {
+                var t = arr[0]
+                textState.textindex += t.length
+                var tl = this.loadText(t)
+                var text = this.makeText()
+                text.text = t
+                text.test.w = re.w
+                text.test.h = re.h
+                this.tslPushOther(textState, text)
+                return
+            }
+        }
+    }
 
-    var regExp = /^\w+/i;
-    var arr = regExp.exec(textState.text.slice(textState.index));
-    if (arr) {
-        if (arr[0]) {
-            var t = arr[0]
-            textState.textindex += t.length
-            var tl = this.loadText(t)
-            var text = this.makeText()
-            text.text = t
-            text.test.w = re.w
-            text.test.h = re.h
-            this.tslPushOther(textState, text)
-            return
-        }
-    }
-    var regExp = /^ +/i;
-    var arr = regExp.exec(textState.text.slice(textState.index));
-    if (arr) {
-        if (arr[0]) {
-            var t = arr[0]
-            textState.textindex += t.length
-            var tl = this.loadText(t)
-            var text = this.makeText()
-            text.text = t
-            text.test.w = re.w
-            text.test.h = re.h
-            this.tslPushOther(textState, text)
-            return
-        }
-    }
 
     var c = textState.text[textState.textindex++];
     var re = this.loadText(c)
@@ -1293,14 +1433,12 @@ Window_Base.prototype.tslPushNormalCharacter = function (textState) {
 };
 /**设置改变粗体 */
 Window_Base.prototype.tslPushKongGe = function (textState) {
-    this.reKg = color;
+
+    this.setKg(!this._kg)
     var obj = {
-        "type": "textColor",
-        "value": color
+        "type": "liancifu",
+        "value": this._kg
     }
-    this.tslPushOther(textState, obj)
-
-
     this.tslPushOther(textState, text)
 }
 
@@ -1349,19 +1487,7 @@ Window_Base.prototype.tslPushTextColor = function (textState, color) {
     }
     this.tslPushOther(textState, obj)
 };
-Window_Base.prototype.tslPushColorOutColor = function (textState, color) {
-    this.contents.textColor = color;
-    var obj = {
-        "type": "textColor",
-        "value": color
-    }
-    this.tslPushOther(textState, obj)
-    var obj = {
-        "type": "outlineColor",
-        "value": color
-    }
-    this.tslPushOther(textState, obj)
-};
+
 /**添加描边颜色 */
 Window_Base.prototype.tslPushOutColor = function (textState, color) {
     var obj = {
@@ -1538,6 +1664,15 @@ Window_Base.prototype.tslPushEscapeParam = function (textState, un) {
 /**获取参数增强 */
 Window_Base.prototype.tslPushEscapeParamEx = function (textState) {
     var arr = /^\[(.*?)\]/.exec(textState.text.slice(textState.textindex));
+    if (arr) {
+        textState.textindex += arr[0].length;
+        return arr[1].split(/ +/)
+    }
+    return arr;
+};
+
+Window_Base.prototype.tslPushEscapeParamEx2 = function (textState) {
+    var arr = /^\[\{(.*?)\}\]/.exec(textState.text.slice(textState.textindex));
     if (arr) {
         textState.textindex += arr[0].length;
         return arr[1].split(/ +/)
@@ -1761,9 +1896,6 @@ Window_Message.prototype.tslPushNewPage = function (textState) {
     var type = this.positionType()
     page.set.wz = type
     if (type == 0) {
-        page.set.wtype = 1
-        page.set.htype = 0
-    } else {
         page.set.wtype = 0
         page.set.htype = 0
     }
@@ -1830,11 +1962,23 @@ Window_Message.prototype.tslPushNewPageY = function (textState) {
         var type = arr//[0] * 1
         page.set.wz = type
 
-        page.set.wtype = 0
-        page.set.htype = 0
-        page.set.autoh = 1
-        page.set.autow = 1
-
+        if (arr[0] == 10 || arr[0] == 11 || arr[0] == 12) {
+            page.set.wtype = 0
+            page.set.htype = 0
+            page.set.autoh = 1
+            page.set.autow = 1
+            page.set.hl = 1
+        } else if (arr[0] >= 3) {
+            page.set.wtype = 0
+            page.set.htype = 0
+            page.set.autoh = 1
+            page.set.autow = 1
+        } else {
+            page.set.wtype = 0
+            page.set.htype = 0
+            page.set.autoh = 0
+            page.set.autow = 0
+        }
     }
     //console.log(arr)
     this.tslPushPage(textState, page)
@@ -2051,6 +2195,7 @@ Window_Message.prototype.updatePlacement = function () {
 
             var ah = set && set.autoh
 
+            console.log(aw, ah)
             var sp2 = this.standardPadding()
             sp2 += sp2 //窗口间隔 
             if (aw == 2) {
@@ -2062,7 +2207,7 @@ Window_Message.prototype.updatePlacement = function () {
                 w += sp2
             }
             if (ah == 2) {
-                h = page.set.w + sp2
+                h = page.set.h + sp2
             }
             if (ah == 1 || h == Infinity) {
                 var h = page.test.y + page.test.h
@@ -2092,7 +2237,28 @@ Window_Message.prototype.updatePlacement = function () {
         var ry = 0
         var rw = 1
         var rh = 1
-        if (type == 8) {
+        if (type == 12) {
+            var rw = Graphics.boxWidth
+            var rh = Graphics.boxHeight
+            var cex = 0.5
+            var cey = 1
+            var wex = 0.5;
+            var wey = 1;
+        } else if (type == 11) {
+            var rw = Graphics.boxWidth
+            var rh = Graphics.boxHeight
+            var cex = 0.5
+            var cey = 0.5
+            var wex = 0.5;
+            var wey = 0.5;
+        } else if (type == 10) {
+            var rw = Graphics.boxWidth
+            var rh = Graphics.boxHeight
+            var cex = 0.5
+            var cey = 0
+            var wex = 0.5;
+            var wey = 0;
+        } else if (type == 8) {
             if (id == 4) {
                 var rx = 0
                 var ry = 0
@@ -2268,11 +2434,9 @@ Window_Message.prototype.updatePlacement = function () {
 
             }
         }
-
-
-
         var x = rx + cex * rw - w * wex + wdx
         var y = ry + cey * rh - h * wey + wdx
+
     }
 
 
@@ -2286,6 +2450,7 @@ Window_Message.prototype.updatePlacement = function () {
 
 
 
+    console.log(x, y, w, h)
 
     var zx = l
     var zy = u + trueh - h

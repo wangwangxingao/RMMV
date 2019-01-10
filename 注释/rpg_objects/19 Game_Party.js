@@ -1,10 +1,11 @@
 
 /**-----------------------------------------------------------------------------*/
-/** Game_Party*/
-/** 游戏队伍  $gameParty*/
-/** The game object class for the party. Information such as gold and items is*/
-/** included.*/
-/** 队伍的游戏对象类.包含物品和金钱这样的信息*/
+/** 
+ * Game_Party 
+ * 游戏队伍  $gameParty 
+ * The game object class for the party. Information such as gold and items is included. 
+ * 队伍的游戏对象类.包含物品和金钱这样的信息
+ * */
 
 function Game_Party() {
     this.initialize.apply(this, arguments);

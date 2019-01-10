@@ -751,7 +751,7 @@ Sprite.prototype.isTouchThis = function (x, y, b, c, up) {
  * 是在之中 
  * @param {number} x x坐标
  * @param {number} y y坐标
- * @param {boolean} type 不检查图片
+ * @param {boolean} b 检查图片
  * 
  */
 Sprite.prototype.isTouchIn = function (x, y, b) {
@@ -759,7 +759,7 @@ Sprite.prototype.isTouchIn = function (x, y, b) {
         var x = x + this.anchor.x * this.width
         var y = y + this.anchor.y * this.height
     }
-    return this.isTouchInFrame(x, y, b) && (b || this.isTouchInBitamp(x, y))
+    return this.isTouchInFrame(x, y, b) && (!b || this.isTouchInBitamp(x, y))
 }
 
 

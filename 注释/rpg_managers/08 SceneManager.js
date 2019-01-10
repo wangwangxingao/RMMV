@@ -11,6 +11,7 @@ function SceneManager() {
 
 
 /*
+*在iOS Safari上获取当前时间，以毫秒为单位。
  * Gets the current time in ms without on iOS Safari.
  * @private
  */
@@ -255,14 +256,18 @@ SceneManager.updateInputData = function() {
 
 /**更新主要 */
 SceneManager.updateMain = function() {
+    //是移动苹果
     if (Utils.isMobileSafari()) {
         this.changeScene();
         this.updateScene();
     } else {
         var newTime = this._getTimeInMsWithoutMobileSafari();
+        //
         var fTime = (newTime - this._currentTime) / 1000;
+        //
         if (fTime > 0.25) fTime = 0.25;
         this._currentTime = newTime;
+        //累加器 += 
         this._accumulator += fTime;
         while (this._accumulator >= this._deltaTime) {
             this.updateInputData();

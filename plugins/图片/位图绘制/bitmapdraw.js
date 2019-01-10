@@ -1,41 +1,69 @@
-Bitmap.prototype.drawSetStyle = function (style) {
-    if (style && typeof (style) == "object") {
+var ww = ww || {}
+
+ww.draw = {}
+
+
+ww.draw.drawSetStyle = function (context, style) {
+    if (context && style && typeof (style) == "object") {
         for (var i in style) {
             this._context[i] = style
         }
     }
 }
 
-Bitmap.prototype.drawFun = function (list) {
+ww.draw.drawFun = function (context, list) {
 
     //环境 = 环境
-    var context = this._context;
+    if (!context) { return }
     //环境 保存()
-    context.save();
- 
+    //context.save(); 
     for (var i = 0; i < list.length; i++) {
-        var name = list[i]
-        if (Array.isArray(name)) {
-            var n = name[0]
-            var p = name.slice(1)
+        var set = list[i]
+        if (Array.isArray(set)) {
+            var n = set[0]
+            var p = set.slice(1)
             if (typeof (context[n]) == "function") {
                 context[n].apply(context, p)
+            } else {
+                context[n] = p[0]
             }
-        } else if (typeof (name) == "string") { 
-            if (typeof (context[n]) == "function") {
-                context[n]()
+        } else if (typeof (set) == "string") {
+            if (typeof (context[set]) == "function") {
+                context[set]()
             }
-        } else{
-            this.drawSetStyle(name)
+        } else {
+            this.drawSetStyle(context,set)
         }
     } 
-
-  
     //环境 恢复()
-    context.restore();
-    //设置发生更改()
-    this._setDirty();
+    //context.restore(); 
 }
+
+Bitmap.prototype.drawFun = function(list){
+    var context = this._context;
+    ww.draw.drawFun(context,list) 
+}
+/**绘制扇形 */
+Bitmap.prototype.drawCircleSEList = function (x, y, r, start, end, color, type) {
+    var type = type ? "stroke" : "fill"
+    var unit = Math.PI / 180;
+    var start = start || 0
+    var end = end === undefined ? 360 : (end || 0)
+    var list = [
+        "save"
+        [type + "Style", color],
+        "beginPath",
+        ["moveTo", x, y],
+        ["arc", x, y, r, start * unit, end * unit],
+        "closePath",
+        type,
+        "restore",
+    ]
+
+}
+
+
+
 
 /**绘制扇形 */
 Bitmap.prototype.drawCircleSE = function (x, y, r, start, end, color, type) {
@@ -50,13 +78,13 @@ Bitmap.prototype.drawCircleSE = function (x, y, r, start, end, color, type) {
     //环境 保存()
     context.save();
 
-    context[type + 'Style'] = color; 
- 
+    context[type + 'Style'] = color;
+
     //环境 开始路径()
     context.beginPath();
     //环境 弧形(x,y,半径,0,数学 PI * 2 ,false )     
     context.arc(x, y, r, start * unit, end * unit);
- 
+
     context.closePath();
 
     context[type]();
@@ -64,13 +92,13 @@ Bitmap.prototype.drawCircleSE = function (x, y, r, start, end, color, type) {
     context.restore();
     //设置发生更改()
     this._setDirty();
- 
+
 }
 
 
 /**绘制圆角矩形 */
 Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, color, type, j0, j1, j2, j3) {
- 
+
 
     var type = type ? "stroke" : "fill"
     //环境 = 环境
@@ -152,7 +180,7 @@ Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, c
 
 
 
-/** 
+/**
 描述
 
 HTML5 <canvas> 标签用于绘制图像（通过脚本，通常是 JavaScript）。
@@ -242,9 +270,9 @@ globalCompositeOperation 	设置或返回新图像如何绘制到已有的图像
 方法 	描述
 save() 	保存当前环境的状态
 restore() 	返回之前保存过的路径状态和属性
-createEvent() 	 
-getContext() 	 
-toDataURL() 	 
+createEvent()
+getContext()
+toDataURL()
 
 
  */

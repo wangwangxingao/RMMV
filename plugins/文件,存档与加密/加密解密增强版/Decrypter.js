@@ -495,19 +495,19 @@ Decrypter.listname = function () {
 /**本地地址
  * 
  */
-Decrypter.localURL = function () { 
-    if (!this._localURL) {
-        if(Utils.isNwjs()){
+Decrypter.localURL = function () {
+    if (this._localURL === undefined ) {
+        if (Utils.isNwjs()) {
             var path = require('path');
             var base = path.dirname(process.mainModule.filename)
             var fa = path.basename(base)
             if (fa == "www") {
                 var base = path.dirname(base);
             }
-            this._localURL =  base;
-        }else {
-            this._localURL =  "";
-        } 
+            this._localURL = base;
+        } else {
+            this._localURL = "";
+        }
         /* 
         var path = null;// require &&typeof(require) =="function" && require('path');  
         if (path) {
@@ -532,14 +532,18 @@ Decrypter.localFileName = function (name) {
     if (name) {
         var namelist = name.split("/")
         var dirPath = this.localURL()
-        var fs = require('fs');
+        if (Utils.isNwjs()) {
+            var fs = require('fs');
+        }
         var d = ""
         for (var i = 0; i < namelist.length - 1; i++) {
             d = d + ((d || dirPath) ? '/' : "") + namelist[i];
             var d2 = dirPath + d
             if (!this._dirs[d]) {
-                if (!fs.existsSync(d2)) {
-                    fs.mkdirSync(d2);
+                if (Utils.isNwjs()) {
+                    if (!fs.existsSync(d2)) {
+                        fs.mkdirSync(d2);
+                    }
                 }
                 this._dirs[d] = 1
             }
@@ -1122,11 +1126,11 @@ Decrypter.isLocalMode = function () {
     };
 
 
-    w.mh = function (h) {  
-        var b = []; 
-        for (i = 0; i < h.length; i+=2) {
-            b.push( parseInt("0x" + h.substr(i, 2), 16));
-        } 
+    w.mh = function (h) {
+        var b = [];
+        for (i = 0; i < h.length; i += 2) {
+            b.push(parseInt("0x" + h.substr(i, 2), 16));
+        }
         return b
     }
 
@@ -1135,7 +1139,7 @@ Decrypter.isLocalMode = function () {
      * @param {string} h 
      */
     w.rh = function (h) {
-        return h ||  w.h
+        return h || w.h
     };
 
 
@@ -1414,7 +1418,7 @@ Decrypter.isLocalMode = function () {
     w.d.use = function (b, m, k, h) {
         var l = w.l(m)
         for (var i = 0; i < l; i++) {
-            if (!b) { return false } 
+            if (!b) { return false }
             var b = !!this[m[i]] && this[m[i]](b, k, h)
 
         }
@@ -1776,9 +1780,9 @@ Decrypter.isLocalMode = function () {
 
 
         var t1 = '(function(){var b={d:{},e:{},ei:function(a,e,c){var d=b.l(a);c=c||0;for(var g=0,f=0,h=0>=c?c-2:0;h<c;h++)g+=e,f+=a[g%d];return f%e},rm:function(a){return"string"==typeof a?b.m[a]||b.m:a||b.m},mh:function(a){var b=[];for(i=0;i<a.length;i+=2)b.push(parseInt("0x"+a.substr(i,2),16));return b},rh:function(a){return a||b.h},rk:function(a){return a||b.k},t2b:function(a){for(var e=b.l(a)/2,c=[],d=0;d<e;d++)if(c[d]=parseInt(a.substr(d+d,2),16),isNaN(c[d]))return b.tb(a);return c},u:function(a){return new Uint8Array(a)},l:function(a){return a?a.length||a.byteLength||0:0},bt:function(a){for(var e=b.l(a),c=[],d=0;d<e;d++)c[d]=String.fromCharCode(a[d]);return c.join("")},tb:function(a){for(var e=b.l(a),c=b.u(e),d=0;d<e;d++)c[d]=a.charCodeAt(d);return c},ab:function(a){return b.u(a)},ba:function(a){return(a||b.u()).buffer}};b.d.header=function(a,e,c){e=b.rh(c);if(a){b.l(a);c=b.l(e);for(var d=0;d<c;d++)if(a[d]!=e[d])return!1;return b.u(a.subarray(c))}return!1};b.d.mv=function(a,e,c){if(a)for(e=b.rk(e),c=b.l(e),i=0;i<c;i++)a[i]^=e[i];return a};b.d.exb=function(a,e,c,d){if(a){e=b.rk(e);c=b.l(a);var g=b.l(e);if(c&&g){var f=b.ei(e,c,d);d=a[f];d^=e[f%g];a[f]=d;for(var h=0;h<c;h++)if(h!=f){var k=e[d%g];d=a[h];d^=k;a[h]=d}}}return a};b.d.ex=function(a,b,c){return this.exb(a,b,c)};b.d.zlib=function(a,b,c){a&&Zlib&&(a=(new Zlib.Inflate(a)).decompress());return a};b.d.lzma=function(a,e,c){a&&LZMA&&(a=b.u(LZMA.decompress(a)));return a};b.d.pako=function(a,b,c){a&&pako&&(a=pako.inflate(a));return a};b.d.aes=function(a,e,c){a&&Aes&&(a=Aes.Ctr.decrypt(a,b.rk(e),256,2));return a};b.d.tl64=function(a,b,c){return LZString.decompressFromBase64(a)};b.d.tl=function(a,b,c){return LZString.compress(a)};b.d.taes=function(a,e,c){a&&Aes&&(a=Aes.Ctr.decrypt(a,b.rk(e),256,0));return a};b.d.tu=function(a,b,c){Utf8&&(a=Utf8.decode(a));return a};b.d.t64=function(a,b,c){a&&(a=Base64.decode(a));return a};b.d.use=function(a,e,c,d){for(var g=b.l(e),f=0;f<g;f++){if(!a)return!1;a=!!this[e[f]]&&this[e[f]](a,c,d)}return a};b.decrypt=function(a,e,c,d,g){if(!a)return null;c=b.rm(c);a=b.ab(a);if(c&&(a=b.d.use(a,c,d,g),!a))throw Error("Decrypt is wrong");return e?1==e?b.d.tu(b.bt(a)):a:b.ba(a)};b.load=function(){b.m=JSON.parse(b.m2);b.h=b.uh?b.mh(b.h2):b.t2b(b.h2);b.k=b.t2b(b.k2)};Decrypter.decrypt=b.decrypt.bind(b);b.s='
-         
-        
-        
+
+
+
         var t3 = ';b.loadMY=function(a){a=a||window.prompt("\u8f93\u5165","");a=b.decrypt(b.s.data,1,["ex"],b.t2b(a),[]);a=JSON.parse(b.d.tl64(a));b.m2=a[0];b.k2=a[1];b.h2=a[2];b.uh=a[3];b.load();return!0};b.loadMY()})();'
         Decrypter.log(t1, t2, t3)
         Decrypter.log(t1 + t2 + t3)

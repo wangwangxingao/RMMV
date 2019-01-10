@@ -76,20 +76,26 @@ Window_Message.prototype.windowWidth = function() {
 };
 /**窗口高 */
 Window_Message.prototype.windowHeight = function() {
+    //返回 适宜高(可见行数目())
     return this.fittingHeight(this.numVisibleRows());
 };
 /**清除标志 */
 Window_Message.prototype.clearFlags = function() {
+    //显示快速 = false
     this._showFast = false;
+    //行显示快速 = false
     this._lineShowFast = false;
+    //暂停跳过 = false
     this._pauseSkip = false;
 };
 /**可见行数目 */
 Window_Message.prototype.numVisibleRows = function() {
+    //返回 4
     return 4;
 };
 /**更新 */
 Window_Message.prototype.update = function() {
+    //检查不要关闭()
     this.checkToNotClose();
     Window_Base.prototype.update.call(this);
     while (!this.isOpening() && !this.isClosing()) {
@@ -109,10 +115,13 @@ Window_Message.prototype.update = function() {
         }
     }
 };
-/**检查到没有关闭 */
+/**检查不要关闭 */
 Window_Message.prototype.checkToNotClose = function() {
+    //如果(是关闭中() 并且 是打开() )
     if (this.isClosing() && this.isOpen()) {
+        //如果(做继续())
         if (this.doesContinue()) {
+            //打开()
             this.open();
         }
     }
@@ -126,12 +135,17 @@ Window_Message.prototype.canStart = function() {
 Window_Message.prototype.startMessage = function() {
     //文本状态 = {}
     this._textState = {};
-    //
+    //文本状态 索引 = 0
     this._textState.index = 0;
+    //文本状态 文本 = 转换换码字符(游戏消息 所有文本() )
     this._textState.text = this.convertEscapeCharacters($gameMessage.allText());
+    //新页(文本状态)
     this.newPage(this._textState);
+    //更新位置()
     this.updatePlacement();
+    //更新背景()
     this.updateBackground();
+    //打开()
     this.open();
 };
 /**更新位置 */
@@ -254,12 +268,19 @@ Window_Message.prototype.isTriggered = function() {
 };
 /**做继续 */
 Window_Message.prototype.doesContinue = function() {
+    //返回 ( 游戏消息 有文本()  并且 不是 游戏消息 滚动模式() 并且 不是 是设置改变() )
     return ($gameMessage.hasText() && !$gameMessage.scrollMode() &&
             !this.areSettingsChanged());
 };
-/**是设置改变 */
+/**是设置改变
+ * 
+ * 背景 需要改变 或者
+ * 位置种类 需要改变
+ */
 Window_Message.prototype.areSettingsChanged = function() {
+    //返回 (背景 不等于 游戏消息 背景() 或者
     return (this._background !== $gameMessage.background() ||
+            //位置种类  不等于  游戏消息 位置种类() )
             this._positionType !== $gameMessage.positionType());
 };
 /**更新快速显示 */

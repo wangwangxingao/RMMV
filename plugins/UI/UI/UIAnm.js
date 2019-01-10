@@ -195,7 +195,10 @@
 
     /**
      * 数值初始化
-     * 
+     * @param {} s 精灵
+     * @param {} set 设置
+     * @param {} n 设置名称
+     * @param {} n2 属性名
      * 
      */
     ww.anm.evalini = function (s, set, n, n2, oa, anmobj) {
@@ -234,7 +237,7 @@
             var t = typeof v
             //为数值时,判断值
             if (t == "number") {
-                var z = "__" + n + n2
+                var z = "__" + n +"," + n2
                 oa.value[z] = oa.value[z] || 0
                 oa.value[z]++
                 return v >= oa.value[z]
@@ -299,6 +302,88 @@
     }
 
 
+
+    /**
+     * 
+     * 计算数值返回
+     * 
+     * 
+     * 
+     */
+    ww.anm.evalReturn2 = function (s, set, n, n2, oa, anmobj) {
+        if (set) {
+            var v = set[n]
+            var t = typeof v
+            //为数值时,判断值
+            if (t == "number") {
+                var z = "__" + n +"," + n2
+                oa.value[z] = oa.value[z] || 0
+                oa.value[z]++
+                if(  v >= oa.value[z]){
+                    oa.value[z] = 0
+                    return true
+                }else{
+                    return false
+                }
+                //没有时,永远运行
+            } else if (!t) {
+                //主设置没有时停止
+                if (n2) {
+                    return true
+                } else {
+                    //单个设置没有时继续
+                    return false
+                }
+            } else if (t == "function") {
+                return v(s, set, n, n2, oa, anmobj)
+            } else if (t == "object") {
+                //为对象时,判断值是否符合范围
+                if (n2) {
+                    if (Array.isArray(v)) {
+                        var vz = s[n2]
+                        var vil = v
+                        for (var vi = 0; vi < vil.length; vi + 2) {
+                            if (!ww.anm.isEvalValue(vz, vil[vi], vil[vi + 1])) {
+                                return false
+                            }
+                        }
+                    } else {
+                        for (var i in v) {
+                            var vz = oa.value[i]
+                            var vil = v[i]
+                            if (Array.isArray(vil)) {
+                                for (var vi = 0; vi < vil.length; vi + 2) {
+                                    if (!ww.anm.isEvalValue(vz, vil[vi], vil[vi + 1])) {
+                                        return false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    //为对象时,判断值是否符合范围
+                    for (var i in v) {
+                        if (!ww.anm.evalReturn(s, v, i, i, oa, anmobj)) {
+                            return false
+                        }
+                        /* var vz = s[i]
+                        var vil = v[i]
+                        if (Array.isArray(vil)) {
+                            for (var vi = 0; vi < vil.length; vi + 2) {
+                                if (!ww.anm.isEvalValue(vz, vil[vi], vil[vi + 1])) {
+                                    return false
+                                }
+                            }
+                        } */
+                    }
+                }
+                return true
+            } else {
+                return true
+            }
+        }
+        return false
+    }
 
 
     /**
@@ -390,6 +475,13 @@
 
 
 
+    /**
+     * 
+     * 
+     * {fr:{x:0}}
+     * {set:{x:{fr:0}}}
+     * 
+     */
     ww.anm.runAnmSt = function (name,s) {
         var name = name
         s.__anm = s.__anm || {}
@@ -432,12 +524,12 @@
         var index = anmobj.index
         var oa = list[index]
         if (oa) {
-            if (!oa.d || ww.anm.evalReturn(s, oa, "d", "", oa, anmobj)) {
+            if (!oa.d || ww.anm.evalReturn2(s, oa, "d", "", oa, anmobj)) {
                 ww.anm.evalUpdate(s, oa, "up", "", oa, anmobj)
                 if (typeof oa.set == "object") {
                     for (var i in oa.set) {
                         var set = oa.set[i]
-                        if (!set.d || ww.anm.evalReturn(s, set, "d", i, oa, anmobj)) {
+                        if (!set.d || ww.anm.evalReturn2(s, set, "d", i, oa, anmobj)) {
                             ww.anm.evalUpdate(s, set, "up", i, oa, anmobj)
                         }
                     }
@@ -469,7 +561,7 @@
         if (anmobj.re && list.length) {
             anmobj.index = anmobj.index % list.length
         }
-        ww.anm.runAnmSt(name)
+        ww.anm.runAnmSt(name,s)
     };
 
 
@@ -625,7 +717,7 @@
             ww.anm.runAnmUpdate(name,this)
             return
         }
-        this.anmEnd(name)
+        ww.anm.runAnmEnd(name,this) 
     }
 
     Sprite.prototype.anmEnd = function (name) {

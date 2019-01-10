@@ -9,7 +9,7 @@ function Sprite_HPMPEXP() {
     this.initialize.apply(this, arguments);
 }
 /**设置原形  */
-Sprite_HPMPEXP.prototype = Object.create(Sprite_UIBase.prototype);
+Sprite_HPMPEXP.prototype = Object.create(Sprite.prototype);
 /**设置创造者 */
 Sprite_HPMPEXP.prototype.constructor = Sprite_HPMPEXP;
 
@@ -30,7 +30,7 @@ Sprite_HPMPEXP.hp = {
 
 
 Sprite_HPMPEXP.prototype.initialize = function (set) {
-    Sprite_UIBase.prototype.initialize.call(this);
+    Sprite.prototype.initialize.call(this);
     this.create(set)
 };
 
@@ -178,7 +178,7 @@ Sprite_HPMPEXP.prototype.toP = function (p, maps) {
  * 更新
  */
 Sprite_HPMPEXP.prototype.update = function () {
-    Sprite_UIBase.prototype.update.call(this)
+    Sprite.prototype.update.call(this)
     if (this._duration > 0) {
         var d = this._duration
         this._p = Math.round((this._p * (d - 1) + this._targetP) / d)

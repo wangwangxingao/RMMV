@@ -290,7 +290,9 @@ Game_Message.prototype.newPage = function() {
         this._texts[this._texts.length - 1] += '\f';
     }
 };
-/**所有文本*/
+/**所有文本
+ * @returns {string} 所有文本
+*/
 Game_Message.prototype.allText = function() {
     return this._texts.join('\n');
 };

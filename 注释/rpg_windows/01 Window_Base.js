@@ -289,21 +289,35 @@ Window_Base.prototype.changeTextColor = function(color) {
 Window_Base.prototype.changePaintOpacity = function(enabled) {
     this.contents.paintOpacity = enabled ? 255 : this.translucentOpacity();
 };
-/**绘制文本 */
+/**绘制文本
+ * @param {string} text 文本
+ * @param {number} x x坐标
+ * @param {number} y y坐标
+ * @param {number} maxWidth 最大宽
+ * @param {number} align 对齐
+ */
 Window_Base.prototype.drawText = function(text, x, y, maxWidth, align) {
     this.contents.drawText(text, x, y, maxWidth, this.lineHeight(), align);
 };
-/**文本宽 */
+/**文本宽
+ * @param {string} text 文本
+ * @returns {number} 文本宽
+ */
 Window_Base.prototype.textWidth = function(text) {
     return this.contents.measureTextWidth(text);
 };
-/**绘制文本加强 */
+/**绘制文本加强
+ * @param {string} text 文本
+ * @param {number} x x坐标
+ * @param {number} y y坐标
+ * 
+ */
 Window_Base.prototype.drawTextEx = function(text, x, y) {
-	//如果 text 
+	//如果 (text //文本)
     if (text) {
 	    //文本状态 = { 索引: 0,x:x ,y:y,左:x }
         var textState = { index: 0, x: x, y: y, left: x };
-        //文本状态 文本 = 转换换码
+        //文本状态 文本 = 转换换码字符(text //文本)
         textState.text = this.convertEscapeCharacters(text);
         //文本状态 高 = 计算文本高(文本状态 ,false)
         textState.height = this.calcTextHeight(textState, false);

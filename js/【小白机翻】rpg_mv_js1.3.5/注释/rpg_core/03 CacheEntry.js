@@ -59,8 +59,8 @@ CacheEntry.prototype.allocate = function () {
 
 /**设置生存时间
  * Sets the time to live
- * @param {number} ticks TTL in ticks, 0 if not set
- * @param {number} time TTL in seconds, 0 if not set
+ * @param {number} ticks  在生存标记，如果未设置则为0  TTL in ticks, 0 if not set
+ * @param {number} time 生存秒，如果未设置则为0，TTL in seconds, 0 if not set
  * @returns {CacheEntry}
  * 
  * 设置生存时间
@@ -74,6 +74,9 @@ CacheEntry.prototype.setTimeToLive = function (ticks, seconds) {
 };
 /**
  * 是生存状态
+ * 生存标记 == 0  或者  (  触发标记 + 生存标记 < 缓存 更新标记  )
+ * 并且
+ * 生存秒数 == 0  或者  (  触发秒数 + 生存秒数 < 缓存 更新秒数  ) 
  */
 CacheEntry.prototype.isStillAlive = function () {
     var cache = this.cache;
@@ -102,8 +105,11 @@ CacheEntry.prototype.touch = function () {
         //解放通过生存时间 = false
         this.freedByTTL = false; 
         //TODO: shall we log this event? its not 
+        
         //TODO: 我们将记录此事件？不正常
+        //如果(不是 缓存 内 [键] )
         if (!cache._inner[this.key]) {
+            //缓存 内 [键]  = this
             cache._inner[this.key] = this;
         }
     }

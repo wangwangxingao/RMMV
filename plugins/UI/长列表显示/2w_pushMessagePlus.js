@@ -243,15 +243,15 @@ Sprite.prototype.isTouchInBitamp = function (x, y) {
 
 
 
-function Sprite_UIBase() {
+function Sprite() {
     this.initialize.apply(this, arguments);
 }
-Sprite_UIBase.prototype = Object.create(Sprite.prototype);
-Sprite_UIBase.prototype.constructor = Sprite_UIBase;
+Sprite.prototype = Object.create(Sprite.prototype);
+Sprite.prototype.constructor = Sprite;
 
 
 
-Sprite_UIBase.prototype.initialize = function (set) {
+Sprite.prototype.initialize = function (set) {
     Sprite.prototype.initialize.call(this)
     if (set) {
         this.bitmap = new Bitmap(set[0], set[1])
@@ -267,12 +267,12 @@ function Sprite_LongList() {
 
 
 /**设置原形  */
-Sprite_LongList.prototype = Object.create(Sprite_UIBase.prototype);
+Sprite_LongList.prototype = Object.create(Sprite.prototype);
 /**设置创造者 */
 Sprite_LongList.prototype.constructor = Sprite_LongList;
 /**初始化 */
 Sprite_LongList.prototype.initialize = function () {
-    Sprite_UIBase.prototype.initialize.call(this);
+    Sprite.prototype.initialize.call(this);
     this._set = []
     this._show = []
     this._noshow = []
@@ -339,7 +339,7 @@ Sprite_LongList.prototype.haveShow = function () {
 
 /**更新 */
 Sprite_LongList.prototype.update = function () {
-    Sprite_UIBase.prototype.update.call(this);
+    Sprite.prototype.update.call(this);
 
 
     this.updateType()

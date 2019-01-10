@@ -102,7 +102,7 @@ Sprite_LongList2.prototype = Object.create(Sprite_LongList.prototype);
 Sprite_LongList2.prototype.constructor = Sprite_LongList2;
 /**初始化 */
 Sprite_LongList2.prototype.initialize = function () {
-    Sprite_UIBase.prototype.initialize.call(this);
+    Sprite.prototype.initialize.call(this);
     this._set = []
     this._show = []
     this._noshow = []
@@ -138,7 +138,7 @@ Sprite_LongList2.prototype.make = function () {
 
 /**更新 */
 Sprite_LongList2.prototype.update = function () {
-    Sprite_UIBase.prototype.update.call(this);
+    Sprite.prototype.update.call(this);
     this.updateType()
     var inputfast = ww.pushMessage2.inputfast
     //向上移动

@@ -9,12 +9,12 @@ function Sprite_UIRect() {
     this.initialize.apply(this, arguments);
 }
 /**设置原形  */
-Sprite_UIRect.prototype = Object.create(Sprite_UIBase.prototype);
+Sprite_UIRect.prototype = Object.create(Sprite.prototype);
 /**设置创造者 */
 Sprite_UIRect.prototype.constructor = Sprite_UIRect;
 /**初始化 */
 Sprite_UIRect.prototype.initialize = function(w, h, color) {
-    Sprite_UIBase.prototype.initialize.call(this);
+    Sprite.prototype.initialize.call(this);
     this.bitmap = new Bitmap(w, h)
     this.long = 1
     this.color = color
@@ -66,12 +66,12 @@ function Sprite_UIRect2() {
     this.initialize.apply(this, arguments);
 }
 /**设置原形  */
-Sprite_UIRect2.prototype = Object.create(Sprite_UIBase.prototype);
+Sprite_UIRect2.prototype = Object.create(Sprite.prototype);
 /**设置创造者 */
 Sprite_UIRect2.prototype.constructor = Sprite_UIRect2;
 /**初始化 */
 Sprite_UIRect2.prototype.initialize = function(bitmap) {
-    Sprite_UIBase.prototype.initialize.call(this);
+    Sprite.prototype.initialize.call(this);
     this.bitmap = bitmap
     this.long = 1
 };
