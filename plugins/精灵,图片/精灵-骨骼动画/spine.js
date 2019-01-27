@@ -66,6 +66,15 @@ Spine.prototype.initialize = function (name) {
     this.spineName = name;
 };
 
+
+Spine.prototype.setAnimation = function(trackIndex, animationName, loop){
+    if(this.isReady() && this.state){
+        this.state.setAnimation(trackIndex, animationName, loop)
+    }else{
+        this.addLoadListener(this.setAnimation.bind(this,trackIndex, animationName, loop))
+    }
+} 
+
 /**动画数据名称 */
 Object.defineProperty(Spine.prototype, 'spineName', {
     get: function () {

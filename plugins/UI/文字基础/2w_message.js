@@ -439,6 +439,28 @@ Window_Base.prototype.nextCharacter = function (textState) {
 };
 
 
+Window_Base.prototype.drawTextState = function (textState, pageIndex) {
+    if (textState) {
+        var textState = textState ;
+        var pageIndex = pageIndex ||0
+        this.resetFontSettings();
+        var pi = 0 
+        while (textState.index < textState.list.length) {
+            this.processDrawCharacter(textState);
+            textState.index += 1
+            if (this.needsNewPage(textState)) {
+                if(pi == pageIndex){
+                    break
+                } 
+            }
+        }
+        this.resetFontSettings();
+        return textState.pages[0].test.w;
+    } else {
+        return 0;
+    }
+};
+
 /** */
 Window_Base.prototype.drawTextEx = function (text, x, y, w, h, p, l) {
     if (text) {

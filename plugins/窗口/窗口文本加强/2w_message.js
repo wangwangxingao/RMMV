@@ -4,7 +4,7 @@
 
 /*:
  * @plugindesc 显示文本加强
- * @author 汪汪 
+ * @author 汪汪
  * @version 2.0
  * 
  * @help 
@@ -438,6 +438,28 @@ Window_Base.prototype.nextCharacter = function (textState) {
     return this.indexCharacter(textState, textState.index + 1)
 };
 
+
+Window_Base.prototype.drawTextState = function (textState, pageIndex) {
+    if (textState) {
+        var textState = textState ;
+        var pageIndex = pageIndex ||0
+        this.resetFontSettings();
+        var pi = 0 
+        while (textState.index < textState.list.length) {
+            this.processDrawCharacter(textState);
+            textState.index += 1
+            if (this.needsNewPage(textState)) {
+                if(pi == pageIndex){
+                    break
+                } 
+            }
+        }
+        this.resetFontSettings();
+        return textState.pages[0].test.w;
+    } else {
+        return 0;
+    }
+};
 
 /** */
 Window_Base.prototype.drawTextEx = function (text, x, y, w, h, p, l) {
@@ -1958,22 +1980,23 @@ Window_Message.prototype.tslPushNewPageY = function (textState) {
     var page = this.makePage(textState)
     var line = this.makeLine(textState)
     var arr = this.tslPushEscapeParamEx(textState)
-    if (arr) {
-        var type = arr//[0] * 1
-        page.set.wz = type
+    if (arr) { 
+        page.set.wz = arr
 
-        if (arr[0] == 10 || arr[0] == 11 || arr[0] == 12) {
+        var wz = arr[0] * 1
+        if (wz == 10 || wz == 11 || wz == 12) {
             page.set.wtype = 0
             page.set.htype = 0
             page.set.autoh = 1
             page.set.autow = 1
             page.set.hl = 1
-        } else if (arr[0] >= 3) {
+        } else if (wz >= 3) {
             page.set.wtype = 0
             page.set.htype = 0
             page.set.autoh = 1
             page.set.autow = 1
         } else {
+            page.set.wz = wz
             page.set.wtype = 0
             page.set.htype = 0
             page.set.autoh = 0
