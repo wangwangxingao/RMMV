@@ -438,8 +438,26 @@ Window_Base.prototype.nextCharacter = function (textState) {
     return this.indexCharacter(textState, textState.index + 1)
 };
 
+/**绘制文本状态 */
+Window_Base.prototype.drawTextState = function (textState,index) {
+    if (textState) { 
+        if(index !== undefined){
+            textState.index = index
+        }
+        if(!textState.index){
+            this.resetFontSettings(); 
+        }
+        if (textState.index < textState.list.length) {
+            this.processDrawCharacter(textState);
+            textState.index += 1
+            return false
+        }
+    } 
+    return true
+};
 
-Window_Base.prototype.drawTextState = function (textState, pageIndex) {
+/**绘制某一页 */
+Window_Base.prototype.drawTextStatePage = function (textState, pageIndex) {
     if (textState) {
         var textState = textState ;
         var pageIndex = pageIndex ||0
@@ -451,7 +469,9 @@ Window_Base.prototype.drawTextState = function (textState, pageIndex) {
             if (this.needsNewPage(textState)) {
                 if(pi == pageIndex){
                     break
-                } 
+                } else{
+                   pi++
+                }
             }
         }
         this.resetFontSettings();
@@ -1881,7 +1901,7 @@ Window_Base.prototype.drawBitmapText = function (b, c, x, y, w, h) {
 
 
 /**添加参数 */
-Window_Message.prototype.tslPushParam = function (textState, name, value) {
+Window_Base.prototype.tslPushParam = function (textState, name, value) {
     var obj = {
         "type": name,
         "value": value
@@ -1980,17 +2000,16 @@ Window_Message.prototype.tslPushNewPageY = function (textState) {
     var page = this.makePage(textState)
     var line = this.makeLine(textState)
     var arr = this.tslPushEscapeParamEx(textState)
-    if (arr) {
-        var type = arr//[0] * 1
-        page.set.wz = type
-
-        if (arr[0] == 10 || arr[0] == 11 || arr[0] == 12) {
+    if (arr) { 
+        page.set.wz = arr 
+        var wz = arr[0] * 1
+        if (wz == 10 || wz == 11 || wz == 12) {
             page.set.wtype = 0
             page.set.htype = 0
             page.set.autoh = 1
             page.set.autow = 1
             page.set.hl = 1
-        } else if (arr[0] >= 3) {
+        } else if (wz >= 3) {
             page.set.wtype = 0
             page.set.htype = 0
             page.set.autoh = 1
@@ -2194,8 +2213,17 @@ Window_Message.prototype.updateBackground = function (background) {
 };
 
 
+Window_Message.prototype.update_2w_message   = Window_Message.prototype.update 
+Window_Message.prototype.update= function ()  { 
+    this.update_2w_message()
+    if(this._needUpdatePlacement){
+        this.updatePlacement()
+    }
+}
+
 /**更新位置 */
 Window_Message.prototype.updatePlacement = function () {
+    this._needUpdatePlacement = false
     var postype = this.positionType();
 
     //console.log(postype)
@@ -2247,19 +2275,37 @@ Window_Message.prototype.updatePlacement = function () {
         var types = postype
         var type = (types[0] || 0) * 1
         var id = (types[1] || 0) * 1
+        //场景锚点x
         var cex = types[2] === undefined ? 0.5 : types[2] * 1
+        //场景锚点y
         var cey = types[3] === undefined ? 0.5 : types[3] * 1
+        //窗口锚点x
         var wex = types[4] === undefined ? 0.5 : types[4] * 1
+        //窗口锚点y
         var wey = types[5] === undefined ? 0.5 : types[5] * 1
+        //窗口偏移x
         var wdx = (types[6] || 0) * 1
+        //窗口偏移y
         var wdy = (types[7] || 0) * 1
 
         //console.log(type, id, cex, cey)
+        //场景偏移x
         var rx = 0
+        //场景偏移y
         var ry = 0
+        //场景宽
         var rw = 1
+        //场景高
         var rh = 1
-        if (type == 12) {
+        if (type == 0 ||  type == 1 || type == 2) {
+            var rh =  Graphics.boxHeight 
+            var cey =  type *0.5 
+            var wey =  cey
+
+            var rw  =  Graphics.boxWidth
+            var cex = 0.5
+            var wex = 0.5 
+        } else if (type == 12) {
             var rw = Graphics.boxWidth
             var rh = Graphics.boxHeight
             var cex = 0.5
@@ -2312,6 +2358,10 @@ Window_Message.prototype.updatePlacement = function () {
                 var rh = SceneManager._screenHeight
             }
         } else {
+            if(type > 10 ){
+                type = type - 10
+                this._needUpdatePlacement = true
+            }
 
             var actor
             var character
@@ -2456,8 +2506,9 @@ Window_Message.prototype.updatePlacement = function () {
 
             }
         }
+        
         var x = rx + cex * rw - w * wex + wdx
-        var y = ry + cey * rh - h * wey + wdx
+        var y = ry + cey * rh - h * wey + wdy
 
     }
 

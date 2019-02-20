@@ -198,24 +198,31 @@ Sprite_Enemy.prototype.updateEffect = function() {
         this._effectDuration--;
         switch (this._effectType) {
             case 'whiten':
+                //更新变白()
                 this.updateWhiten();
                 break;
             case 'blink':
+                //更新闪烁()
                 this.updateBlink();
                 break;
             case 'appear':
+                //更新闪烁()
                 this.updateAppear();
                 break;
             case 'disappear':
+                //更新闪烁()
                 this.updateDisappear();
                 break;
             case 'collapse':
+                //更新崩溃()
                 this.updateCollapse();
                 break;
             case 'bossCollapse':
+                //更新boss崩溃()
                 this.updateBossCollapse();
                 break;
             case 'instantCollapse':
+                //更新立即崩溃()
                 this.updateInstantCollapse();
                 break;
         }

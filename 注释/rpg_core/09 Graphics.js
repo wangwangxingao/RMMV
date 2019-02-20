@@ -10,8 +10,9 @@ function Graphics() {
 }
 
 
-
+/**css字体读取中 */
 Graphics._cssFontLoading =  document.fonts && document.fonts.ready;
+/**字体加载后 */
 Graphics._fontLoaded = null;
 Graphics._videoVolume = 1;
 
@@ -68,15 +69,19 @@ Graphics.initialize = function(width, height, type) {
     this._disableTextSelection();
     this._disableContextMenu();
     this._setupEventHandlers();
+    //安装Css字体加载
     this._setupCssFontLoading();
 };
 
 /**安装Css字体加载*/
 Graphics._setupCssFontLoading = function(){
+    //如果( css字体读取中 ) 
     if(Graphics._cssFontLoading){
+
         document.fonts.ready.then(function(fonts){
             Graphics._fontLoaded = fonts;
         }).catch(function(error){
+            //错误
             SceneManager.onError(error);
         });
     }
@@ -399,9 +404,9 @@ Graphics.hideFps = function() {
  * Loads a font file.
  *
  * @static
- * @method loadFont
- * @param {string} name The face name of the font
- * @param {string} url The url of the font file
+ * @method loadFont  加载字体
+ * @param {string} name 字体的名称 The face name of the font  
+ * @param {string} url 字体文件的url The url of the font file
  */ 
 Graphics.loadFont = function(name, url) {
     var style = document.createElement('style');
@@ -424,11 +429,15 @@ Graphics.loadFont = function(name, url) {
  * @return {boolean} True if the font file is loaded
  */ 
 Graphics.isFontLoaded = function(name) {
+    //如果(css字体加载中)
     if (Graphics._cssFontLoading) {
+        //如果(字体加载后)
         if(Graphics._fontLoaded){
+            //返回 字体加载后 检查 
             return Graphics._fontLoaded.check('10px "'+name+'"');
         }
 
+        //返回 false
         return false;
     } else {
         if (!this._hiddenCanvas) {

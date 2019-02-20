@@ -200,6 +200,15 @@
      * @param {} n 设置名称
      * @param {} n2 属性名
      * 
+     * 
+     * {fr:{x:0}} 
+     * {fr:{x:0}} , "fr" , ""  
+     * v = {x:0}
+     *  
+     * {set:{x:{fr:0}}}
+     * {fr:0} , "fr" , "x"  
+     * 
+     * 
      */
     ww.anm.evalini = function (s, set, n, n2, oa, anmobj) {
         if (set) {
@@ -209,14 +218,27 @@
                 v(s, set, n, n2, oa, anmobj)
             } else if (v && t == "object") {
                 for (var i in v) {
-                    s[i] = v[i]
+                    //如果是 方法
+                    if(typeof  s[i] == "function"){
+                        s[i](v[i])
+                    }else{
+                        s[i] = v[i] 
+                    }
                 }
             } else {
                 if (n2) {
                     if (t == "undefind") {
-                        oa.value[n2] = s[n2]
+                        if(typeof s[n2] == "function"){
+                            //oa.value[n2] = s[n2]()
+                        }else{ 
+                            oa.value[n2] = s[n2]
+                        } 
                     } else {
-                        s[n2] = v
+                        if(typeof s[n2] == "function"){
+                            s[n2](v)
+                        }else{
+                            s[n2] = v 
+                        }
                     }
                 }
             }
@@ -237,7 +259,7 @@
             var t = typeof v
             //为数值时,判断值
             if (t == "number") {
-                var z = "__" + n +"," + n2
+                var z = "__" + n + "," + n2
                 oa.value[z] = oa.value[z] || 0
                 oa.value[z]++
                 return v >= oa.value[z]
@@ -302,26 +324,18 @@
     }
 
 
-
-    /**
-     * 
-     * 计算数值返回
-     * 
-     * 
-     * 
-     */
     ww.anm.evalReturn2 = function (s, set, n, n2, oa, anmobj) {
         if (set) {
             var v = set[n]
             var t = typeof v
             //为数值时,判断值
             if (t == "number") {
-                var z = "__" + n +"," + n2
+                var z = "__" + n + "," + n2
                 oa.value[z] = oa.value[z] || 0
                 oa.value[z]++
-                if(  v >= oa.value[z]){
+                if(v>=oa.value[z]){
                     oa.value[z] = 0
-                    return true
+                    return  true  
                 }else{
                     return false
                 }
@@ -396,10 +410,15 @@
      * 如果是对象 ,对对象名对应的值进行计算
      * 
      * 否则 赋值
-     * {set:{x:{up:1}}}  // s.x + 1 
-     * {up:{x:1}}  // s.x + 1 
      * 
      * 
+     * {up:{x:0}} 
+     * {up:{x:0}} , "up" , "" , oa  
+     * v = {x:0}
+     *  
+     * {set:{x:{up:0}}}
+     * {up:0} , "up" , "x"  
+     *  
      * 
      * 
      */
@@ -410,7 +429,11 @@
             //为数值时,判断值
             if (t == "number") {
                 if (n2) {
-                    s[n2] += v
+                    if(typeof s[n2] =="function" ){
+                        s[n2](v)
+                    }else{
+                        s[n2] += v 
+                    }
                 }
                 //没有时,永远运行
             } else if (t == "function") {
@@ -448,6 +471,7 @@
                 } else {
                     //为对象时,判断值是否符合范围
                     for (var i in v) {
+                        // s , {x:0} , "x" , "x" 
                         ww.anm.evalUpdate(s, v, i, i, oa, anmobj)
                         /*  var vz = s[i]
                          var vil = v[i]
@@ -467,7 +491,11 @@
                 }
             } else {
                 if (n2 && t != "undefined") {
-                    s[n2] = v
+                    if(typeof s[n2] =="function" ){
+                        s[n2](v)
+                    }else{
+                        s[n2] = v 
+                    } 
                 }
             }
         }
@@ -476,13 +504,16 @@
 
 
     /**
+     * {fr:{x:0}} 
+     * oa , "fr" , "" , oa  
      * 
-     * 
-     * {fr:{x:0}}
      * {set:{x:{fr:0}}}
+     * {fr:0} , "fr" , "x" 
+     *  
+     * 
      * 
      */
-    ww.anm.runAnmSt = function (name,s) {
+    ww.anm.runAnmSt = function (name, s) {
         var name = name
         s.__anm = s.__anm || {}
         var anmobj = s.__anm[name]

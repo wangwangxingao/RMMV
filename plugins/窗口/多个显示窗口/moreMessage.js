@@ -39,6 +39,9 @@ Window_MessageClone.prototype.update = function () {
         Window_Message.prototype.update.call(this);
     }else{
         Window_Base.prototype.update.call(this)
+        if(this._needUpdatePlacement){
+            this.updatePlacement()
+        }
     }
 }
 
