@@ -2,9 +2,9 @@
 
 
 
-   var ww = ww ||{}
+    var ww = ww || {}
 
-   ww.deepClone = function (that) {
+    ww.deepClone = function (that) {
         var that = that
         var obj, i;
         if (typeof (that) === "object") {
@@ -30,7 +30,7 @@
 
     ww.anm = {}
 
-    
+
     ww.anm.anmToObj = function (obj) {
         var tl = typeof obj
         if (tl == "number") {
@@ -219,25 +219,25 @@
             } else if (v && t == "object") {
                 for (var i in v) {
                     //如果是 方法
-                    if(typeof  s[i] == "function"){
+                    if (typeof s[i] == "function") {
                         s[i](v[i])
-                    }else{
-                        s[i] = v[i] 
+                    } else {
+                        s[i] = v[i]
                     }
                 }
             } else {
                 if (n2) {
                     if (t == "undefind") {
-                        if(typeof s[n2] == "function"){
+                        if (typeof s[n2] == "function") {
                             //oa.value[n2] = s[n2]()
-                        }else{ 
+                        } else {
                             oa.value[n2] = s[n2]
-                        } 
+                        }
                     } else {
-                        if(typeof s[n2] == "function"){
+                        if (typeof s[n2] == "function") {
                             s[n2](v)
-                        }else{
-                            s[n2] = v 
+                        } else {
+                            s[n2] = v
                         }
                     }
                 }
@@ -333,10 +333,10 @@
                 var z = "__" + n + "," + n2
                 oa.value[z] = oa.value[z] || 0
                 oa.value[z]++
-                if(v>=oa.value[z]){
+                if (v >= oa.value[z]) {
                     oa.value[z] = 0
-                    return  true  
-                }else{
+                    return true
+                } else {
                     return false
                 }
                 //没有时,永远运行
@@ -429,10 +429,10 @@
             //为数值时,判断值
             if (t == "number") {
                 if (n2) {
-                    if(typeof s[n2] =="function" ){
+                    if (typeof s[n2] == "function") {
                         s[n2](v)
-                    }else{
-                        s[n2] += v 
+                    } else {
+                        s[n2] += v
                     }
                 }
                 //没有时,永远运行
@@ -491,11 +491,11 @@
                 }
             } else {
                 if (n2 && t != "undefined") {
-                    if(typeof s[n2] =="function" ){
+                    if (typeof s[n2] == "function") {
                         s[n2](v)
-                    }else{
-                        s[n2] = v 
-                    } 
+                    } else {
+                        s[n2] = v
+                    }
                 }
             }
         }
@@ -517,6 +517,10 @@
         var name = name
         s.__anm = s.__anm || {}
         var anmobj = s.__anm[name]
+        if (!anmobj) {
+            s.anmClear(name)
+            return
+        }
         var list = anmobj.list
         var index = anmobj.index
         var oa = list[index]
@@ -534,10 +538,14 @@
         }
     };
 
-    ww.anm.runAnmRun = function (name,s) {
+    ww.anm.runAnmRun = function (name, s) {
         var name = name
         s.__anm = s.__anm || {}
         var anmobj = s.__anm[name]
+        if (!anmobj) {
+            s.anmClear(name)
+            return
+        }
         var list = anmobj.list
         var index = anmobj.index
         var oa = list[index]
@@ -547,10 +555,14 @@
         return false
     }
 
-    ww.anm.runAnmUpdate = function (name,s) {
+    ww.anm.runAnmUpdate = function (name, s) {
         var name = name
         s.__anm = s.__anm || {}
         var anmobj = s.__anm[name]
+        if (!anmobj) {
+            s.anmClear(name)
+            return
+        }
         var list = anmobj.list
         var index = anmobj.index
         var oa = list[index]
@@ -572,10 +584,14 @@
 
 
     /**动画结束 */
-    ww.anm.runAnmEnd = function (name,s) {
+    ww.anm.runAnmEnd = function (name, s) {
         var name = name
         s.__anm = s.__anm || {}
         var anmobj = s.__anm[name]
+        if (!anmobj) {
+            s.anmClear(name)
+            return
+        }
         var list = anmobj.list
         var index = anmobj.index
         var oa = list[index]
@@ -592,13 +608,15 @@
         if (anmobj.re && list.length) {
             anmobj.index = anmobj.index % list.length
         }
-        ww.anm.runAnmSt(name,s)
+        if(!anmobj.break){
+            ww.anm.runAnmSt(name, s) 
+        } 
     };
 
 
- 
 
-    
+
+
 
     var Sprite_prototype_initialize = Sprite.prototype.initialize
     /**初始化 */
@@ -710,7 +728,7 @@
         this.__anm[name] = anmobj
         this.__anming = true
 
-        ww.anm.runAnmSt(name,this)
+        ww.anm.runAnmSt(name, this)
     };
 
 
@@ -744,15 +762,15 @@
 
     /**单个动画更新 */
     Sprite.prototype.anmUpdate = function (name) {
-        if (ww.anm.runAnmRun(name,this)) {
-            ww.anm.runAnmUpdate(name,this)
+        if (ww.anm.runAnmRun(name, this)) {
+            ww.anm.runAnmUpdate(name, this)
             return
         }
-        ww.anm.runAnmEnd(name,this) 
+        ww.anm.runAnmEnd(name, this)
     }
 
     Sprite.prototype.anmEnd = function (name) {
-        ww.anm.runAnmEnd(name,this)
+        ww.anm.runAnmEnd(name, this)
     }
 
     /**
