@@ -6,15 +6,18 @@ ww.draw = {}
 ww.draw.drawSetStyle = function (context, style) {
     if (context && style && typeof (style) == "object") {
         for (var i in style) {
-            this._context[i] = style
+            context[i] = style[i] 
         }
     }
 }
 
-ww.draw.drawFun = function (context, list) {
+ww.draw.drawFun = function (bitmap, list) {
 
     //环境 = 环境
-    if (!context) { return }
+    if (!bitmap) { return }
+    if (bitmap instanceof Bitmap) {
+        bitmap = bitmap._context
+    } 
     //环境 保存()
     //context.save(); 
     for (var i = 0; i < list.length; i++) {
@@ -26,23 +29,38 @@ ww.draw.drawFun = function (context, list) {
                 context[n].apply(context, p)
             } else {
                 context[n] = p[0]
-            }
+            } 
         } else if (typeof (set) == "string") {
             if (typeof (context[set]) == "function") {
                 context[set]()
             }
         } else {
-            this.drawSetStyle(context,set)
-        }
-    } 
-    //环境 恢复()
-    //context.restore(); 
+            ww.draw.drawSetStyle(context, set)
+        } 
+    }
+    bitmap._setDirty() 
 }
 
+
 Bitmap.prototype.drawFun = function(list){
-    var context = this._context;
-    ww.draw.drawFun(context,list) 
+    ww.draw.drawFun(this,list) 
 }
+
+Bitmap.prototype.drawLine = function(x,y,x2,y2,line){ 
+    var list = [
+        "save",
+         line,
+        //"beginPath", 
+        ["moveTo", x, y],
+        ["lineTo", x2, y2],
+        //"closePath",
+        "restore",
+    ] 
+    this.drawFun( list)
+}
+
+
+
 /**绘制扇形 */
 Bitmap.prototype.drawCircleSEList = function (x, y, r, start, end, color, type) {
     var type = type ? "stroke" : "fill"
@@ -59,8 +77,10 @@ Bitmap.prototype.drawCircleSEList = function (x, y, r, start, end, color, type) 
         type,
         "restore",
     ]
+    this.drawFun( list)
 
 }
+
 
 
 

@@ -42,203 +42,54 @@
         }
     }
 
-    /**值的赋予 */
-
-    ww.anm.getSpriteValue = function (o1, name1) {
-        if (Array.isArray(name1)) {
-            for (var i = 0; i < name1.length - 1; i++) {
-                var n = name1[i]
-                if (o1 && typeof o1 == "object") {
-                    o1 = o1[n]
-                } else {
-                    return
-                }
-            }
-            var name1 = name1[i]
-        }
-        if (o1 && typeof o1 == "object") {
-            return [o1, name1]
-        }
-
-    }
-
-    ww.anm.setSpriteValue = function (s, set, oa, anmobj, type, name1, name2) {
-        var js = 0
-        var t1 = 0
-        var t2 = 0
-        if (type) {
-            var t1 = Math.floor(type * 0.01)
-            var t2 = Math.floor(type * 0.1 - t1 * 10)
-            var js = Math.floor(type % 10)
-        }
-
-        var o1 = s
-        var o2 = set
-        if (t1 == 2) {
-            o1 = s
-        } else if (t1 == 3) {
-            o1 = set
-        } else if (t1 == 4) {
-            o1 = oa
-        } else if (t1 == 5) {
-            o1 = anmobj
-        } else if (t1 == 6) {
-            oa.value = oa.value || {}
-            o1 = oa.value
-        }
-        if (t2 == 2) {
-            o2 = s
-        } else if (t2 == 3) {
-            o2 = set
-        } else if (t2 == 4) {
-            o2 = oa
-        } else if (t2 == 5) {
-            o2 = anmobj
-        } else if (t2 == 6) {
-            oa.value = oa.value || {}
-            o2 = oa.value
-        }
-        if (Array.isArray(name1)) {
-            for (var i = 0; i < name1.length - 1; i++) {
-                var n = name1[i]
-                if (o1 && typeof o1 == "object") {
-                    o1 = o1[n]
-                } else {
-                    return
-                }
-            }
-            var name1 = name1[i]
-        }
-        if (Array.isArray(name2)) {
-            for (var i = 0; i < name2.length - 1; i++) {
-                var n = name2[i]
-                if (o2 && typeof o2 == "object") {
-                    o2 = o2[n]
-                } else {
-                    return
-                }
-            }
-            var name2 = name2[i]
-        }
-
-        if (o1 && o2 && typeof o2 == "object" && typeof o1 == "object") {
-            if (js == 0) {
-                o1[name1] = o2[name2]
-            } else if (js == 1) {
-                o1[name1] = o1[name1] + o2[name2]
-            } else if (js == 2) {
-                o1[name1] = o1[name1] - o2[name2]
-            } else if (js == 3) {
-                o1[name1] = o1[name1] * o2[name2]
-            } else if (type == 4) {
-                o1[name1] = o1[name1] / o2[name2]
-            } else if (js == 5) {
-                o1[name1] = o1[name1] % o2[name2]
-            }
-        }
-    }
-
-    /**值的比较 */
-
-
-    ww.anm.setEvalValue = function (time, type, value) {
-        var value = value || 0
-        if (type == 0) {
-            return value
-        } else if (type == 1) {
-            return time + value
-        } else if (type == 2) {
-            return time - value
-        } else if (type == 3) {
-            return time * value
-        } else if (type == 4) {
-            return time / value
-        } else if (type == 5) {
-            return time % value
-        } else if (type == 6) {
-            return value + time
-        } else if (type == 7) {
-            return value - time
-        } else if (type == 8) {
-            return value * time
-        } else if (type == 9) {
-            return value / time
-        } else if (type == 10) {
-            return value % time
-        }
-        return 0
-    }
-
-    ww.anm.isEvalValue = function (time, type, value) {
-        var value = value || 0
-        if (type == 0) {
-            return time == value
-        } else if (type == 1) {
-            return time > value
-        } else if (type == 2) {
-            return time >= value
-        } else if (type == 3) {
-            return time < value
-        } else if (type == 4) {
-            return time <= value
-        } else if (type == 5) {
-            return time != value
-        } else if (type == 6) {
-            return time % value == 0
-        } else if (type == 7) {
-            return time % value != 0
-        }
-        return false
-    }
-
-
-
     /**
      * 数值初始化
-     * @param {} s 精灵
-     * @param {} set 设置
-     * @param {} n 设置名称
-     * @param {} n2 属性名
+     * @param {sprite} s 精灵
+     * @param {{n:{}|function}} set 设置
+     * @param {string} n 设置名称 
+     * @param {{tv:{},break:boolean}} oa 当前动画对象
+     * @param {} anmGroup 动画组
+     *  
      * 
      * 
      * {fr:{x:0}} 
      * {fr:{x:0}} , "fr" , ""  
      * v = {x:0}
-     *  
-     * {set:{x:{fr:0}}}
+     * 
+     * 
      * {fr:0} , "fr" , "x"  
      * 
      * 
      */
-    ww.anm.evalini = function (s, set, n, n2, oa, anmobj) {
-        if (set) {
-            var v = set[n]
+    ww.anm.evalini = function (s, oa, n, anmGroup) {
+        if (oa) {
+            //该设置
+            var v = oa[n]
+            //种类
             var t = typeof v
+            //是方法时
             if (t == "function") {
-                v(s, set, n, n2, oa, anmobj)
+                //运行方法
+                v(s, oa, n, anmGroup)
+                //是对象时
             } else if (v && t == "object") {
+                //对于所有对象
                 for (var i in v) {
                     //如果是 方法
                     if (typeof s[i] == "function") {
-                        s[i](v[i])
+                        if (typeof (v[i]) == "function") {
+                            s[i](
+                                v[i](s, oa, n, anmGroup),
+                                s, oa, n, anmGroup
+                            )
+                        } else {
+                            s[i](
+                                v[i],
+                                s, oa, n, anmGroup
+                            )
+                        }
                     } else {
                         s[i] = v[i]
-                    }
-                }
-            } else {
-                if (n2) {
-                    if (t == "undefind") {
-                        if (typeof s[n2] == "function") {
-                            //oa.value[n2] = s[n2]()
-                        } else {
-                            oa.value[n2] = s[n2]
-                        }
-                    } else {
-                        if (typeof s[n2] == "function") {
-                            s[n2](v)
-                        } else {
-                            s[n2] = v
-                        }
                     }
                 }
             }
@@ -248,162 +99,132 @@
 
     /**
      * 
-     * 计算数值返回
+     * 
+     *  fr: function () { } || { x: 1 },
+     *  t: 10 || function () { } || { x: 1 },
+     *  d: 10 || function () { } || { x: 1 },
+     *  up: function () { } || { x: 1 },
+     *  ed: function () { } || { x: 1 }
      * 
      * 
      * 
      */
-    ww.anm.evalReturn = function (s, set, n, n2, oa, anmobj) {
-        if (set) {
-            var v = set[n]
+
+    ww.anm.ini = function (oa) {
+        oa.uv = {}
+        oa.tv = {}
+        oa.tr = {}
+        oa.ds = {}
+        oa.dv = {}
+    }
+
+    /**
+     * 
+     * 计算数值运转
+     * 
+     * 
+     */
+    ww.anm.evalRun = function (s, oa, n, anmGroup) {
+        if (oa) {
+            var v = oa[n]
             var t = typeof v
-            //为数值时,判断值
+            var n2 = "__" + n
+
+            oa.tr[n2] = false
+            //为数值时,判断值 
             if (t == "number") {
-                var z = "__" + n + "," + n2
-                oa.value[z] = oa.value[z] || 0
-                oa.value[z]++
-                return v >= oa.value[z]
-                //没有时,永远运行
-            } else if (!t) {
-                //主设置没有时停止
-                if (n2) {
-                    return true
-                } else {
-                    //单个设置没有时继续
-                    return false
-                }
+                oa.tv[n2] = oa.tv[n2] || 0
+                oa.tv[n2]++
+                //值是否小于预设值 
+                oa.tr[n2] = oa.tv[n2] <= v
+            } else if (!v) {
+                //主设置没有时不继续运行
+                oa.tr[n2] = false
             } else if (t == "function") {
-                return v(s, set, n, n2, oa, anmobj)
+                oa.tr[n2] = v(s, oa, n, anmGroup)
             } else if (t == "object") {
+                var z = false
                 //为对象时,判断值是否符合范围
-                if (n2) {
-                    if (Array.isArray(v)) {
-                        var vz = s[n2]
-                        var vil = v
-                        for (var vi = 0; vi < vil.length; vi + 2) {
-                            if (!ww.anm.isEvalValue(vz, vil[vi], vil[vi + 1])) {
-                                return false
-                            }
-                        }
-                    } else {
-                        for (var i in v) {
-                            var vz = oa.value[i]
-                            var vil = v[i]
-                            if (Array.isArray(vil)) {
-                                for (var vi = 0; vi < vil.length; vi + 2) {
-                                    if (!ww.anm.isEvalValue(vz, vil[vi], vil[vi + 1])) {
-                                        return false
-                                    }
-                                }
-                            }
-                        }
+                for (var i in v) {
+                    var vt = typeof (v[i])
+                    if (vt == "function") {
+                        oa.tr[i] = v[i](s, oa, n, anmGroup)
+                    } else if (vt == "number") {
+                        oa.tv[i] = oa.tv[i] || 0
+                        oa.tv[i]++
+                        //值是否小于预设值 
+                        oa.tr[i] = oa.tv[i] <= v[i]
                     }
-                } else {
-                    //为对象时,判断值是否符合范围
-                    for (var i in v) {
-                        if (!ww.anm.evalReturn(s, v, i, i, oa, anmobj)) {
-                            return false
-                        }
-                        /* var vz = s[i]
-                        var vil = v[i]
-                        if (Array.isArray(vil)) {
-                            for (var vi = 0; vi < vil.length; vi + 2) {
-                                if (!ww.anm.isEvalValue(vz, vil[vi], vil[vi + 1])) {
-                                    return false
-                                }
-                            }
-                        } */
-                    }
+                    z = z || oa.tr[i]
                 }
-                return true
+                oa.tr[n2] = z
             } else {
-                return true
+                oa.tr[n2] = false
             }
+            return oa.tr[n2]
         }
         return false
     }
 
 
-    ww.anm.evalReturn2 = function (s, set, n, n2, oa, anmobj) {
-        if (set) {
-            var v = set[n]
+    /**计算暂停 
+     * 
+    */
+    ww.anm.evalStop = function (s, oa, n, anmGroup) {
+        if (oa) {
+            var v = oa[n]
             var t = typeof v
-            //为数值时,判断值
+            var n2 = "__" + n
+
+            oa.ds[n2] = false
+            //为数值时,判断值 
             if (t == "number") {
-                var z = "__" + n + "," + n2
-                oa.value[z] = oa.value[z] || 0
-                oa.value[z]++
-                if (v >= oa.value[z]) {
-                    oa.value[z] = 0
-                    return true
-                } else {
-                    return false
+                //预计间隔的帧数
+                oa.dv[n2] = oa.dv[n2] || 0
+                oa.dv[n2]++
+                //值是否小于预设值 
+                //1 ,2, 3   3
+                oa.ds[n2] = oa.dv[n2] <= v
+                if (!oa.ds[n2]) {
+                    oa.dv[n2] = 0
                 }
-                //没有时,永远运行
-            } else if (!t) {
-                //主设置没有时停止
-                if (n2) {
-                    return true
-                } else {
-                    //单个设置没有时继续
-                    return false
-                }
+            } else if (!v) {
+                //主设置没有时不继续运行
+                oa.ds[n2] = false
             } else if (t == "function") {
-                return v(s, set, n, n2, oa, anmobj)
+                oa.ds[n2] = v(s, oa, n, anmGroup)
             } else if (t == "object") {
                 //为对象时,判断值是否符合范围
-                if (n2) {
-                    if (Array.isArray(v)) {
-                        var vz = s[n2]
-                        var vil = v
-                        for (var vi = 0; vi < vil.length; vi + 2) {
-                            if (!ww.anm.isEvalValue(vz, vil[vi], vil[vi + 1])) {
-                                return false
-                            }
+                for (var i in v) {
+                    var vt = typeof (v[i])
+                    if (vt == "function") {
+                        oa.ds[i] = v[i](s, oa, n, anmGroup)
+                    } else if (vt == "number") {
+                        oa.dv[i] = oa.dv[i] || 0
+                        oa.dv[i]++
+                        //到达预设值 
+                        oa.ds[i] = oa.dv[i] <= v[i]
+                        //重制
+                        if (!oa.ds[i]) {
+                            oa.dv[i] = 0
                         }
-                    } else {
-                        for (var i in v) {
-                            var vz = oa.value[i]
-                            var vil = v[i]
-                            if (Array.isArray(vil)) {
-                                for (var vi = 0; vi < vil.length; vi + 2) {
-                                    if (!ww.anm.isEvalValue(vz, vil[vi], vil[vi + 1])) {
-                                        return false
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    //为对象时,判断值是否符合范围
-                    for (var i in v) {
-                        if (!ww.anm.evalReturn(s, v, i, i, oa, anmobj)) {
-                            return false
-                        }
-                        /* var vz = s[i]
-                        var vil = v[i]
-                        if (Array.isArray(vil)) {
-                            for (var vi = 0; vi < vil.length; vi + 2) {
-                                if (!ww.anm.isEvalValue(vz, vil[vi], vil[vi + 1])) {
-                                    return false
-                                }
-                            }
-                        } */
                     }
                 }
-                return true
+                oa.ds[n2] = false
             } else {
-                return true
+                oa.ds[n2] = false
             }
+            return oa.ds[n2]
         }
         return false
     }
+
 
 
     /**
      * 计算更新
      * 对于分设定 
-     * set n 为数值时
+     * oa n 为数值时
      * 增加值
      * 为对象时  
      * 如果是数组 ,进行计算
@@ -416,85 +237,31 @@
      * {up:{x:0}} , "up" , "" , oa  
      * v = {x:0}
      *  
-     * {set:{x:{up:0}}}
+     * {oa:{x:{up:0}}}
      * {up:0} , "up" , "x"  
      *  
      * 
      * 
      */
-    ww.anm.evalUpdate = function (s, set, n, n2, oa, anmobj) {
-        if (set) {
-            var v = set[n]
-            var t = typeof v
-            //为数值时,判断值
-            if (t == "number") {
-                if (n2) {
-                    if (typeof s[n2] == "function") {
-                        s[n2](v)
-                    } else {
-                        s[n2] += v
-                    }
-                }
-                //没有时,永远运行
-            } else if (t == "function") {
-                return v(s, set, n, n2, oa, anmobj)
-            } else if (v && t == "object") {
-                if (n2) {
-                    if (Array.isArray(v)) {
-                        var vz = s[n2]
-                        var vil = v
-                        for (var vi = 0; vi < vil.length; vi + 2) {
-                            vz = ww.anm.setEvalValue(vz, vil[vi + 1], vil[vi])
-                        }
-                        s[n2] = vz
-
-                    } else {
-                        for (var i in v) {
-                            var vz = oa.value[i]
-                            var vil = v[i]
-                            if (Array.isArray(vil)) {
-                                for (var vi = 0; vi < vil.length; vi + 2) {
-                                    vz = ww.anm.setEvalValue(vz, vil[vi + 1], vil[vi])
-                                }
-                                s[n2] = vz
-                            } else {
-                                var vz = vil || vz
-                                if (typeof vil == "number") {
-                                    s[i] += vz
-                                } else {
-                                    s[i] = vz
-                                }
-                            }
-                        }
-
-                    }
-                } else {
-                    //为对象时,判断值是否符合范围
+    ww.anm.evalUpdate = function (s, oa, n, anmGroup) {
+        if (oa) {
+            var n2 = "__" + n
+            if (oa.tr[n2] && !oa.ds[n2]) {
+                //该设置
+                var v = oa[n]
+                //种类
+                var t = typeof v
+                //是方法时
+                if (t == "function") {
+                    //运行方法
+                    v(s, oa, n, anmGroup)
+                    //是对象时
+                } else if (v && t == "object") {
+                    //对于所有对象
                     for (var i in v) {
-                        // s , {x:0} , "x" , "x" 
-                        ww.anm.evalUpdate(s, v, i, i, oa, anmobj)
-                        /*  var vz = s[i]
-                         var vil = v[i]
-                         if (Array.isArray(vil)) {
-                             for (var vi = 0; vi < vil.length; vi + 2) {
-                                 vz = ww.anm.setEvalValue(vz, vil[vi + 1], vil[vi])
-                             }
-                             s[i] = vz
-                         } else {
-                             if(typeof vil == "number"){
-                                 s[i] = vz + vil 
-                             }else{ 
-                                 s[i] =  vil
-                             }
-                         } */
-                    }
-                }
-            } else {
-                if (n2 && t != "undefined") {
-                    if (typeof s[n2] == "function") {
-                        s[n2](v)
-                    } else {
-                        s[n2] = v
+                        if (oa.tr[i] !== false && oa.ds[i] !== true) {
+                            ww.anm.evalUpdateValue(v[i], i, s, oa, n, anmGroup)
+                        }
                     }
                 }
             }
@@ -502,12 +269,45 @@
     }
 
 
+    ww.anm.evalUpdateValue = function (v, i, s, oa, n, anmGroup) {
+
+        //如果是 方法
+        if (typeof s[i] == "function") {
+            if (typeof (v) == "function") {
+                s[i](
+                    v(s, oa, n, anmGroup),
+                    s, oa, n, anmGroup
+                )
+            } else {
+                s[i](
+                    v,
+                    s, oa, n, anmGroup
+                )
+            }
+        } else {
+            if (typeof v == "number") {
+                if (oa.ue && oa.ue[i]) {
+                    if (oa.ue[i].type) {
+                    }
+                } else {
+                    s[i] += v
+                }
+            } else {
+                s[i] = v
+            }
+        }
+    }
+
+
+    ww.anm.getoa = function (name, s) {
+
+    }
 
     /**
      * {fr:{x:0}} 
      * oa , "fr" , "" , oa  
      * 
-     * {set:{x:{fr:0}}}
+     * {oa:{x:{fr:0}}}
      * {fr:0} , "fr" , "x" 
      *  
      * 
@@ -516,23 +316,17 @@
     ww.anm.runAnmSt = function (name, s) {
         var name = name
         s.__anm = s.__anm || {}
-        var anmobj = s.__anm[name]
-        if (!anmobj) {
+        var anmGroup = s.__anm[name]
+        if (!anmGroup) {
             s.anmClear(name)
             return
         }
-        var list = anmobj.list
-        var index = anmobj.index
+        var list = anmGroup.list
+        var index = anmGroup.index
         var oa = list[index]
         if (oa) {
-            oa.value = {}
-            ww.anm.evalini(s, oa, "fr", "", oa, anmobj)
-            if (typeof oa.set == "object") {
-                for (var i in oa.set) {
-                    var set = oa.set[i]
-                    ww.anm.evalini(s, set, "fr", i, oa, anmobj)
-                }
-            }
+            ww.anm.ini(oa)
+            ww.anm.evalini(s, oa, "fr", anmGroup)
         } else {
             s.anmClear(name)
         }
@@ -541,16 +335,17 @@
     ww.anm.runAnmRun = function (name, s) {
         var name = name
         s.__anm = s.__anm || {}
-        var anmobj = s.__anm[name]
-        if (!anmobj) {
+        var anmGroup = s.__anm[name]
+        if (!anmGroup) {
             s.anmClear(name)
             return
         }
-        var list = anmobj.list
-        var index = anmobj.index
+        var list = anmGroup.list
+        var index = anmGroup.index
         var oa = list[index]
+
         if (oa) {
-            return ww.anm.evalReturn(s, oa, "t", "", oa, anmobj)
+            return ww.anm.evalReturn(s, oa, "t", anmGroup)
         }
         return false
     }
@@ -558,59 +353,43 @@
     ww.anm.runAnmUpdate = function (name, s) {
         var name = name
         s.__anm = s.__anm || {}
-        var anmobj = s.__anm[name]
-        if (!anmobj) {
+        var anmGroup = s.__anm[name]
+        if (!anmGroup) {
             s.anmClear(name)
             return
         }
-        var list = anmobj.list
-        var index = anmobj.index
+        var list = anmGroup.list
+        var index = anmGroup.index
         var oa = list[index]
         if (oa) {
-            if (!oa.d || ww.anm.evalReturn2(s, oa, "d", "", oa, anmobj)) {
-                ww.anm.evalUpdate(s, oa, "up", "", oa, anmobj)
-                if (typeof oa.set == "object") {
-                    for (var i in oa.set) {
-                        var set = oa.set[i]
-                        if (!set.d || ww.anm.evalReturn2(s, set, "d", i, oa, anmobj)) {
-                            ww.anm.evalUpdate(s, set, "up", i, oa, anmobj)
-                        }
-                    }
-                }
-            }
+            ww.anm.evalStop(s, oa, "d", anmGroup)
+            ww.anm.evalUpdate(s, oa, "up", anmGroup)
         }
     }
-
 
 
     /**动画结束 */
     ww.anm.runAnmEnd = function (name, s) {
         var name = name
         s.__anm = s.__anm || {}
-        var anmobj = s.__anm[name]
-        if (!anmobj) {
+        var anmGroup = s.__anm[name]
+        if (!anmGroup) {
             s.anmClear(name)
             return
         }
-        var list = anmobj.list
-        var index = anmobj.index
+        var list = anmGroup.list
+        var index = anmGroup.index
         var oa = list[index]
         if (oa) {
-            ww.anm.evalini(s, oa, "ed", "", s, oa, anmobj)
-            if (typeof oa.set == "object") {
-                for (var i in oa.set) {
-                    var set = oa.set[i]
-                    ww.anm.evalini(s, set, "ed", i, s, oa, anmobj)
-                }
-            }
+            ww.anm.evalini(s, oa, "ed", anmGroup)
         }
-        anmobj.index++
-        if (anmobj.re && list.length) {
-            anmobj.index = anmobj.index % list.length
+        anmGroup.index++
+        if (anmGroup.re && list.length) {
+            anmGroup.index = anmGroup.index % list.length
         }
-        if(!anmobj.break){
-            ww.anm.runAnmSt(name, s) 
-        } 
+        if (!oa.break) {
+            ww.anm.runAnmSt(name, s)
+        }
     };
 
 
@@ -717,15 +496,14 @@
         if (!oa) {
             return this.anmClear(name, l)
         }
-        var anmobj = {
+        var anmGroup = {
             name: name,
             index: 0,
             list: l,
-            value: {},
             re: re
         }
         this.__anm = this.__anm || {}
-        this.__anm[name] = anmobj
+        this.__anm[name] = anmGroup
         this.__anming = true
 
         ww.anm.runAnmSt(name, this)
