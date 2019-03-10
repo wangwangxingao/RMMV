@@ -12,7 +12,13 @@
  *  
  * 
  * @help 
+ * 
+ * 需要 2w_message插件支持
+ * 使用 
+ * ww.UIData.goto()
+ * 或  
  * SceneManager.goto(Scene_GUI)
+ * 运行
  * 
  * 名称   种类
  * x      y 
@@ -21,10 +27,10 @@
  * 
  * 
  * 种类  
- * text 时  value为文本内容
+ * text 时  value为文本内容 width height 为宽和高
  * bitmap时 value为pictures文件夹的图片
  * base时 为空白图片
- * 其他时为半透明图片
+ * color为该颜色图片
  * 
  * 
  * 
@@ -32,50 +38,87 @@
  * */
 
 
-function UIData() {
-    this.initialize.apply(this, arguments);
+
+
+var ww = ww || {}
+ww.UIData = ww.UIData || {}
+
+ww.UIData.goto = function () {
+    SceneManager.goto(Scene_GUI)
 }
-/**设置原形  */
-UIData.prototype = Object.create(UIData.prototype);
-/**设置创造者 */
-UIData.prototype.constructor = UIData;
-
-
-UIData.prototype.initialize = function (name, type, x, y, width, height, value) {
-    this._name = name || ""
-    this._type = type || ""
-    this._x = x || 0
-    this._y = y || 0
-    this._width = width || 100
-    this._height = height || 100
-    this._value = value || ""
-    this._children = []
+ww.UIData.load = function (data) {
+    ww.UIData.save = data
+    SceneManager.goto(Scene_GUI)
 }
 
 
-function Sprite_UIShow() {
+
+
+
+
+var ww = ww || {} 
+ww.UIData = ww.UIData ||{}
+
+/*
+ww.UIData.goto = function () {
+    SceneManager.goto(Scene_GUI)
+}
+ww.UIData.load = function (data) {
+    ww.UIData.save = data
+    SceneManager.goto(Scene_GUI)
+}
+*/
+ww.UIData.click = function (data) {
+    if (data) {
+        var v = data.value
+        return v
+    }
+    return 0
+}
+
+
+
+
+ww.UIData.make = function (name, type, value, x, y, width, height, children, object) {
+    return {
+        name: name || "",
+        type: type || "",
+        x: x || 0,
+        y: y || 0,
+        width: width || 100,
+        height: height || 100,
+        value: value || "",
+        children: children || [],
+        object: object || {}
+    }
+}
+
+
+
+function Sprite_UIDataShow() {
     this.initialize.apply(this, arguments);
 }
 //设置原形 
-Sprite_UIShow.prototype = Object.create(Sprite.prototype);
+Sprite_UIDataShow.prototype = Object.create(Sprite.prototype);
 //设置创造者
-Sprite_UIShow.prototype.constructor = Sprite_UIShow;
+Sprite_UIDataShow.prototype.constructor = Sprite_UIDataShow;
 
 
 
 /**初始化 */
-Sprite_UIShow.prototype.initialize = function (data) {
+Sprite_UIDataShow.prototype.initialize = function (data) {
     Sprite.prototype.initialize.call(this);
     this._data = data
     this._childList = []
 };
 
 /**设置 */
-Sprite_UIShow.prototype.setUI = function (data) {
+Sprite_UIDataShow.prototype.setUI = function (data) {
     this._data = data
     if (!data) {
         this.visible = false
     } else {
+        this.visible = true
         this.refesh()
     }
 }
@@ -83,66 +126,62 @@ Sprite_UIShow.prototype.setUI = function (data) {
 
 
 
-Sprite_UIShow.prototype.update = function () {
+Sprite_UIDataShow.prototype.update = function () {
     if (this._data) {
-
         this.updateData()
     }
     Sprite.prototype.update.call(this)
 }
 
 
-Sprite_UIShow.prototype.updateData = function () {
+Sprite_UIDataShow.prototype.updateData = function () {
     if (this._data) {
-        if (this._type != this._data._type || this._value != this._data._value ||this._width != this._data._width || this._height!= this._data._height) {
-            this._type = this._data._type
-            this._value = this._data._value
-            this._width  = this._data._width  
-            this._height = this._data._height
+        if (this._type != this._data.type || this._value != this._data.value
+            || this._w != this._data.width || this._h != this._data.height) {
+            this._type = this._data.type
+            this._value = this._data.value
+            this._w = this._data.width
+            this._h = this._data.height
             if (this._type == "bitmap") {
-                this.bitmap = ImageManager.loadPicture(this._data._value)
+                this.bitmap = ImageManager.loadPicture(this._data.value)
             } else if (this._type == "text") {
-                this.bitmap = new Bitmap(this._data._width, this._data._height)
+                this.bitmap = new Bitmap(this._data.width, this._data.height)
                 var w = this.bitmap.window()
                 this.bitmap.clear()
-                w.drawTextEx(this._data._value, 0, 0, this.bitmap.width, this.bitmap.height)
-            } else if (this._type == "base") {
-
-                this.bitmap = new Bitmap(0, 0)
-
-            } else {
-                this.bitmap = new Bitmap(this._data._width, this._data._height)
+                w.drawTextEx(this._data.value, 0, 0, this.bitmap.width, this.bitmap.height)
+            } else if (this._type == "color") {
+                this.bitmap = new Bitmap(this._data.width, this._data.height)
 
                 var r = Math.randomInt(255)
                 var g = Math.randomInt(255)
                 var b = Math.randomInt(255)
                 var a = 0.2
-                this._value = this._data._value = "rgba(" + r + "," + g + "," + b + "," + a + ")"
+                if (!this._data.value) {
+                    this._data.value = "rgba(" + r + "," + g + "," + b + "," + a + ")"
+                }
+                this._value = this._data.value
                 this.bitmap.fillAll(this._value)
+            } else {//if (this._type == "base") {
+                this.bitmap = new Bitmap(this._data.width, this._data.height)
             }
         }
-        if (this._x !== this._data._x) {
-            this.x = this._x = this._data._x
-        }
-        if (this._y !== this._data._y) {
-            this.y = this._y = this._data._y
-        }
-
+        this.x = this._data.x
+        this.y = this._data.y
     }
 }
 
 
-Sprite_UIShow.prototype.refesh = function () {
+Sprite_UIDataShow.prototype.refesh = function () {
     if (this._data) {
 
         this.updateData()
-        var adds = this._data._children
+        var adds = this._data.children
         if (Array.isArray(adds)) {
             var i0 = this._childList.length
             var i1 = adds.length
             for (var i = i0; i < i1; i++) {
                 var add = adds[i]
-                var sprite = new Sprite_UIShow()
+                var sprite = new Sprite_UIDataShow()
                 sprite.setUI(add)
                 this._childList.push(sprite)
                 this.addChild(sprite)
@@ -160,10 +199,24 @@ Sprite_UIShow.prototype.refesh = function () {
         } else {
             while (this._childList.length) {
                 var sprite = this._childList.pop()
-                sprite.clear()
+                //sprite.clear()
                 this.removeChild(sprite)
             }
         }
+    }
+}
+
+
+
+Sprite_UIDataShow.prototype.touchInput = function () {
+    if (this.visible && this.isTouchThis(TouchInput.x, TouchInput.y)) {
+        this.clickThis()
+    }
+}
+
+Sprite_UIDataShow.prototype.clickThis = function () {
+    if (this.data) {
+        ww.UIData.click(this.data)
     }
 }
 
@@ -181,8 +234,20 @@ Scene_GUI.prototype.constructor = Scene_GUI;
 
 Scene_GUI.prototype.initialize = function () {
     Scene_Base.prototype.initialize.call(this);
-    this._data = new UIData("base", "base")
-    this._list = []
+
+
+    this.load(ww.UIData.save)
+
+
+    this._data.children = [
+
+        ww.UIData.make("1", "text", "这是第一个精灵,是文本", 0, 0, 300, 100),
+        ww.UIData.make("2", "text", "第3个精灵是图片", 0, 100, 300, 100),
+        ww.UIData.make("3", "bitmap", "", 0, 100, 100, 300),
+        ww.UIData.make("4", "text", "第5个精灵是半透明图片" + "rgba(" + 255 + "," + 0 + "," + 0 + "," + 1 + ")", 0, 200, 300, 100),
+        ww.UIData.make("5", "color", "rgba(" + 255 + "," + 0 + "," + 0 + "," + 0.2 + ")", 0, 200, 300, 100)
+    ]
+
 };
 
 Scene_GUI.prototype.create = function () {
@@ -190,6 +255,11 @@ Scene_GUI.prototype.create = function () {
     this.makeInput()
 };
 
+Scene_GUI.prototype.load = function (data) {
+    this._list = []
+
+    this._data = data || ww.UIData.make("base", "base")
+};
 
 
 
@@ -217,37 +287,37 @@ Scene_GUI.prototype.terminate = function () {
 
 
 
-
-
-
 Scene_GUI.prototype.updateInput = function () {
     if (this._inputhide) {
-        if (TouchInput.isTriggered()) {
-
+        if (TouchInput.isTriggered() ||
+            (TouchInput.isPressed() && TouchInput.isMoved())) {
             var xy = this.nowxy()
             console.log(TouchInput.x, TouchInput.y)
             var s = this.now()
             if (s != this.base()) {
-                s._x = TouchInput.x - xy[0]
-                s._y = TouchInput.y- xy[1]
+                s.x = TouchInput.x - xy[0]
+                s.y = TouchInput.y - xy[1]
             }
-        } else if (Input.isTriggered('ok')) {
-            this.onshow()
-            console.log("ok")
         } else {
             var x = Input.isRepeated('left') ? -1 : Input.isRepeated("right") ? 1 : 0
             var y = Input.isRepeated('up') ? -1 : Input.isRepeated("down") ? 1 : 0
             if (x || y) {
-
                 var s = this.now()
-                if (s != this.base()) { 
-
-                    s._x += x
-
-                    s._y += y
+                if (s != this.base()) {
+                    s.x += x
+                    s.y += y
                 }
             }
 
+        }
+    }
+    if (Input.isTriggered('ok') || Input.isTriggered("cancel") || TouchInput.isCancelled()) {
+        if (this._inputhide) {
+            this.onshow()
+            console.log("show")
+        } else {
+            this.onhide()
+            console.log("show")
         }
     }
 };
@@ -260,10 +330,10 @@ Scene_GUI.prototype.now = function () {
     var b = this.base()
     for (var i = 0; i < this._list.length; i++) {
         var z = this._list[i]
-        if (!b._children[z]) {
-            b._children[z] = new UIData("" + z)
+        if (!b.children[z]) {
+            b.children[z] = ww.UIData.make("" + z)
         }
-        b = b._children[z]
+        b = b.children[z]
     }
     return b
 }
@@ -273,10 +343,10 @@ Scene_GUI.prototype.nowFather = function () {
     var b = this.base()
     for (var i = 0; i < this._list.length - 1; i++) {
         var z = this._list[i]
-        if (!b._children[z]) {
-            b._children[z] = new UIData("" + z)
+        if (!b.children[z]) {
+            b.children[z] = ww.UIData.make("" + z)
         }
-        b = b._children[z]
+        b = b.children[z]
     }
     return b
 }
@@ -285,9 +355,9 @@ Scene_GUI.prototype.nowFather = function () {
 Scene_GUI.prototype.nowFatherList = function () {
     var b = this.nowFather()
     var l = []
-    for (var i = 0; i < b._children.length; i++) {
-        var z = b._children[i]
-        var name = z && z._name
+    for (var i = 0; i < b.children.length; i++) {
+        var z = b.children[i]
+        var name = z && z.name
         name = name || ""
         l.push(name)
     }
@@ -300,11 +370,11 @@ Scene_GUI.prototype.nowPath = function () {
     var l = []
     for (var i = 0; i < this._list.length; i++) {
         var z = this._list[i]
-        if (!b._children[z]) {
-            b._children[z] = new UIData("" + z)
+        if (!b.children[z]) {
+            b.children[z] = ww.UIData.make("" + z)
         }
-        b = b._children[z]
-        var name = b && b._name
+        b = b.children[z]
+        var name = b && b.name
         name = name || ""
         l.push(name)
     }
@@ -312,19 +382,19 @@ Scene_GUI.prototype.nowPath = function () {
 }
 
 
-Scene_GUI.prototype.nowxy= function () {
-    var b = this.base() 
+Scene_GUI.prototype.nowxy = function () {
+    var b = this.base()
     var x = y = 0
-    for (var i = 0; i < this._list.length-1; i++) {
+    for (var i = 0; i < this._list.length - 1; i++) {
         var z = this._list[i]
-        if (!b._children[z]) {
-            b._children[z] = new UIData("" + z)
+        if (!b.children[z]) {
+            b.children[z] = ww.UIData.make("" + z)
         }
-        b = b._children[z]
-        x += ( b && b._x)||0
-        y += ( b && b._y)||0 
+        b = b.children[z]
+        x += (b && b.x) || 0
+        y += (b && b.y) || 0
     }
-    return [x,y]
+    return [x, y]
 }
 
 
@@ -336,7 +406,7 @@ Scene_GUI.prototype.refesh = function () {
     if (this._show) {
         this._show.setUI(this.base())
     } else {
-        this._show = new Sprite_UIShow(this.base())
+        this._show = new Sprite_UIDataShow(this.base())
         this.addChild(this._show)
     }
 
@@ -383,44 +453,66 @@ Scene_GUI.prototype.makeInput = function () {
     this._input = {}
     //名称
     this._input.name = Graphics._createElement("name", "input", { "type": "text", sz: { x: 0, y: 0, width: 50, height: 20 } }, 0, "gui")
+
     this._input.type = Graphics._createElement("type", "input", { "type": "text", sz: { x: 60, y: 0, width: 50, height: 20 } }, 0, "gui")
+
+
     this._input.x = Graphics._createElement("x", "input", { "type": "number", sz: { x: 0, y: 30, width: 50, height: 20 } }, 0, "gui")
+
+    this._input.x.onchange = this.onok.bind(this)
+
     this._input.y = Graphics._createElement("y", "input", { "type": "number", sz: { x: 60, y: 30, width: 50, height: 20 } }, 0, "gui")
+
+    this._input.y.onchange = this.onok.bind(this)
+
+
     this._input.w = Graphics._createElement("w", "input", { "type": "number", sz: { x: 0, y: 60, width: 50, height: 20 } }, 0, "gui")
+
+    this._input.w.onchange = this.onok.bind(this)
+
     this._input.h = Graphics._createElement("h", "input", { "type": "number", sz: { x: 60, y: 60, width: 50, height: 20 } }, 0, "gui")
+
+    this._input.h.onchange = this.onok.bind(this)
 
     //值 
     this._input.value = Graphics._createElement("value", "input", { "type": "text", sz: { x: 0, y: 90, width: 100, height: 20 } }, 0, "gui")
+
+    //this._input.value.onchange = this.onok.bind(this)
 
 
     //列表
     this._input.list = Graphics._createElement("list", "select", { size: 10, sz: { x: -100, y: 0, width: 100, height: 110 } }, 0, "gui")
     this._input.list.onclick = this.onchange.bind(this)
 
+    this._input.del = Graphics._createElement("del", "input", { "type": "button", sz: { x: 120, y: -30, width: 50, height: 20 }, value: "删除" }, 0, "gui")
+
+    this._input.del.onclick = this.ondel.bind(this)
     //添加
     this._input.add = Graphics._createElement("add", "input", { "type": "button", sz: { x: 120, y: 0, width: 50, height: 20 }, value: "添加" }, 0, "gui")
     this._input.add.onclick = this.onadd.bind(this)
     //确定
     this._input.ok = Graphics._createElement("ok", "input", { "type": "button", sz: { x: 120, y: 30, width: 50, height: 20 }, value: "确定" }, 0, "gui")
+
     this._input.ok.onclick = this.onok.bind(this)
+
     //隐藏
     this._input.hide = Graphics._createElement("hide", "input", { "type": "button", sz: { x: 120, y: 60, width: 50, height: 20 }, value: "手动" }, 0, "gui")
     this._input.hide.onclick = this.onhide.bind(this)
     //保存
     this._input.save = Graphics._createElement("save", "input", { "type": "button", sz: { x: 120, y: 90, width: 50, height: 20 }, value: "保存" }, 0, "gui")
     this._input.save.onclick = this.onsave.bind(this)
- 
+
 
     //到父项
     this._input.tof = Graphics._createElement("tof", "input", { "type": "button", sz: { x: 0, y: -30, width: 50, height: 20 }, value: "父项" }, 0, "gui")
-    this._input.tof.onclick = this.onfa.bind(this) 
+    this._input.tof.onclick = this.onfa.bind(this)
     //到子项
     this._input.toc = Graphics._createElement("toc", "input", { "type": "button", sz: { x: 60, y: -30, width: 50, height: 20 }, value: "子项" }, 0, "gui")
     this._input.toc.onclick = this.onch.bind(this)
     //位置
     this._input.fp = Graphics._createElement("fp", "input", { "type": "text", sz: { x: -100, y: -30, width: 100, height: 20 } }, 0, "gui")
 
-  
+
     Graphics.makeList("list", this.nowFatherList())
 
     this.change(0)
@@ -436,17 +528,18 @@ Scene_GUI.prototype.makeInput = function () {
 Scene_GUI.prototype.onok = function () {
 
     var b = this.now()
-    b._name = this._input.name.value
-    b._type = this._input.type.value
-    b._x = (this._input.x.value || 0) * 1
-    b._y = (this._input.y.value || 0) * 1
-    
-    b._width = (this._input.w.value || 0) * 1
-    b._height = (this._input.h.value || 0) * 1
-    b._value = this._input.value.value
-    // this.hideInput()
-}
+    b.name = this._input.name.value
+    b.type = this._input.type.value
+    b.x = (this._input.x.value || 0) * 1
+    b.y = (this._input.y.value || 0) * 1
 
+    b.width = (this._input.w.value || 0) * 1
+    b.height = (this._input.h.value || 0) * 1
+    b.value = this._input.value.value
+    this.refesh()
+    // this.hideInput()
+    console.log(b)
+}
 
 
 Scene_GUI.prototype.onsave = function () {
@@ -465,10 +558,31 @@ Scene_GUI.prototype.onchange = function () {
 
 
 
+
+Scene_GUI.prototype.ondel = function () {
+    var s = this.now()
+    var f = this.nowFather()
+    var b = this.base()
+    if (b != s) {
+        if (f) {
+            var index = f.children.indexOf(s)
+            if (index >= 0) {
+                f.children.splice(index, 1)
+                console.log(index, f)
+                this.change(0)
+            }
+        }
+    }
+}
+
+
+
+
+
 Scene_GUI.prototype.onadd = function () {
-    var list = this.nowFatherList()||[]
+    var list = this.nowFatherList() || []
     var i = list.length
-    this.change(i) 
+    this.change(i)
 }
 
 
@@ -516,33 +630,34 @@ Scene_GUI.prototype.showInput = function () {
 
 Scene_GUI.prototype.nowInput = function () {
     var b = this.now()
-    this._input.name.value = b._name
-    this._input.type.value = b._type
-    this._input.x.value = b._x
-    this._input.y.value = b._y
-    
-    
-    this._input.w.value =  b._width 
-    this._input.h.value = b._height
-    this._input.value.value = b._value
+    this._input.name.value = b.name
+    this._input.type.value = b.type
+    this._input.x.value = b.x
+    this._input.y.value = b.y
+
+
+    this._input.w.value = b.width
+    this._input.h.value = b.height
+    this._input.value.value = b.value
 }
 
 
 Scene_GUI.prototype.save = function () {
+    ww.UIData.save = this.base()
 
-  var data =  JsonEx.stringify(this.base())
-  var fs = require('fs');
-  // 目录路径 = 本地文件目录路径()
-  var dirPath = StorageManager.localFileDirectoryPath();
-  // 文件路径 = 本地文件路径( 保存文件id )
-  var filePath = StorageManager.localFileDirectoryPath() + "uisave.txt";
-  //如果(不是 fs 存在(目录路径))
-  if (!fs.existsSync(dirPath)) {
-      //fs 建立目录(目录路径)
-      fs.mkdirSync(dirPath);
-  }
-  //fs 写入文件(文件路径, 数据 )
-  fs.writeFileSync(filePath, data)
+    var data = JSON.stringify(this.base()) // JsonEx.stringify(this.base())
+    var fs = require('fs');
+    // 目录路径 = 本地文件目录路径()
+    var dirPath = StorageManager.localFileDirectoryPath();
+    // 文件路径 = 本地文件路径( 保存文件id )
+    var filePath = StorageManager.localFileDirectoryPath() + "uisave.txt";
+    //如果(不是 fs 存在(目录路径))
+    if (!fs.existsSync(dirPath)) {
+        //fs 建立目录(目录路径)
+        fs.mkdirSync(dirPath);
+    }
+    //fs 写入文件(文件路径, 数据 )
+    fs.writeFileSync(filePath, data)
 }
 
 

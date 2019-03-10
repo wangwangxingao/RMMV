@@ -45,6 +45,11 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.zip
+*.gitignore
+*.gitattributes
 /plugins/定制
 /plugins/战斗/战斗动作
 /plugins/战斗/战斗图增强
+plugins/UI/列表显示/Sprite_listscene.js
+.gitignore

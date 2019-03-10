@@ -11,6 +11,15 @@ Sprite_UIList.prototype.constructor = Sprite_UIList;
  */
 Sprite_UIList.prototype.initialize = function (w, h) {
     Sprite.prototype.initialize.call(this)
+
+    this.createMain(w, h)
+    //显示到Y
+    this.refresh()
+};
+
+
+Sprite_UIList.prototype.createMain = function (w, h) {
+
     this._index = -1
 
     this._allW = 0
@@ -24,19 +33,52 @@ Sprite_UIList.prototype.initialize = function (w, h) {
     this.height = 0
 
     //放所有对象的列表
-    this._objectsList = []
+    this._spritesList = []
 
-    this._showSprite = new Sprite()
+    this.createShowSprite()
+    this.createBarSprite(w, h)
+ 
+    this.setShowWH(w, h)
 
-    this._scrollBarSprite = new Sprite()
-    this._scrollBarSprite.visible = false // = new Bitmap(10,h) 
+}
 
+
+
+/**创建显示精灵 */
+Sprite_UIList.prototype.createShowSprite = function (w, h) {
+
+    if (!this._showSprite) { 
+        this._showSprite = new Sprite()
+    } 
     this.addChild(this._showSprite)
+}
+
+/**创建进度条精灵 */
+Sprite_UIList.prototype.createBarSprite = function (w, h) {
+    var w = w || 0
+    var h = h || 0
+
+    var x = w - 5
+    var y = 0
+
+    var b = new Bitmap(5, h)
+
+    if (!this._scrollBarSprite) {
+
+        this._scrollBarSprite = new Sprite()
+    }
+    var s = this._scrollBarSprite
+    s.visible = false // = new Bitmap(10,h) 
+    s.bitmap = b
+    b.fillAll("#ffffff")
+    s.x = x
+    s.y = y
+
     this.addChild(this._scrollBarSprite)
 
-    this.setShowWH(w, h)
-    // this._evalInMapIndex = []
-};
+}
+
+
 
 
 /**设置显示的宽和高 */
@@ -47,35 +89,36 @@ Sprite_UIList.prototype.setShowWH = function (w, h) {
     this.width = w || 0
     this.height = h || 0
 
-    var b = new Bitmap(5, h)
-    this._scrollBarSprite.bitmap = b
-    b.fillAll("#ffffff")
-    this._scrollBarSprite.x = this.width - 5
-
+    //设置遮罩
     this.makeMask(0, 0, w, h)
-
-
-    this.showToY(this._showY)
-    this.setScrollBarScale()
-    this.moveScrollBarToShow()
 }
 
 
-
+/**刷新 */
+Sprite_UIList.prototype.refresh = function () {
+    this.refreshSpritesPos()
+    this.refreshShowY()
+};
 
 /**刷新精灵位置 */
-Sprite_UIList.prototype.refreshShowPos = function () {
+Sprite_UIList.prototype.refreshSpritesPos = function () {
     this._allH = 0
-    for (var i = 0; i < this._objectsList.length; i++) {
-        var s = this._objectsList[i]
+    //不断把精灵添加到最后
+    for (var i = 0; i < this._spritesList.length; i++) {
+        var s = this._spritesList[i]
         if (s) {
             this.addSpritePosToEnd(s)
         }
     }
+};
+
+/**刷新显示位置 */
+Sprite_UIList.prototype.refreshShowY = function () {
     this.showToY(this._showY)
     this.setScrollBarScale()
     this.moveScrollBarToShow()
-};
+
+}
 
 
 /**添加精灵 */
@@ -83,18 +126,18 @@ Sprite_UIList.prototype.addSprite = function (s, xywh) {
     if (!s) { return }
     this.setSpriteXywh(s, xywh)
 
-    var index = this._objectsList.indexOf(s)
+    var index = this._spritesList.indexOf(s)
     if (index >= 0) {
-        this._objectsList[index] = null
+        this._spritesList[index] = null
 
-        this._objectsList.push(s)
-        this._showSprite.addChild(s)
+        this._spritesList.push(s)
+        this.addSpriteOnShow(s)
 
-        this.refreshShowPos()
+        this.refresh()
     } else {
         //添加到列表
-        this._objectsList.push(s)
-        this._showSprite.addChild(s)
+        this._spritesList.push(s)
+        this.addSpriteOnShow(s)
 
         this.addSpritePosToEnd(s)
         this.setScrollBarScale()
@@ -109,22 +152,22 @@ Sprite_UIList.prototype.addSpriteTo = function (s, id, xywh) {
     this.setSpriteXywh(s, xywh)
 
 
-    var s2 = this._objectsList[id]
+    var s2 = this._spritesList[id]
 
-    this.removeSpriteOnSprite(s2)
+    this.removeSpriteOnShow(s2)
 
 
     this.deleteSpriteOnList(s)
 
 
-    this._objectsList[id] = s
-    this._showSprite.addChild(s)
+    this._spritesList[id] = s
+    this.addSpriteOnShow(s)
 
     //this._mustRefreshShowPos = true 
-    this.refreshShowPos()
+    this.refresh()
 };
 
-
+/**添加精灵在 */
 Sprite_UIList.prototype.addSpriteAt = function (s, id, xywh) {
 
     if (!s) { return }
@@ -134,51 +177,23 @@ Sprite_UIList.prototype.addSpriteAt = function (s, id, xywh) {
     this.deleteSpriteOnList(s)
 
 
-    this._objectsList.splice(id, 0, s)
-    this._showSprite.addChild(s)
+    this._spritesList.splice(id, 0, s)
+
+
+    this.addSpriteOnShow(s)
 
     //this._mustRefreshShowPos = true
 
-    this.refreshShowPos()
+    this.refresh()
 };
-
-
-
-Sprite_UIList.prototype.removeSpriteOnList = function (s) {
-    if (!s) { return }
-    var index = this._objectsList.indexOf(s)
-    if (index >= 0) {
-        this._objectsList.splice(index, 1)
-    }
-}
-
-Sprite_UIList.prototype.deleteSpriteOnList = function (s) {
-    if (!s) { return }
-    var index = this._objectsList.indexOf(s)
-    if (index >= 0) {
-        this._objectsList[index] = null
-    }
-};
-
-
-Sprite_UIList.prototype.deleteSpriteOnSprite = function (s) {
-    if (!s) { return }
-    this._showSprite.removeChild(s)
-};
-
-
-Sprite_UIList.prototype.removeSpriteOnSprite = function (s) {
-    if (!s) { return }
-    this._showSprite.removeChild(s)
-}
 
 /**移除精灵 */
 Sprite_UIList.prototype.removeSprite = function (s) {
 
     this.removeSpriteOnList(s)
-    this.removeSpriteOnSprite(s)
+    this.removeSpriteOnShow(s)
 
-    this.refreshShowPos()
+    this.refresh()
 
 };
 
@@ -186,17 +201,62 @@ Sprite_UIList.prototype.removeSprite = function (s) {
 Sprite_UIList.prototype.deleteSprite = function (s) {
 
     this.deleteSpriteOnList(s)
-    this.removeSpriteOnSprite(s)
+    this.removeSpriteOnShow(s)
 
-    this.refreshShowPos()
+    this.refresh()
 
 };
+
+
+/**添加精灵在显示 */
+Sprite_UIList.prototype.addSpriteOnShow = function (s) {
+    if (s) {
+
+        this._showSprite.addChild(s)
+    }
+}
+
+
+/**移除精灵 */
+Sprite_UIList.prototype.removeSpriteOnList = function (s) {
+    if (!s) { return }
+    var index = this._spritesList.indexOf(s)
+    if (index >= 0) {
+        this._spritesList.splice(index, 1)
+    }
+}
+
+/**删除精灵在列表中 */
+Sprite_UIList.prototype.deleteSpriteOnList = function (s) {
+    if (!s) { return }
+    var index = this._spritesList.indexOf(s)
+    if (index >= 0) {
+        this._spritesList[index] = null
+    }
+};
+
+/**删除精灵在精灵中 */
+Sprite_UIList.prototype.deleteSpriteOnShow = function (s) {
+    if (!s) { return }
+    this._showSprite.removeChild(s)
+};
+
+/**移除精灵在精灵中 */
+Sprite_UIList.prototype.removeSpriteOnShow = function (s) {
+    if (!s) { return }
+    this._showSprite.removeChild(s)
+}
 
 
 
 /**
  * 添加精灵位置到最后
- * xywh  x 偏移x y偏移y  w 长 h 宽
+ * @param {sprite} s 精灵
+ * @param {[number,number,number,number]} xywh   位置设置  
+ * x 偏移x  
+ * y 偏移y  
+ * w 长  
+ * h 宽  
  * 
  */
 Sprite_UIList.prototype.addSpritePosToEnd = function (s) {
@@ -211,14 +271,29 @@ Sprite_UIList.prototype.addSpritePosToEnd = function (s) {
     var w = xywh[2]
     var h = xywh[3]
 
+    //精灵的y
+    s._touchY = this._allH 
+    //s.x = x
     s.y = this._allH + y
+
+    //全部的高 += h
     this._allH += h
+    
+    s._touchYE = this._allH 
+
 };
 
-/**设置精灵xywh */
+/**设置精灵xywh
+ * @param {sprite} s 精灵
+ * @param {[number,number,number,number]} xywh   位置设置  
+ * x 偏移x  
+ * y 偏移y  
+ * w 总长  
+ * h 总宽  
+ */
 Sprite_UIList.prototype.setSpriteXywh = function (s, xywh) {
     if (!xywh) {
-        var xywh = [s.x, s.y, s.width, s.height]
+        var xywh = [s.x, s.y, s.x + s.width, s.y + s.height]
     }
     s.xywh = xywh
     return xywh
@@ -236,6 +311,7 @@ Sprite_UIList.prototype.setScrollBarScale = function () {
     }
 }
 
+
 Sprite_UIList.prototype.__pagetoO = [{ fr: { opacity: 255 }, t: 0 }, 30, { t: 255, up: { opacity: -1 } }]
 
 
@@ -250,7 +326,7 @@ Sprite_UIList.prototype.moveScrollBarToShow = function () {
 }
 
 
-
+/**显示滚动条 */
 Sprite_UIList.prototype.showScrollBar = function () {
     this.moveScrollBarToShow()
     if (this._scrollBarSprite.visible) {
@@ -258,28 +334,33 @@ Sprite_UIList.prototype.showScrollBar = function () {
     }
 }
 
+/**清除 */
 Sprite_UIList.prototype.clear = function () {
-    for (var i = 0; i < this._objectsList.length; i++) {
-        var s = this._objectsList[i]
+    for (var i = 0; i < this._spritesList.length; i++) {
+        var s = this._spritesList[i]
         if (s) {
             this._showSprite.removeChild(s)
         }
     }
-    this._objectsList.length = 0
+    this._spritesList.length = 0
     this._allH = 0
     //this._mustRefreshShowPos = true
-    this.refreshShowPos()
+    this.refresh()
 }
 
 
 
 /**显示内容到y处 */
 Sprite_UIList.prototype.showToY = function (y) {
-    this._showY = Math.min(Math.max(y, 0), this._allH - this._showH)
+    this._showY = Math.max(0,Math.min(y, this._allH - this._showH))
     this._showSprite.y = -this._showY
     this.showScrollBar()
 }
 
+/**移动偏移y */
+Sprite_UIList.prototype.showMoveY = function (y) {
+    this.showToY(this._showY + y)
+}
 
 /**移动到底部 */
 Sprite_UIList.prototype.showToYEnd = function () {
@@ -292,10 +373,6 @@ Sprite_UIList.prototype.showToYTop = function () {
 }
 
 
-/**移动y */
-Sprite_UIList.prototype.showMoveY = function (y) {
-    this.showToY(this._showY + y)
-}
 
 /**显示到索引 */
 Sprite_UIList.prototype.showToIndex = function (i) {
@@ -303,14 +380,14 @@ Sprite_UIList.prototype.showToIndex = function (i) {
         this._index = 0
         this.showToYTop()
 
-    } else if (i >= this._objectsList.length) {
-        this._index = Math.max(0, this._objectsList.length - 1)
+    } else if (i >= this._spritesList.length) {
+        this._index = Math.max(0, this._spritesList.length - 1)
 
         this.showToYEnd()
     } else {
         this._index = i
 
-        var s = this._objectsList[i]
+        var s = this._spritesList[i]
         if (s) {
             this.setSpriteXywh(s)
             var xywh = s.xywh
@@ -331,7 +408,7 @@ Sprite_UIList.prototype.showToIndex = function (i) {
 Sprite_UIList.prototype.__updateInput = function () {
 
     /* if( this._mustRefreshShowPos){
-        this.refreshShowPos() 
+        this.refresh() 
     } */
 
     if (Input.isKeyTriggered("touch2")) {
@@ -356,7 +433,7 @@ Sprite_UIList.prototype.__TouchInputisTouchInPressMove = function (x, y) {
 var s = new Sprite_UIList(300,400)
 SceneManager._scene.addChild(s)
 
-b = ImageManager.loadEnemy("actor1_3") 
+b = ImageManager.loadEnemy("actor1_3")
 
 a = new Sprite(b)
 

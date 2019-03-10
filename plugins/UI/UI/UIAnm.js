@@ -130,18 +130,18 @@
             var t = typeof v
             var n2 = "__" + n
 
-            oa.tr[n2] = false
+            oa.trz = false
             //为数值时,判断值 
             if (t == "number") {
                 oa.tv[n2] = oa.tv[n2] || 0
                 oa.tv[n2]++
                 //值是否小于预设值 
-                oa.tr[n2] = oa.tv[n2] <= v
+                oa.trz = oa.tv[n2] <= v 
             } else if (!v) {
                 //主设置没有时不继续运行
-                oa.tr[n2] = false
+                oa.trz = false
             } else if (t == "function") {
-                oa.tr[n2] = v(s, oa, n, anmGroup)
+                oa.trz = v(s, oa, n, anmGroup)
             } else if (t == "object") {
                 var z = false
                 //为对象时,判断值是否符合范围
@@ -157,11 +157,11 @@
                     }
                     z = z || oa.tr[i]
                 }
-                oa.tr[n2] = z
+                oa.trz = z
             } else {
-                oa.tr[n2] = false
+                oa.trz = false
             }
-            return oa.tr[n2]
+            return oa.trz
         }
         return false
     }
@@ -176,7 +176,7 @@
             var t = typeof v
             var n2 = "__" + n
 
-            oa.ds[n2] = false
+            oa.dsz = false
             //为数值时,判断值 
             if (t == "number") {
                 //预计间隔的帧数
@@ -184,15 +184,15 @@
                 oa.dv[n2]++
                 //值是否小于预设值 
                 //1 ,2, 3   3
-                oa.ds[n2] = oa.dv[n2] <= v
-                if (!oa.ds[n2]) {
+                oa.dsz = oa.dv[n2] <= v
+                if (!oa.dsz) {
                     oa.dv[n2] = 0
                 }
             } else if (!v) {
                 //主设置没有时不继续运行
-                oa.ds[n2] = false
+                oa.dsz = false
             } else if (t == "function") {
-                oa.ds[n2] = v(s, oa, n, anmGroup)
+                oa.dsz = v(s, oa, n, anmGroup)
             } else if (t == "object") {
                 //为对象时,判断值是否符合范围
                 for (var i in v) {
@@ -210,11 +210,11 @@
                         }
                     }
                 }
-                oa.ds[n2] = false
+                oa.dsz = false
             } else {
-                oa.ds[n2] = false
+                oa.dsz = false
             }
-            return oa.ds[n2]
+            return oa.dsz
         }
         return false
     }
@@ -245,8 +245,8 @@
      */
     ww.anm.evalUpdate = function (s, oa, n, anmGroup) {
         if (oa) {
-            var n2 = "__" + n
-            if (oa.tr[n2] && !oa.ds[n2]) {
+            var n2 = "__" + "t" 
+            if (oa.trz && !oa.dsz) {
                 //该设置
                 var v = oa[n]
                 //种类
@@ -342,10 +342,9 @@
         }
         var list = anmGroup.list
         var index = anmGroup.index
-        var oa = list[index]
-
+        var oa = list[index] 
         if (oa) {
-            return ww.anm.evalReturn(s, oa, "t", anmGroup)
+            return ww.anm.evalRun(s, oa, "t", anmGroup)
         }
         return false
     }
