@@ -55,9 +55,25 @@ if (!Array.prototype.forEach) {
 }
 
 // define variable JSON, needed for correct error handling on IE7 and older
+//定义变量JSON，用于在IE7及更早版本上进行正确的错误处理
 var JSON;
 
 /**
+ *
+ * @param {Element}  container  容器元素
+ * @param {Object} [options] 带选项的对象。可用选项：
+ * {String}模式编辑器模式。可用值：
+ *'编辑'（默认），'查看'。
+ * {Boolean} 搜索 启用搜索框。
+ *默认为True
+ * {Boolean} history 启用历史记录（撤消/重做）。
+ *默认为True
+ * {function} 更改回调方法，触发
+ *关于内容的变更
+ * {String} name 根节点的字段名称。
+ *
+ * 
+ * 
  * JSONEditor
  * @param {Element} container    Container element
  * @param {Object}  [options]    Object with options. available options:
@@ -99,6 +115,21 @@ JSONEditor = function (container, options, json) {
 };
 
 /**
+ * 
+ * *初始化并设置默认选项
+ * @param {Object} [options]  带选项的对象。可用选项：
+ * {String}模式编辑器模式。可用值：
+ *'编辑'（默认），'查看'。
+ * {Boolean}搜索启用搜索框。
+ *默认为True。
+ * {Boolean} history启用历史记录（撤消/重做）。
+ *默认为True。
+ * {function}更改回调方法，触发
+ *关于内容的变更。
+ * {String} name根节点的字段名称。
+ *
+ * 
+ * 
  * Initialize and set default options
  * @param {Object}  [options]    Object with options. available options:
  *                               {String} mode      Editor mode. Available values:
@@ -128,8 +159,10 @@ JSONEditor.prototype._setOptions = function (options) {
 			}
 		}
 
+		//检查已弃用的选项
 		// check for deprecated options
 		if (options.enableSearch) {
+			//检查已弃用的选项
 			// deprecated since version 1.6.0, 2012-11-03
 			this.options.search = options.enableSearch;
 			// console.log('WARNING: Option "enableSearch" is deprecated. Use "search" instead.');
@@ -145,14 +178,17 @@ JSONEditor.prototype._setOptions = function (options) {
 	this.editable = (this.options.mode != 'viewer');
 };
 
+//当前正在编辑的节点
 // node currently being edited
 JSONEditor.focusNode = undefined;
 
 /**
+ * 在编辑器中设置JSON对象
+ * 
  * Set JSON object in editor
- * @param {Object | undefined} json      JSON data
- * @param {String}             [name]    Optional field name for the root node.
- *                                       Can also be set using setName(name).
+ * @param {Object | undefined} json      JSON data  JSON数据
+ * @param {String}             [name]    Optional field name for the root node.   根节点的可选字段名称。
+ *                                       Can also be set using setName(name).  也可以使用setName（name）进行设置。
  */
 JSONEditor.prototype.set = function (json, name) {
 	// adjust field name for root node
@@ -188,6 +224,8 @@ JSONEditor.prototype.set = function (json, name) {
 };
 
 /**
+ * 
+ * 从编辑器中获取JSON对象
  * Get JSON object from editor
  * @return {Object | undefined} json
  */
@@ -205,6 +243,7 @@ JSONEditor.prototype.get = function () {
 };
 
 /**
+ * 为根节点设置字段名称。
  * Set a field name for the root node.
  * @param {String | undefined} name
  */
@@ -216,6 +255,7 @@ JSONEditor.prototype.setName = function (name) {
 };
 
 /**
+ * 获取根节点的字段名称。
  * Get the field name for the root node.
  * @return {String | undefined} name
  */
@@ -224,6 +264,7 @@ JSONEditor.prototype.getName = function () {
 };
 
 /**
+ * 从编辑器中删除根节点
  * Remove the root node from the editor
  */
 JSONEditor.prototype.clear = function () {
@@ -235,6 +276,7 @@ JSONEditor.prototype.clear = function () {
 };
 
 /**
+ * 设置json编辑器的根节点
  * Set the root node for the json editor
  * @param {JSONEditor.Node} node
  * @private
@@ -249,6 +291,17 @@ JSONEditor.prototype._setRoot = function (node) {
 };
 
 /**
+ * 在所有节点中搜索文本
+ *当找到其中一个孩子的文本时，节点将被展开，
+ *否则它将被折叠。搜索不区分大小写。
+ * @param {String}文字
+ * @return {Object []} results包含包含搜索结果的节点的Array
+ *结果对象包含字段：
+ *  -  {JSONEditor.Node}节点，
+ *  -  {String} elem dom元素名称在哪里
+ *结果被找到（'field'或
+ *'价值'）
+ * 
  * Search text in all nodes
  * The nodes will be expanded when the text is found one of its childs,
  * else it will be collapsed. Searches are case insensitive.
@@ -274,6 +327,7 @@ JSONEditor.prototype.search = function (text) {
 };
 
 /**
+ * 展开所有节点
  * Expand all nodes
  */
 JSONEditor.prototype.expandAll = function () {
@@ -285,6 +339,7 @@ JSONEditor.prototype.expandAll = function () {
 };
 
 /**
+ * 折叠所有节点
  * Collapse all nodes
  */
 JSONEditor.prototype.collapseAll = function () {
@@ -296,6 +351,22 @@ JSONEditor.prototype.collapseAll = function () {
 };
 
 /**
+ * 
+ * 
+ * *无论何时更改，创建字段或值，都会调用onChange方法，
+ *删除，复制等
+ * @param {String}操作更改操作。可用值：“editField”，
+ *“editValue”，“changeType”，“appendNode”，
+ *“removeNode”，“duplicateNode”，“moveNode”，“expand”，
+ *                         “坍方”。
+ * @param {Object} params包含描述更改的参数的对象。
+ *参数中的参数取决于动作（for
+ *示例“editValue”Node，旧值和new
+ *提供价值）。 params包含所有信息
+ *需要撤消或重做动作。
+ * 
+ * 
+ * 
  * The method onChange is called whenever a field or value is changed, created,
  * deleted, duplicated, etc.
  * @param {String} action  Change action. Available values: "editField",
@@ -325,6 +396,9 @@ JSONEditor.prototype.onAction = function (action, params) {
 };
 
 /**
+ * 将焦点设置为JSONEditor。将创建隐藏的输入字段
+ * 捕获关键事件
+ * 
  * Set the focus to the JSONEditor. A hidden input field will be created
  * which captures key events
  */
@@ -358,6 +432,8 @@ JSONEditor.prototype.focus = function () {
 };
 
 /**
+ * *调整滚动位置，使给定的顶部位置显示为1/4
+ *窗户高度。
  * Adjust the scroll position such that given top position is shown at 1/4
  * of the window height.
  * @param {Number} top
@@ -611,6 +687,8 @@ JSONEditor.Node.prototype.getParent = function () {
 };
 
 /**
+ * 获取字段
+ * 
  * Set field
  * @param {String} field
  * @param {boolean} fieldEditable
@@ -621,6 +699,9 @@ JSONEditor.Node.prototype.setField = function (field, fieldEditable) {
 };
 
 /**
+ * 获取字段
+ * 
+ * 
  * Get field
  * @return {String}
  */
@@ -633,6 +714,9 @@ JSONEditor.Node.prototype.getField = function () {
 };
 
 /**
+ * 设定值。值是JSON结构或元素String，Boolean等。
+ * 
+ * 
  * Set value. Value is a JSON structure or an element String, Boolean, etc.
  * @param {*} value
  */
@@ -699,6 +783,9 @@ JSONEditor.Node.prototype.setValue = function (value) {
 };
 
 /**
+ * 获得价值。值是JSON结构
+ * 
+ * 
  * Get value. Value is a JSON structure
  * @return {*} value
  */
@@ -727,6 +814,9 @@ JSONEditor.Node.prototype.getValue = function () {
 };
 
 /**
+ * 获取此节点的嵌套级别
+ * 
+ * 
  * Get the nesting level of this node
  * @return {Number} level
  */
@@ -735,6 +825,12 @@ JSONEditor.Node.prototype.getLevel = function () {
 };
 
 /**
+ * 创建节点的克隆
+ * 复制克隆的完整状态，包括是否展开或
+ * 不是。不克隆DOM元素。
+ * 
+ * 
+ * 
  * Create a clone of a node
  * The complete state of a clone is copied, including whether it is expanded or
  * not. The DOM elements are not cloned.
@@ -768,6 +864,8 @@ JSONEditor.Node.prototype.clone = function () {
 };
 
 /**
+ * 折叠此节点及其子节点。
+ * 
  * Expand this node and optionally its childs.
  * @param {boolean} recurse   Optional recursion, true by default. When
  *                            true, all childs will be expanded recursively
@@ -793,6 +891,8 @@ JSONEditor.Node.prototype.expand = function (recurse) {
 };
 
 /**
+ * 折叠此节点及其子项。
+ * 
  * Collapse this node and optionally its childs.
  * @param {Number} recurse   Optional recursion, true by default. When
  *                            true, all childs will be collapsed recursively
@@ -820,6 +920,10 @@ JSONEditor.Node.prototype.collapse = function (recurse) {
 };
 
 /**
+ * 
+ * 在扩展时递归显示所有孩子
+ * 
+ * 
  * Recursively show all childs when they are expanded
  */
 JSONEditor.Node.prototype.showChilds = function () {
@@ -852,6 +956,7 @@ JSONEditor.Node.prototype.showChilds = function () {
 };
 
 /**
+ * 隐藏包含其所有子节点的节点
  * Hide the node with all its childs
  */
 JSONEditor.Node.prototype.hide = function () {
@@ -865,6 +970,7 @@ JSONEditor.Node.prototype.hide = function () {
 
 
 /**
+ * 递归隐藏所有孩子
  * Recursively hide all childs
  */
 JSONEditor.Node.prototype.hideChilds = function () {
@@ -890,6 +996,10 @@ JSONEditor.Node.prototype.hideChilds = function () {
 
 
 /**
+ *将新子项添加到节点。
+ *仅在Node值为array或object类型时适用
+ *
+ * 
  * Add a new child to the node.
  * Only applicable when Node value is of type array or object
  * @param {JSONEditor.Node} node
@@ -927,6 +1037,10 @@ JSONEditor.Node.prototype.appendChild = function (node) {
 
 
 /**
+ * 将节点从其当前父节点移动到此节点
+ * 仅在Node值为array或object类型时适用
+ *
+ * 
  * Move a node from its current parent to this node
  * Only applicable when Node value is of type array or object
  * @param {JSONEditor.Node} node
@@ -960,6 +1074,11 @@ JSONEditor.Node.prototype.moveBefore = function (node, beforeNode) {
 };
 
 /**
+ *  
+ *将节点从其当前父节点移动到此节点
+ *仅在Node值为array或object类型时适用。
+ *如果索引超出范围，节点将附加到末尾
+ * 
  * Move a node from its current parent to this node
  * Only applicable when Node value is of type array or object.
  * If index is out of range, the node will be appended to the end
@@ -981,6 +1100,10 @@ JSONEditor.Node.prototype.moveTo = function (node, index) {
 };
 
 /**
+ * 在给定节点之前插入一个新子节点
+ * 仅在Node值为array或object类型时适用
+ * 
+ * 
  * Insert a new child before a given node
  * Only applicable when Node value is of type array or object
  * @param {JSONEditor.Node} node
@@ -1030,6 +1153,11 @@ JSONEditor.Node.prototype.insertBefore = function (node, beforeNode) {
 };
 
 /**
+ * 在此节点中搜索
+ * 当找到其中一个子文本时，该节点将被展开，否则
+ * 它会崩溃。搜索不区分大小写。
+ * 
+ * 
  * Search in this node
  * The node will be expanded when the text is found one of its childs, else
  * it will be collapsed. Searches are case insensitive.
@@ -1105,6 +1233,10 @@ JSONEditor.Node.prototype.search = function (text) {
 };
 
 /**
+ * 该节点位于可见区域。
+ * 节点无法获得焦点
+ * 
+ * 
  * Move the scroll position such that this node is in the visible area.
  * The node will not get the focus
  */
@@ -1125,6 +1257,9 @@ JSONEditor.Node.prototype.scrollTo = function () {
 };
 
 /**
+ * 将焦点设置为此节点的值
+ * 
+ * 
  * Set focus to the value of this node
  * @param {String} [field]  The field name of the element to get the focus
  *                          available values: 'field', 'value'
@@ -1146,6 +1281,8 @@ JSONEditor.Node.prototype.focus = function (field) {
 };
 
 /**
+ * 更新DOM字段中的值和此节点的值
+ * 
  * Update the values from the DOM field and value of this node
  */
 JSONEditor.Node.prototype.blur = function () {
@@ -1155,6 +1292,10 @@ JSONEditor.Node.prototype.blur = function () {
 };
 
 /**
+ * 
+ * 复制给定的子节点
+ * 将在克隆节点之前添加新结构
+ * 
  * Duplicate given child node
  * new structure will be added right before the cloned node
  * @param {JSONEditor.Node} node           the childNode to be duplicated
@@ -1176,6 +1317,9 @@ JSONEditor.Node.prototype._duplicate = function (node) {
 };
 
 /**
+ * 检查给定节点是否为子节点。该方法将递归检查以查找
+ * 这个节点。
+ * 
  * Check if given node is a child. The method will check recursively to find
  * this node.
  * @param {JSONEditor.Node} node
@@ -1200,6 +1344,8 @@ JSONEditor.Node.prototype.containsNode = function (node) {
 };
 
 /**
+ * 将给定节点移动到此节点
+ * 
  * Move given node into this node
  * @param {JSONEditor.Node} node           the childNode to be moved
  * @param {JSONEditor.Node} beforeNode     node will be inserted before given
@@ -1213,20 +1359,24 @@ JSONEditor.Node.prototype._move = function (node, beforeNode) {
 		return;
 	}
 
+	//检查此节点是否不是要在此处移动的节点的子节点
 	// check if this node is not a child of the node to be moved here
 	if (node.containsNode(this)) {
 		throw new Error('不能把区域移动到自身的子节点.');
 	}
 
+	//删除原始节点
 	// remove the original node
 	if (node.parent) {
 		node.parent.removeChild(node);
 	}
 
+	//创建节点的克隆
 	// create a clone of the node
 	var clone = node.clone();
 	node.clearDom();
 
+	//插入或附加节点
 	// insert or append the node
 	if (beforeNode) {
 		this.insertBefore(clone, beforeNode);
@@ -1241,6 +1391,9 @@ JSONEditor.Node.prototype._move = function (node, beforeNode) {
 };
 
 /**
+ * 从节点中删除一个孩子。
+ * 仅在Node值为array或object类型时适用
+ * 
  * Remove a child from the node.
  * Only applicable when Node value is of type array or object
  * @param {JSONEditor.Node} node   The child node to be removed;
@@ -1272,6 +1425,10 @@ JSONEditor.Node.prototype.removeChild = function (node) {
 };
 
 /**
+ * 从此节点中删除子节点节点
+ * 此方法等于Node.removeChild，除了_remove firex an
+ * onChange事件。
+ * 
  * Remove a child node node from this node
  * This method is equal to Node.removeChild, except that _remove firex an
  * onChange event.
@@ -1283,6 +1440,8 @@ JSONEditor.Node.prototype._remove = function (node) {
 };
 
 /**
+ * 更改此节点的值的类型
+ * 
  * Change the type of the value of this Node
  * @param {String} newType
  */
@@ -1375,6 +1534,8 @@ JSONEditor.Node.prototype.changeType = function (newType) {
 };
 
 /**
+ * 从DOM中检索值
+ * 
  * Retrieve value from DOM
  * @param {boolean} silent.   If true (default), no errors will be thrown in
  *                            case of invalid data
@@ -1415,6 +1576,11 @@ JSONEditor.Node.prototype._getDomValue = function (silent) {
 };
 
 /**
+ * 更新dom值：
+ *  - 值的文本颜色，具体取决于值的类型
+ *  - 场地的高度，取决于宽度
+ *  - 背景颜色，以防它是空的
+ * 
  * Update dom value:
  * - the text color of the value, depending on the type of the value
  * - the height of the field, depending on the width
@@ -1471,6 +1637,12 @@ JSONEditor.Node.prototype._updateDomValue = function () {
 };
 
 /**
+ * 更新dom字段：
+ *  - 字段的文本颜色，具体取决于文本
+ *  - 场地的高度，取决于宽度
+ *  - 背景颜色，以防它是空的
+ * 
+ * 
  * Update dom field:
  * - the text color of the field, depending on the text
  * - the height of the field, depending on the width
@@ -1506,6 +1678,8 @@ JSONEditor.Node.prototype._updateDomField = function () {
 };
 
 /**
+ * 从DOM中检索字段
+ * 
  * Retrieve field from DOM
  * @param {boolean} silent.   If true (default), no errors will be thrown in
  *                            case of invalid data
@@ -1540,6 +1714,7 @@ JSONEditor.Node.prototype._getDomField = function (silent) {
 };
 
 /**
+ * 清除节点的dom
  * Clear the dom of the node
  */
 JSONEditor.Node.prototype.clearDom = function () {
@@ -1551,6 +1726,10 @@ JSONEditor.Node.prototype.clearDom = function () {
 };
 
 /**
+ * 
+ * 获取节点的HTML DOM TR元素。
+ * 尚未创建时将生成dom
+ * 
  * Get the HTML DOM TR element of the node.
  * The dom will be generated when not yet created
  * @return {Element} tr    HTML DOM TR Element
@@ -1561,12 +1740,14 @@ JSONEditor.Node.prototype.getDom = function () {
 		return dom.tr;
 	}
 
+	// 创建行
 	// create row
 	dom.tr = document.createElement('tr');
 	dom.tr.className = 'jsoneditor-tr';
 	dom.tr.node = this;
 
 	if (this.editor.editable) {
+		//创建可拖动区域
 		// create draggable area
 		var tdDrag = document.createElement('td');
 		tdDrag.className = 'jsoneditor-td';
@@ -1577,6 +1758,8 @@ JSONEditor.Node.prototype.getDom = function () {
 		dom.tr.appendChild(tdDrag);
 	}
 
+	
+	// 创建树和字段
 	// create tree and field
 	var tdField = document.createElement('td');
 	tdField.className = 'jsoneditor-td';
@@ -1588,6 +1771,8 @@ JSONEditor.Node.prototype.getDom = function () {
 	tdField.appendChild(dom.tree);
 
 	if (this.editor.editable) {
+
+		//创建类型选择框
 		// create type select box
 		var tdType = document.createElement('td');
 		tdType.className = 'jsoneditor-td jsoneditor-td-edit';
@@ -1595,6 +1780,7 @@ JSONEditor.Node.prototype.getDom = function () {
 		dom.type = this._createDomTypeButton();
 		tdType.appendChild(dom.type);
 
+		//创建重复按钮
 		// create duplicate button
 		var tdDuplicate = document.createElement('td');
 		tdDuplicate.className = 'jsoneditor-td jsoneditor-td-edit';
@@ -1604,6 +1790,7 @@ JSONEditor.Node.prototype.getDom = function () {
 			tdDuplicate.appendChild(dom.duplicate);
 		}
 
+		//  创建删除按钮
 		// create remove button
 		var tdRemove = document.createElement('td');
 		tdRemove.className = 'jsoneditor-td jsoneditor-td-edit';
@@ -1620,6 +1807,7 @@ JSONEditor.Node.prototype.getDom = function () {
 };
 
 /**
+ * DragStart事件，在节点左侧的dragarea上的mousedown上触发
  * DragStart event, fired on mousedown on the dragarea at the left side of a Node
  * @param {Event} event
  * @private
@@ -1663,6 +1851,7 @@ JSONEditor.Node.prototype._onDragStart = function (event) {
 };
 
 /**
+ * 拖动事件，在拖动节点时移动鼠标时触发
  * Drag event, fired when moving the mouse while dragging a Node
  * @param {Event} event
  * @private
@@ -1671,12 +1860,14 @@ JSONEditor.Node.prototype._onDrag = function (event) {
 	event = event || window.event;
 	var trThis = this.dom.tr;
 
+	// TODO：添加ESC选项，重置为原始位置
 	// TODO: add an ESC option, which resets to the original position
 
 	var topThis = JSONEditor.getAbsoluteTop(trThis);
 	var heightThis = trThis.offsetHeight;
 	var mouseY = event.pageY || (event.clientY + document.body.scrollTop);
 	if (mouseY < topThis) {
+		// 提升
 		// move up
 		var trPrev = trThis.previousSibling;
 		var topPrev = JSONEditor.getAbsoluteTop(trPrev);
@@ -1699,6 +1890,7 @@ JSONEditor.Node.prototype._onDrag = function (event) {
 			nodePrev.parent.moveBefore(this, nodePrev);
 		}
 	} else {
+		//向下移动
 		// move down
 		var trLast = (this.expanded && this.append) ? this.append.getDom() : this.dom.tr;
 		var trFirst = trLast ? trLast.nextSibling : undefined;
@@ -1725,6 +1917,8 @@ JSONEditor.Node.prototype._onDrag = function (event) {
 };
 
 /**
+ * 拖动事件，在拖动节点后触发鼠标
+ * 
  * Drag event, fired on mouseup after having dragged a node
  * @param {Event} event
  * @private
@@ -1740,6 +1934,7 @@ JSONEditor.Node.prototype._onDragEnd = function (event) {
 		'endIndex': this.parent.childs.indexOf(this)
 	};
 	if ((params.startParent != params.endParent) || (params.startIndex != params.endIndex)) {
+		//如果节点实际移动到另一个地方，则仅注册此操作
 		// only register this action if the node is actually moved to another place
 		this.editor.onAction('moveNode', params);
 	}
@@ -1762,6 +1957,7 @@ JSONEditor.Node.prototype._onDragEnd = function (event) {
 };
 
 /**
+ * 创建一个显示在节点左侧的拖动区域
  * Create a drag area, displayed at the left side of the node
  * @return {Element | undefined} domDrag
  * @private
@@ -1779,6 +1975,8 @@ JSONEditor.Node.prototype._createDomDragArea = function () {
 };
 
 /**
+ * 创建一个可编辑的字段
+ * 
  * Create an editable field
  * @return {Element} domField
  * @private
@@ -1788,6 +1986,9 @@ JSONEditor.Node.prototype._createDomField = function () {
 };
 
 /**
+ * 为此节点及其所有子节点设置突出显示。
+ * 仅适用于当前可见（扩展的孩子）
+ * 
  * Set highlighting for this node and all its childs.
  * Only applied to the currently visible (expanded childs)
  * @param {boolean} highlight
@@ -1813,6 +2014,9 @@ JSONEditor.Node.prototype.setHighlight = function (highlight) {
 };
 
 /**
+ * 更新节点的值。只允许原始类型，不允许使用Object
+ * 或数组是允许的。
+ * 
  * Update the value of the node. Only primitive types are allowed, no Object
  * or Array is allowed.
  * @param {String | Number | Boolean | null} value
@@ -1823,6 +2027,7 @@ JSONEditor.Node.prototype.updateValue = function (value) {
 };
 
 /**
+ * 更新节点的字段。
  * Update the field of the node.
  * @param {String} field
  */
@@ -1832,6 +2037,7 @@ JSONEditor.Node.prototype.updateField = function (field) {
 };
 
 /**
+ * HTML DOM，可选择通过子进程递归
  * Update the HTML DOM, optionally recursing through the childs
  * @param {Object} [options] Available parameters:
  *                          {boolean} [recurse]         If true, the
@@ -1842,21 +2048,25 @@ JSONEditor.Node.prototype.updateField = function (field) {
  *                          default.
  */
 JSONEditor.Node.prototype.updateDom = function (options) {
+	//更新级别缩进
 	// update level indentation
 	var domTree = this.dom.tree;
 	if (domTree) {
 		domTree.style.marginLeft = this.getLevel() * 24 + 'px';
 	}
 
+	//更新字段
 	// update field
 	var domField = this.dom.field;
 	if (domField) {
 		if (this.fieldEditable == true) {
+			// 亲 是一个对象
 			// parent is an object
 			domField.contentEditable = this.editor.editable;
 			domField.spellcheck = false;
 			domField.className = 'jsoneditor-field';
 		} else {
+			// parent是一个数组，这是根节点
 			// parent is an array this is the root node
 			domField.className = 'jsoneditor-readonly';
 		}
@@ -1874,6 +2084,7 @@ JSONEditor.Node.prototype.updateDom = function (options) {
 		domField.innerHTML = this._escapeHTML(field);
 	}
 
+	//更新值
 	// update value
 	var domValue = this.dom.value;
 	if (domValue) {
@@ -1890,17 +2101,23 @@ JSONEditor.Node.prototype.updateDom = function (options) {
 		}
 	}
 
+	//更新字段和值
 	// update field and value
 	this._updateDomField();
 	this._updateDomValue();
 
+	//更新子索引
+
 	// update childs indexes
 	if (options && options.updateIndexes == true) {
+		// updateIndexes为true或undefined 
+
 		// updateIndexes is true or undefined
 		this._updateDomIndexes();
 	}
 
 	if (options && options.recurse == true) {
+		// recurse是true还是undefined。递归更新子项
 		// recurse is true or undefined. update childs recursively
 		if (this.childs) {
 			this.childs.forEach(function (child) {
@@ -1908,6 +2125,7 @@ JSONEditor.Node.prototype.updateDom = function (options) {
 			});
 		}
 
+		//使用追加按钮更新行
 		// update row with append button
 		if (this.append) {
 			this.append.updateDom();
@@ -1916,6 +2134,9 @@ JSONEditor.Node.prototype.updateDom = function (options) {
 };
 
 /**
+ * 更新节点子节点的DOM：更新索引和未定义字段
+ * 名字。
+ * 仅在结构是数组或对象时适用
  * Update the DOM of the childs of a node: update indexes and undefined field
  * names.
  * Only applicable when structure is an array or object
@@ -1948,6 +2169,8 @@ JSONEditor.Node.prototype._updateDomIndexes = function () {
 };
 
 /**
+ * 创建可编辑的值
+ * 
  * Create an editable value
  * @private
  */
@@ -1983,6 +2206,8 @@ JSONEditor.Node.prototype._createDomValue = function () {
 };
 
 /**
+ * 创建展开/折叠按钮
+ * 
  * Create an expand/collapse button
  * @return {Element} expand
  * @private
@@ -2006,6 +2231,8 @@ JSONEditor.Node.prototype._createDomExpandButton = function () {
 
 
 /**
+ * 
+ * 创建一个DOM树元素，其中包含展开/折叠按钮
  * Create a DOM tree element, containing the expand/collapse button
  * @param {Element} domExpand
  * @param {Element} domField
@@ -2057,6 +2284,9 @@ JSONEditor.Node.prototype._createDomTree = function (domExpand, domField, domVal
 };
 
 /**
+ * 处理一个事件。该活动由编辑集中收集
+ * 
+ * 
  * Handle an event. The event is catched centrally by the editor
  * @param {Event} event
  */
@@ -2067,6 +2297,7 @@ JSONEditor.Node.prototype.onEvent = function (event) {
 	var node = this;
 	var expandable = (this.type == 'array' || this.type == 'object');
 
+	//值事件
 	// value events
 	var domValue = dom.value;
 	if (target == domValue) {
@@ -2099,6 +2330,7 @@ JSONEditor.Node.prototype.onEvent = function (event) {
 		}
 	}
 
+	//场事件
 	// field events
 	var domField = dom.field;
 	if (target == domField) {
@@ -2131,6 +2363,7 @@ JSONEditor.Node.prototype.onEvent = function (event) {
 		}
 	}
 
+	//拖动事件
 	// drag events
 	var domDrag = dom.drag;
 	if (target == domDrag) {
@@ -2146,7 +2379,7 @@ JSONEditor.Node.prototype.onEvent = function (event) {
 				break;
 		}
 	}
-
+	//展开事件
 	// expand events
 	var domExpand = dom.expand;
 	if (target == domExpand) {
@@ -2157,6 +2390,7 @@ JSONEditor.Node.prototype.onEvent = function (event) {
 		}
 	}
 
+	//重复按钮
 	// duplicate button
 	var domDuplicate = dom.duplicate;
 	if (target == domDuplicate) {
@@ -2179,6 +2413,7 @@ JSONEditor.Node.prototype.onEvent = function (event) {
 		}
 	}
 
+	//删除按钮
 	// remove button
 	var domRemove = dom.remove;
 	if (target == domRemove) {
@@ -2195,6 +2430,7 @@ JSONEditor.Node.prototype.onEvent = function (event) {
 		}
 	}
 
+	//键入按钮
 	// type button
 	var domType = dom.type;
 	if (target == domType) {
@@ -2210,6 +2446,9 @@ JSONEditor.Node.prototype.onEvent = function (event) {
 				break;
 		}
 	}
+
+	//焦点
+	//当从字段或值左侧或右侧单击空白时，设置焦点
 
 	// focus
 	// when clicked in whitespace left or right from the field or value, set focus
@@ -2362,6 +2601,7 @@ JSONEditor.Node.prototype._onChangeType = function (event) {
 };
 
 /**
+ * 显示下拉列表
  * Show a dropdown list
  * @param {Object} params    Available parameters:
  *                           {Number} x  The absolute horizontal position
@@ -2437,8 +2677,10 @@ JSONEditor.showDropDownList = function (params) {
 };
 
 /**
+ * 使用追加按钮创建表格行。
+ * 
  * Create a table row with an append button.
- * @return {Element | undefined} buttonAppend or undefined when inapplicable
+ * @return {Element | undefined} buttonAppend or undefined when inapplicable  buttonAppend或undefined在不适用时
  */
 JSONEditor.Node.prototype.getAppend = function () {
 	if (!this.append) {
@@ -2449,6 +2691,9 @@ JSONEditor.Node.prototype.getAppend = function () {
 };
 
 /**
+ * 创建一个删除按钮。当结构不能时，返回undefined
+ * 被删除
+ * 
  * Create a remove button. Returns undefined when the structure cannot
  * be removed
  * @return {Element | undefined} removeButton, or undefined when inapplicable
@@ -2467,6 +2712,10 @@ JSONEditor.Node.prototype._createDomRemoveButton = function () {
 };
 
 /**
+ * 创建一个重复按钮。
+ * 如果节点是根节点，则没有重复按钮可用且未定义
+ * 将被退回
+ * 
  * Create a duplicate button.
  * If the Node is the root node, no duplicate button is available and undefined
  * will be returned
@@ -2486,6 +2735,8 @@ JSONEditor.Node.prototype._createDomDuplicateButton = function () {
 };
 
 /**
+ * 获取值的类型
+ * 
  * get the type of a value
  * @param {*} value
  * @return {String} type   Can be 'object', 'array', 'string', 'auto'
@@ -2506,6 +2757,10 @@ JSONEditor.Node.prototype._getType = function (value) {
 };
 
 /**
+ * 将字符串的内容强制转换为正确的类型。这可以是一个字符串，
+ * 数字，布尔值等
+ * 
+ * 
  * cast contents of a string to the correct type. This can be a string,
  * a number, a boolean, etc
  * @param {String} str
@@ -2533,6 +2788,8 @@ JSONEditor.Node.prototype._stringCast = function (str) {
 };
 
 /**
+ * 转义文本，以便它可以安全地显示在HTML元素中
+ * 
  * escape a text, such that it can be displayed safely in an HTML element
  * @param {String} text
  * @return {String} escapedText
@@ -2551,6 +2808,8 @@ JSONEditor.Node.prototype._escapeHTML = function (text) {
 };
 
 /**
+ * 逃避json
+ * 
  * unescape a string.
  * @param {String} escapedText
  * @return {String} text
@@ -2565,6 +2824,11 @@ JSONEditor.Node.prototype._unescapeHTML = function (escapedText) {
 };
 
 /**
+ * 转义文本以使其成为有效的JSON字符串。该方法将：
+ *  - 用'\''替换未转义的双引号
+ *  - 用'\\'替换未转义的反斜杠
+ *  - 用'\ n'替换返回
+ * 
  * escape a text to make it a valid JSON string. The method will:
  *   - replace unescaped double quotes with '\"'
  *   - replace unescaped backslash with '\\'
@@ -2608,6 +2872,10 @@ JSONEditor.Node.prototype._escapeJSON = function (text) {
  * @param {JSONEditor} editor
  * Create a new AppendNode. This is a special node which is created at the
  * end of the list with childs for an object or array
+ * 
+ * 创建一个新的AppendNode。这是一个特殊的节点，它是在
+ * 带有子对象或数组的列表末尾
+ * 
  */
 JSONEditor.AppendNode = function (editor) {
 	this.editor = editor;
@@ -2617,6 +2885,8 @@ JSONEditor.AppendNode = function (editor) {
 JSONEditor.AppendNode.prototype = new JSONEditor.Node();
 
 /**
+ * 返回带有追加按钮的表格行。
+ * 
  * Return a table row with an append button.
  * @return {Element} dom   TR element
  */
@@ -2684,6 +2954,9 @@ JSONEditor.AppendNode.prototype.updateDom = function () {
 };
 
 /**
+ * 
+ * 处理一个事件。该活动由编辑集中收集
+ * 
  * Handle an event. The event is catched centrally by the editor
  * @param {Event} event
  */
@@ -2710,6 +2983,8 @@ JSONEditor.AppendNode.prototype.onEvent = function (event) {
 };
 
 /**
+ * 处理追加事件
+ * 
  * Handle append event
  * @private
  */
@@ -2729,6 +3004,10 @@ JSONEditor.AppendNode.prototype._onAppend = function () {
 };
 
 /**
+ * 
+ * 创建主框架
+ * 
+ * 
  * Create main frame
  * @private
  */
@@ -2791,6 +3070,15 @@ JSONEditor.prototype._createFrame = function () {
 		// prevent default submit action when JSONEditor is located inside a form
 		JSONEditor.Events.preventDefault(event);
 	};
+	this.frame.oncontextmenu = function (event) {
+		onEvent(event);
+
+		console.log(event)
+		// prevent default submit action when JSONEditor is located inside a form
+		JSONEditor.Events.preventDefault(event);
+	};
+
+	
 	this.frame.onchange = onEvent;
 	this.frame.onkeydown = onEvent;
 	this.frame.onkeyup = onEvent;
@@ -2886,6 +3174,8 @@ JSONEditor.prototype._createFrame = function () {
 
 
 /**
+ * 创建主表
+ * 
  * Create main table
  * @private
  */
@@ -2936,6 +3226,8 @@ JSONEditor.prototype._createTable = function () {
 };
 
 /**
+ * 从事件目标中查找节点
+ * 
  * Find the node from an event target
  * @param {Element} target
  * @return {JSONEditor.Node | undefined} node  or undefined when not found
@@ -2952,6 +3244,9 @@ JSONEditor.getNodeFromTarget = function (target) {
 };
 
 /**
+ * 
+ * 创建一个JSONFormatter并将其附加到给定的容器
+ * 
  * Create a JSONFormatter and attach it to given container
  * @constructor JSONFormatter
  * @param {Element} container
@@ -3081,6 +3376,7 @@ JSONFormatter.prototype.set = function (json) {
 };
 
 /**
+ * 从格式化程序中获取json数据
  * Get json data from the formatter
  * @return {Object} json
  */
@@ -3089,6 +3385,7 @@ JSONFormatter.prototype.get = function () {
 };
 
 /**
+ * 获取JSONFormatter的文本内容
  * Get the text contents of the JSONFormatter
  * @return {String} text
  */
@@ -3097,6 +3394,7 @@ JSONFormatter.prototype.getText = function () {
 };
 
 /**
+ * 格式化程序
  * Set the text contents of the JSONFormatter
  * @param {String} text
  */
@@ -3211,6 +3509,7 @@ JSONEditor.SearchBox = function (editor, container) {
 };
 
 /**
+ * 转到下一个搜索结果
  * Go to the next search result
  */
 JSONEditor.SearchBox.prototype.next = function () {
@@ -3224,6 +3523,8 @@ JSONEditor.SearchBox.prototype.next = function () {
 };
 
 /**
+ * 转到上一个搜索结果
+ * 
  * Go to the prevous search result
  */
 JSONEditor.SearchBox.prototype.previous = function () {
@@ -3238,6 +3539,7 @@ JSONEditor.SearchBox.prototype.previous = function () {
 };
 
 /**
+ * 为当前活动结果设置新值
  * Set new value for the current active result
  * @param {Number} index
  */
@@ -3278,6 +3580,9 @@ JSONEditor.SearchBox.prototype.setActiveResult = function (index) {
 };
 
 /**
+ * 将焦点设置为当前活动的结果。如果目前没有
+ * 有效结果，下一个搜索结果将获得焦点
+ * 
  * Set the focus to the currently active result. If there is no currently
  * active result, the next search result will get focus
  */
@@ -3292,6 +3597,8 @@ JSONEditor.SearchBox.prototype.focusActiveResult = function () {
 };
 
 /**
+ * *取消任何正在运行的onDelayedSearch。
+ * 
  * Cancel any running onDelayedSearch.
  */
 JSONEditor.SearchBox.prototype.clearDelay = function () {
@@ -3302,6 +3609,9 @@ JSONEditor.SearchBox.prototype.clearDelay = function () {
 };
 
 /**
+ * 启动计时器以在短暂延迟后执行搜索。
+ * 用于在键入时减少搜索次数。
+ * 
  * Start a timer to execute a search after a short delay.
  * Used for reducing the number of searches while typing.
  * @param {Event} event
@@ -3318,6 +3628,8 @@ JSONEditor.SearchBox.prototype.onDelayedSearch = function (event) {
 };
 
 /**
+ * 处理onSearch事件
+ * 
  * Handle onSearch event
  * @param {Event} event
  * @param {boolean} [forceSearch]  If true, search will be executed again even
@@ -3353,6 +3665,8 @@ JSONEditor.SearchBox.prototype.onSearch = function (event, forceSearch) {
 };
 
 /**
+ * 在输入框中处理onKeyDown事件
+ * 
  * Handle onKeyDown event in the input box
  * @param {Event} event
  */
@@ -3381,6 +3695,8 @@ JSONEditor.SearchBox.prototype.onKeyDown = function (event) {
 };
 
 /**
+ * 在输入框中处理onKeyUp事件
+ * 
  * Handle onKeyUp event in the input box
  * @param {Event} event
  */
@@ -3396,6 +3712,8 @@ JSONEditor.SearchBox.prototype.onKeyUp = function (event) {
 JSONEditor.Events = {};
 
 /**
+ * 添加和事件监听器。适用于所有浏览器
+ * 
  * Add and event listener. Works for all browsers
  * @param {Element}     element    An html element
  * @param {string}      action     The action, for example "click",
@@ -3425,6 +3743,8 @@ JSONEditor.Events.addEventListener = function (element, action, listener, useCap
 };
 
 /**
+ * 从元素中删除事件侦听器
+ * 
  * Remove an event listener from an element
  * @param {Element}  element   An html dom element
  * @param {string}   action    The name of the event, for example "mousedown"
@@ -3449,6 +3769,8 @@ JSONEditor.Events.removeEventListener = function (element, action, listener, use
 
 
 /**
+ * 停止事件传播
+ * 
  * Stop event propagation
  * @param {Event} event
  */
@@ -3464,6 +3786,8 @@ JSONEditor.Events.stopPropagation = function (event) {
 
 
 /**
+ * 如果事件可以取消，则取消该事件，而不停止事件的进一步传播。
+ * 
  * Cancels the event if it is cancelable, without stopping further propagation of the event.
  * @param {Event} event
  */
@@ -3480,6 +3804,8 @@ JSONEditor.Events.preventDefault = function (event) {
 
 
 /**
+ * 检索DOM元素的绝对左值
+ * 
  * Retrieve the absolute left value of a DOM element
  * @param {Element} elem    A dom element, for example a div
  * @return {Number} left    The absolute left position of this element
@@ -3497,6 +3823,8 @@ JSONEditor.getAbsoluteLeft = function (elem) {
 };
 
 /**
+ * 检索DOM元素的绝对顶值
+ * 
  * Retrieve the absolute top value of a DOM element
  * @param {Element} elem    A dom element, for example a div
  * @return {Number} top    The absolute top position of this element
@@ -3514,6 +3842,8 @@ JSONEditor.getAbsoluteTop = function (elem) {
 };
 
 /**
+ * 将className添加到给定的元素样式
+ * 
  * add a className to the given elements style
  * @param {Element} elem
  * @param {String} className
@@ -3527,6 +3857,8 @@ JSONEditor.addClassName = function (elem, className) {
 };
 
 /**
+ * 将className添加到给定的元素样式
+ * 
  * add a className to the given elements style
  * @param {Element} elem
  * @param {String} className
@@ -3540,7 +3872,11 @@ JSONEditor.removeClassName = function (elem, className) {
 	}
 };
 
-/**
+/** 
+ * 从div的内容中删除格式
+ * div本身的格式不会被剥离，只能从其子节点中删除。
+ * 
+ * 
  * Strip the formatting from the contents of a div
  * the formatting from the div itself is not stripped, only from its childs.
  * @param {Element} divElement
@@ -3572,7 +3908,10 @@ JSONEditor.stripFormatting = function (divElement) {
 	}
 };
 
-/**
+/** 
+ * 将焦点设置为可编辑div的末尾
+ * 来自Nico Burns的代码
+ * 
  * Set focus to the end of an editable div
  * code from Nico Burns
  * http://stackoverflow.com/users/140293/nico-burns
@@ -3597,6 +3936,9 @@ JSONEditor.setEndOfContentEditable = function (contentEditableElement) {
 };
 
 /**
+ * 
+ * 获取HTML元素的内部文本（例如div元素）
+ * 
  * Get the inner text of an HTML element (for example a div element)
  * @param {Element} element
  * @param {Object} [buffer]
@@ -3618,11 +3960,13 @@ JSONEditor.getInnerText = function (element, buffer) {
 		};
 	}
 
+	// 文本节点
 	// text node
 	if (element.nodeValue) {
 		return buffer.flush() + element.nodeValue;
 	}
 
+	// div或其他HTML元素
 	// divs or other HTML elements
 	if (element.hasChildNodes()) {
 		var childNodes = element.childNodes;
@@ -3651,6 +3995,12 @@ JSONEditor.getInnerText = function (element, buffer) {
 		return innerText;
 	} else {
 		if (element.nodeName == 'P' && JSONEditor.getInternetExplorerVersion() != -1) {
+			//在Internet Explorer上，带有hasChildNodes（）== false的<p>是
+			//用新行渲染。注意一个<p>用
+			// hasChildNodes（）== true呈现时没有换行
+			//其他浏览器总是确保<p>中有一个<br>，
+			//如果没有，<p>不会呈现新行
+
 			// On Internet Explorer, a <p> with hasChildNodes()==false is
 			// rendered with a new line. Note that a <p> with
 			// hasChildNodes()==true is rendered without a new line
@@ -3665,6 +4015,9 @@ JSONEditor.getInnerText = function (element, buffer) {
 };
 
 /**
+ * 返回Internet Explorer的版本或-1
+ *（表示使用其他浏览器）。
+ * 
  * Returns the version of Internet Explorer or a -1
  * (indicating the use of another browser).
  * Source: http://msdn.microsoft.com/en-us/library/ms537509(v=vs.85).aspx
@@ -3691,6 +4044,9 @@ JSONEditor.getInternetExplorerVersion = function () {
 JSONEditor.ieVersion = JSONEditor.getInternetExplorerVersion();
 
 /**
+ * 使用浏览器内置的解析器解析JSON。
+ * 异常时，验证jsonString并抛出详细错误。
+ * 
  * Parse JSON using the parser built-in in the browser.
  * On exception, the jsonString is validated and a detailed error is thrown.
  * @param {String} jsonString
@@ -3706,6 +4062,11 @@ JSONEditor.parse = function (jsonString) {
 };
 
 /**
+ * 验证包含JSON对象的字符串
+ * 此方法使用JSONLint验证String。如果没有JSONLint
+ * 可用，使用浏览器的内置JSON解析器。
+ * 
+ * 
  * Validate a string containing a JSON object
  * This method uses JSONLint to validate the String. If JSONLint is not
  * available, the built-in JSON parser of the browser is used.

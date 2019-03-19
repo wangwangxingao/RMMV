@@ -163,6 +163,18 @@ ww.scenceWindowChange.changeScene = function (scene) {
     }
 }
 
+ww.scenceWindowChange.changeNowScene = function (sceneSet, scene) {
+    var scene = scene || SceneManager._scene
+    if (scene && sceneSet) {
+        for (var i in sceneSet) {
+            var sprite = scene[i]
+            var set = sceneSet[i]
+            console.log(sprite, set)
+            this.changeSprite(sprite, set)
+        }
+    }
+}
+
 ww.scenceWindowChange.changeSprite = function (sprite, set) {
 
     if (sprite && set) {

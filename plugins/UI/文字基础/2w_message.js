@@ -2096,7 +2096,8 @@ Window_Message.prototype.processDrawCharacter = function (textState) {
                 //this.clearFace()
                 this.resetFontSettings();
                 this.clearlineShowFast();
-            case "addpage":
+                this.clearSkipFlags()
+                case "addpage":
                 textState.page = obj;
                 var page = obj
                 this.contents.clear();
@@ -2110,7 +2111,6 @@ Window_Message.prototype.processDrawCharacter = function (textState) {
                         this.updatePlacement();
                     }
                 }
-                this.clearSkipFlags()
                 break
             case "gold":
                 this._goldWindow.open();

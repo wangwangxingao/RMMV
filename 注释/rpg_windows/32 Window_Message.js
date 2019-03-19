@@ -98,19 +98,30 @@ Window_Message.prototype.update = function() {
     //检查不要关闭()
     this.checkToNotClose();
     Window_Base.prototype.update.call(this);
+    //循环(不是 是打开中() 并且  不是 是关闭中())
     while (!this.isOpening() && !this.isClosing()) {
+        //如果(更新等待())
         if (this.updateWait()) {
+            //返回
             return;
         } else if (this.updateLoading()) {
+            //返回
             return;
         } else if (this.updateInput()) {
+            //返回
             return;
         } else if (this.updateMessage()) {
+            //返回
             return;
+        //否则 如果(能开始())
         } else if (this.canStart()) {
+            //开始消息()
             this.startMessage();
+        //否则
         } else {
+            //开始输入()
             this.startInput();
+            //返回
             return;
         }
     }
@@ -190,19 +201,29 @@ Window_Message.prototype.updateLoading = function() {
 };
 /**更新输入 */
 Window_Message.prototype.updateInput = function() {
+    //如果(是任何辅助窗口活动())
     if (this.isAnySubWindowActive()) {
+        //返回 true
         return true;
     }
+    //如果(暂停)
     if (this.pause) {
+        //如果(是触发())
         if (this.isTriggered()) {
+            //输入 更新()
             Input.update();
+            //暂停 = false
             this.pause = false;
+            //如果(不是 文本状态)
             if (!this._textState) {
+                //终止消息()
                 this.terminateMessage();
             }
         }
+        //返回 true
         return true;
     }
+    //返回 false
     return false;
 };
 /**是任何辅助窗口活动 */
