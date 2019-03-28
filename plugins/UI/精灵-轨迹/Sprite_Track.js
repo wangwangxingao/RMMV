@@ -4,15 +4,6 @@ ww.draw = {}
 
 
 
-ww.draw.test = function () {
-
-
-    s = new Sprite_Track(620, 350);
-    SceneManager._scene.addChild(s)
-    ww.draw._test = s
-    return s
-
-}
 
 
 ww.draw.drawSetStyle = function (context, style) {
@@ -76,7 +67,7 @@ Sprite_Track.prototype.constructor = Sprite_Track;
 /**初始化 */
 Sprite_Track.prototype.initialize = function (w, h, add) {
     Sprite.prototype.initialize.call(this);
-    this.bitmap = new Bitmap(w, h)
+    this.resizeBitmap(w, h)
     this._pointX = 0
     this._pointY = 0
     this._lineSet = {
@@ -89,9 +80,9 @@ Sprite_Track.prototype.initialize = function (w, h, add) {
     this._isTouch = false
     this._canTouch = true
 
-    this._touchId = 0
+    this._strokeId = 0
 
-    this._char = new ww.track.char(w, h)
+    this._char = new ww.track.char()
 
     if (!add) {
         this._add = new Sprite_Track(w, h, true)
@@ -121,7 +112,6 @@ Sprite_Track.prototype.setLineSet = function (set) {
 
 Sprite_Track.prototype.char = function () {
     ww.track.eval(this._char)
-
     this.drawAdd()
     return this._char
 };
@@ -129,11 +119,10 @@ Sprite_Track.prototype.char = function () {
 Sprite_Track.prototype.drawAdd = function () {
     if (this._add) {
         this._add.clear()
-        var tmpPoint = null
         var character = this._char.eval
         for (var i = 0; i < character.strokes.length; i++) {
             var stroke = character.strokes[i];
-            var tmpPoint;
+            var tmpPoint = 0;
             for (var j = 0; j < stroke.length; j++) {
                 if (tmpPoint) {
                     tmpPoint = stroke[j];
@@ -151,8 +140,11 @@ Sprite_Track.prototype.drawAdd = function () {
 
 Sprite_Track.prototype.clear = function () {
     this.bitmap.clear()
-    this._touchId = 0
+    this._strokeId = 0
     this._char.clear()
+    if (this._add) {
+        this._add.clear()
+    }
 };
 
 
@@ -160,7 +152,7 @@ Sprite_Track.prototype.moveTo = function (x, y) {
     this._pointX = x
     this._pointY = y
     //console.log(x, y)
-    this._char.addPoint(this._touchId, x, y)
+    this._char.addPoint(this._strokeId, x, y)
 };
 
 
@@ -179,7 +171,6 @@ Sprite_Track.prototype.drawLine = function (x, y, x2, y2, line) {
         ["moveTo", x, y],
         ["lineTo", x2, y2],
         line,
-        //"closePath",
         "stroke",
         "restore",
     ]
@@ -209,7 +200,7 @@ Sprite_Track.prototype.updateDraw = function () {
         if (TouchInput.isTriggered() || TouchInput.isMoved()) {
             if (!this._isTouch) {
                 this._isTouch = true
-                this._touchId++
+                this._strokeId++
                 var xyv = this.xyToThis(TouchInput.x, TouchInput.y)
                 this.moveTo(xyv[0], xyv[1])
             } else {
@@ -269,116 +260,9 @@ var ww = ww || {}
 ww.track = (function () {
 
     var MAXFLOAT = Infinity
-
-    var DEAFULT_WIDTH = 1000
-    var DEAFULT_HEIGHT = 1000
-
     var MAX_DIFF_PER_STROKE = 35
-    var MAX_DIRETION = 1000
-    var VERTICAL = 1001
-    var HORIZONTAL = 1002
-    /**
-     * 
-     * @param {Point} lastPoint  
-     * @param {Point} startPoint 
-     */
-    function dir(lastPoint, startPoint) {
-        var result = -1;
-        result = Math.atan2(startPoint.y - lastPoint.y, startPoint.x - lastPoint.x) * 10;
-        return result;
-    }
 
-
-    function distance(lastPoint, startPoint) {
-        var result = -1;
-        result = Math.abs(startPoint.y - lastPoint.y) + Math.abs(startPoint.x - lastPoint.x) * 10;
-        return result;
-    }
-
-    /**
-     * 
-     * @param {Character} character 
-     */
-    function norm(character) {
-        var lastPoint = {};
-        lastPoint.x = -1;
-        lastPoint.y = -1;
-        for (var i = 0; i < character.strokes.length; i++) {
-            var stroke = character.strokes[i];
-            var tmpPoint;
-            for (var j = 0; j < stroke.length; j++) {
-                tmpPoint = stroke[j];
-                tmpPoint.dir = (lastPoint.x == -1 && lastPoint.y == -1) ? 0 : dir(lastPoint, tmpPoint);
-                lastPoint = tmpPoint;
-            }
-        }
-    };
-
-    /**
-     * 
-     * @param {Character} character 
-     */
-    function long(character) {
-        var lastPoint = {};
-        lastPoint.x = -1;
-        lastPoint.y = -1;
-        lastPoint.d = -1;
-        for (var i = 0; i < character.strokes.length; i++) {
-            var stroke = character.strokes[i];
-            var tmpPoint;
-            for (var j = 0; j < stroke.length; j++) {
-                tmpPoint = stroke[j];
-                tmpPoint.d = (lastPoint.x == -1 && lastPoint.y == -1) ? 0 : distance(lastPoint, tmpPoint);
-                tmpPoint.dn = (lastPoint.d <= 0) ? 0 : tmpPoint.d / lastPoint.d
-                lastPoint = tmpPoint;
-            }
-        }
-    };
-
-
-
-    /**
-     *  跳转点
-     * @param {Stroke} stroke  
-     * @param {*} points 
-     * @param {any} pointIndex1
-     * @param {*} pointIndex2 
-     */
-    function strokeSize(stroke) {
-
-        var point = stroke[0];
-
-        if (point) {
-            var maxx = point.x
-            var minx = point.x
-            var maxy = point.y
-            var miny = point.y
-        } else {
-            return 0
-        }
-        for (var i = 1; i < stroke.length; i++) {
-            var point = stroke[i];
-            var x = point.x
-            var y = point.y
-            if (x > maxx) {
-                maxx = x
-            } else if (x < minx) {
-                minx = x
-            }
-            if (y > maxy) {
-                maxy = y
-            } else if (y < miny) {
-                miny = y
-            }
-        }
-        return Math.max(maxx - minx, maxy - miny) * 0.001
-
-    }
-
-
-
-
-    var MaxValue = 10000
+    var MaxValue = 1000
     function getMax() {
         return MaxValue
     }
@@ -396,14 +280,147 @@ ww.track = (function () {
         return MaxDirValue = v
     }
 
+    /**
+     * 
+     * @param {Point} lastPoint  
+     * @param {Point} startPoint 
+     */
+    function dir(lastPoint, startPoint) {
+        var result = Math.atan2(startPoint.y - lastPoint.y, startPoint.x - lastPoint.x) * 10;
+        return result;
+    }
+
+
+    function xydist(lastPoint, startPoint) {
+        var result = Math.abs(startPoint.x - lastPoint.x) + Math.abs(startPoint.y - lastPoint.y);
+        return result;
+    }
+
+    function distance(lastPoint, startPoint) {
+        var x = startPoint.x - lastPoint.x
+        var y = startPoint.y - lastPoint.y
+        return x * x + y * y
+    }
 
     /**
-     *  跳转点
-     * @param {Stroke} stroke  
-     * @param {[]} points 
-     * @param {number} pointIndex1
-     * @param {number} pointIndex2 
-     * @param {number} size 
+     * 
+     * @param {Character} character 
+     */
+    function evalDir(character) {
+        var lastPoint = 0
+        var tmpPoint;
+        for (var i = 0; i < character.strokes.length; i++) {
+            var stroke = character.strokes[i];
+            for (var j = 0; j < stroke.length; j++) {
+                tmpPoint = stroke[j];
+                tmpPoint.dir = (lastPoint) ? dir(lastPoint, tmpPoint) : 0;
+                lastPoint = tmpPoint;
+            }
+        }
+    };
+
+    /**
+     * 计算的长度
+     * @param {Character} character 
+     */
+    function evalDist(character) {
+        var lastPoint = 0
+        var tmpPoint;
+        for (var i = 0; i < character.strokes.length; i++) {
+            var stroke = character.strokes[i];
+            for (var j = 0; j < stroke.length; j++) {
+                tmpPoint = stroke[j];
+                tmpPoint.dist = lastPoint ? distance(lastPoint, tmpPoint) : 0;
+                lastPoint = tmpPoint;
+            }
+        }
+    };
+
+
+
+    /**
+     * 全部轨迹跨度
+     * @param {Character} character  
+     */
+    function characterSize(character) {
+        var maxx = 0
+        var minx = 0
+        var maxy = 0
+        var miny = 0
+        var startpoint = 0
+        for (var i = 0; i < character.strokes.length; i++) {
+            var stroke = character.strokes[i];
+            for (var i2 = 0; i2 < stroke.length; i2++) {
+                var point = stroke[i2];
+                if (point) {
+                    if (!startpoint) {
+                        var maxx = point.x
+                        var minx = point.x
+                        var maxy = point.y
+                        var miny = point.y
+                        var startpoint = point
+                    } else {
+                        var x = point.x
+                        var y = point.y
+                        if (x > maxx) { maxx = x } else if (x < minx) { minx = x }
+                        if (y > maxy) { maxy = y } else if (y < miny) { miny = y }
+                    }
+                }
+            }
+        }
+
+        var z = Math.max(maxx - minx, maxy - miny)
+        return z
+    }
+
+
+
+    /**
+     * 单个轨迹跨度
+     * @param {Stroke} stroke   
+     */
+    function strokeSize(stroke) {
+        var maxx = 0
+        var minx = 0
+        var maxy = 0
+        var miny = 0
+        var startpoint = 0
+        var maxdist = 0
+        var index = -1
+        for (var i2 = 0; i2 < stroke.length; i2++) {
+            var point = stroke[i2];
+            if (point) {
+                if (!startpoint) {
+                    var maxx = point.x
+                    var minx = point.x
+                    var maxy = point.y
+                    var miny = point.y
+                    var startpoint = point
+                } else {
+                    var dist = xydist(point, startpoint)
+                    if (dist > maxdist) {
+                        maxdist = dist
+                        index = i2
+                    }
+                    var x = point.x
+                    var y = point.y
+                    if (x > maxx) { maxx = x } else if (x < minx) { minx = x }
+                    if (y > maxy) { maxy = y } else if (y < miny) { miny = y }
+                }
+            }
+        }
+        var z = Math.max(maxx - minx, maxy - miny)
+        return [z, index]
+    }
+
+
+    /**
+     * 跳转点
+     * @param {Stroke} stroke  轨迹
+     * @param {[]} points 输出数组
+     * @param {number} pointIndex1 开始索引
+     * @param {number} pointIndex2 结束索引
+     * @param {number} size 轨迹大小
      */
     function turnPoints(stroke, points, pointIndex1, pointIndex2, size) {
         if (pointIndex1 < 0 || pointIndex2 <= 0 || pointIndex1 >= pointIndex2 - 1) {
@@ -413,20 +430,16 @@ ww.track = (function () {
         var b = stroke[pointIndex2].y - stroke[pointIndex1].y;
         var c = stroke[pointIndex1].x * stroke[pointIndex2].y - stroke[pointIndex2].x * stroke[pointIndex1].y;
         var max = getMax() * size;
-        console.log(max)
-        //var maxDir = getDirMax()
         var maxDistPointIndex = -1;
+        console.log(max)
         for (var i = pointIndex1 + 1; i < pointIndex2; i++) {
             var point = stroke[i];
             var dist = Math.abs((a * point.y) - (b * point.x) + c);
-            //var dir = Math.abs(Math.atan2(a, b) - Math.atan2(point.x - stroke[pointIndex1].x, point.y - stroke[pointIndex1].y))
-            //td:: cout << dist << std:: endl;
             console.log(dist)
             if (dist > max) {
                 max = dist;
                 maxDistPointIndex = i;
             }
-            //if (dir > maxDir) {maxDir = dir ;maxDistPointIndex = i; }
         }
         if (maxDistPointIndex != -1) {
             turnPoints(stroke, points, pointIndex1, maxDistPointIndex, size);
@@ -434,57 +447,66 @@ ww.track = (function () {
             turnPoints(stroke, points, maxDistPointIndex, pointIndex2, size);
         }
     }
-    /**
-     *  
-     * @param {Character} character 
-    function getTurnPoints(character) {
 
-        for (var i = 0; i < character.strokes.length; i++) {
-            var stroke = character.strokes[i];
-            if (stroke.length > 1) {
-                //std:: vector < Point > points;
-                var points = []
-                points.push(stroke[0]);
-                turnPoints(stroke, points, 0, stroke.length - 1);
-                points.push(stroke[stroke.length - 1]);
-                stroke.length = 0;
-                for (var i2 = 0; i2 < points.length; i2++) {
-                    stroke.push(points[i2]);
-                }
+    function turnPoints2(stroke, points, pointIndex1, pointIndex2, size) {
+        if (pointIndex1 < 0 || pointIndex2 <= 0 || pointIndex1 >= pointIndex2 - 1) {
+            return;
+        }
+        var a = stroke[pointIndex1];
+        var b = stroke[pointIndex2];
+
+        var dist = xydist(a, b)
+        var max = dist;
+        var maxDistPointIndex = -1;
+        for (var i = pointIndex1 + 1; i < pointIndex2; i++) {
+            var c = stroke[i];
+            var dist = xydist(a, c);
+            if (dist > max) {
+                max = dist;
+                maxDistPointIndex = i;
             }
         }
-        //console.log(charccter);
-        return character
+        if (maxDistPointIndex != -1) {
+            turnPoints(stroke, points, pointIndex1, maxDistPointIndex, size);
+            points.push(stroke[maxDistPointIndex]);
+            turnPoints(stroke, points, maxDistPointIndex, pointIndex2, size);
+        }
     }
 
-    */
+
 
     /**
      *  获取跳转点
      * @param {Character} character 
      */
     function getTurnPoints(character) {
-        var c = new Character(this.width, this.height)
-
+        var c = new Character()
+        var size = characterSize(character)
         for (var i = 0; i < character.strokes.length; i++) {
             var stroke = character.strokes[i];
-
-            if (stroke.length > 1) {
+            //获取结果缓存
+            if (character.evals[i]) {
+                c.strokes.push(character.evals[i]);
+            } else if (stroke.length > 1) {
                 var stroke2 = [];
-                c.strokes.push(stroke2);
-
                 var size = strokeSize(stroke)
+                var index = size[1]
+                var size = (size[0] * size[0]) * 0.0001
 
-                console.log(size,"size")
-                var points = []
-                points.push(stroke[0]);
-                turnPoints(stroke, points, 0, stroke.length - 1, size);
-                points.push(stroke[stroke.length - 1]);
-
-                for (var i2 = 0; i2 < points.length; i2++) {
-                    stroke2.push(points[i2]);
+                stroke2.push(stroke[0]);
+                if (index > 0 && index != stroke2.length - 1) {
+                    turnPoints(stroke, stroke2, 0, index, size);
+                    stroke2.push(stroke[index]);
+                } else {
+                    index = 0
                 }
-                console.log(i, points.length)
+                turnPoints(stroke, stroke2, index, stroke.length - 1, size);
+                stroke2.push(stroke[stroke.length - 1]);
+
+                character.evals[i] = stroke2
+
+                c.strokes.push(stroke2);
+                console.log(i, stroke2.length)
             }
         }
         //console.log(charccter);
@@ -492,12 +514,16 @@ ww.track = (function () {
     }
 
 
+    /**
+     * 计算
+     * @param {Character} character 
+     * 
+     */
     function evalCharacter(character) {
-
         if (!character.eval) {
             character.eval = getTurnPoints(character)
-            norm(character.eval)
-            long(character.eval)
+            evalDir(character.eval)
+            evalDist(character.eval)
         }
         return character.eval
     }
@@ -509,7 +535,6 @@ ww.track = (function () {
      */
     function distBetweenStrokes(stroke1, stroke2) {
         var strokeDist = MAXFLOAT;
-        //std:: cout << "Stroke size::" << stroke1.length << " " << stroke2.length << std:: endl; 
         var dist = 0// 0.0f;
         var minLength = Math.min(stroke1.length, stroke2.length);
         var largeStroke = stroke1.length > minLength ? stroke1 : stroke2;
@@ -519,23 +544,6 @@ ww.track = (function () {
             var diretion2 = smallStroke[j].dir;
 
             dist += Math.abs(diretion1 - diretion2);
-            //console.log(diretion1, diretion2, VERTICAL, HORIZONTAL)
-            // 垂直笔画处理
-            /*if (diretion1 == VERTICAL && diretion2 == VERTICAL) {
-                dist += Math.abs(0.1);
-                // 水平笔画处理
-            } else if (Math.abs(diretion1) == HORIZONTAL && Math.abs(diretion2) == HORIZONTAL) {
-                dist += Math.abs(diretion1 - diretion2);
-            } else {
-                if (Math.abs(diretion1) == HORIZONTAL) {
-                    diretion1 = 0.1;
-                }
-                if (Math.abs(diretion2) == HORIZONTAL) {
-                    diretion2 = 0.1;
-                }
-                dist += Math.abs(diretion1 - diretion2);
-            }
-            */
         }
         // 当前笔与上一笔的largeStroke位置
         dist += Math.abs(largeStroke[0].dir - smallStroke[0].dir);
@@ -551,12 +559,11 @@ ww.track = (function () {
      * @param {Character} c1  
      * @param {Character} c2 
      */
-    function dist(c1, c2) {
+    function chardist(c1, c2) {
         var character1 = evalCharacter(c1)
         var character2 = evalCharacter(c2)
         var dist = MAXFLOAT;
         if (character2.strokes.length >= character1.strokes.length && character2.strokes.length <= character1.strokes.length + 2) {
-            //std:: cout << character1.word << ":" << character1.strokeCount << "." << character2.word << ":" << character2.strokeCount << std:: endl;
             var allStrokeDist = 0.0;
             for (var i = 0; i < character1.strokes.length; i++) {
                 var stroke1 = character1.strokes[i];
@@ -584,48 +591,25 @@ ww.track = (function () {
         return dist;
     }
 
-    /**
-     *  
-     * @param {Word} word1  
-     * @param {Word} word2 
-     */
-    function cmp_word_dist(word1, word2) {
-        return word1.dist < word2.dist;
-    }
 
 
-    function Character(width, height) {
-        this.lastStrokeId = -1;
 
-        this.strokes = []
+    function Character() {
         this.clear();
-        var width = width || 1000
-        var height = height || 1000
-        this.initSize(width, height);
-
     };
 
 
     Character.prototype.clear = function () {
-
         this.lastStrokeId = -1;
-        //this.width = DEAFULT_WIDTH;
-        //this.height = DEAFULT_HEIGHT;
-        this.strokes.length = 0;
+        this.strokes = [];
         this.eval = false
+        this.evals = []
     }
 
 
-    /**
-     * 
-     */
-    Character.prototype.initSize = function (tmpWidth, tmpHeight) {
-        this.width = tmpWidth;
-        this.height = tmpHeight;
-    }
 
     /**
-     * 
+     * 添加点
      */
     Character.prototype.addPoint = function (strokeId, x, y) {
         if (strokeId < 0) {
@@ -633,13 +617,14 @@ ww.track = (function () {
         }
         if (strokeId != this.lastStrokeId) {
             this.lastStrokeId = strokeId;
-
             var stroke = [];
             this.strokes.push(stroke);
         }
-        var x = this.posX(x) //x / this.width * DEAFULT_WIDTH;
-        var y = this.posX(y)//y / this.height * DEAFULT_HEIGHT; 
-        this.strokes[this.strokes.length - 1].push({ x: x, y: y });
+        var x = x || 0
+        var y = y || 0
+        var id = this.strokes.length - 1
+        this.strokes[id].push({ x: x, y: y });
+        this.evals[id] = false
         this.eval = false
         return this
     };
@@ -655,6 +640,7 @@ ww.track = (function () {
                 for (var i2 = 0; i2 < l2.length; i2++) {
                     stroke.push({ dir: l2[i2] });
                 }
+                this.evals[this.strokes.length - 1] = stroke
             }
         }
         this.eval = this
@@ -677,8 +663,8 @@ ww.track = (function () {
                             var x = l2[i2].x
                             var y = l2[i2].y
                         }
-                        var x = this.posX(x) //x / this.width * DEAFULT_WIDTH;
-                        var y = this.posX(y) // y / this.height * DEAFULT_HEIGHT;
+                        var x = x || 0
+                        var y = y || 0
                         stroke.push({ x: x, y: y });
                     }
                 }
@@ -689,24 +675,15 @@ ww.track = (function () {
     }
 
 
-
-    Character.prototype.posY = function (y) {
-        return y//  y / this.height * DEAFULT_HEIGHT;
-
-    }
-    Character.prototype.posX = function (x) {
-        return x// x / this.width * DEAFULT_WIDTH;
-
-    }
-
-
-
     Character.prototype.clone = function () {
         var c = new Character()
         c.formPoints(this.strokes)
         return c
     }
 
+    Character.prototype.evalthis = function () {
+        evalCharacter(this)
+    }
 
     function formPoints(list) {
         var c = new Character()
@@ -725,7 +702,7 @@ ww.track = (function () {
     return {
         eval: evalCharacter,
         char: Character,
-        dist: dist,
+        chardist: chardist,
         formPoints: formPoints,
         formDirs: formDirs,
         setMax: setMax,
@@ -735,5 +712,26 @@ ww.track = (function () {
 
 
 
+ww.track.test = function () {
 
-ww.draw.test()
+
+    if (!ww.track._test) {
+        s = new Sprite_Track(620, 350);
+        SceneManager._scene.addChild(s)
+        ww.track._test = s
+        return s
+    }
+
+}
+
+ww.track.clear = function () {
+
+
+    ww.track.test()
+
+    ww.track._test.clear()
+
+
+}
+
+ww.track.test()

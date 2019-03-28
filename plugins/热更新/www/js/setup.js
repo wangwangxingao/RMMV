@@ -1,0 +1,1 @@
+PluginManager.setup($plugins)

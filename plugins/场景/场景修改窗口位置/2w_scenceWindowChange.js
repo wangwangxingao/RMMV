@@ -149,8 +149,8 @@ ww.scenceWindowChange.changeScene = function (scene) {
 
     if (scene && scene.constructor.name) {
 
-        var name = scene.constructor.name
-
+        var name = scene.constructor.name 
+        console.log(name)
         var scenesSet = ww.scenceWindowChange.scenesSet || {}
 
         var sceneSet = scenesSet[name] || {}
@@ -179,20 +179,44 @@ ww.scenceWindowChange.changeSprite = function (sprite, set) {
 
     if (sprite && set) {
         if (typeof set == "object") {
-            for (var i in set) {
-                console.log(i, sprite[i], set[i])
-                var type = typeof sprite[i]
-                if (type == "function") {
-                    if (Array.isArray(set[i])) {
-                        sprite[i].apply(sprite, set[i])
-                    } else {
-                        sprite[i].call(sprite, set[i])
+            if (Array.isArray(set)) {
+                for (var id = 0; id < set.length; id++) {
+                    var s = set[id]
+                    if (!s) {
+                        continue
                     }
-                } else if (type == "object") {
-                    this.changeSprite(sprite[i], set[i])
-                } else if (type == "undefined") {
-                } else {
-                    sprite[i] = set[i]
+                    var i = s[0]
+                    var value = s[1]
+                    var type = typeof sprite[i]
+                    if (type == "function") {
+                        if (Array.isArray(value)) {
+                            sprite[i].apply(sprite, value)
+                        } else {
+                            sprite[i].call(sprite, value)
+                        }
+                    } else if (type == "object") {
+                        this.changeSprite(sprite[i], value)
+                    } else if (type == "undefined") {
+                    } else {
+                        sprite[i] = value
+                    }
+                }
+            } else {
+                for (var i in set) {
+                    var value = set[i]
+                    var type = typeof sprite[i]
+                    if (type == "function") {
+                        if (Array.isArray(value)) {
+                            sprite[i].apply(sprite, value)
+                        } else {
+                            sprite[i].call(sprite, value)
+                        }
+                    } else if (type == "object") {
+                        this.changeSprite(sprite[i], value)
+                    } else if (type == "undefined") {
+                    } else {
+                        sprite[i] = value
+                    }
                 }
             }
             if (typeof sprite["refresh"] == "function") {
@@ -202,88 +226,13 @@ ww.scenceWindowChange.changeSprite = function (sprite, set) {
     }
 
 }
-
-ww.scenceWindowChange.Scene_Title_prototype_start = Scene_Title.prototype.start
-Scene_Title.prototype.start = function () {
-    ww.scenceWindowChange.Scene_Title_prototype_start.call(this)
-    ww.scenceWindowChange.changeScene(this)
-
-}
-
-
-
-ww.scenceWindowChange.Scene_Menu_prototype_start = Scene_Menu.prototype.start
-Scene_Menu.prototype.start = function () {
-    ww.scenceWindowChange.Scene_Menu_prototype_start.call(this)
-    ww.scenceWindowChange.changeScene(this)
-}
-
-
-
-ww.scenceWindowChange.Scene_Item_prototype_start = Scene_Item.prototype.start
-Scene_Item.prototype.start = function () {
-    ww.scenceWindowChange.Scene_Item_prototype_start.call(this)
-    ww.scenceWindowChange.changeScene(this)
-}
-
-
-
-
-ww.scenceWindowChange.Scene_Skill_prototype_start = Scene_Skill.prototype.start
-Scene_Skill.prototype.start = function () {
-    ww.scenceWindowChange.Scene_Skill_prototype_start.call(this)
-    ww.scenceWindowChange.changeScene(this)
-}
-
-
-
-
-
-
-ww.scenceWindowChange.Scene_Equip_prototype_start = Scene_Equip.prototype.start
-Scene_Equip.prototype.start = function () {
-    ww.scenceWindowChange.Scene_Equip_prototype_start.call(this)
-    ww.scenceWindowChange.changeScene(this)
-}
-
-
-
-
-
-ww.scenceWindowChange.Scene_Status_prototype_start = Scene_Status.prototype.start
-Scene_Status.prototype.start = function () {
-    ww.scenceWindowChange.Scene_Status_prototype_start.call(this)
-    ww.scenceWindowChange.changeScene(this)
-}
-
-
-
-
-ww.scenceWindowChange.Scene_Shop_prototype_start = Scene_Shop.prototype.start
-Scene_Shop.prototype.start = function () {
-    ww.scenceWindowChange.Scene_Shop_prototype_start.call(this)
-    ww.scenceWindowChange.changeScene(this)
-}
-
-
-
-
-
-ww.scenceWindowChange.Scene_Battle_prototype_start = Scene_Battle.prototype.start
-Scene_Battle.prototype.start = function () {
-    ww.scenceWindowChange.Scene_Battle_prototype_start.call(this)
-    ww.scenceWindowChange.changeScene(this)
-}
-
-
-ww.scenceWindowChange.Scene_Map_prototype_start = Scene_Map.prototype.start
-Scene_Map.prototype.start = function () {
-    ww.scenceWindowChange.Scene_Map_prototype_start.call(this)
-    ww.scenceWindowChange.changeScene(this)
-}
-
-
-
+ 
+SceneManager.onSceneStart = function() {
+	//图形 结束读取中
+    Graphics.endLoading(); 
+    ww.scenceWindowChange.changeScene(this._scene)
+};
+ 
 Window_Base.prototype.moveSize = function (x, y, w, h) {
     this.move(x, y, w, h)
     this.createContents()
@@ -294,4 +243,25 @@ Window_Base.prototype.moveSize = function (x, y, w, h) {
 Window_Base.prototype.setWindowskin = function (name) {
     //窗口皮肤 = 图像管理器 读取系统("window")
     this.windowskin = ImageManager.loadSystem(name);
+};
+
+
+
+
+Window_Base.prototype.setBackgroundName = function (name, x, y) {
+    if (!name) {
+        this.opacity = 255;
+    } else {
+        this.opacity = 0;
+    }
+    if (!this._dimmerSprite) {
+        this._dimmerSprite = new Sprite();
+        this._dimmerSprite.bitmap = new Bitmap(0, 0);
+        this.addChildToBack(this._dimmerSprite);
+    }
+    this._dimmerSprite.bitmap = ImageManager.loadPicture(name || "")
+    this._dimmerSprite.x = x || 0
+    this._dimmerSprite.y = y || 0
+    this._dimmerSprite.visible = !!name;
+    this.updateBackgroundDimmer();
 };

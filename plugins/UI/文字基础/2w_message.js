@@ -153,6 +153,17 @@ Bitmap.prototype.window = function () {
 }
 
 
+Bitmap.prototype._drawTextOutline = function(text, tx, ty, maxWidth) {
+    if (!this.outlineWidth) { return }
+    //环境 = 环境
+    var context = this._context;
+    //环境 笔触模式 = 
+    context.strokeStyle = this.outlineColor;
+    //环境 
+    context.lineWidth = this.outlineWidth;
+    context.lineJoin = 'round';
+    context.strokeText(text, tx, ty, maxWidth);
+};
 
 
 Bitmap.prototype._makeFontNameText = function () {
