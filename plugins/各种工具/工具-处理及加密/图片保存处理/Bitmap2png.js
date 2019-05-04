@@ -2,7 +2,11 @@ bitmapChange = {}
 
 /**保存图片到png格式(图片,文件名,文件夹名)*/
 
-/**图片 获取 dataurl */
+/**图片 获取 dataurl 
+ *
+ * 
+ * @param {"image/png"}  type 
+*/
 bitmapChange.bitmap2DataURL = function (bitmap, type) {
     var imgData = ""
     if (!bitmap) {
@@ -39,7 +43,7 @@ bitmapChange.dataURL2Buffer = function (imgData) {
  * @param {*} bitmap 
  * @param {*} type 
  */
-bitmapChange.bitmapChange = function (bitmap, type) {
+bitmapChange.bitmap2Buffer = function (bitmap, type) {
     var imgData = this.bitmap2DataURL(bitmap, type)
     return this.dataURL2Buffer(imgData);
 }

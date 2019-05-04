@@ -10,7 +10,9 @@
 function WebAudio() {
     this.initialize.apply(this, arguments);
 }
+/**独立*/
 WebAudio._standAlone = (function(top){
+    //返回 不是 资源处理程序
     return !top.ResourceHandler;
 })(this);
 
@@ -19,23 +21,33 @@ WebAudio._standAlone = (function(top){
  * @param {*} url 
  */
 WebAudio.prototype.initialize = function(url) {
+    //如果 没有 网络音频 初始化 
     if (!WebAudio._initialized) {
+        //网络音频 初始化()
         WebAudio.initialize();
     }
+    //清除()
     this.clear();
+    //如果 不是(网络音频独立)
     if(!WebAudio._standAlone){
         this._loader = ResourceHandler.createLoader(url, this._load.bind(this, url), function() {
             this._hasError = true;
         }.bind(this));
     }
+    //读取(url)
     this._load(url);
     this._url = url;
 };
 
+/**主音量 */
 WebAudio._masterVolume   = 1;
+/**上下文 */
 WebAudio._context        = null;
+/**主增益节点 */
 WebAudio._masterGainNode = null;
+//初始化
 WebAudio._initialized    = false;
+//解锁
 WebAudio._unlocked       = false;
 
 /**初始化音频系统
@@ -43,19 +55,25 @@ WebAudio._unlocked       = false;
  *
  * @static
  * @method initialize
- * @param {boolean} noAudio Flag for the no-audio mode
- * @return {boolean} True if the audio system is available
+ * @param {boolean} noAudio 标志为无音频模式Flag. for the no-audio mode
+ * @return {boolean} 如果音频系统可用，则为True. True if the audio system is available
  */
 WebAudio.initialize = function(noAudio) {
     if (!this._initialized) {
         if (!noAudio) {
+            //创建上下文()
             this._createContext();
+            //检测编解码器()
             this._detectCodecs();
+            //创建主增益节点()
             this._createMasterGainNode();
+            //设置事件处理程序()
             this._setupEventHandlers();
         }
+        //初始化 = true
         this._initialized = true;
     }
+    //返回 上下文
     return !!this._context;
 };
 
@@ -63,8 +81,8 @@ WebAudio.initialize = function(noAudio) {
  * Checks whether the browser can play ogg files.
  *
  * @static
- * @method canPlayOgg
- * @return {boolean} True if the browser can play ogg files
+ * @method canPlayOgg  可以播放ogg
+ * @return {boolean} 如果浏览器可以播放ogg文件，则为True. True if the browser can play ogg files
  */
 WebAudio.canPlayOgg = function() {
     if (!this._initialized) {
@@ -77,8 +95,8 @@ WebAudio.canPlayOgg = function() {
  * Checks whether the browser can play m4a files.
  *
  * @static
- * @method canPlayM4a
- * @return {boolean} True if the browser can play m4a files
+ * @method canPlayM4a 可以播放m4a
+ * @return {boolean} 如果浏览器可以播放m4a文件，则为True. True if the browser can play m4a files
  */
 WebAudio.canPlayM4a = function() {
     if (!this._initialized) {
@@ -93,38 +111,44 @@ WebAudio.canPlayM4a = function() {
  * Sets the master volume of the all audio.
  *
  * @static
- * @method setMasterVolume 
+ * @method setMasterVolume 设置主音量
  * @param {Number} value 主音量（最小值：0，最大值：1） Master volume (min: 0, max: 1)
  */
 WebAudio.setMasterVolume = function(value) {
+    //主音量 = 值;
     this._masterVolume = value;
     //如果(主增益节点)  
     if (this._masterGainNode) {
-
+        //主增益节点 增益 设定值在时间( 主音量,上下文 当前时间 )
         this._masterGainNode.gain.setValueAtTime(this._masterVolume, this._context.currentTime);
     }
 };
 
-/**创建环境
+/**创建上下文
  * @static
- * @method _createContext
+ * @method _createContext  创建上下文
  * @private
  */
 WebAudio._createContext = function() {
     try {
+        //如果 音频上下文 !== 'undefined'
         if (typeof AudioContext !== 'undefined') {
+            //上下文 = 新 音频上下文()
             this._context = new AudioContext();
+        //否则 如果  webkit音频上下文  !== 'undefined'
         } else if (typeof webkitAudioContext !== 'undefined') {
+            //上下文 = 新 webkit音频上下文()
             this._context = new webkitAudioContext();
         }
     } catch (e) {
+        //上下文 = null
         this._context = null;
     }
 };
 
 /**探测编码译码器
  * @static
- * @method _detectCodecs
+ * @method _detectCodecs 探测编码译码器
  * @private
  */
 WebAudio._detectCodecs = function() {
@@ -139,46 +163,59 @@ WebAudio._detectCodecs = function() {
     }
 };
 
-/**创建控制获得节点
+/**创建主增益节点
  * @static
- * @method _createMasterGainNode
+ * @method _createMasterGainNode  创建主增益节点
  * @private
  */
 WebAudio._createMasterGainNode = function() {
+    //上下文 = 网络音频 上下文
     var context = WebAudio._context;
+    //如果 上下文
     if (context) {
-        //主增益节点 = 环境 创建增益()
+        //主增益节点 = 上下文 创建增益()
         this._masterGainNode = context.createGain(); 
-        //主增益节点 增益 设定值在时间(主音量,环境 当前时间)  
+        //主增益节点 增益 设定值在时间(主音量,上下文 当前时间)  
         this._masterGainNode.gain.setValueAtTime(this._masterVolume, context.currentTime);
 
-        //主增益节点  连 (环境 目的地)  //context.destination 声音数据传输给扬声器或者耳机
+        //主增益节点  连 (上下文 目的地)  //context.destination 声音数据传输给扬声器或者耳机
         this._masterGainNode.connect(context.destination);
     }
 };
 
 /**安装事件处理
  * @static
- * @method _setupEventHandlers
+ * @method _setupEventHandlers 设置事件处理程序
  * @private
  */
 WebAudio._setupEventHandlers = function() {
+    //恢复处理程序
     var resumeHandler = function() {
-        //环境 = 网络音频 环境
+        //上下文 = 网络音频 上下文
         var context = WebAudio._context;
-        //如果 环境 并且 环境 状态 如果暂停 并且 类型 环境 恢复 ==="function" // 方法 
+        //如果 上下文 并且 
+        //     上下文 状态 ==  "suspended"//暂停   并且 
+        //     类型 上下文 恢复 ==="function"//方法 
         if (context && context.state === "suspended" && typeof context.resume === "function") {
+            //上下文 恢复 然后 
             context.resume().then(function() {
+                //网络音频 在触摸开始
                 WebAudio._onTouchStart();
             })
         } else {
+            //网络音频 在触摸开始
             WebAudio._onTouchStart();
         }
     };
+    //文献.添加事件监听器（"keydown，恢复处理）
     document.addEventListener("keydown", resumeHandler);
+    //文献.添加事件监听器（"mousedown"，恢复处理）
     document.addEventListener("mousedown", resumeHandler);
+    //文献.添加事件监听器（"touchend"，恢复处理）
     document.addEventListener("touchend", resumeHandler);
+    //文献.添加事件监听器（'touchstart',当触摸开始 )
     document.addEventListener('touchstart', this._onTouchStart.bind(this));
+    //文献.添加事件监听器（'visibilitychange',当能见度变化 )
     document.addEventListener('visibilitychange', this._onVisibilityChange.bind(this));
 };
 
@@ -188,11 +225,17 @@ WebAudio._setupEventHandlers = function() {
  * @private
  */ 
 WebAudio._onTouchStart = function() {
+    //上下文 = 网络音频 上下文
     var context = WebAudio._context;
+    //如果(上下文 并且  不是 解锁)
     if (context && !this._unlocked) {
         // Unlock Web Audio on iOS
+        //在iOS上解锁Web音频
+        //节点 = 上下文 创建缓冲区源();
         var node = context.createBufferSource();
+        //节点 开始(0)
         node.start(0);
+        //解锁 = true 
         this._unlocked = true;
     }
 };
@@ -203,41 +246,50 @@ WebAudio._onTouchStart = function() {
  * @private
  */
 WebAudio._onVisibilityChange = function() {
+    //如果(文献.能见度状态 ==='hidden' )
     if (document.visibilityState === 'hidden') {
+        //当隐藏()
         this._onHide();
+    //否则
     } else {
+        //当显示()
         this._onShow();
     }
 };
 
 /**当隐藏
  * @static
- * @method _onHide
+ * @method _onHide 当隐藏
  * @private
  */
 WebAudio._onHide = function() {
+    //需要消除当隐藏()
     if (this._shouldMuteOnHide()) {
+        //淡出(1)
         this._fadeOut(1);
     }
 };
 
 /**当显示
  * @static
- * @method _onShow
+ * @method _onShow  当显示
  * @private
  */
 WebAudio._onShow = function() {
+    //需要消除当隐藏()
     if (this._shouldMuteOnHide()) {
+        //淡入(0.5)
         this._fadeIn(0.5);
     }
 };
 
 /**需要消除当隐藏
  * @static
- * @method _shouldMuteOnHide
+ * @method _shouldMuteOnHide 需要消除当隐藏
  * @private
  */
 WebAudio._shouldMuteOnHide = function() {
+    //返回  utils的 是移动设备
     return Utils.isMobileDevice();
 };
 
@@ -432,9 +484,13 @@ WebAudio.prototype.play = function(loop, offset) {
  * @method stop
  */
 WebAudio.prototype.stop = function() {
+    //自动播放 = false
     this._autoPlay = false;
+    //结束计时器()
     this._removeEndTimer();
+    //移除节点()
     this._removeNodes();
+    //
     if (this._stopListeners) {
         while (this._stopListeners.length > 0) {
             var listner = this._stopListeners.shift();
@@ -608,8 +664,11 @@ WebAudio.prototype._createNodes = function() {
  * @private
  */
 WebAudio.prototype._connectNodes = function() {
+    //源节点 连接 (增益节点)
     this._sourceNode.connect(this._gainNode);
+    //增益节点 连接 (声相节点)
     this._gainNode.connect(this._pannerNode);
+    //声相节点 连接 (网络音频 主增益节点)
     this._pannerNode.connect(WebAudio._masterGainNode);
 };
 
@@ -618,29 +677,40 @@ WebAudio.prototype._connectNodes = function() {
  * @private
  */
 WebAudio.prototype._removeNodes = function() {
+    //如果 源节点  
     if (this._sourceNode) {
+        //源节点 停止(0) 
         this._sourceNode.stop(0);
+        //源节点 = null
         this._sourceNode = null;
+        //增益节点 = null
         this._gainNode = null;
+        //声相节点 = null
         this._pannerNode = null;
     }
 };
 
-/**创建结束时间 
+/**创建结束计时器
  * @method _createEndTimer
  * @private
  */
 WebAudio.prototype._createEndTimer = function() {
+    //如果( 源节点 并且 不是 源节点 循环 )
     if (this._sourceNode && !this._sourceNode.loop) {
+        //结束时间 = 开始时间 + 总时间 / 音高
         var endTime = this._startTime + this._totalTime / this._pitch;
+        //间隔 = 结束时间 - 网络音频.上下文.当前时间
         var delay =  endTime - WebAudio._context.currentTime;
+        //结束计时器 = 设置超时
         this._endTimer = setTimeout(function() {
+            //停止()
             this.stop();
+        //绑定 this  , 间隔 * 1000
         }.bind(this), delay * 1000);
     }
 };
 
-/**移除结束时间
+/**移除结束计时器
  * @method _removeEndTimer
  * @private
  */

@@ -19,6 +19,7 @@ var ww = ww || {}
 
 
 ww.data2xls = {}
+/**字符串化 */
 ww.data2xls.stringify = function (that) {
 
     return that || ""
@@ -27,7 +28,7 @@ ww.data2xls.stringify = function (that) {
     return JSON.stringify(that)
 
 }
-
+/**解析 */
 ww.data2xls.parse = function (that) {
 
     return that || ""
@@ -69,11 +70,11 @@ ww.data2xls.copyo2l = function (that, obj, setslist, father) {
 
 /**
  * 检查并处理
- * @param {*} that 
- * @param {*} obj 
- * @param {*} setslist 
- * @param {*} father 
- * @param {*} i 
+ * @param {*} that 原始数据
+ * @param {*} obj 对象
+ * @param {*} setslist 设置列表
+ * @param {*} father 父组
+ * @param {*} i 子变量名  
  */
 ww.data2xls.check = function (that, obj, setslist, father, i) {
     var list = setslist
@@ -128,11 +129,11 @@ ww.data2xls.checksets = function (that, father, i, sets) {
 
 
 /** 
- * 检查是否继续 根据设置
- * @param {*} that 
- * @param {*} father 
- * @param {*} i 
- * @param {*} set 
+ * 检查是否继续 根据设置 
+ * @param {*} that 原始数据
+ * @param {*} father 父组
+ * @param {*} i 子变量名
+ * @param {*} set 设置 
  */
 ww.data2xls.checkset = function (that, father, i, set) {
     if (!set) {
@@ -206,7 +207,7 @@ ww.data2xls.checkset = function (that, father, i, set) {
 
 /**
  * 检查种类
- * @param {*} that 
+ * @param {*} that 原始数据
  */
 ww.data2xls.checktype = function (that) {
     var type = typeof (that)
@@ -226,10 +227,10 @@ ww.data2xls.checktype = function (that) {
 
 /**
  * 拷贝  列表到对象
- * @param {*} list 
- * @param {*} obj 
- * @param {*} type 
- * @param {*} lang 
+ * @param {*} list 列表
+ * @param {*} obj 对象
+ * @param {*} type 种类
+ * @param {*} lang 语言
  */
 ww.data2xls.copyl2o = function (list, obj, type, lang) {
     var obj = obj || {}
@@ -254,10 +255,10 @@ ww.data2xls.copyl2o = function (list, obj, type, lang) {
 
 /**
  * 拷贝 键 值
- * @param {*} key 
- * @param {*} save 
- * @param {*} obj 
- * @param {*} type 
+ * @param {*} key 键
+ * @param {*} save 保存
+ * @param {*} obj 对象
+ * @param {*} type 种类
  * @param {*} lang 语言
  */
 ww.data2xls.copyKeyValue = function (key, save, obj, type, lang) {

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>multiagent collision avoidance</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <style type="text/css">
+      label {
+        display: block;
+        font-family: sans-serif;
+        font-size: 11px;
+        line-height: 25px;
+        vertical-align: top;
+      }
+
+      @media only screen and (max-device-width: 800px) {
+        canvas {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <label>Speed: <input type="range" value="6" max="15" min="1" step="1" id="speed" /></label>
+    <canvas height="800" width="800" id="rvo-test"></canvas>
+    <script type="text/javascript" src="rvo.js"></script>
+    <script>
+    // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+    // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+
+    // requestAnimationFrame polyfill by Erik Möller
+    // fixes from Paul Irish and Tino Zijdel
+
+    (function() {
+        var lastTime = 0;
+        var vendors = ['ms', 'moz', 'webkit', 'o'];
+        for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+            window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+            window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame']
+                                       || window[vendors[x]+'CancelRequestAnimationFrame'];
+        }
+
+        if (!window.requestAnimationFrame)
+            window.requestAnimationFrame = function(callback, element) {
+                var currTime = new Date().getTime();
+                var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+                  timeToCall);
+                lastTime = currTime + timeToCall;
+                return id;
+            };
+
+        if (!window.cancelAnimationFrame)
+            window.cancelAnimationFrame = function(id) {
+                clearTimeout(id);
+            };
+    }());
+
+    var canvas = document.getElementById('rvo-test')
+      , canvasSize = 800
+      , center = [canvasSize / 2, canvasSize / 2]
+      , goals = []
+      , altgoals = []
+      , colors = []
+      , obstacles = []
+      , total = 20
+      , redrawIvl = 1000 / 60
+      , speed = .6
+      , newSpeed = speed
+      , sim = new RVO.Simulator(1, 50, 7, 10, 10, 7, speed, [0, 0]);
+
+    for (var angle = Math.PI / total; angle < Math.PI * 2; angle += Math.PI / (.5 * total)) {
+      var point = RVO.Vector.multiply([Math.sin(angle), Math.cos(angle)], canvasSize * .48)
+        , rgb = HSVtoRGB(Math.round(360 * (angle / (Math.PI * 2))), 1, 255);
+
+      sim.addAgent(RVO.Vector.add(center, point));
+      goals.push(RVO.Vector.subtract(center, point));
+      altgoals.push(RVO.Vector.add(center, point));
+      colors.push('rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ', .75)');
+    }
+
+    sim.addAgent( center );
+      goals.push(center);
+      altgoals.push(center);
+      colors.push('rgba(' + 0+ ',' +0 + ',' + 0 + ', .75)');
+    window.addEventListener('load', function() {
+      document.getElementById('speed').addEventListener('change', function(e) {
+        newSpeed = (e.srcElement.value >> 0) // 10;
+      });
+    });
+
+    sim.globalTime = new Date().getTime() / redrawIvl;
+    function redraw() {
+      var now = new Date().getTime()
+        , timeStep = sim.timeStep = (now - sim.globalTime * redrawIvl) / redrawIvl;
+
+      if (speed != newSpeed) {
+        speed = newSpeed;
+        for (var i = 0, len = sim.agents.length; i < len; i ++) {
+          sim.agents[i].maxSpeed = newSpeed;
+          if(i ==len-1 ){
+            sim.agents[i].maxSpeed = 0
+          }
+        }
+      }
+
+      updateGoals();
+      setPreferredVelocities();
+      sim.doStep();
+      updateVisualization();
+      requestAnimationFrame(redraw, canvas);
+    }
+    requestAnimationFrame(redraw, canvas);
+
+    function updateGoals() {
+      for (var i = 0, len = sim.agents.length; i < len; i ++) {
+        if (RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, goals[i])) < 1) {
+          var temp = goals[i];
+          goals[i] = altgoals[i];
+          altgoals[i] = temp;
+        }
+      }
+    }
+
+    function setPreferredVelocities() {
+      for (var i = 0, len = sim.agents.length; i < len; i ++) {
+        var dist = RVO.Vector.subtract(goals[i], sim.agents[i].position)
+          , distSq = RVO.Vector.absSq(dist)
+          , goalVector = distSq > 1 ? RVO.Vector.multiply(RVO.Vector.normalize(dist), sim.agents[i].maxSpeed) : dist;
+        if (RVO.Vector.absSq(RVO.Vector.multiply(goalVector, sim.timeStep)) > distSq) {
+          goalVector = RVO.Vector.divide(dist, sim.timeStep);
+        }
+        sim.agents[i].prefVelocity = goalVector;
+      }
+    }
+
+    function updateVisualization() {
+      var ctx = canvas.getContext('2d');
+
+      ctx.clearRect(0, 0, canvasSize, canvasSize);
+
+      for (var i = 0, len = sim.agents.length; i < len; i ++) {
+        var agent = sim.agents[i];
+        ctx.beginPath();
+        ctx.arc(agent.position[0], agent.position[1], agent.radius * .9, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+      }
+    }
+
+    function HSVtoRGB(h, s, v) {
+      var r, g, b;
+      if( s == 0 ) {
+        r = g = b = v;
+        return;
+      }
+      var h = h / 60
+        , i = Math.floor(h)
+        , f = h - i
+        , p = v * (1 - s)
+        , q = v * (1 - s * f)
+        , t = v * (1 - s * (1 - f));
+      switch(i) {
+        case 0:
+          r = v;
+          g = t;
+          b = p;
+          break;
+        case 1:
+          r = q;
+          g = v;
+          b = p;
+          break;
+        case 2:
+          r = p;
+          g = v;
+          b = t;
+          break;
+        case 3:
+          r = p;
+          g = q;
+          b = v;
+          break;
+        case 4:
+          r = t;
+          g = p;
+          b = v;
+          break;
+        default:
+          r = v;
+          g = p;
+          b = q;
+          break;
+      }
+      return {
+        r: Math.round(r),
+        g: Math.round(g),
+        b: Math.round(b)
+      }
+    }
+    </script>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-309942-36']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+  </body>
+</html>

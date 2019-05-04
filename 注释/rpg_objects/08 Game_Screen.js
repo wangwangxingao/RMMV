@@ -467,7 +467,6 @@ Game_Screen.prototype.startFlashForDamage = function() {
  * @param {number} scaleY 比例y
  * @param {number} opacity 不透明度
  * @param {number} blendMode 混合模式 
- * @param {number} duration 持续时间 
  */
 Game_Screen.prototype.showPicture = function(pictureId, name, origin, x, y,
     scaleX, scaleY, opacity, blendMode) {

@@ -1,118 +1,157 @@
 var ww = ww || {}
 
+
 ww.draw = {}
 
 
 ww.draw.drawSetStyle = function (context, style) {
     if (context && style && typeof (style) == "object") {
         for (var i in style) {
-            context[i] = style[i] 
+            context[i] = style[i]
         }
     }
 }
 
+/**
+ * 方法名,
+ * [方法名,参数...],
+ * [变量名,参数],
+ * {变量名:参数},
+ * 
+ * 
+ */
 ww.draw.drawFun = function (bitmap, list) {
 
     //环境 = 环境
     if (!bitmap) { return }
     if (bitmap instanceof Bitmap) {
-        bitmap = bitmap._context
-    } 
+        var context = bitmap._context
+    } else {
+        return
+    }
     //环境 保存()
     //context.save(); 
     for (var i = 0; i < list.length; i++) {
         var set = list[i]
         if (Array.isArray(set)) {
             var n = set[0]
-            var p = set.slice(1)
+            var p = set.slice(1) 
             if (typeof (context[n]) == "function") {
                 context[n].apply(context, p)
             } else {
                 context[n] = p[0]
-            } 
+            }
         } else if (typeof (set) == "string") {
             if (typeof (context[set]) == "function") {
                 context[set]()
             }
         } else {
             ww.draw.drawSetStyle(context, set)
-        } 
+        }
     }
-    bitmap._setDirty() 
+    bitmap._setDirty()
 }
 
 
-Bitmap.prototype.drawFun = function(list){
-    ww.draw.drawFun(this,list) 
+Bitmap.prototype.drawFun = function (list) {
+    ww.draw.drawFun(this, list)
 }
 
-Bitmap.prototype.drawLine = function(x,y,x2,y2,line){ 
+Bitmap.prototype.drawLine = function (x, y, x2, y2, line) {
     var list = [
         "save",
-         line,
+        line,
         //"beginPath", 
         ["moveTo", x, y],
         ["lineTo", x2, y2],
         //"closePath",
         "restore",
-    ] 
-    this.drawFun( list)
+    ]
+    this.drawFun(list)
 }
 
 
 
-/**绘制扇形 */
-Bitmap.prototype.drawCircleSEList = function (x, y, r, start, end, color, type) {
+/**绘制扇形
+ * 
+ * 
+ * 
+ */
+Bitmap.prototype.drawCircleSE = function (x, y, r, start, end, color, t) {
     var type = type ? "stroke" : "fill"
     var unit = Math.PI / 180;
     var start = start || 0
     var end = end === undefined ? 360 : (end || 0)
     var list = [
-        "save"
+        "save",
         [type + "Style", color],
         "beginPath",
-        ["moveTo", x, y],
+        !t?["moveTo", x, y]:0,
         ["arc", x, y, r, start * unit, end * unit],
-        "closePath",
+        !t?["moveTo", x, y]:0,
+        !t?"closePath":"",
         type,
         "restore",
     ]
-    this.drawFun( list)
+    this.drawFun(list)
 
 }
 
 
 
 
+/**绘制圆角矩形 */
+Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, color, type, j0, j1, j2, j3) {
 
-/**绘制扇形 */
-Bitmap.prototype.drawCircleSE = function (x, y, r, start, end, color, type) {
 
     var type = type ? "stroke" : "fill"
-    var unit = Math.PI / 180;
-    var start = start || 0
-    var end = end === undefined ? 360 : (end || 0)
+    var list = [
+        "save"
+        [type + "Style", color],
+        "beginPath",
+    ]
 
-    //环境 = 环境
-    var context = this._context;
-    //环境 保存()
-    context.save();
 
-    context[type + 'Style'] = color;
+    list.push(["moveTo", x, y + radius])
+    list.push(["lineTo", x, y + height - radius])
 
-    //环境 开始路径()
-    context.beginPath();
-    //环境 弧形(x,y,半径,0,数学 PI * 2 ,false )     
-    context.arc(x, y, r, start * unit, end * unit);
-
-    context.closePath();
-
-    context[type]();
-    //环境 恢复()
-    context.restore();
-    //设置发生更改()
-    this._setDirty();
-
+    if (j1) {
+        list.push(["lineTo", x, y + height])
+        list.push(["lineTo", x + radius, y + height])
+    } else {
+        list.push(["quadraticCurveTo", x, y + height, x + radius, y + height])
+    }
+    //往左
+    list.push(["lineTo", x + width - radius, y + height])
+    //角2处理 
+    if (j2) {
+        list.push(["lineTo", x + width, y + height])
+        list.push(["lineTo", x + width, y + height - radius])
+    } else {
+        list.push(["quadraticCurveTo", x + width, y + height, x + width, y + height - radius])
+    }
+    //往上
+    list.push(["lineTo", x + width, y + radius])
+    //角3处理  
+    if (j3) {
+        list.push(["lineTo", x + width, y])
+        list.push(["lineTo", x + width - radius, y])
+    } else {
+        list.push(["quadraticCurveTo", x + width, y, x + width - radius, y + height])
+    }
+    //往左
+    list.push(["lineTo", x + radius, y])
+    //角0处理 
+    if (j0) {
+        list.push(["lineTo", x, y])
+        list.push(["lineTo", x, y + radius])
+    } else {
+        list.push(["quadraticCurveTo", x, y, x, y + radius])
+    }
+    list.push("closePath", type, "restore")
+    list.push(type)
+    list.push("restore")
+    this.drawFun(list)
 }
 
 
@@ -186,19 +225,16 @@ Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, c
 
 
 
+Bitmap.prototype.fillCircle = function (color, s, e) {
+    var x = this.width * 0.5
+    var y = this.height * 0.5
+    this.drawCircleSE(x, y, Math.min(x, y), s, e, color);
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
+Bitmap.prototype.fillRoundedRectangle = function (color, j0, j1, j2, j3) {
+    var r = Math.min(this.width * 0.1, this.height * 0.1)
+    this.drawRoundedRectangle(0, 0, this.width, this.height, r, color, 0, j0, j1, j2, j3);
+}
 
 /**
 描述

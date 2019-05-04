@@ -1556,7 +1556,7 @@ Window_Base.prototype.tslPushOutWidth = function (textState, width) {
         "type": "outlineWidth",
         "value": width
     }
-    this.tslPushOther(textState, obj)
+    this.tslPushFont(textState, obj)
 };
 
 

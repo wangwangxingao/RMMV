@@ -73,6 +73,24 @@ RVO.Agent = function (sim) {
     this.id = 0;
 }
 
+
+/**
+ * 碰撞责任
+ * @param {*} other 其他模拟器
+ * 
+ */
+RVO.Agent.prototype.collisionAvoidance = function (other) {
+    var c = 0.5
+    /*if(this.id > other.id){
+        c =  0.001
+    }else if(this.id < other.id){
+        c =  0.999//1//0.001
+    }*/
+    return c
+}
+
+
+
 /**
  * 计算邻居组
  */
@@ -104,6 +122,7 @@ RVO.Agent.prototype.computeNewVelocity = function () {
     var invTimeHorizonObst = 1 / this.timeHorizonObst;
 
     //在碰撞邻居组中循环 
+    /**添加碰撞障碍物的orca */
     for (var i = 0, ilen = this.obstacleNeighbors.length; i < ilen; ++i) {
         //障碍1 障碍邻居组[i][1]
         var obstacle1 = this.obstacleNeighbors[i][1],
@@ -159,7 +178,7 @@ RVO.Agent.prototype.computeNewVelocity = function () {
             distSq2 = RVO.Vector.absSq(relativePosition2),
             //半径平方 = 平方 半径 
             radiusSq = RVO.sqr(this.radius),
-            //相对向量 = 相对位置1 - 相对位置2 
+            //相对向量 = 障碍2位置 - 障碍1 位置 
             obstacleVector = RVO.Vector.subtract(obstacle2.point, obstacle1.point),
             //s = 数量积 / 相对向量平方 
             s = RVO.Vector.dotProduct(
@@ -324,6 +343,7 @@ RVO.Agent.prototype.computeNewVelocity = function () {
     var numObstLines = this.orcaLines.length,
         invTimeHorizon = 1 / this.timeHorizon;
 
+    /**添加代理造成的orca */
     for (var i = 0, len = this.agentNeighbors.length; i < len; ++i) {
         var other = this.agentNeighbors[i][1],
             relativePosition = RVO.Vector.subtract(other.position, this.position),
@@ -333,12 +353,15 @@ RVO.Agent.prototype.computeNewVelocity = function () {
             combinedRadiusSq = RVO.sqr(combinedRadius),
             line = new Array(2);
 
+                /**没有碰撞。 */
         if (distSq > combinedRadiusSq) {
             var w = RVO.Vector.subtract(relativeVelocity, RVO.Vector.multiply(relativePosition, invTimeHorizon)),
+				/* 从截止中心到相对速度的矢量 */
                 wLengthSq = RVO.Vector.absSq(w),
                 dotProduct1 = RVO.Vector.dotProduct(w, relativePosition);
 
             if (dotProduct1 < 0 && RVO.sqr(dotProduct1) > combinedRadiusSq * wLengthSq) {
+                /* 关于截止圆的项目。*/
                 var wLength = Math.sqrt(wLengthSq),
                     unitW = RVO.Vector.divide(w, wLength),
                     u = RVO.Vector.multiply(unitW, combinedRadius * invTimeHorizon - wLength);
@@ -360,7 +383,12 @@ RVO.Agent.prototype.computeNewVelocity = function () {
             }
         }
         else {
-            var invTimeStep = 1 / this.sim.timeStep,
+            
+				/* Collision. Project on cut-off circle of time timeStep. */
+                /**碰撞。 关于时间截止圆的项目步骤。*/
+            var invTimeStep = this.invtimeStep,
+            		/* Vector from cutoff center to relative velocity. */
+                /*从截止中心到相对速度的矢量。*/
                 w = RVO.Vector.subtract(relativeVelocity, RVO.Vector.multiply(relativePosition, invTimeStep)),
                 wLength = RVO.Vector.abs(w),
                 unitW = RVO.Vector.divide(w, wLength),
@@ -369,7 +397,10 @@ RVO.Agent.prototype.computeNewVelocity = function () {
             line[1] = [unitW[1], - unitW[0]];
         }
 
-        line[0] = RVO.Vector.add(this.velocity, RVO.Vector.multiply(u, .5));
+        /**避障责任 */
+        var c = this.collisionAvoidance(other)
+        
+        line[0] = RVO.Vector.add(this.velocity, RVO.Vector.multiply(u, c))// .5));
         this.orcaLines.push(line);
     }
 
@@ -447,12 +478,12 @@ RVO.Agent.prototype.update = function () {
 
 /**
  * 线性程序1
- * @param {*} lines 
- * @param {*} lineNo 
- * @param {*} radius 
- * @param {*} optVelocity 
- * @param {*} directionOpt 
- * @param {*} result 
+ * @param {*} lines 线
+ * @param {*} lineNo 线
+ * @param {*} radius 半径
+ * @param {*} optVelocity 选择速度
+ * @param {*} directionOpt  方向选择
+ * @param {*} result  结果
  */
 RVO.Agent.linearProgram1 = function (lines, lineNo, radius, optVelocity, directionOpt, result) {
     var dotProduct = RVO.Vector.dotProduct(lines[lineNo][0], lines[lineNo][1]),
@@ -520,11 +551,11 @@ RVO.Agent.linearProgram1 = function (lines, lineNo, radius, optVelocity, directi
 
 /**
  * 线性程序2
- * @param {*} lines 
- * @param {*} radius 
- * @param {*} optVelocity 
- * @param {*} directionOpt 
- * @param {*} result 
+ * @param {*} lines  线
+ * @param {*} radius 半径
+ * @param {*} optVelocity 选择速度
+ * @param {*} directionOpt 方向选择
+ * @param {*} result 结果
  */
 RVO.Agent.linearProgram2 = function (lines, radius, optVelocity, directionOpt, result) {
     if (directionOpt) {
@@ -552,11 +583,11 @@ RVO.Agent.linearProgram2 = function (lines, radius, optVelocity, directionOpt, r
 
 /**
  * 线性程序3
- * @param {*} lines 
- * @param {*} numObstLines 
- * @param {*} beginLine 
- * @param {*} radius 
- * @param {*} result 
+ * @param {*} lines 线
+ * @param {*} numObstLines num水果线
+ * @param {*} beginLine 起跑线
+ * @param {*} radius 半径
+ * @param {*} result 结果
  */
 RVO.Agent.linearProgram3 = function (lines, numObstLines, beginLine, radius, result) {
     var distance = 0;
@@ -1116,6 +1147,10 @@ var RVO = RVO || {};
  */
 RVO.Simulator = function (timeStep, neighborDist, maxNeighbors, timeHorizon, timeHorizonObst, radius, maxSpeed, velocity) {
     this.timeStep = timeStep;
+
+    /**预先计算 */
+    this.invtimeStep = 1/ timeStep;
+
     this.agents = [];
     this.globalTime = 0;
     this.obstacles = [];
@@ -1226,6 +1261,11 @@ RVO.Simulator.prototype.processObstacles = function () {
 }
 
 RVO.Simulator.prototype.doStep = function () {
+
+    /**预先计算 */
+    this.invtimeStep = 1/ this.timeStep;
+
+
     //kd树 创建代理树() 
     this.kdTree.buildAgentTree();
 

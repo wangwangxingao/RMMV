@@ -1,3 +1,7 @@
+/**
+ * 创建遮罩
+ */
+
 
 Sprite.prototype.setMask = function (s) {
     if (this.mask) {

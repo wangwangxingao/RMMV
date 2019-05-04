@@ -27,7 +27,7 @@
 
     /**
     * 是触摸输入自己 
-    * @param {boolean|number} b 是否不检查位图(每层-1)
+    * @param {boolean|number} b 是否检查位图(每层-1)
     * @param {boolean|number} c 是否检查子图(每层-1 ) 
     * @param {boolean} up 是否是从上往下判断 
     * 

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- Create a simple CodeMirror instance -->
+    <link rel="stylesheet" href="codemirror.css">
+    <script src="codemirror.js"></script>
+    <script>
+        var myTextarea = document.createElement("textarea")
+
+        document.body.appendChild(myTextarea)
+        var editor = CodeMirror.fromTextArea(myTextarea, {
+            lineNumbers: true
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        #dropBox {
+            width: 300px;
+            height: 300px;
+            border: 1px solid rgb(125, 125, 125);
+            font-size: 40px;
+            text-align: center;
+            background: rgb(125, 125, 125);
+            background-repeat: no-repeat;
+            background-size: 100%;
+        }
+
+        #dropBox div {
+            margin: 50px auto;
+            width: 140px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="dropBox">
+        <div></div>
+    </div>
+    <script type="text/javascript">
+        var dropBox;
+        window.onload = function () {
+            dropBox = document.getElementById("dropBox");
+            // 鼠标进入放置区时 
+            dropBox.ondragenter = ignoreDrag;
+            // 拖动文件的鼠标指针位置放置区之上时发生 
+            dropBox.ondragover = ignoreDrag;
+            dropBox.ondrop = drop;
+        }
+        function ignoreDrag(e) {
+            // 确保其他元素不会取得该事件 
+            e.stopPropagation();
+            e.preventDefault();
+        }
+        function drop(e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            // 取得拖放进来的文件 
+            var data = e.dataTransfer;
+            var files = data.files;
+            // 将其传给真正的处理文件的函数 
+
+            var file = files[0];
+            var reader = new FileReader();
+            reader.onload = function (e) { 
+                
+                dropBox.style.backgroundImage = "url('" + e.target.result + "')";
+            }
+            reader.readAsDataURL(file);
+
+
+        } 
+    </script>
+</body>
+
+</html>

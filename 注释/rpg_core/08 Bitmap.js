@@ -983,7 +983,7 @@ Bitmap.prototype._makeFontNameText = function() {
  * @private
  */ 
 Bitmap.prototype._drawTextOutline = function(text, tx, ty, maxWidth) {
-    //if (!this.outlineWidth) { return }
+    if (!this.outlineWidth) { return } /**修改,如果为0跳过 */
     //环境 = 环境
     var context = this._context;
     //环境 笔触模式 = 

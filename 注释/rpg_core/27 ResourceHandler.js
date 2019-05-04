@@ -2,7 +2,7 @@
 //-----------------------------------------------------------------------------
 /**处理资源加载的静态类。
  * The static class that handles resource loading.
- * 资源处理程序
+ * 资源处理程序 
  * @class ResourceHandler
  */
 function ResourceHandler() {
