@@ -1439,9 +1439,9 @@ TouchInput._onTouchStart = function (event) {
         //触摸 =  事件改变触摸组[i]
         var touch = event.changedTouches[i];
         //x  = 画布x 
-        var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
+        var x = Graphics.pageToCanvasX2(touch.pageX, touch.pageY);
         //y  = 画布y
-        var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
+        var y = Graphics.pageToCanvasY2(touch.pageX, touch.pageY);
         if (Graphics.isInsideCanvas(x, y)) {
             //屏幕按下 = true
             this._screenPressed = true;
@@ -1482,9 +1482,9 @@ TouchInput._onTouchMove = function (event) {
         //触摸 = 事件改变触摸组[i]
         var touch = event.changedTouches[i];
         //x  = 画布x
-        var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
+        var x = Graphics.pageToCanvasX2(touch.pageX, touch.pageY);
         //y  = 画布y
-        var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
+        var y = Graphics.pageToCanvasY2(touch.pageX, touch.pageY);
 
         this._onMove(x, y);
     }
@@ -1502,9 +1502,9 @@ TouchInput._onTouchEnd = function (event) {
         //触摸 = 事件改变触摸组[i]
         var touch = event.changedTouches[i];
         //x  = 画布x
-        var x = Graphics.pageToCanvasX2(event.pageX, event.pageY);
+        var x = Graphics.pageToCanvasX2(touch.pageX, touch.pageY);
         //y  = 画布y
-        var y = Graphics.pageToCanvasY2(event.pageX, event.pageY);
+        var y = Graphics.pageToCanvasY2(touch.pageX, touch.pageY);
         //屏幕按下 = false
         this._screenPressed = false;
         //当释放(x,y)

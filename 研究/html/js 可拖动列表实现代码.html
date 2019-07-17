@@ -1,0 +1,150 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            -moz-user-select: none;
+        }
+
+        ul {
+            margin: 100px;
+            border: 1px solid #adff2f;
+            list-style: none;
+        }
+
+        li {
+            height: 30px;
+            line-height: 30px;
+            padding: 0;
+            list-style: none;
+        }
+
+        li:hover {
+            background: #bdb76b;
+            cursor: move;
+        }
+    </style>
+</head>
+
+<body>
+    <ul id="outer_wrap">
+        <li>第一条</li>
+        <li>第二条</li>
+        <li>第三条</li>
+        <li>第四条</li>
+        <li>第五条</li>
+        <li>第六条</li>
+        <li>第七条</li>
+        <li>第八条</li>
+    </ul>
+    <script type="text/javascript">
+        function $(id) {
+            return document.getElementById(id);
+        }
+        //获取鼠标位置
+        function getMousePos(e) {
+            return {
+                x: e.pageX || e.clientX + document.body.scrollLeft,
+                y: e.pageY || e.clientY + document.body.scrollTop
+            }
+        }
+        //获取元素位置
+        function getElementPos(el) {
+            return {
+                x: el.offsetParent ? el.offsetLeft + arguments.callee(el.offsetParent)['x'] : el.offsetLeft,
+                y: el.offsetParent ? el.offsetTop + arguments.callee(el.offsetParent)['y'] : el.offsetTop
+            }
+        }
+        //获取元素尺寸
+        function getElementSize(el) {
+            return {
+                width: el.offsetWidth,
+                height: el.offsetHeight
+            }
+        }
+        //禁止选择
+        document.onselectstart = function () {
+            return false;
+        }
+        //判断是否有挪动
+        var MOVE = {};
+        MOVE.isMove = false;
+
+        //就是创建的标杆
+        var div = document.createElement('div');
+        div.style.width = '400px';
+        div.style.height = '1px';
+        div.style.fontSize = '0';
+        div.style.background = 'red';
+
+        var outer_wrap = $('outer_wrap');
+        outer_wrap.onmousedown = function (event) {
+            //获取列表顺序
+            var lis = outer_wrap.getElementsByTagName('li');
+            for (var i = 0; i < lis.length; i++) {
+                lis[i]['pos'] = getElementPos(lis[i]);
+                lis[i]['size'] = getElementSize(lis[i]);
+            }
+            event = event || window.event;
+            var t = event.target || event.srcElement;
+            if (t.tagName.toLowerCase() == 'li') {
+                var p = getMousePos(event);
+                var el = t.cloneNode(true);
+                el.style.position = 'absolute';
+                el.style.left = t.pos.x + 'px';
+                el.style.top = t.pos.y + 'px';
+                el.style.width = t.size.width + 'px';
+                el.style.height = t.size.height + 'px';
+                el.style.border = '1px solid #d4d4d4';
+                el.style.background = '#d4d4d4';
+                el.style.opacity = '0.7';
+                document.body.appendChild(el);
+
+                document.onmousemove = function (event) {
+                    event = event || window.event;
+                    var current = getMousePos(event);
+                    el.style.left = t.pos.x + current.x - p.x + 'px';
+                    el.style.top = t.pos.y + current.y - p.y + 'px';
+                    document.body.style.cursor = 'move';
+
+                    //判断插入点
+                    for (var i = 0; i < lis.length; i++) {
+                        if (current.x > lis[i]['pos']['x'] && current.x < lis[i]['pos']['x'] + lis[i]['size']['width'] && current.y > lis[i]['pos']['y'] && current.y < lis[i]['pos']['y'] + lis[i]['size']['height'] / 2) {
+                            if (t != lis[i]) {
+                                MOVE.isMove = true;
+                                outer_wrap.insertBefore(div, lis[i]);
+                            }
+
+                        } else if (current.x > lis[i]['pos']['x'] && current.x < lis[i]['pos']['x'] + lis[i]['size']['width'] && current.y > lis[i]['pos']['y'] + lis[i]['size']['height'] / 2 && current.y < lis[i]['pos']['y'] + lis[i]['size']['height']) {
+                            if (t != lis[i]) {
+                                MOVE.isMove = true;
+                                outer_wrap.insertBefore(div, lis[i].nextSibling);
+                            }
+                        }
+                    }
+                }
+                //移除事件
+                document.onmouseup = function (event) {
+                    event = event || window.event;
+                    document.onmousemove = null;
+                    if (MOVE.isMove) {
+                        outer_wrap.replaceChild(t, div);
+                        MOVE.isMove = false;
+                    }
+                    document.body.removeChild(el);
+                    el = null;
+                    document.body.style.cursor = 'normal';
+                    document.onmouseup = null;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

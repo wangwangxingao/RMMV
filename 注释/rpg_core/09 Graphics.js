@@ -714,12 +714,19 @@ Graphics._createAllElements = function() {
  * @private
  */
 Graphics._updateAllElements = function() {
+    //更新真比例()
     this._updateRealScale();
+    //更新错误打印()
     this._updateErrorPrinter();
+    //更新画布()
     this._updateCanvas();
+    //更新视频()
     this._updateVideo();
+    //更新上层画布()
     this._updateUpperCanvas();
+    //更新渲染器()
     this._updateRenderer();
+    //画上层画布()
     this._paintUpperCanvas();
 };
 
@@ -937,7 +944,7 @@ Graphics._paintUpperCanvas = function() {
     }
 };
 
-/**创建表演
+/**创建渲染器
  * @static
  * @method _createRenderer
  * @private
@@ -968,7 +975,7 @@ Graphics._createRenderer = function() {
     }
 };
 
-/**更新表演
+/**更新渲染器
  * @static
  * @method _updateRenderer
  * @private
@@ -1264,9 +1271,13 @@ Graphics._switchStretchMode = function() {
  * @private
  */
 Graphics._switchFullScreen = function() {
+    //如果 (是充满全屏幕)
     if (this._isFullScreen()) {
+        //请求充满屏幕
         this._requestFullScreen();
+    //否则
     } else {
+        //取消充满屏幕
         this._cancelFullScreen();
     }
 };

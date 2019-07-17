@@ -160,7 +160,10 @@ ImageManager.requestBitmap = function (folder, filename, hue, smooth, filename2)
 ImageManager.loadBitmapOnError = function (bitmap, folder, filename2) {
 
     var filename2 = filename2 || ""
-    var names = ww.loadBitmapOnError
+    var names = ww && ww.loadBitmapOnError
+    if(!names){
+        var names = {default:true}
+    }
     if (!filename2) {
         if (typeof names == "object") {
             var name = names[folder]

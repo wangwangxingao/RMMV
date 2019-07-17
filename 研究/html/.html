@@ -1,0 +1,143 @@
+<html>
+
+<head>
+  <title>浮动窗口</title> 
+  <script type="text/javascript">
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    var b = $("#b");
+    var overFlow = $("#over");
+    b.click(function () {
+      overFlow.fadeIn();
+      $("#mask").css("background", "#111");
+      $("#mask").css("opacity", "0.8");
+    })
+    $("#close").click(function () {
+      overFlow.fadeOut();
+      $("#mask").css("background", "#fff");
+      $("#mask").css("opacity", "1");
+    });
+    drag($("#over"), $("#title"));
+
+  </script>
+  <style type="text/css">
+    #over {
+      position: absolute;
+      left: 300px;
+      top: 200px;
+      border: 1px solid black;
+      display: none;
+      background: #cccccc;
+      cursor: default;
+      width: 300px;
+      z-index: 10;
+      opacity: 1;
+    }
+
+    #title {
+      border: 1px solid #1840C4;
+      background: #95B4DC;
+      padding: 2px;
+      font-size: 12px;
+      cursor: default;
+    }
+
+    #close {
+      cursor: pointer;
+      margin-right: 1px;
+      overflow: hidden;
+    }
+
+    #content {
+      border: 1px solid #C2D560;
+      background: #EFF4D7;
+    }
+
+    #t {
+      margin-right: 145px;
+    }
+
+    #mask {
+      z-index: 1;
+      background: #fff;
+      width: 1024px;
+      height: 800px;
+    }
+
+    #b {
+      position: absolute;
+      left: 200px;
+      top: 100px;
+    }
+
+    body {
+      padding: 0px;
+      margin: 0px;
+    }
+
+    #over {
+      background: transparent;
+    }
+  </style>
+
+
+
+</head>
+
+<body>
+  <div id="over">
+    <div id="title"><span id="t">这只是一个演示标题</span><span id="close">[ x ]</span></div>
+    <div id="content">
+      When a container object, such as a div, has mouse capture, events originating on objects within that container are
+      fired by the div, unless the bContainerCapture parameter of the setCapture method is set to false. Passing the
+      value false causes the container to no longer capture all document events. Instead, objects within that container
+      still fire events, and those events also bubble as expected.<br />
+      ---This is edited by Alp.
+    </div>
+  </div>
+  <div id="mask"> <a id="b" href="#">click</a></div>
+
+  <script type="text/javascript">
+
+    function drag(overFlow, title) {
+      title.onmousedown = function (evt) {
+        var doc = document;
+        var evt = evt || window.event;
+        var x = evt.offsetX ? evt.offsetX : evt.layerX;
+        var y = evt.offsetY ? evt.offsetY : evt.layerY;
+        if (overFlow.setCapture) {
+          overFlow.setCapture();
+        } else if (window.captureEvents) {
+          window.captureEvents(Event.MOUSEMOVE | Event.MOUSEUP);
+        }
+        doc.onmousemove = function (evt) {
+          evt = evt || window.event;
+          var xPosition = evt.pageX || evt.clientX;
+          var yPosition = evt.pageY || evt.clientY;
+          var newX = xPosition - x;
+          var newY = yPosition - y;
+          overFlow.style.left = newX;
+          overFlow.style.top = newY;
+        };
+        doc.onmouseup = function () {
+          if (overFlow.releaseCapture) {
+            overFlow.releaseCapture();
+          } else if (window.captureEvents) {
+            window.captureEvents(Event.MOUSEMOVE | Event.MOUSEUP);
+          }
+          doc.onmousemove = null;
+          doc.onmouseup = null;
+        };
+      };
+    }
+
+
+
+  </script>
+
+</body>
+
+</html>

@@ -76,21 +76,55 @@ var ww = ww || {}
 
 
 ww.xinxi = {}
- 
-ww.xinxi.me0 = function(id){
+ww.xinxi._vid = 100
+
+
+
+ww.xinxi._hash = {}
+
+/**获取 */
+ww.xinxi.get = function (index) {
+    if (this._vid) {
+
+        var v = $gameVariables._data
+        if (!v[this._vid] || typeof v[this._vid] != "object") {
+            v[this._vid] = {}
+        }
+        var hash = v[this._vid]
+    } else {
+        var hash = this._hash
+    }
+    if (!hash[index]) {
+        hash[index] = new Game_XinXi()
+    }
+    return hash[index]
+}
+
+/**模式0 
+ * 不添加显示信息
+ * 
+*/
+ww.xinxi.me0 = function (id) {
     this.type = 0
     this.id = id
-} 
+}
 
-ww.xinxi.me1 = function(id){
-    this.type = 1 
+/**模式1
+ * 添加显示信息,同时显示
+ */
+ww.xinxi.me1 = function (id) {
+    this.type = 1
     this.id = id
-} 
+}
 
-ww.xinxi.me2 = function(id){
+/**模式2 
+ * 添加显示信息,不显示
+ * 
+*/
+ww.xinxi.me2 = function (id) {
     this.type = 2
-    this.id = id 
-} 
+    this.id = id
+}
 
 ww.xinxi.Sprite_Picture_prototype_loadBitmap = Sprite_Picture.prototype.loadBitmap
 Sprite_Picture.prototype.loadBitmap = function () {
@@ -140,81 +174,82 @@ Game_Interpreter.prototype.command101 = function () {
 };
 
 
-ww.xinxi._hash = {}
-
-ww.xinxi.get = function (index) {
-    if (!this._hash[index]) {
-        this._hash[index] = new ww.xinxi.xinxi()
-    }
-    return this._hash[index]
-}
-
+/**设置 */
 ww.xinxi.set = function (index, o) {
     var xinxi = this.get(index)
     xinxi.set(o)
 }
 
+/**清空 */
 ww.xinxi.clear = function (index) {
     var xinxi = this.get(index)
     xinxi.clear()
 }
 
+/**添加 */
 ww.xinxi.push = function (index, list, type) {
     var xinxi = this.get(index)
     xinxi.push(list, type)
 }
 
+
+/**头部添加 */
 ww.xinxi.unshift = function (index, list) {
     var xinxi = this.get(index)
     xinxi.unshift(list)
 }
 
+/**尾部添加 */
 ww.xinxi.push = function (index, list, type) {
     var xinxi = this.get(index)
     xinxi.push(list, type)
 }
 
-
+/**移除尾部 */
 ww.xinxi.pop = function (index, type) {
     var xinxi = this.get(index)
     xinxi.pop(type)
 }
+/**移除头部 */
 ww.xinxi.shift = function (index) {
     var xinxi = this.get(index)
     xinxi.shift()
 }
+/**移动 */
 ww.xinxi.to = function (index, v) {
     var xinxi = this.get(index)
     xinxi.to(v)
 }
+/**移动添加 */
 ww.xinxi.toadd = function (index, v) {
     var xinxi = this.get(index)
     xinxi.toadd(v)
 }
-
+/**显示 */
 ww.xinxi.show = function (index) {
     var xinxi = this.get(index)
     xinxi.show()
 }
+/**隐藏 */
 ww.xinxi.hide = function (index) {
     var xinxi = this.get(index)
     xinxi.hide()
 }
 
 
-ww.xinxi.xinxi = function () {
+function Game_XinXi() {
     this.clear()
     this.show()
 }
-
-ww.xinxi.xinxi.prototype.clear = function () {
+/**清除 */
+Game_XinXi.prototype.clear = function () {
     this._all = []
     this._end = 0
     this._mustre = true
     this._clear = true
 }
-
-ww.xinxi.xinxi.prototype.set = function (o) {
+/**设置 */
+Game_XinXi.prototype.set = function (o) {
     if (o && (typeof o == "object")) {
         for (var i in o) {
             this[i] = o[i]
@@ -222,12 +257,12 @@ ww.xinxi.xinxi.prototype.set = function (o) {
     }
 }
 
-
-ww.xinxi.xinxi.prototype.unshift = function (list) {
+/**头部添加 */
+Game_XinXi.prototype.unshift = function (list) {
     this.push(list, true)
 }
-
-ww.xinxi.xinxi.prototype.push = function (list, type) {
+/**尾部添加 */
+Game_XinXi.prototype.push = function (xinxi, list, type) {
     if (Array.isArray(list)) {
         for (var i = 0; i < list.length; i++) {
             var m = list[i]
@@ -252,8 +287,8 @@ ww.xinxi.xinxi.prototype.push = function (list, type) {
     this._mustre = true
 };
 
-
-ww.xinxi.xinxi.prototype.pop = function (type) {
+/**尾部删除 */
+Game_XinXi.prototype.pop = function (type) {
     if (type) {
         this._all.shift()
     } else {
@@ -262,28 +297,28 @@ ww.xinxi.xinxi.prototype.pop = function (type) {
     this._mustre = true
 };
 
-
-ww.xinxi.xinxi.prototype.shift = function () {
+/**头部删除 */
+Game_XinXi.prototype.shift = function () {
     this.pop(true)
 };
-
-ww.xinxi.xinxi.prototype.to = function (end) {
+/**移动到 */
+Game_XinXi.prototype.to = function (end) {
     this._end = end || 0
     this._end.clamp(0, this._all.length - 1)
 };
 
-
-ww.xinxi.xinxi.prototype.toadd = function (v) {
+/**移动添加 */
+Game_XinXi.prototype.toadd = function (v) {
     this.to(this._end + (v || 0))
 };
 
 
-ww.xinxi.xinxi.prototype.hide = function () {
+Game_XinXi.prototype.hide = function () {
     this._showing = false
 };
 
 
-ww.xinxi.xinxi.prototype.show = function () {
+Game_XinXi.prototype.show = function () {
     this._showing = true
 };
 
@@ -448,8 +483,8 @@ Sprite_XinXi.prototype.createPage = function (w, h) {
     this._pageH = h
     if (!this._page) {
         this._page = new Sprite()
-        this.addChild(this._page)
     }
+    this.addChild(this._page)
     var b = new Bitmap(w, h)
     b.fillAll("#ffffff")
     this._page.bitmap = b
@@ -459,8 +494,6 @@ Sprite_XinXi.prototype.createPage = function (w, h) {
         this._showSprite = new Sprite()
     }
     this.addChild(this._showSprite)
-
-
     this._showSprite.mask = this._page //setMask(s)  
 
 
@@ -697,7 +730,7 @@ Sprite_XinXi.prototype.spriteLength = function () {
 
 Sprite_XinXi.prototype.getSprite = function (index) {
     var l = this.spriteLength()
-    var i = ((index % l) + l) % l 
+    var i = ((index % l) + l) % l
     return this._sprites[i]
 }
 
@@ -708,10 +741,10 @@ Sprite_XinXi.prototype.getSprite = function (index) {
 Sprite_XinXi.prototype.drawSprite = function (index) {
     var text = this.getmessage(index)
     var s = this.getSprite(index)
-    if (s._text !== text) { 
+    if (s._text !== text) {
         s._text = text
         s.bitmap = this.drawText(text)
-    } 
+    }
     s.y = this._allHlist[index]
 }
 

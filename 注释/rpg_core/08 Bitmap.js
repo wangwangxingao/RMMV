@@ -24,31 +24,40 @@ Bitmap._reuseImages = [];
  * Bitmap states(Bitmap._loadingState):
  *
  * none: 
- * Empty Bitmap 空图片
+ * Empty Bitmap
+ * 空图片
  *
  * pending:
  * Url requested, but pending to load until startRequest called
+ * 请求了Url，但挂起，直到调用startRequest
  *
  * purged:
  * Url request completed and purged.
+ * 网址请求已完成并已清除。
  *
  * requesting:
  * Requesting supplied URI now.
+ * 现在请求提供的URI。
  *
  * requestCompleted:
  * Request completed
+ * 请求已完成
  *
  * decrypting:
  * requesting encrypted data from supplied URI or decrypting it.
+ * 从提供的URI请求加密数据或解密它。
  *
  * decryptCompleted:
  * Decrypt completed   
+ * 解密完成
  *
  * loaded:
- * loaded. isReady() === true, so It's usable. 是读取后的 
+ * loaded. isReady() === true, so It's usable. 
+ * 是读取后的 
  *
  * error:
- * error occurred  是错误的
+ * error occurred  
+ * 是错误的
  *
  */
 
@@ -65,13 +74,18 @@ Bitmap.prototype._createCanvas = function(width, height){
     this.__canvas.width = Math.max(width || 0, 1);
     this.__canvas.height = Math.max(height || 0, 1);
 
+    //如果 图像
     if(this._image){
+
         var w = Math.max(this._image.width || 0, 1);
         var h = Math.max(this._image.height || 0, 1);
+        //修改画布宽
         this.__canvas.width = w;
+        //修改画布高
         this.__canvas.height = h;
+        //创建基础纹理(画布)
         this._createBaseTexture(this._canvas);
-
+        //
         this.__context.drawImage(this._image, 0, 0);
     }
 
@@ -141,6 +155,7 @@ Object.defineProperties(Bitmap.prototype, {
  * 
 */
 Bitmap.prototype._renewCanvas = function(){
+    //新图像 = 图像
     var newImage = this._image;
     if(newImage && this.__canvas && (this.__canvas.width < newImage.width || this.__canvas.height < newImage.height)){
         this._createCanvas();

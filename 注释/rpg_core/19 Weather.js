@@ -20,7 +20,9 @@ Weather.prototype.initialize = function() {
     this._height = Graphics.height;
     this._sprites = [];
 
+    /**创建位图 */
     this._createBitmaps();
+    /**创建调光器 */
     this._createDimmer();
 
     /**天气类型在['无'，'雨'，'风暴'，'雪']
@@ -54,11 +56,14 @@ Weather.prototype.initialize = function() {
  * @method update
  */
 Weather.prototype.update = function() {
+    //更新调光器()
     this._updateDimmer();
+    //更新所有精灵
     this._updateAllSprites();
 };
 
 /**创建位图
+ * 
  * @method _createBitmaps
  * @private
  */
@@ -94,14 +99,21 @@ Weather.prototype._updateDimmer = function() {
  * @private
  */
 Weather.prototype._updateAllSprites = function() {
+    //最大精灵数
     var maxSprites = Math.floor(this.power * 10);
+    //如果 精灵数 小于 最大精灵数 
     while (this._sprites.length < maxSprites) {
+        //添加精灵()
         this._addSprite();
     }
+    //如果 精灵数 大于 最大精灵数
     while (this._sprites.length > maxSprites) {
+        //删除精灵()
         this._removeSprite();
     }
+    //对每一个精灵
     this._sprites.forEach(function(sprite) {
+        //更新精灵
         this._updateSprite(sprite);
         sprite.x = sprite.ax - this.origin.x;
         sprite.y = sprite.ay - this.origin.y;
@@ -156,6 +168,7 @@ Weather.prototype._updateSprite = function(sprite) {
  */
 Weather.prototype._updateRainSprite = function(sprite) {
     sprite.bitmap = this._rainBitmap;
+    //旋转
     sprite.rotation = Math.PI / 16;
     sprite.ax -= 6 * Math.sin(sprite.rotation);
     sprite.ay += 6 * Math.cos(sprite.rotation);

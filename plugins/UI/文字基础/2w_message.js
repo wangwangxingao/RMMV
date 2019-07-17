@@ -7,6 +7,13 @@
  * @author 汪汪
  * @version 2.0
  * 
+ *
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
  * @help 
  *  
  * \. \|  : 扩展  \.[z] 和 \|[z] 方法  等待z
@@ -61,6 +68,10 @@
  *     设置外围线条颜色 
  * \OW[number]
  *     设置外围线条粗细 
+ * 
+ * \BW[width]  下方绘制圆弧宽
+ * \BC[color]  下方绘制颜色
+ * 
  * 
  * \WT[z] 
  *     设置本页的横向排列位置 , 不填为 0左对齐,   1 中间,2右对齐
@@ -153,7 +164,7 @@ Bitmap.prototype.window = function () {
 }
 
 
-Bitmap.prototype._drawTextOutline = function(text, tx, ty, maxWidth) {
+Bitmap.prototype._drawTextOutline = function (text, tx, ty, maxWidth) {
     if (!this.outlineWidth) { return }
     //环境 = 环境
     var context = this._context;
@@ -450,38 +461,38 @@ Window_Base.prototype.nextCharacter = function (textState) {
 };
 
 /**绘制文本状态 */
-Window_Base.prototype.drawTextState = function (textState,index) {
-    if (textState) { 
-        if(index !== undefined){
+Window_Base.prototype.drawTextState = function (textState, index) {
+    if (textState) {
+        if (index !== undefined) {
             textState.index = index
         }
-        if(!textState.index){
-            this.resetFontSettings(); 
+        if (!textState.index) {
+            this.resetFontSettings();
         }
         if (textState.index < textState.list.length) {
             this.processDrawCharacter(textState);
             textState.index += 1
             return false
         }
-    } 
+    }
     return true
 };
 
 /**绘制某一页 */
 Window_Base.prototype.drawTextStatePage = function (textState, pageIndex) {
     if (textState) {
-        var textState = textState ;
-        var pageIndex = pageIndex ||0
+        var textState = textState;
+        var pageIndex = pageIndex || 0
         this.resetFontSettings();
-        var pi = 0 
+        var pi = 0
         while (textState.index < textState.list.length) {
             this.processDrawCharacter(textState);
             textState.index += 1
             if (this.needsNewPage(textState)) {
-                if(pi == pageIndex){
+                if (pi == pageIndex) {
                     break
-                } else{
-                   pi++
+                } else {
+                    pi++
                 }
             }
         }
@@ -979,7 +990,12 @@ Window_Base.prototype.tslPushEscapeCharacter = function (textState, code) {
         case 'C':
             this.tslPushTextColor(textState, this.tslPushTextColorEscapeParam(textState));
             break;
-
+        case 'BC':
+            this.tslPushBC(textState, this.tslPushTextColorEscapeParam(textState));
+            break;
+        case 'BW':
+            this.tslPushBW(textState, this.tslPushEscapeParam(textState));
+            break;
         case 'T':
             this.tslPushPicParam(textState)
             break;
@@ -1540,6 +1556,13 @@ Window_Base.prototype.tslPushTextColor = function (textState, color) {
     }
     this.tslPushOther(textState, obj)
 };
+Window_Base.prototype.tslPushBC = function (textState, color) {
+    var obj = {
+        "type": "bc",
+        "value": color
+    }
+    this.tslPushOther(textState, obj)
+};
 
 /**添加描边颜色 */
 Window_Base.prototype.tslPushOutColor = function (textState, color) {
@@ -1559,6 +1582,15 @@ Window_Base.prototype.tslPushOutWidth = function (textState, width) {
     this.tslPushFont(textState, obj)
 };
 
+
+
+Window_Base.prototype.tslPushBW = function (textState, width) {
+    var obj = {
+        "type": "bw",
+        "value": width
+    }
+    this.tslPushOther(textState, obj)
+};
 
 /**添加绘制图标 */
 Window_Base.prototype.tslPushDrawIcon = function (textState, iconId) {
@@ -1810,6 +1842,7 @@ Window_Base.prototype.processDrawCharacter = function (textState) {
                     textState.page.set.draw.y +
                     textState.page.test.y +
                     textState.line.test.y
+                this.processBC(textState.bw, textState.bc, textState)
                 break
             case "page":
             case "addpage":
@@ -1822,6 +1855,13 @@ Window_Base.prototype.processDrawCharacter = function (textState) {
             case "outlineColor":
             case "outlineWidth":
                 this.processFont(obj.type, obj.value);
+                break
+            case "bw":
+                textState.bw = obj.value
+                break
+            case "bc":
+                textState.bc = obj.value
+                this.processBC(textState.bw, textState.bc, textState)
                 break
             case "text":
                 var x = textState.drawx + obj.test.x
@@ -1874,6 +1914,20 @@ Window_Base.prototype.processDrawCharacter = function (textState) {
 }
 
 
+Window_Base.prototype.processBC = function (type, value, textState) {
+    if (!value) { return }
+    var z = textState.page.test
+    var s = textState.page.set.draw
+    var l = textState.line.test
+
+    z && this.drawBitmapBC(this.contents, z.x + s.x + l.x, z.y + s.y + l.y, l.w, l.h, type || 0, value)
+}
+
+
+Window_Base.prototype.drawBitmapBC = function (b, x, y, w, h, type, value) {
+    console.log(x, y, w, h, type, value, 0, "fill")
+    b && b.drawRoundedRectangle(x, y, w, h, type, value, 0, "fill");
+};
 
 Window_Base.prototype.processFont = function (type, value) {
     this.drawBitmapFont(this.contents, type, value)
@@ -2011,8 +2065,8 @@ Window_Message.prototype.tslPushNewPageY = function (textState) {
     var page = this.makePage(textState)
     var line = this.makeLine(textState)
     var arr = this.tslPushEscapeParamEx(textState)
-    if (arr) { 
-        page.set.wz = arr 
+    if (arr) {
+        page.set.wz = arr
         var wz = arr[0] * 1
         if (wz == 10 || wz == 11 || wz == 12) {
             page.set.wtype = 0
@@ -2108,7 +2162,7 @@ Window_Message.prototype.processDrawCharacter = function (textState) {
                 this.resetFontSettings();
                 this.clearlineShowFast();
                 this.clearSkipFlags()
-                case "addpage":
+            case "addpage":
                 textState.page = obj;
                 var page = obj
                 this.contents.clear();
@@ -2224,10 +2278,10 @@ Window_Message.prototype.updateBackground = function (background) {
 };
 
 
-Window_Message.prototype.update_2w_message   = Window_Message.prototype.update 
-Window_Message.prototype.update= function ()  { 
+Window_Message.prototype.update_2w_message = Window_Message.prototype.update
+Window_Message.prototype.update = function () {
     this.update_2w_message()
-    if(this._needUpdatePlacement){
+    if (this._needUpdatePlacement) {
         this.updatePlacement()
     }
 }
@@ -2308,14 +2362,14 @@ Window_Message.prototype.updatePlacement = function () {
         var rw = 1
         //场景高
         var rh = 1
-        if (type == 0 ||  type == 1 || type == 2) {
-            var rh =  Graphics.boxHeight 
-            var cey =  type *0.5 
-            var wey =  cey
+        if (type == 0 || type == 1 || type == 2) {
+            var rh = Graphics.boxHeight
+            var cey = type * 0.5
+            var wey = cey
 
-            var rw  =  Graphics.boxWidth
+            var rw = Graphics.boxWidth
             var cex = 0.5
-            var wex = 0.5 
+            var wex = 0.5
         } else if (type == 12) {
             var rw = Graphics.boxWidth
             var rh = Graphics.boxHeight
@@ -2369,7 +2423,7 @@ Window_Message.prototype.updatePlacement = function () {
                 var rh = SceneManager._screenHeight
             }
         } else {
-            if(type > 10 ){
+            if (type > 10) {
                 type = type - 10
                 this._needUpdatePlacement = true
             }
@@ -2517,7 +2571,7 @@ Window_Message.prototype.updatePlacement = function () {
 
             }
         }
-        
+
         var x = rx + cex * rw - w * wex + wdx
         var y = ry + cey * rh - h * wey + wdy
 

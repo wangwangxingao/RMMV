@@ -35,11 +35,29 @@ ww.draw.drawFun = function (bitmap, list) {
         var set = list[i]
         if (Array.isArray(set)) {
             var n = set[0]
-            var p = set.slice(1) 
+            var p = set.slice(1)
             if (typeof (context[n]) == "function") {
                 context[n].apply(context, p)
             } else {
-                context[n] = p[0]
+                if (n == "fillStyle" || "strokeStyle") {
+                    if (p[0] == "createLinearGradient") {
+                        var canvasGradient = context.createLinearGradient(p[1], p[2], p[3], p[4]);
+                        for (var pi = 5; pi < p.length; pi += 2) {
+                            canvasGradient.addColorStop(p[pi], p[pi + 1]);
+                        }
+                        context[n] = canvasGradient
+                    } else if (p[0] == "createRadialGradient") {
+                        var canvasGradient = context.createLinearGradient(p[1], p[2], p[3], p[4], p[5]);
+                        for (var pi = 6; pi < p.length; pi += 2) {
+                            canvasGradient.addColorStop(p[pi], p[pi + 1]);
+                        }
+                        context[n] = canvasGradient
+                    } else {
+                        context[n] = p[0]
+                    }
+                } else {
+                    context[n] = p[0]
+                }
             }
         } else if (typeof (set) == "string") {
             if (typeof (context[set]) == "function") {
@@ -78,7 +96,7 @@ Bitmap.prototype.drawLine = function (x, y, x2, y2, line) {
  * 
  */
 Bitmap.prototype.drawCircleSE = function (x, y, r, start, end, color, t) {
-    var type = type ? "stroke" : "fill"
+    var type = type == "stroke" || type == "fill" ? type : type ? "fill" : "stroke"
     var unit = Math.PI / 180;
     var start = start || 0
     var end = end === undefined ? 360 : (end || 0)
@@ -86,10 +104,10 @@ Bitmap.prototype.drawCircleSE = function (x, y, r, start, end, color, t) {
         "save",
         [type + "Style", color],
         "beginPath",
-        !t?["moveTo", x, y]:0,
+        !t ? ["moveTo", x, y] : 0,
         ["arc", x, y, r, start * unit, end * unit],
-        !t?["moveTo", x, y]:0,
-        !t?"closePath":"",
+        !t ? ["moveTo", x, y] : 0,
+        !t ? "closePath" : "",
         type,
         "restore",
     ]
@@ -104,7 +122,8 @@ Bitmap.prototype.drawCircleSE = function (x, y, r, start, end, color, t) {
 Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, color, type, j0, j1, j2, j3) {
 
 
-    var type = type ? "stroke" : "fill"
+    var type = type == "stroke" || type == "fill" ? type : type ? "fill" : "stroke"
+
     var list = [
         "save"
         [type + "Style", color],
@@ -149,25 +168,59 @@ Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, c
         list.push(["quadraticCurveTo", x, y, x, y + radius])
     }
     list.push("closePath", type, "restore")
-    list.push(type)
-    list.push("restore")
     this.drawFun(list)
 }
 
+ 
+
+
+Bitmap.prototype.fillCircle = function (color, s, e) {
+    var x = this.width * 0.5
+    var y = this.height * 0.5
+    this.drawCircleSE(x, y, Math.min(x, y), s, e, color);
+};
+
+Bitmap.prototype.fillRoundedRectangle = function (color,line,type,j0, j1, j2, j3) {
+    var r = Math.min(this.width * 0.1, this.height * 0.1)
+    this.drawRoundedRectangle(0, 0, this.width, this.height, r, color,line,type,j0, j1, j2, j3) ;
+}
+
+
+
 
 /**绘制圆角矩形 */
-Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, color, type, j0, j1, j2, j3) {
-
-
-    var type = type ? "stroke" : "fill"
+Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, color, line, type, j0, j1, j2, j3) {
+    var type = (type == "stroke" || type == "fill") ? type : type ? "fill" : "stroke"
     //环境 = 环境
     var context = this._context;
     //环境 保存()
     context.save();
 
+    if (Array.isArray(color)) {
+        var p = color
+        if (p[0] == "createLinearGradient") {
+            var canvasGradient = context.createLinearGradient(p[1], p[2], p[3], p[4]);
+            for (var pi = 5; pi < p.length; pi += 2) {
+                canvasGradient.addColorStop(p[pi], p[pi + 1]);
+            }
+        } else if (p[0] == "createRadialGradient") {
+            var canvasGradient = context.createLinearGradient(p[1], p[2], p[3], p[4], p[5]);
+            for (var pi = 6; pi < p.length; pi += 2) {
+                canvasGradient.addColorStop(p[pi], p[pi + 1]);
+            }
+        } else {
+            var canvasGradient = p[0]
+        }
+        context[type + 'Style'] = canvasGradient;
+    } else {
+        context[type + 'Style'] = color;
+    }
 
-    context[type + 'Style'] = color;
-
+    if (line) {
+        for (var i in line) {
+            context[i] = line[i]
+        }
+    }
     /**
      * 0 3
      * 1 2
@@ -214,8 +267,6 @@ Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, c
 
     context.closePath();
     context[type]();
-
-
     //环境 恢复()
     context.restore();
     //设置发生更改()
@@ -223,18 +274,6 @@ Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, c
 
 }
 
-
-
-Bitmap.prototype.fillCircle = function (color, s, e) {
-    var x = this.width * 0.5
-    var y = this.height * 0.5
-    this.drawCircleSE(x, y, Math.min(x, y), s, e, color);
-};
-
-Bitmap.prototype.fillRoundedRectangle = function (color, j0, j1, j2, j3) {
-    var r = Math.min(this.width * 0.1, this.height * 0.1)
-    this.drawRoundedRectangle(0, 0, this.width, this.height, r, color, 0, j0, j1, j2, j3);
-}
 
 /**
 描述

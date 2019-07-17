@@ -86,6 +86,7 @@ JsonEx._linkCircularReference = function(contents, circulars, registry) {
     });
 };
 
+/**清理元数据 */
 JsonEx._cleanMetadata = function(object) {
     if (!object) return;
 

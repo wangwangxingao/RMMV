@@ -196,14 +196,6 @@ Xoshiro.prototype.random128ss = function () {
 
 
 
-
-Xoshiro.prototype.random128pReal = function () {
-    return Xoshiro.real(this.random128p());
-} //[0,1)
-Xoshiro.prototype.random128ssReal = function () {
-    return Xoshiro.real(this.random128ss());
-
-} //[0,1)
 Xoshiro.prototype.random64sReal = function () {
     return Xoshiro.real(this.random64s());
 } //[0,1)
@@ -213,6 +205,13 @@ Xoshiro.prototype.random64ssReal = function () {
     return Xoshiro.real(this.random64ss());
 } //[0,1)
 
+
+Xoshiro.prototype.random128pReal = function () {
+    return Xoshiro.real(this.random128p());
+} //[0,1)
+Xoshiro.prototype.random128ssReal = function () {
+    return Xoshiro.real(this.random128ss());
+} //[0,1)
 
 
 Xoshiro.prototype.random64sFree = function (num) {

@@ -37,10 +37,10 @@ ww.data2xls.parse = function (that) {
 
 /**
  * 深度复制 
- * @param {*} that 
- * @param {*} obj 
- * @param {*} setslist 
- * @param {*} father 
+ * @param {*} that 源
+ * @param {*} obj 对象
+ * @param {*} setslist 设置列表
+ * @param {*} father 父
  */
 ww.data2xls.copyo2l = function (that, obj, setslist, father) {
     var that = that
@@ -111,7 +111,7 @@ ww.data2xls.check = function (that, obj, setslist, father, i) {
  * @param {*} that 原始数据
  * @param {*} father 父组
  * @param {*} i 子变量名
- * @param {*} sets 设置
+ * @param {*} sets 设置 
  */
 ww.data2xls.checksets = function (that, father, i, sets) {
     if (typeof sets == "object" && sets !== null) {
@@ -133,7 +133,21 @@ ww.data2xls.checksets = function (that, father, i, sets) {
  * @param {*} that 原始数据
  * @param {*} father 父组
  * @param {*} i 子变量名
- * @param {*} set 设置 
+ * @param {*} set 设置  
+ * 无  允许  
+ * 字符串  子变量名 与其相等  
+ * 数组  子变量 在其中  
+ * 对象   
+ * nameTypes 子变量名类型 在其中  
+ * names 子变量名 在其中  
+ * types 子变量类型 在其中  
+ * values 子变量值 在其中  
+ * has  存在此参数  
+ * re  返回
+ * 数值   
+ * 1 子变量值存在  
+ * 2 子变量值 为字符串  
+ * -1 不允许
  */
 ww.data2xls.checkset = function (that, father, i, set) {
     if (!set) {

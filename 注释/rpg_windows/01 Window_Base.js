@@ -348,12 +348,15 @@ Window_Base.prototype.convertEscapeCharacters = function(text) {
     text = text.replace(/\x1bV\[(\d+)\]/gi, function() {
         return $gameVariables.value(parseInt(arguments[1]));
     }.bind(this));
+    //替换\xlbN[n]为  角色名称 
     text = text.replace(/\x1bN\[(\d+)\]/gi, function() {
         return this.actorName(parseInt(arguments[1]));
     }.bind(this));
+    //替换\xlbP[n]为  队伍成员名称 
     text = text.replace(/\x1bP\[(\d+)\]/gi, function() {
         return this.partyMemberName(parseInt(arguments[1]));
     }.bind(this));
+    //替换\xlbG为  金钱
     text = text.replace(/\x1bG/gi, TextManager.currencyUnit);
     return text;
 };
