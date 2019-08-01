@@ -53,3 +53,7 @@ Temporary Items
 /plugins/战斗/战斗图增强
 plugins/UI/列表显示/Sprite_listscene.js
 .gitignore
+.vscode/settings.json
+.gitignore
+plugins/游戏/阻占棋/zuzhanqi.js
+.gitignore

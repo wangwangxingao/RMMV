@@ -122,20 +122,20 @@ HBQManager.p = function (v) {
     return false
 }
 
-HBQManager.npId = function (v) { 
+HBQManager.npId = function () {
     return this.pId(this._hb)
 }
 
 HBQManager.pId = function (v) {
     if (v > 0) {
-        return  this._eventId - v 
+        return this._eventId - v
     }
     return false
 }
 
 HBQManager.eId = function (v) {
     if (v >= 0) {
-        return  v + this._eventId 
+        return v + this._eventId
     }
 }
 
@@ -371,6 +371,14 @@ HBQManager.hvsb = function () {
     return this.hbq.hvsb()
 };
 
+/**黑白棋结果 黑结果*/
+HBQManager.hvsbh = function () {
+    return this.hbq.hvsbh()
+};
+/**黑白棋结果 白结果*/
+HBQManager.hvsbb = function () {
+    return this.hbq.hvsbb()
+};
 
 /**复制fid事件到tid x ,y*/
 HBQManager.copyEvent = function (tid, x, y) {
@@ -506,6 +514,7 @@ Game_HeiBaiQi.prototype.makehbq = function (set) {
 Game_HeiBaiQi.prototype.makeInfo = function (w, h) {
     this.w = w
     this.h = h
+    this.all = w * h
     this._way = []
     this.push([w, h])
 }
@@ -793,6 +802,7 @@ Game_HeiBaiQi.prototype.celue = function (i) {
         var l2 = this.jsluozi(i2)
         //另一个人也不能走
         if (l2.length == 0) {
+            this.evalOver()
             //游戏结束
             return -3
         }
@@ -867,24 +877,9 @@ Game_HeiBaiQi.prototype.toString = function () {
     return s
 }
 
-/**胜负字符串 */
-Game_HeiBaiQi.prototype.hvsbStrite = function () {
-    var hb = [0, 0, 0, 0]
-    for (var hi = 0; hi < this.h; hi++) {
-        for (var wi = 0; wi < this.w; wi++) {
-            var l = this.xyqz(wi, hi)
-            hb[l]++
-            if (l > 0) {
-                hb[3]++
-            }
-        }
-    }
-    return "结果: " + (hb[1] == hb[2] ? "平手" : (hb[1] > hb[2] ? "红多" : "蓝多")) + " ;\n" + "红: " + hb[1] + " ; " + "蓝: " + hb[2] + " ;\n" +
-        "空: " + hb[0] + " ; " + "全: " + hb[3]
-}
 
 /**计算输赢 */
-Game_HeiBaiQi.prototype.hvsb = function () {
+Game_HeiBaiQi.prototype.evalOver = function () {
     var hb = [0, 0, 0, 0]
     for (var hi = 0; hi < this.h; hi++) {
         for (var wi = 0; wi < this.w; wi++) {
@@ -895,8 +890,30 @@ Game_HeiBaiQi.prototype.hvsb = function () {
             }
         }
     }
-    return (hb[1] == hb[2] ? 1.5 : hb[1] > hb[2] ? 1 : 2)
+    this.over = (hb[1] == hb[2] ? 3 : hb[1] > hb[2] ? 1 : 2)
+    this.overh = hb[1]
+    this.overb = hb[2]
+    this.overk = hb[0]
+    this.overa = hb[3]
 }
+Game_HeiBaiQi.prototype.hvsb = function () {
+    return this.over
+}
+Game_HeiBaiQi.prototype.hvsbh = function () {
+    return this.overh
+}
+
+Game_HeiBaiQi.prototype.hvsbb = function () {
+    return this.overb
+}
+
+/**胜负字符串 */
+Game_HeiBaiQi.prototype.hvsbStrite = function () {
+    this.evalOver()
+    return "结果: " + (this.over == 3 ? "平手" : (this.over == 1 ? "红多" : "蓝多")) + " ;\n" + "红: " + this.overh + " ; " + "蓝: " + this.overb + " ;\n" +
+        "空: " + this.overk + " ; " + "全: " + this.overa
+}
+
 /**转化为字符串2 */
 Game_HeiBaiQi.prototype.toString2 = function (v) {
     var s = ""
@@ -1041,6 +1058,7 @@ Game_WuZi.prototype.makehbq = function (set) {
 Game_WuZi.prototype.makeInfo = function (w, h) {
     this.w = w
     this.h = h
+    this.all = w * h
     this._way = []
     this.push([w, h])
 }
@@ -1151,13 +1169,18 @@ Game_WuZi.prototype.evalluozi = function (i, id) {
             for (var k in wins[id]) {
                 var z = win[i][k] || 0
                 var z2 = win[i2][k] || 0
-                sc[1] += c1[z] || 0
-                sc[2] += c2[z2] || 0
-                sc[3][z] = (sc[3][z] || 0) + 1
-                sc[4][z2] = (sc[4][z2] || 0) + 1
-                sc[5][k] = z
-                sc[6][k] = z2
-                re = sc
+                if (z <= 5 || z2 <= 5) {
+
+                    sc[1] += c1[z] || 0
+                    sc[2] += c2[z2] || 0
+                    sc[3][z] = (sc[3][z] || 0) + 1
+                    sc[4][z2] = (sc[4][z2] || 0) + 1
+                    sc[5][k] = z
+                    sc[6][k] = z2
+                    re = sc
+
+                }
+
             }
         }
     }
@@ -1181,7 +1204,7 @@ Game_WuZi.prototype.evalsetqz = function (i, id) {
                 win[i2][k] += 6;  //计算机在这种赢法就不可能赢，设置一个异常的值6
                 //说明黑棋已经赢了
                 if (win[i][k] == 5) {
-                    this.over = i2;
+                    this.evalOver()
                 }
             }
         } else {
@@ -1208,20 +1231,43 @@ Game_WuZi.prototype.evalsetqz = function (i, id) {
 Game_WuZi.prototype.evalOver = function () {
     var count = Game_WuZi._count
     var win = this._wzs2
+
+    this.over = 0
+    this.overh = 0
+    this.overb = 0
+    this.overk = 0
+    this.overa = this.all
+
+
     for (var k = 0; k < count; k++) {
         //如果为true说明我们在K种赢法上面胜算大了一步
-        if (win[1][k] == 5) {
-            this.overId =  Game_WuZi._countset[k][0] 
-            this.overType = Game_WuZi._countset[k][1] 
-            return this.over = 1
+        var w = win[1][k]
+        if (w <= 5) {
+            this.overk++
+            this.overh = Math.max(this.overh, w)
+            if (w == 5) {
+                if (!this.over) {
+                    this.over = 1
+                    this.overId = Game_WuZi._countset[k][0]
+                    this.overType = Game_WuZi._countset[k][1]
+                }
+            }
         }
-        if (win[2][k] == 5) {
-            this.overId = Game_WuZi._countset[k][0] 
-            this.overType = Game_WuZi._countset[k][1]
-            return this.over = 2
+        var w = win[2][k]
+        if (w <= 5) {
+            this.overk++
+            this.overb = Math.max(this.overb, w)
+            if (w == 5) {
+                if (!this.over) {
+                    this.over = 2
+                    this.overId = Game_WuZi._countset[k][0]
+                    this.overType = Game_WuZi._countset[k][1]
+                }
+
+            }
         }
     }
-    this.over = 0
+
     return this.over
 }
 
@@ -1267,7 +1313,7 @@ Game_WuZi.prototype.sort = function (a, b) {
 
 Game_WuZi.prototype.celue = function (i) {
     if (Game_WuZi.celueType) {
-        return this.celue1(i) 
+        return this.celue1(i)
     } else {
         return this.celue0(i)
     }
@@ -1278,24 +1324,28 @@ Game_WuZi.prototype.celue1 = function (i) {
     var i2 = i == 2 ? 1 : 2
     //一个人无路可走 (实际上即两个人无路可走)
     if (l.length == 0) {
+        this.evalOver()
         //平局
-        this.over = 1.5
+        this.over = 3
         //游戏结束
         return -3
     } else {
         //下了也白下
         if (l[0][1] == 0 && l[0][2] == 0) {
-            this.over = 1.5
+            this.evalOver()
+            this.over = 3
             return -3
         }
         //下一个子为胜利
         if (l[0][3][4]) {
+            this.evalOver()
             //我方胜利
             this.over = i
             return -3
         }
         //我方无胜利可能,对方两个胜利可能
         if (l.length >= 2 && l[0][4][4] && l[1][4][4]) {
+            this.evalOver()
             this.over = i2
             return -3
         }
@@ -1314,8 +1364,9 @@ Game_WuZi.prototype.celue0 = function (i) {
     var i2 = i == 2 ? 1 : 2
     //一个人无路可走 (实际上即两个人无路可走)
     if (l.length == 0) {
+        this.evalOver()
         //平局
-        this.over = 1.5
+        this.over = 3
         //游戏结束
         return -3
     } else {
@@ -1326,11 +1377,17 @@ Game_WuZi.prototype.celue0 = function (i) {
 Game_WuZi.prototype.hvsb = function () {
     return this.over
 }
+Game_WuZi.prototype.hvsbh = function () {
+    return this.overh
+}
 
- 
+Game_WuZi.prototype.hvsbb = function () {
+    return this.overb
+}
+
 
 Game_WuZi.prototype.hvsbStrite = function () {
-    return "结果: " + (this.over == 1.5 ? "平手" : (this.over == 1 ? "1胜" : "2胜"))
+    return "结果: " + (this.over == 3 ? "平手" : (this.over == 1 ? "1胜" : "2胜"))
 }
 
 

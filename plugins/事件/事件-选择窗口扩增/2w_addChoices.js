@@ -20,7 +20,19 @@
  * (如n为2,则为下面的显示选项 + 往后的显示选项 , 共3个显示选项拼在一起)
  * 
  * 
- *  
+ * 设置显示选项
+ * this.setAddChoices(list)
+ * @param {[number]} list 数组,为显示选项的索引,第一个选项为0
+ * 
+ * 设置id处显示选项为index
+ * this.setAddChoice(id,index)
+ * @param {number} id 显示的id位置处的选项
+ * @param {number} index 设置为的选项id
+ * 
+ * 添加显示选项
+ * this.pushAddChoice(index)
+ * @param {number} index 添加的选项id 
+ * 
  */
 
 
@@ -32,24 +44,63 @@ Game_Interpreter.prototype.addChoicesClear = Game_Interpreter.prototype.clear
 Game_Interpreter.prototype.clear = function () {
     this.addChoicesClear()
     this._addChoices = 0
+    this._addChoicesParams = []
+    this._setChoices = []
     this._choicesBranch = {}
+
 };
 
 /**增加显示选项
- * @param {number} n
+ * 
+ * @param {number} n 
  */
 Game_Interpreter.prototype.addChoices = function (n) {
     this._addChoices = n
     delete this._choicesBranch[this._indent]
 };
 
- 
-/**增加显示选项
- * @param {number} n
+/**增加显示选项 
+ * @param {number} type 种类
+ * @param {number} index 索引
  */
-Game_Interpreter.prototype.setChoices = function (list) {
-    this._setChoices = list 
+Game_Interpreter.prototype.setChoicesParams = function (type, index) {
+    if (!Array.isArray(this._addChoicesParams)) {
+        this._addChoicesParams = []
+    }
+    this._addChoicesParams[type] = index
 };
+
+
+/**设置显示选项
+ * @param {[number]} list 数组,为显示选项的索引,第一个选项为0
+ */
+Game_Interpreter.prototype.setAddChoices = function (list) {
+    this._setChoices = list || []
+};
+
+
+/**设置id处显示选项为index
+ * @param {number} id 显示的id位置处的选项
+ * @param {number} index 设置为的选项id
+ */
+Game_Interpreter.prototype.setAddChoice = function (id, index) {
+    if (!Array.isArray(this._setChoices)) {
+        this._setChoices = []
+    }
+    this._setChoices[id] = index
+};
+
+/**添加显示选项
+ * @param {number} index 添加的选项id 
+ */
+Game_Interpreter.prototype.pushAddChoice = function (index) {
+    if (!Array.isArray(this._setChoices)) {
+        this._setChoices = []
+    }
+    this._setChoices[id] = index
+};
+
+
 
 /** Show Text 显示文本*/
 Game_Interpreter.prototype.command101 = function () {
@@ -121,8 +172,23 @@ Game_Interpreter.prototype.setupAddChoices = function () {
     choices = choices.concat(params[0])
 
     var addParams = []
-    for (var i = 0; i < params.length; i++) {
-        addParams[i] = params[i]
+
+    var l = params
+    if (Array.isArray(l)) {
+        for (var i = 0; i < l.length; i++) {
+            if (l[i] !== undefined) {
+                addParams[i] = l[i]
+            }
+        }
+    }
+
+    var l = this._addChoicesParams
+    if (Array.isArray(l)) {
+        for (var i = 0; i < l.length; i++) {
+            if (l[i] !== undefined) {
+                addParams[i] = l[i]
+            }
+        }
     }
 
     while (addNumber) {
@@ -158,15 +224,16 @@ Game_Interpreter.prototype.setupAddChoices = function () {
 Game_Interpreter.prototype.setupChoices = function (params) {
 
     var choices = params[0].clone();
- 
+
     var setChoices = this._setChoices
-    if ( setChoices && setChoices.length > 0) { 
-        var choices = [] ;
+    if (setChoices && setChoices.length > 0) {
+        var l = [];
         for (var i = 0; i < setChoices.length; i++) {
-            choices.push(choices[setChoices[i]]) 
-        } 
+            l.push(choices[setChoices[i]])
+        }
     }
-    this._setChoices = null
+    choices = l
+    this._setChoices = []
 
     //选择组 = 参数组[0] 克隆()
     //取消种类 = 参数组[1]
@@ -189,11 +256,11 @@ Game_Interpreter.prototype.setupChoices = function (params) {
     //游戏消息 设置选择位置种类 (位置种类)
     $gameMessage.setChoicePositionType(positionType);
     //游戏消息 设置选择呼回  方法(n)
-    $gameMessage.setChoiceCallback(function (n) { 
-        if(setChoices){ 
-            this._branch[this._indent] = setChoices[n]; 
-        }else{
-            this._branch[this._indent] = n; 
+    $gameMessage.setChoiceCallback(function (n) {
+        if (setChoices) {
+            this._branch[this._indent] = setChoices[n];
+        } else {
+            this._branch[this._indent] = n;
         }
         //分支[缩进] = n
         //绑定(this) )
