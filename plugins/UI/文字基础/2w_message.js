@@ -129,7 +129,6 @@
  */
 
 
-
 Window_Base.deepCopy = function (that) {
     var obj
     if (typeof (that) === "object") {
@@ -183,6 +182,15 @@ Bitmap.prototype._makeFontNameText = function () {
 };
 
 
+/**字体设置 */
+Window_Base.prototype.fontSettings = function (i) {
+    if (i || !this.contents._fontnametext) {
+        this.contents._fontnametext = this.contents._makeFontNameText()
+    }
+    return this.contents._fontnametext
+};
+
+
 Window_Base.prototype.standardFontBold = function () {
     return false
 };
@@ -190,14 +198,6 @@ Window_Base.prototype.standardFontBold = function () {
 /** */
 Window_Base.prototype.standardFontItalic = function () {
     return false
-};
-
-/**字体设置 */
-Window_Base.prototype.fontSettings = function (i) {
-    if (i || !this.contents._fontnametext) {
-        this.contents._fontnametext = this.contents._makeFontNameText()
-    }
-    return this.contents._fontnametext
 };
 
 
@@ -215,7 +215,6 @@ Window_Base.prototype.standardOutlineColor = function () {
     return 'rgba(0, 0, 0, 0.5)';
 };
 Window_Base.prototype.standardOutlineWidth = function () {
-
     return 4;
 };
 
@@ -321,6 +320,7 @@ Window_Base.prototype.makeLCFText = function (textState) {
 /**测试文字增强 */
 Window_Base.prototype.testTextEx = function (text, x, y, w, h, wt, ht, facepos, wz, aw, ah) {
     var text = text || ""
+    text = "" +text
     var draw = { x: x || 0, y: y || 0 }
     var pageset = {
         w: w || Infinity,

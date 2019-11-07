@@ -284,6 +284,10 @@ window.ThreeBSP = (function() {
 			return COPLANAR;
 		}
 	};
+	/**
+	 * 分类面
+	 * @param {*} polygon 
+	 */
 	ThreeBSP.Polygon.prototype.classifySide = function( polygon ) {
 		var i, vertex, classification,
 			num_positive = 0,
@@ -310,6 +314,14 @@ window.ThreeBSP = (function() {
 			return SPANNING;
 		}
 	};
+	/**
+	 * 分割多边形
+	 * @param {*} polygon 
+	 * @param {*} coplanar_front 
+	 * @param {*} coplanar_back 
+	 * @param {*} front 
+	 * @param {*} back 
+	 */
 	ThreeBSP.Polygon.prototype.splitPolygon = function( polygon, coplanar_front, coplanar_back, front, back ) {
 		var classification = this.classifySide( polygon );
 		
@@ -356,7 +368,14 @@ window.ThreeBSP = (function() {
 			if ( b.length >= 3 ) back.push( new ThreeBSP.Polygon( b ).calculateProperties() );
 		}
 	};
-	
+	/**
+	 * 顶点
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} z 
+	 * @param {*} normal 
+	 * @param {*} uv 
+	 */
 	ThreeBSP.Vertex = function( x, y, z, normal, uv ) {
 		this.x = x;
 		this.y = y;
@@ -364,27 +383,46 @@ window.ThreeBSP = (function() {
 		this.normal = normal || new THREE.Vector3;
 		this.uv = uv || new THREE.Vector2;
 	};
+	/**
+	 * 复制
+	 */
 	ThreeBSP.Vertex.prototype.clone = function() {
 		return new ThreeBSP.Vertex( this.x, this.y, this.z, this.normal.clone(), this.uv.clone() );
 	};
+	/**
+	 * 加
+	 * @param {*} vertex 顶点
+	 */
 	ThreeBSP.Vertex.prototype.add = function( vertex ) {
 		this.x += vertex.x;
 		this.y += vertex.y;
 		this.z += vertex.z;
 		return this;
 	};
+	/**
+	 * 减
+	 * @param {*} vertex 
+	 */
 	ThreeBSP.Vertex.prototype.subtract = function( vertex ) {
 		this.x -= vertex.x;
 		this.y -= vertex.y;
 		this.z -= vertex.z;
 		return this;
 	};
+	/**
+	 * 标量乘
+	 * @param {*} scalar 
+	 */
 	ThreeBSP.Vertex.prototype.multiplyScalar = function( scalar ) {
 		this.x *= scalar;
 		this.y *= scalar;
 		this.z *= scalar;
 		return this;
 	};
+	/**
+	 * 交叉
+	 * @param {*} vertex 
+	 */
 	ThreeBSP.Vertex.prototype.cross = function( vertex ) {
 		var x = this.x,
 			y = this.y,
@@ -396,6 +434,9 @@ window.ThreeBSP = (function() {
 		
 		return this;
 	};
+	/**
+	 * 归一化
+	 */
 	ThreeBSP.Vertex.prototype.normalize = function() {
 		var length = Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
 		
@@ -405,9 +446,18 @@ window.ThreeBSP = (function() {
 		
 		return this;
 	};
+	/**
+	 * 点
+	 * @param {*} vertex 
+	 */
 	ThreeBSP.Vertex.prototype.dot = function( vertex ) {
 		return this.x * vertex.x + this.y * vertex.y + this.z * vertex.z;
 	};
+	/**
+	 * 插值
+	 * @param {*} a 
+	 * @param {*} t 
+	 */
 	ThreeBSP.Vertex.prototype.lerp = function( a, t ) {
 		this.add(
 			a.clone().subtract( this ).multiplyScalar( t )
@@ -423,6 +473,11 @@ window.ThreeBSP = (function() {
 		
 		return this;
 	};
+	/**
+	 * 插
+	 * @param {*} other 
+	 * @param {*} t 
+	 */
 	ThreeBSP.Vertex.prototype.interpolate = function( other, t ) {
 		return this.clone().lerp( other, t );
 	};

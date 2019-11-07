@@ -34,22 +34,47 @@ WebAudio.prototype._connectNodes = function () {
 };
 
 
+AudioManager.createBuffer = function (folder, name) {
+    //提取 = 音频文件提取
+    var ext = this.audioFileExt();
+    //地址 = 路径 + 文件夹 +"/" + 编码(name) + 提取
+    var url = this._path + folder + '/' + encodeURIComponent(name) + ext;
+    //如果 应该使用Html5Audio 并且 文件夹 全等于 bgm
+    if (this.shouldUseHtml5Audio() && folder === 'bgm') {
+        if (this._blobUrl) {
+            //Html5Audio安装(地址)
+            Html5Audio.setup(this._blobUrl);
+        } else {
+            //Html5Audio安装(地址)
+            Html5Audio.setup(url);
+        }
+        //返回 Html5Audio
+        return Html5Audio;
+    } else {
+        //返回  WebAudio(url)
+        var buffer = new WebAudio(url);
+        buffer.name = name
+        return buffer
+    }
+};
 
 
 /**
  * 
  * 绘制  
  * 
- * @param {number} w
- * @param {number} h
- * @param {string} name
- * @param {boolean} type
- * @param {number} length
- * @param {{}} set
+ * @param {number} w 宽
+ * @param {number} h 高
+ * @param {string|[string,number]|[string,string]|{}} buffer  名称/buffer  如   "_bgmBuffer" , ["_seBuffers",0] , ["_seBuffers",-1] , ["_seBuffers","test"]   
+ * @param {boolean} type 种类
+ * @param {number} length  数据值的数量
+ * @param {{}} set 设置
+ * @param {number} time 更新每帧增加
+ * 
  * 
  */
 
-function Sprite_Audio(w, h, name, type, length, set) {
+function Sprite_Audio(w, h, buffer, type, length, set, time) {
     this.initialize.apply(this, arguments);
 }
 /**设置原形  */
@@ -57,27 +82,51 @@ Sprite_Audio.prototype = Object.create(Sprite.prototype);
 /**设置创造者 */
 Sprite_Audio.prototype.constructor = Sprite_Audio;
 /**初始化 */
-Sprite_Audio.prototype.initialize = function (w, h, name, type, length, set) {
+Sprite_Audio.prototype.initialize = function (w, h, buffer, type, length, set, time) {
     Sprite.prototype.initialize.call(this);
 
     this.setWH(w, h)
-    this._name = name
     this._type = type
-
     this.setLength(length)
     this._set = set
+    this._time = time || 1
+    this._nowtime = 0
+    this.setAudio(buffer)
 };
 
 
 Sprite_Audio.prototype.getAudio = function () {
-    if (this._name) {
-        return AudioManager[this._name]
-    } else {
-        return null
+    if (typeof this._buffer == "string") {
+        return AudioManager[this._buffer]
+    } else if (Array.isArray(this._buffer)) {
+        var m = this._buffer[0]
+        var n = this._buffer[1]
+        var l = AudioManager[m]
+        if (Array.isArray(l)) {
+            if (typeof n == "number") {
+                if (n < 0) {
+                    return l[l.length + n]
+                } else {
+                    return l[n]
+                }
+            } else {
+                for (var i = 0; i < l.length; i++) {
+                    var buffer = l[i];
+                    if (buffer.name == n) {
+                        return buffer
+                    }
+                }
+            }
+        }
+    } else { 
+        return this._buffer
     }
-
 }
 
+
+Sprite_Audio.prototype.setAudio = function (buffer) {
+    return this._buffer = buffer
+}
 
 Sprite_Audio.prototype.setWH = function (w, h) {
 
@@ -151,24 +200,24 @@ Sprite_Audio.prototype.draw = function () {
     var barHeight;
     var x = 0;
 
-    var c = this._type ? ',0' : ',255'//',50,50)'
+    var c = this._type ? ',0' : ',255' //',50,50)'
 
     for (var i = 0; i < bufferLength; i++) {
         barHeight = dataArray[i];
-        if (dataArray[i] >lastArray[i]) {
+        if (dataArray[i] > lastArray[i]) {
             lastArray[i] = dataArray[i]
             var c2 = ",255)"
-            if(i+1<bufferLength &&i-1>=0){
-                if(dataArray[i]<dataArray[i+1]||
-                    dataArray[i]<dataArray[i-1] 
-                    ){
-                    barHeight= 0 
-                } 
+            if (i + 1 < bufferLength && i - 1 >= 0) {
+                if (dataArray[i] < dataArray[i + 1] ||
+                    dataArray[i] < dataArray[i - 1]
+                ) {
+                    barHeight = 0
+                }
             }
         } else {
             lastArray[i] = dataArray[i]
 
-            barHeight= 0
+            barHeight = 0
             var c2 = ",0)"
         }
         canvasCtx.fillStyle = 'rgb(' + (barHeight + 100) + c + c2;
@@ -183,7 +232,11 @@ Sprite_Audio.prototype.draw = function () {
 
 Sprite_Audio.prototype.update = function () {
     Sprite.prototype.update.call(this)
-    this.draw()
+    this._nowtime += time
+    if (this._nowtime >= 1) {
+        this._nowtime = 0
+        this.draw()
+    }
 }
 
 
@@ -201,7 +254,7 @@ Sprite_Audio.test = function () {
 }
 
 
- 
+
 /*
 AnalyserNode.fftSize
     一个无符号长整形(unsigned long)的值, 用于确定频域的 FFT (快速傅里叶变换) 的大小。

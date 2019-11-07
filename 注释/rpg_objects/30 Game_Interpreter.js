@@ -1718,7 +1718,9 @@ Game_Interpreter.prototype.command213 = function () {
     return true;
 };
 
-/** Erase Event 抹去事件*/
+/** Erase Event 抹去事件 
+ * 暂时消除事件
+*/
 Game_Interpreter.prototype.command214 = function () {
     //如果( 是在当前地图() 并且 事件id > 0 )
     if (this.isOnCurrentMap() && this._eventId > 0) {

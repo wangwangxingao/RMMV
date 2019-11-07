@@ -4,6 +4,15 @@
 /** The window for displaying battle progress. No frame is displayed, but it is */
 /** handled as a window for convenience. */
 /** 显示战斗进行的窗口.没有显示框但运用一个窗口比较方便 */
+/**
+ * 
+ * 通过 push(methodName,...) 来实现调用的方法缓存
+ * update 更新,如果不是等待则进行下一个调用方法
+ * wait()   设置 _waitCount 属性 等待时间
+ * setWaitMode(waitMode)  设置 _waitMode 等待模式
+ * 
+ */
+
 
 function Window_BattleLog() {
     this.initialize.apply(this, arguments);
@@ -42,17 +51,23 @@ Window_BattleLog.prototype.initialize = function() {
     //刷新
     this.refresh();
 };
-/**设置精灵组 */
+/**设置精灵组
+ * @param {Spriteset_Battle} spriteset 精灵组
+ */
 Window_BattleLog.prototype.setSpriteset = function(spriteset) {
     //精灵组 = spriteset
     this._spriteset = spriteset;
 };
-/**窗口宽 */
+/**窗口宽
+ * @returns {number} 窗口宽
+ */
 Window_BattleLog.prototype.windowWidth = function() {
     //返回 图形 盒子宽
     return Graphics.boxWidth;
 };
-/**窗口高 */
+/**窗口高
+ * @returns {number} 窗口高
+ */
 Window_BattleLog.prototype.windowHeight = function() {
     //返回 适宜高(最大行)
     return this.fittingHeight(this.maxLines());
@@ -119,7 +134,7 @@ Window_BattleLog.prototype.updateWait = function() {
 /**更新等待计数
  * 
  * 等待计数>0 时 返回 true 否则返回 false
- * 当>0时 减去计数,如果减去后<0则为0
+ * 当>0时 减去计数(),如果减去后<0则为0
  * 
  * 
  */
@@ -141,15 +156,13 @@ Window_BattleLog.prototype.updateWaitCount = function() {
 };
 /**更新模式
  * 
- * 如果有等待模式 进行判断 ,返回结果
+ * @returns {boolean} 是否需要等待  
+ * 如果有等待模式 进行判断 ,返回结果 
+ * 等待模式分为  
+ * "effec"       当精灵组处于效果中  
+ * 'movement'   当精灵组处于运动中  
  * 
  * 如果不是等待的,则把模式设置为 ""
- * 
- * 等待模式分为 
- * "effec"       当精灵组处于效果中
- * 'movement'   当精灵组处于运动中
- * 
- * 
  */
 Window_BattleLog.prototype.updateWaitMode = function() {
     //等待中 = false
@@ -177,7 +190,12 @@ Window_BattleLog.prototype.updateWaitMode = function() {
     //返回 等待中
     return waiting;
 };
-/**设置等待模式 */
+/**
+ * 设置等待模式
+ * @param {"effect"|"movement"|""} waitMode 等待模式  
+ * "effect" 是效果中  
+ * "movement" 是任何一个移动中  
+ */
 Window_BattleLog.prototype.setWaitMode = function(waitMode) {
     //等待模式 = waitMode
     this._waitMode = waitMode;
@@ -205,12 +223,12 @@ Window_BattleLog.prototype.callNextMethod = function() {
 };
 /**是快发送 
  * 
+ * @returns {boolean} 是否快发送  
  * 输入 是长按下(ok)  或者 输入 是按下(shift) 或者 触摸输入 是长按下()
  * 返回true或者false
  * 
  * 为true时处理速度为3,否则为1
  * 
- * @return {blooean}
  */
 Window_BattleLog.prototype.isFastForward = function() {
     //返回 输入 是长按下(ok)  或者 输入 是按下(shift) 或者 触摸输入 是长按下()
@@ -592,7 +610,7 @@ Window_BattleLog.prototype.startTurn = function() {
 /**开始动作
  * @param {Game_Battler} subject  主体 
  * @param {Game_Action} action 动作 
- * @param {[Game_Battler]} 目标组
+ * @param {[Game_Battler]} targets 目标组
  *  */
 Window_BattleLog.prototype.startAction = function(subject, action, targets) {
     //项目 = 动作 项目()

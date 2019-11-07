@@ -3,11 +3,51 @@ var ww = ww || {}
 
 ww.draw = {}
 
+/**
+ * 设置参数
+ * @param {*} context 
+ * @param {*} i 
+ * @param {*} p 
+ */
+ww.draw.drawSetStyle = function (context, i, p) {
+    if (!context || !i || !p) {
+        return
+    }
+    if ((i == "fillStyle" || i == "strokeStyle") ||
+        Array.isArray(p)) {
+        switch (p[0]) {
+            case "l":
+            case "createLinearGradient":
+                var canvasGradient = context.createLinearGradient(p[1], p[2], p[3], p[4]);
+                for (var pi = 5; pi < p.length; pi += 2) {
+                    canvasGradient.addColorStop(p[pi], p[pi + 1]);
+                }
+                context[n] = canvasGradient
+                break;
+            case "r":
+            case "createRadialGradient":
+                var canvasGradient = context.createRadialGradient(p[1], p[2], p[3], p[4], p[5]);
+                for (var pi = 6; pi < p.length; pi += 2) {
+                    canvasGradient.addColorStop(p[pi], p[pi + 1]);
+                }
+                context[n] = canvasGradient
+                break;
 
-ww.draw.drawSetStyle = function (context, style) {
+            default:
+                context[n] = p[0]
+                break;
+        }
+    } else {
+        context[i] = p
+    }
+}
+/**设置
+ * 
+ */
+ww.draw.drawSet = function (context, style) {
     if (context && style && typeof (style) == "object") {
         for (var i in style) {
-            context[i] = style[i]
+            ww.draw.drawSetStyle(context, i, style[i])
         }
     }
 }
@@ -21,9 +61,10 @@ ww.draw.drawSetStyle = function (context, style) {
  * 
  */
 ww.draw.drawFun = function (bitmap, list) {
-
     //环境 = 环境
-    if (!bitmap) { return }
+    if (!bitmap) {
+        return
+    }
     if (bitmap instanceof Bitmap) {
         var context = bitmap._context
     } else {
@@ -33,48 +74,41 @@ ww.draw.drawFun = function (bitmap, list) {
     //context.save(); 
     for (var i = 0; i < list.length; i++) {
         var set = list[i]
-        if (Array.isArray(set)) {
+        if (!set) {} else if (Array.isArray(set)) {
             var n = set[0]
             var p = set.slice(1)
             if (typeof (context[n]) == "function") {
                 context[n].apply(context, p)
             } else {
-                if (n == "fillStyle" || "strokeStyle") {
-                    if (p[0] == "createLinearGradient") {
-                        var canvasGradient = context.createLinearGradient(p[1], p[2], p[3], p[4]);
-                        for (var pi = 5; pi < p.length; pi += 2) {
-                            canvasGradient.addColorStop(p[pi], p[pi + 1]);
-                        }
-                        context[n] = canvasGradient
-                    } else if (p[0] == "createRadialGradient") {
-                        var canvasGradient = context.createLinearGradient(p[1], p[2], p[3], p[4], p[5]);
-                        for (var pi = 6; pi < p.length; pi += 2) {
-                            canvasGradient.addColorStop(p[pi], p[pi + 1]);
-                        }
-                        context[n] = canvasGradient
-                    } else {
-                        context[n] = p[0]
-                    }
-                } else {
-                    context[n] = p[0]
-                }
+                ww.draw.drawSetStyle(context, n, p)
             }
         } else if (typeof (set) == "string") {
             if (typeof (context[set]) == "function") {
                 context[set]()
             }
         } else {
-            ww.draw.drawSetStyle(context, set)
+            ww.draw.drawSet(context, set)
         }
     }
     bitmap._setDirty()
 }
 
-
+/**
+ * 绘制方法
+ * @param {*} list 
+ */
 Bitmap.prototype.drawFun = function (list) {
     ww.draw.drawFun(this, list)
 }
 
+/**
+ * 绘制线
+ * @param {*} x 初始点 x坐标
+ * @param {*} y 初始点 y坐标
+ * @param {*} x2 结束点 设置 
+ * @param {*} y2 结束点 设置
+ * @param {*} line 线的设置
+ */
 Bitmap.prototype.drawLine = function (x, y, x2, y2, line) {
     var list = [
         "save",
@@ -91,10 +125,15 @@ Bitmap.prototype.drawLine = function (x, y, x2, y2, line) {
 
 
 /**绘制扇形
- * 
- * 
- * 
+ * @param {*} x x坐标
+ * @param {*} y y坐标
+ * @param {*} r 半径
+ * @param {*} start 开始角度
+ * @param {*} end 结束角度
+ * @param {*} color 颜色
+ * @param {*} t 是否过原点
  */
+
 Bitmap.prototype.drawCircleSE = function (x, y, r, start, end, color, t) {
     var type = type == "stroke" || type == "fill" ? type : type ? "fill" : "stroke"
     var unit = Math.PI / 180;
@@ -118,19 +157,32 @@ Bitmap.prototype.drawCircleSE = function (x, y, r, start, end, color, t) {
 
 
 
-/**绘制圆角矩形 */
+/**绘制圆角矩形
+ * 
+ * @param {*} x x位置
+ * @param {*} y y位置
+ * @param {*} width 宽
+ * @param {*} height 高
+ * @param {*} radius 圆角半径
+ * @param {*} color 颜色
+ * @param {"stroke"|"fill"} type 类型
+ * @param {boolean} j0 左上角 是否直角
+ * @param {boolean} j1 左下角 是否直角
+ * @param {boolean} j2 右下角 是否直角
+ * @param {boolean} j3 右上角 是否直角
+ */
 Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, color, type, j0, j1, j2, j3) {
 
 
     var type = type == "stroke" || type == "fill" ? type : type ? "fill" : "stroke"
 
     var list = [
-        "save"
+        "save",
         [type + "Style", color],
         "beginPath",
     ]
 
-
+    //往下
     list.push(["moveTo", x, y + radius])
     list.push(["lineTo", x, y + height - radius])
 
@@ -140,7 +192,7 @@ Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, c
     } else {
         list.push(["quadraticCurveTo", x, y + height, x + radius, y + height])
     }
-    //往左
+    //往右
     list.push(["lineTo", x + width - radius, y + height])
     //角2处理 
     if (j2) {
@@ -171,7 +223,7 @@ Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, c
     this.drawFun(list)
 }
 
- 
+
 
 
 Bitmap.prototype.fillCircle = function (color, s, e) {
@@ -180,99 +232,12 @@ Bitmap.prototype.fillCircle = function (color, s, e) {
     this.drawCircleSE(x, y, Math.min(x, y), s, e, color);
 };
 
-Bitmap.prototype.fillRoundedRectangle = function (color,line,type,j0, j1, j2, j3) {
+Bitmap.prototype.fillRoundedRectangle = function (color, line, type, j0, j1, j2, j3) {
     var r = Math.min(this.width * 0.1, this.height * 0.1)
-    this.drawRoundedRectangle(0, 0, this.width, this.height, r, color,line,type,j0, j1, j2, j3) ;
+    this.drawRoundedRectangle(0, 0, this.width, this.height, r, color, line, type, j0, j1, j2, j3);
 }
 
 
-
-
-/**绘制圆角矩形 */
-Bitmap.prototype.drawRoundedRectangle = function (x, y, width, height, radius, color, line, type, j0, j1, j2, j3) {
-    var type = (type == "stroke" || type == "fill") ? type : type ? "fill" : "stroke"
-    //环境 = 环境
-    var context = this._context;
-    //环境 保存()
-    context.save();
-
-    if (Array.isArray(color)) {
-        var p = color
-        if (p[0] == "createLinearGradient") {
-            var canvasGradient = context.createLinearGradient(p[1], p[2], p[3], p[4]);
-            for (var pi = 5; pi < p.length; pi += 2) {
-                canvasGradient.addColorStop(p[pi], p[pi + 1]);
-            }
-        } else if (p[0] == "createRadialGradient") {
-            var canvasGradient = context.createLinearGradient(p[1], p[2], p[3], p[4], p[5]);
-            for (var pi = 6; pi < p.length; pi += 2) {
-                canvasGradient.addColorStop(p[pi], p[pi + 1]);
-            }
-        } else {
-            var canvasGradient = p[0]
-        }
-        context[type + 'Style'] = canvasGradient;
-    } else {
-        context[type + 'Style'] = color;
-    }
-
-    if (line) {
-        for (var i in line) {
-            context[i] = line[i]
-        }
-    }
-    /**
-     * 0 3
-     * 1 2
-     */
-    context.beginPath();
-    //左上点
-    context.moveTo(x, y + radius);
-    //往下
-    context.lineTo(x, y + height - radius);
-    //角1处理
-    if (j1) {
-        context.lineTo(x, y + height);
-        context.lineTo(x + radius, y + height);
-    } else {
-        context.quadraticCurveTo(x, y + height, x + radius, y + height);
-    }
-    //往左
-    context.lineTo(x + width - radius, y + height);
-    //角2处理 
-    if (j2) {
-        context.lineTo(x + width, y + height);
-        context.lineTo(x + width, y + height - radius);
-    } else {
-        context.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
-    }
-    //往上
-    context.lineTo(x + width, y + radius);
-    //角3处理  
-    if (j3) {
-        context.lineTo(x + width, y);
-        context.lineTo(x + width - radius, y);
-    } else {
-        context.quadraticCurveTo(x + width, y, x + width - radius, y);
-    }
-    //往左
-    context.lineTo(x + radius, y);
-    //角0处理 
-    if (j0) {
-        context.lineTo(x, y);
-        context.lineTo(x, y + radius);
-    } else {
-        context.quadraticCurveTo(x, y, x, y + radius);
-    }
-
-    context.closePath();
-    context[type]();
-    //环境 恢复()
-    context.restore();
-    //设置发生更改()
-    this._setDirty();
-
-}
 
 
 /**

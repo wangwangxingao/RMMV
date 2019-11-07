@@ -9,8 +9,8 @@
  * 
  * 
  * @param ww_plugin 
- * @desc  插件版本
- * @default 2.0
+ * @desc  插件
+ * @default ww
  * 
  * @help
  * 插件获取
@@ -25,5 +25,5 @@
  */
 
 var ww = ww || {};
-ww.plugin={find:function(n,l,p,m){l=PluginManager._parameters;p=l[(n||"").toLowerCase()];if(!p){for(m in l){if(l[m]&&n in l[m]){p=l[m]}}};return p||{}},parse:function(i){try{return JSON.parse(i)}catch(e){try{return eval(i)}catch(e2){return i}}},get:function(n,o,p){o=o||{};p=this.find(n);for(n in p){o[n]=this.parse(p[n])};return o}};
+ww.plugin={find:function(n,l,p,m){l=PluginManager._parameters;p=l[(n||"").toLowerCase()];if(!p){for(m in l){if(l[m]&&l[m][n]){p=l[m]}}};return p||{}},parse:function(i){try{return JSON.parse(i)}catch(e){try{return eval(i)}catch(e2){return i}}},get:function(n,o,p){o=o||{};p=this.find(n);for(n in p){o[n]=this.parse(p[n])};return o}};
 ww.plugin.get("ww_plugin",ww.plugin);

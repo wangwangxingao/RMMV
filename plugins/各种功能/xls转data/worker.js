@@ -20,7 +20,7 @@ ww.worker._workers = {}
  * @param {function} err 错误
  */
 ww.worker.open = function (name, js, fun, err) {
-    try {
+   // try {
         this.del(name)
         if (js) {
             var blob = new Blob([js]);
@@ -40,19 +40,19 @@ ww.worker.open = function (name, js, fun, err) {
         worker.onmessage = function (e) {
             ww.worker.do(name, e.data, e)
         }
- 
+
         worker.onerror = function (e) {
             ww.worker.err(name, e)
         }
         worker.onmessageerror = function (e) {
             ww.worker.err(name, e, 1)
-        } 
+        }
         return true
-    } catch (error) {
+    //} catch (error) {
         this._workers[name] = false
         console.error(name, js, fun, err)
         return false
-    }
+   // }
 }
 /**
  * 接受信息后运行

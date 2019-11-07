@@ -399,7 +399,9 @@ Game_Battler.prototype.removeStatesByDamage = function() {
     //this
     }, this);
 };
-/**制作动作次数*/
+/**制作动作次数
+ * @returns {number} 动作次数
+*/
 Game_Battler.prototype.makeActionTimes = function() {
 	//返回 行动添加集合 缩减 方法( r , p ) 
     return this.actionPlusSet().reduce(function(r, p) {
@@ -425,12 +427,14 @@ Game_Battler.prototype.makeActions = function() {
         }
     }
 };
-/**速度*/
+/**速度
+ *  @returns {number} 速度
+*/
 Game_Battler.prototype.speed = function() {
 	//返回 速度
     return this._speed;
 };
-/**制作速度*/
+/**制作速度 */
 Game_Battler.prototype.makeSpeed = function() {
 	//速度 = 数学 最小值 应用 (null, 动作组 映射 方法(动作)  
     this._speed = Math.min.apply(null, this._actions.map(function(action) {
@@ -439,7 +443,9 @@ Game_Battler.prototype.makeSpeed = function() {
     //   || 0 
     })) || 0;
 };
-/**当前动作*/
+/**当前动作
+ * @returns {Game_Action} 动作对象
+*/
 Game_Battler.prototype.currentAction = function() {
 	//返回 动作组[0]
     return this._actions[0];
@@ -449,7 +455,9 @@ Game_Battler.prototype.removeCurrentAction = function() {
 	//动作组 移除头部()
     this._actions.shift();
 };
-/**设置最后目标*/
+/**设置最后目标
+ * @param {Game_Battler} 目标
+*/
 Game_Battler.prototype.setLastTarget = function(target) {
 	//如果 目标
     if (target) {
@@ -461,7 +469,11 @@ Game_Battler.prototype.setLastTarget = function(target) {
         this._lastTargetIndex = 0;
     }
 };
-/**强制动作*/
+/**强制动作
+ * @param {number} skillId 技能id 
+ * @param {number} targetIndex 目标索引 
+ * 
+*/
 Game_Battler.prototype.forceAction = function(skillId, targetIndex) {
 	//清除动作组
     this.clearActions();
@@ -485,7 +497,9 @@ Game_Battler.prototype.forceAction = function(skillId, targetIndex) {
     //动作组 添加 (动作)
     this._actions.push(action);
 };
-/**用项目(技能,物品)*/
+/**用项目(技能,物品)
+ * @param {object} item 物品/技能 数据对象
+*/
 Game_Battler.prototype.useItem = function(item) {
 	//如果 数据管理器 是技能(项目)
     if (DataManager.isSkill(item)) {

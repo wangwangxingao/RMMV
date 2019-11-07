@@ -1,19 +1,6 @@
-
 (function () {
 
-    var Sprite_prototype_update = Sprite.prototype.update
-    /**更新 */
-    Sprite.prototype.update = function () {
-        //精灵 更新 呼叫(this)
-        Sprite_prototype_update.call(this);
-        this.__updateInput()
-    };
 
-    Sprite.prototype.__updateInput = function () {
-
-    };
-
- 
     /**
      * 世界到局部xy
      * @param {number} y y
@@ -21,17 +8,22 @@
      */
     Sprite.prototype.worldToLocalXY = function (x, y, s) {
         var node = s || this;
-        return node.worldTransform.applyInverse({ x: x, y: y }, { visible: node.worldVisible });
+        return node.worldTransform.applyInverse({
+            x: x,
+            y: y
+        }, {
+            visible: node.worldVisible
+        });
     };
 
 
     /**
-    * 是触摸输入自己 
-    * @param {boolean|number} b 是否检查位图(每层-1)
-    * @param {boolean|number} c 是否检查子图(每层-1 ) 
-    * @param {boolean} up 是否是从上往下判断 
-    * 
-    */
+     * 是触摸输入自己 
+     * @param {boolean|number} b 是否检查位图(每层-1)
+     * @param {boolean|number} c 是否检查子图(每层-1 ) 
+     * @param {boolean} up 是否是从上往下判断 
+     * 
+     */
     Sprite.prototype.isTouchInputThis = function (b, c, up) {
         var x = TouchInput.x
         var y = TouchInput.y
@@ -40,16 +32,48 @@
         return this.isTouchThis(x, y, b, c, up)
     }
 
+    /** 
+     * 快速判断鼠标是否触摸到自己
+     * @param {number} x x坐标
+     * @param {number} y y坐标
+     * @param {boolean|number} b 是否检查位图 
+     */
+    Sprite.prototype.isTouchInputThisFast = function (b) {
+        return this.isTouchThisFast(TouchInput.x, TouchInput.y, b)
+    }
 
     /**
-    * 是触摸自己
-    * @param {number} x x坐标
-    * @param {number} y y坐标
-    * @param {boolean|number} b 是否检查位图(每层-1)
-    * @param {boolean|number} c 是否检查子图(每层-1 ) 
-    * @param {boolean} up 是否是从上往下判断 
-    * 
-    */
+     * 快速判断是否触摸到自己
+     * @param {number} x x坐标
+     * @param {number} y y坐标
+     * @param {boolean|number} b 是否检查位图 
+     * 
+     * 
+     */
+    Sprite.prototype.isTouchThisFast = function (x, y, b) {
+        if (this.visible) {
+            var loc = this.worldToLocalXY(x, y)
+            var lx = loc.x
+            var ly = loc.y
+            var lv = loc.visible
+            if (lv) {
+                if (this.isTouchIn && this.isTouchIn(lx, ly, b)) {
+                    return true
+                }
+            }
+            return false
+        }
+    }
+
+    /**
+     * 是触摸自己
+     * @param {number} x x坐标
+     * @param {number} y y坐标
+     * @param {boolean|number} b 是否检查位图(每层-1)
+     * @param {boolean|number} c 是否检查子图(每层-1 ) 
+     * @param {boolean} up 是否是从上往下判断 
+     * 
+     */
     Sprite.prototype.isTouchThis = function (x, y, b, c, up) {
         if (this.visible) {
             var loc = this.worldToLocalXY(x, y)
@@ -58,7 +82,7 @@
             var lv = loc.visible
             if (lv) {
                 var b2 = b ? b - 1 : 0
-                var c2 = c - 1
+                var c2 = c ? c - 1 : 0
                 var l = this.children.length
                 if (up) {
                     if (c) {
@@ -82,7 +106,7 @@
                             if (s && s.isTouchThis && s.isTouchThis(x, y, b2, c2, up)) {
                                 return true
                             }
-                        } 
+                        }
                     }
                 }
             }
@@ -146,17 +170,26 @@
     /**
      * 是移动到在精灵上或移动出精灵上 
      * 
-     */ 
-    Sprite.prototype.TouchInputMoveIn = function () { 
+     */
+    Sprite.prototype.updateTouchInputMoveIn = function (b, c, up) {
         if (TouchInput.isMoved() || TouchInput.isTriggered()) {
-            var movein = this.isTouchInputThis()
+            var movein = this.isTouchInputThis(b, c, up)
             if (this._TouchInputMoveIn != movein) {
-                this._TouchInputMoveIn = movein
-                if (typeof this.__TouchInputMoveIn == "function") {
-                    this.__TouchInputMoveIn(movein)
-                }
+                this._TouchInputMoveIn = movein ? {
+                    x: TouchInput.x,
+                    y: TouchInput
+                } : 0
+                this._TouchInputisTouchInPressMove = false
+                this.onTouchInputMoveIn(this._TouchInputMoveIn)
             }
         }
+    }
+
+    /**
+     * @param {{x:number,y:number}} touchIn 触摸在其中的{x,y}
+     *  
+     */
+    Sprite.prototype.onTouchInputMoveIn = function (touchIn) {
 
     }
 
@@ -165,37 +198,64 @@
      * 
      */
 
-    Sprite.prototype.TouchInputisTouchIn = function () {
+    Sprite.prototype.updateTouchInputTouchIn = function (b, c, up) {
         if (TouchInput.isTriggered()) {
-            var t = this.isTouchInputThis()
-            if (this._TouchInputisTouchIn != t) {
-                this._TouchInputisTouchIn = t
-                if (typeof this.__TouchInputisTouchIn == "function") {
-                    this.__TouchInputisTouchIn(t)
+            var t = this.isTouchInputThis(b, c, up)
+            if (this._TouchInputTouchIn != t) {
+                this._TouchInputTouchIn = t ? {
+                    x: TouchInput.x,
+                    y: TouchInput.y
+                } : 0
+                this.onTouchInputTouchIn(this._TouchInputTouchIn)
+            }
+        }
+    }
+    /**
+     * 当触摸在其中
+     * @param {{x:number,y:number}} touchIn 触摸在其中的{x,y}
+     */
+    Sprite.prototype.onTouchInputTouchIn = function (touchIn) {
+
+    }
+
+
+    /**
+     * 更新触摸在精灵上并且按着移动
+     * 
+     */
+    Sprite.prototype.updateTouchInputInAndMove = function () {
+        if (this._TouchInputTouchIn) {
+            if (TouchInput.isPressed()) {
+                if (TouchInput.isMoved()) {
+                    this.onTouchInputInAndMove(this._TouchInputTouchIn, TouchInput.x, TouchInput.y)
                 }
+            } else {
+                var m = this._TouchInputTouchInAndMove
+                var i = this._TouchInputTouchIn
+
+                this._TouchInputTouchInAndMove = false
+                this._TouchInputTouchIn = false
+
+                this.onTouchMoveInUp(m, i)
+
             }
         }
     }
 
     /**
-     * 是触摸在精灵上并且按着移动
-     * 
+     * 当触摸在之中然后移动
+     * @param {{x:number,y:number}} touchIn 触摸在其中的{x,y}
      */
-    Sprite.prototype.TouchInputisTouchInPressMove = function () {
-        if (this._TouchInputisTouchIn) {
-            if (TouchInput.isPressMove()) {
-                var x = TouchInput.isMoveDeltX()
-                var y = TouchInput.isMoveDeltY()
-                if (x || y) {
-                    this._TouchInputisTouchInPressMove = true
-                    if (typeof this.__TouchInputisTouchInPressMove == "function") {
-                        this.__TouchInputisTouchInPressMove(x, y)
-                    }
-                    return
-                }
-            }
-        }
-        this._TouchInputisTouchInPressMove = false
+    Sprite.prototype.onTouchInputInAndMove = function (touchIn, x, y) {
+        this._TouchInputTouchInAndMove = true
     }
- 
+    /**
+     * 当触摸在其中并抬起
+     * @param {*} moveed 是否移动
+     * @param {{x:number,y:number}} touchIn 触摸在其中的{x,y}
+     */
+    Sprite.prototype.onTouchInputMoveInUp = function (moveed, touchIn) {
+
+    }
+
 })();

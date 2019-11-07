@@ -1,4 +1,3 @@
-
 //=============================================================================
 // lsxls.js
 //=============================================================================
@@ -22,12 +21,17 @@ var ww = ww || {}
 ww.lsxls = {}
 
 /**
+ * worker文件名
+ */
+ww.lsxls._js = "xlsxworker"
+
+/**
  * 保存
  * @param {*} sheet 表格/二维数组
  * @param {*} name 名称
  */
 ww.lsxls.save = function (sheet, name) {
-    var fs = require("fs")
+    var fs = require && require("fs")
     if (!fs) {
         ww.lsxls.down(sheet, name);
         return
@@ -50,38 +54,65 @@ ww.lsxls.down = function (sheet, name) {
 }
 
 
+
+
 /**
- * 获取
- * @param {string} url
- * @param {function(result)} load
- * 
+ * 读取
+ * @param {*} url 位置
+ * @param {*} onload 当读取
+ * @param {*} type 种类 false 对象 / true 数组
  */
-ww.lsxls.load = function (url, onload) {
+ww.lsxls.load = function (url, onload, type) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url);
     xhr.responseType = "arraybuffer"
     var onload = onload || ww.lsxls.onload
     xhr.onloadend = function () {
-        try {
-            var result = ww.lsxls.onloadxls(xhr.response, xhr)
-        } catch (error) {
-            var result = null
-            console.error("未能读取")
-        }
-        if (typeof onload == "function") {
-            onload(result, url)
+        if (ww.lsxls.worker) {
+            ww.worker.setItemType(ww.lsxls._js, url, "do", onload)
+            ww.lsxls.push(xhr.response, type, url)
         } else {
-            console.log(result)
+            try {
+                var result = ww.lsxls.onloadxls(xhr.response, type, xhr)
+            } catch (error) {
+                var result = null
+                console.error("未能读取")
+            }
+            if (typeof onload == "function") {
+                onload(result, url)
+            } else {
+                console.log(result)
+            }
         }
     };
     xhr.send()
     return xhr
 }
 
+ww.lsxls.do = function (o) {
+    if (typeof o == "object") {
+        var fun = ww.worker.getItemType(ww.lsxls._js, o.name, "do")
+        if (typeof fun == "function") {
+            fun(o.data, o.name, o)
+        }
+    }
+}
+
+
+ww.lsxls.push = function (data, type, name) {
+    ww.worker.push(
+        ww.lsxls._js, {
+
+            name: name,
+            type: type,
+            data: data
+        }
+    )
+}
 
 
 
-
+ww.lsxls.worker = ww.worker.open(ww.lsxls._js, 0, ww.lsxls.do, console.log)
 
 
 /**
@@ -106,9 +137,16 @@ ww.lsxls.sheetMerges = function (sheet, list) {
         sheet['!merges'] = sheet['!merges'] || [];
         for (var i = 0; i < list.length; i++) {
             var l = list[i]
-            sheet['!merges'].push(
-                { s: { r: l[0], c: l[1] }, e: { r: l[2], c: l[3] } }
-            )
+            sheet['!merges'].push({
+                s: {
+                    r: l[0],
+                    c: l[1]
+                },
+                e: {
+                    r: l[2],
+                    c: l[3]
+                }
+            })
         }
     }
     return sheet
@@ -127,7 +165,7 @@ ww.lsxls.toSheet = function (object) {
         } else if (object["!ref"]) {
             return object
         } else {
-            return XLS.utils.json_to_sheet(object)//: 将一个由对象组成的数组转成sheet； 
+            return XLS.utils.json_to_sheet(object) //: 将一个由对象组成的数组转成sheet； 
         }
     }
 
@@ -140,9 +178,15 @@ ww.lsxls.toSheet = function (object) {
  * @param {boolean} type 种类 false 对象/ true 数组
  */
 ww.lsxls.toJson = function (workbook, type) {
-    var result = type ? [[], []] : {};
+    var result = type ? [
+        [],
+        []
+    ] : {};
     workbook.SheetNames.forEach(function (sheetName) {
-        var roa = XLS.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+        var roa = XLS.utils.sheet_to_json(workbook.Sheets[sheetName], {
+            header: 1
+        });
+        var roa = ww.lsxls.roaclear(roa)
         if (roa.length) {
             if (!type) {
                 result[sheetName] = roa;
@@ -155,6 +199,19 @@ ww.lsxls.toJson = function (workbook, type) {
     return result;
 };
 
+ww.lsxls.roaclear = function (roa) {
+    if (roa.length) {
+        var z = 0
+        for (var i = 0; i < roa.length; i++) {
+            var l = roa[i]
+            if (l && l.length > 0) {
+                z = i
+            }
+        }
+        roa.length = z + 1
+    };
+    return roa
+};
 
 
 /**
@@ -196,7 +253,9 @@ ww.lsxls.sheet2Uint8Array = function (sheet, sheetName) {
  */
 ww.lsxls.sheet2Blob = function (sheet, sheetName) {
     var buf = ww.lsxls.sheet2Uint8Array(sheet, sheetName)
-    var blob = new Blob([buf], { type: "application/octet-stream" });
+    var blob = new Blob([buf], {
+        type: "application/octet-stream"
+    });
 
     return blob;
 }
@@ -229,12 +288,14 @@ ww.lsxls.onload = function (result, url) {
  * @param {*} response 
  * @param {*} xhr 
  */
-ww.lsxls.onloadxls = function (response, xhr) {
+ww.lsxls.onloadxls = function (response, type, xhr) {
     var result = {}
     if (response) {
         var data = new Uint8Array(response)
-        var wb = XLS.read(data, { type: 'array' })
-        var result = ww.lsxls.toJson(wb)
+        var wb = XLS.read(data, {
+            type: 'array'
+        })
+        var result = ww.lsxls.toJson(wb, type)
     }
     return result;
 };
@@ -295,7 +356,7 @@ ww.lsxls.localdir = function () {
                 var base = path.dirname(base);
             }
             ww.lsxls._localdir = base;
-        }else{
+        } else {
             ww.lsxls._localdir = ""
         }
     }
@@ -334,8 +395,13 @@ ww.lsxls.localFileName = function (name) {
     }
 }
 
-
-ww.lsxls.writeFileSync = function (file, data, options) {
+/**
+ * 写文件
+ * @param {*} name 
+ * @param {*} data 
+ * @param {*} options 
+ */
+ww.lsxls.writeFileSync = function (name, data, options) {
     var fs = require("fs")
-    return fs.writeFileSync(ww.lsxls.localFileName(file), data, options)
+    return fs.writeFileSync(ww.lsxls.localFileName(name), data, options)
 }

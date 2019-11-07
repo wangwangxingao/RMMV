@@ -50,13 +50,13 @@ Scene_Battle.prototype.update = function() {
     this.updateWindowPositions();
     //如果( 活动 并且 不是 是忙碌())
     if (active && !this.isBusy()) {
-	    //更新战斗进行()
+	    //更新战斗流程()
         this.updateBattleProcess();
     }
     //场景基础 更新 呼叫(this)
     Scene_Base.prototype.update.call(this);
 };
-/**更新战斗进行 */
+/**更新战斗流程 */
 Scene_Battle.prototype.updateBattleProcess = function() {
 	//如果 (不是 是任何输入窗口活动() 或者  战斗管理器 是中止() 或 战斗管理器 是战斗结束() )
     if (!this.isAnyInputWindowActive() || BattleManager.isAborting() ||

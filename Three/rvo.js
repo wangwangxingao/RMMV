@@ -413,8 +413,8 @@ RVO.Agent.prototype.computeNewVelocity = function () {
 
 /**
  * 插入代理邻居
- * @param {*} agent 
- * @param {*} rangeSq 
+ * @param {*} agent 代理
+ * @param {*} rangeSq  范围平方
  */
 RVO.Agent.prototype.insertAgentNeighbor = function (agent, rangeSq) {
     if (this != agent) {
@@ -444,7 +444,7 @@ RVO.Agent.prototype.insertAgentNeighbor = function (agent, rangeSq) {
 /**
  * 插入障碍邻居
  * @param {*} obstacle 障碍
- * @param {*} rangeSq 邻居
+ * @param {*} rangeSq 范围平方
  */
 RVO.Agent.prototype.insertObstacleNeighbor = function (obstacle, rangeSq) {
     //下一个障碍 = 障碍 下一个障碍
@@ -558,7 +558,9 @@ RVO.Agent.linearProgram1 = function (lines, lineNo, radius, optVelocity, directi
  * @param {*} result 结果
  */
 RVO.Agent.linearProgram2 = function (lines, radius, optVelocity, directionOpt, result) {
+    //如果 方向选择
     if (directionOpt) {
+        //设置(结果,  optVelocity * 半径 ) 
         RVO.Vector.set(result, RVO.Vector.multiply(optVelocity, radius));
     }
     else if (RVO.Vector.absSq(optVelocity) > RVO.sqr(radius)) {
@@ -630,7 +632,7 @@ var RVO = RVO || {};
 
 /**
  * kd树
- * @param {*} sim 
+ * @param {*} sim 模拟电脑
  */
 RVO.KdTree = function (sim) {
     this.sim = sim;
@@ -666,9 +668,9 @@ RVO.KdTree.prototype.buildAgentTree = function () {
 
 /**
  * 构建代理树递归
- * @param {*} begin 
- * @param {*} end 
- * @param {*} node 
+ * @param {*} begin 开始
+ * @param {*} end 结束
+ * @param {*} node 节点
  */
 RVO.KdTree.prototype.buildAgentTreeRecursive = function (begin, end, node) {
     var agent = this.agentTree[node] = new RVO.KdTree.AgentTreeNode;
@@ -861,7 +863,7 @@ RVO.KdTree.prototype.buildObstacleTreeRecursive = function (obstacles) {
 
 /**
  * 计算代理邻居组 
- * @param {*} agent 
+ * @param {*} agent 代理人
  * @param {*} rangeSq 
  */
 RVO.KdTree.prototype.computeAgentNeighbors = function (agent, rangeSq) {
@@ -871,8 +873,8 @@ RVO.KdTree.prototype.computeAgentNeighbors = function (agent, rangeSq) {
 
 /**
  * 计算障碍邻居组
- * @param {*} agent 
- * @param {*} rangeSq 
+ * @param {*} agent 代理人
+ * @param {*} rangeSq  范围平方
  */
 RVO.KdTree.prototype.computeObstacleNeighbors = function (agent, rangeSq) {
     //查询障碍树递归
@@ -881,9 +883,9 @@ RVO.KdTree.prototype.computeObstacleNeighbors = function (agent, rangeSq) {
 
 /**
  * 查询代理树递归
- * @param {*} agent 
- * @param {*} rangeSq 
- * @param {*} node 
+ * @param {*} agent 代理人
+ * @param {*} rangeSq 范围平方
+ * @param {*} node 节点
  */
 RVO.KdTree.prototype.queryAgentTreeRecursive = function (agent, rangeSq, node) {
     //节点代理 = 代理树 节点
@@ -974,9 +976,9 @@ RVO.KdTree.prototype.queryAgentTreeRecursive = function (agent, rangeSq, node) {
 
 /**
  * 查询障碍树递归
- * @param {*} agent 
- * @param {*} rangeSq 
- * @param {*} node 
+ * @param {*} agent 代理人
+ * @param {*} rangeSq 范围平方
+ * @param {*} node 节点
  */
 RVO.KdTree.prototype.queryObstacleTreeRecursive = function (agent, rangeSq, node) {
     //如果(节点 == 0 )
@@ -1011,9 +1013,9 @@ RVO.KdTree.prototype.queryObstacleTreeRecursive = function (agent, rangeSq, node
 
 /**
  * 查询可见性
- * @param {*} q1 
- * @param {*} q2 
- * @param {*} radius 
+ * @param {*} q1 点1
+ * @param {*} q2 点2
+ * @param {*} radius 半径
  */
 RVO.KdTree.prototype.queryVisibility = function (q1, q2, radius) {
     //返回 查询可见性递归
@@ -1201,7 +1203,7 @@ RVO.Simulator.prototype.addAgent = function (position, neighborDist, maxNeighbor
 /**
  * 添加障碍
  * @param {[[number,number]]} vertices 变量组 
- * @returns {number}
+ * @returns {number} 障碍组长度
  * 
  */
 RVO.Simulator.prototype.addObstacle = function (vertices) {
@@ -1259,7 +1261,9 @@ RVO.Simulator.prototype.processObstacles = function () {
     //kd树 创建障碍树() 
     this.kdTree.buildObstacleTree();
 }
-
+/**
+ * 做步骤
+ */
 RVO.Simulator.prototype.doStep = function () {
 
     /**预先计算 */
@@ -1293,17 +1297,17 @@ RVO.Vector = {};
 
 /**
  * 求反 返回 相反向量
- * @param {[number,number]}a
- * @return {[number,number]} [-x,-y]
+ * @param {[number,number]}a [x,y]
+ * @return {[number,number]} [-a[0], -a[1]]
  */
 RVO.Vector.invert = function (a) {
     return [- a[0], - a[1]];
 }
 
 /**数量积  
- * @param {[number,number]} a
- * @param {[number,number]} b
- * @return {number} x1*x2+ y1*y2
+ * @param {[number,number]} a [x,y]
+ * @param {[number,number]} b [x,y]
+ * @return {number} a[0] * b[0] +a[1] * b[1]
  * 
 */
 RVO.Vector.dotProduct = function (a, b) {
@@ -1311,9 +1315,9 @@ RVO.Vector.dotProduct = function (a, b) {
 }
 
 /**相乘  成比例扩大   
- * @param {[number,number]} a
- * @param {number} b
- * @returns {[number,number]} [x * b,y * b]
+ * @param {[number,number]} a [x,y]
+ * @param {number} b 比例
+ * @returns {[number,number]} [a[0] * b,a[1] * b]
  * 
 */
 RVO.Vector.multiply = function (a, b) {
@@ -1321,9 +1325,9 @@ RVO.Vector.multiply = function (a, b) {
 }
 
 /**相除 成比例缩小  
- * @param {[number,number]} a
- * @param {number} b
- * @returns {[number,number]}  [x / b,y / b]
+ * @param {[number,number]} a [x,y]
+ * @param {number} b 比例
+ * @returns {[number,number]}  [a[0]/b,a[1]/b]
  * 
 */
 RVO.Vector.divide = function (a, b) {
@@ -1331,18 +1335,18 @@ RVO.Vector.divide = function (a, b) {
 }
 
 /**向量加  两个向量之和
- * @param {[number,number]} a
- * @param {[number,number]} b 
- * @return {[number,number]}  [x1+x2,y1+y2]
+ * @param {[number,number]} a [x,y]
+ * @param {[number,number]} b [x,y]
+ * @return {[number,number]} [a[0]+b[0],a[1]+b[1]]
  */
 RVO.Vector.add = function (a, b) {
     return [a[0] + b[0], a[1] + b[1]];
 }
 
 /**向量减  两个向量之差(从b到a的向量)
- * @param {[number,number]} a
- * @param {[number,number]} b 
- * @return {[number,number]} 
+ * @param {[number,number]} a [x,y]
+ * @param {[number,number]} b [x,y]
+ * @return {[number,number]} [a[0]-b[0],a[1]-b[1]]
  */
 RVO.Vector.subtract = function (a, b) {
     return [a[0] - b[0], a[1] - b[1]];
@@ -1350,9 +1354,9 @@ RVO.Vector.subtract = function (a, b) {
 
 
 /**移动 a的值加上b
- * @param {[number,number]} a
- * @param {[number,number]} b 
- * @return {[number,number]} [x+x1,y+y1]
+ * @param {[number,number]} a  [x,y]
+ * @param {[number,number]} b  [x,y]
+ * @return {[number,number]} [a[0]+=b[0],a[1]+=b[1]]
  */
 RVO.Vector.shift = function (a, b) {
     a[0] += b[0];
@@ -1361,9 +1365,9 @@ RVO.Vector.shift = function (a, b) {
 }
 
 /**设置  a的值设置为b
- * @param {[number,number]} a
- * @param {[number,number]} b 
- * @return {[number,number]} 
+ * @param {[number,number]} a [x,y]
+ * @param {[number,number]} b [x,y]
+ * @return {[number,number]} [a[0]=b[0],a[1]=b[1]]
  */
 RVO.Vector.set = function (a, b) {
     a[0] = b[0];
@@ -1375,7 +1379,7 @@ RVO.Vector.set = function (a, b) {
 /**
  * 距离
  * 数量积平方根  a向量的长度  
- * @param {[number,number]} a 
+ * @param {[number,number]} a  [x,y]
  * @return {number} 
  */
 RVO.Vector.abs = function (a) {
@@ -1384,8 +1388,8 @@ RVO.Vector.abs = function (a) {
 
 /** 
  * 数量积  a向量的长度的平方
- * @param {[number,number]} a a点
- * @return {number} 
+ * @param {[number,number]} a a点 [x,y]
+ * @return {number} 长度的平方
  * */
 RVO.Vector.absSq = function (a) {
     return RVO.Vector.dotProduct(a, a);
@@ -1393,9 +1397,9 @@ RVO.Vector.absSq = function (a) {
 
 /**向量积(拟叉积)  
  * 面积*2  当>0 b在a左侧,当<0 b在a右侧
- * @param {[number,number]} a
- * @param {[number,number]} b 
- * @return {number}  
+ * @param {[number,number]} a [x,y]
+ * @param {[number,number]} b [x,y]
+ * @return {number} a[0] * b[1]-a[1] * b[0]
  * */
 RVO.Vector.det = function (a, b) {
     //返回 向量的面积(顺逆时针) 
@@ -1404,8 +1408,9 @@ RVO.Vector.det = function (a, b) {
 
 
 /**法向量 
- * @param {[number,number]} a 
- * @returns {[number,number]} 
+ * 归一化
+ * @param {[number,number]} a [x,y]
+ * @returns {[number,number]} a的法向量
  *  
  */
 RVO.Vector.normalize = function (a) {
@@ -1429,7 +1434,7 @@ RVO.Vector.leftOf = function (a, b, c) {
 /**线段距离的平方
  * @param {[number,number]} a
  * @param {[number,number]} b 
- * @return {number} number
+ * @return {number} number 向量差的平方
  */
 RVO.Vector.lineSq = function (a, b) {
     return RVO.Vector.absSq(RVO.Vector.subtract(a, b));
@@ -1442,7 +1447,7 @@ RVO.Vector.lineSq = function (a, b) {
  * @param {[number,number]} a 线段a点[x,y]
  * @param {[number,number]} b 线段b点[x,y]
  * @param {[number,number]} c c点[x,y]
- * @returns {number} 距离值
+ * @returns {number} 距离值 
 */
 RVO.Vector.distSqPointLineSegment = function (a, b, c) {
     //ba =  b减a 

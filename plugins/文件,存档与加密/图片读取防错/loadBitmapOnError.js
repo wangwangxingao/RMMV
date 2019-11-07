@@ -91,76 +91,17 @@
 
 var ww = ww || {}
 
+ 
 
-ww.PluginManager = {}
-ww.PluginManager.get = function (n) {
-    var find = function (n) {
-        var l = PluginManager._parameters;
-        var p = l[(n || "").toLowerCase()];
-        if (!p) { for (var m in l) { if (l[m] && (n in l[m])) { p = l[m]; } } }
-        return p || {}
-    }
-    var parse = function (i) {
-        try { return JSON.parse(i) } catch (e) { return i }
-    }
-    var m, o = {}, p = find(n)
-    for (m in p) { o[m] = parse(p[m]) }
-    return o
-}
+ww.loadBitmapOnError = {}
+ww.loadBitmapOnError.names = ww.plugin.get("loadBitmapOnError")
+ww.loadBitmapOnError.loadBitmap = ImageManager.loadBitmap 
+ww.loadBitmapOnError.requestBitmap = ImageManager.requestBitmap 
 
-
-
-ww.loadBitmapOnError = ww.PluginManager.get("loadBitmapOnError")
-
-
-
-ImageManager.loadBitmap = function (folder, filename, hue, smooth, filename2) {
-    //如果(文件名称)
-    if (filename) {
-        //位置 = 文件夹 + 编码(文件名称) + ".png"
-        var path = folder + encodeURIComponent(filename) + '.png';
-        //位图 = 读取普通位图(位置,色相 || 0 )
-        var bitmap = this.loadNormalBitmap(path, hue || 0);
-
-        //位图 平滑 = smooth //平滑
-        bitmap.smooth = smooth;
-
-
-        ImageManager.loadBitmapOnError(bitmap, folder, filename2)
-
-        //返回 位图
-        return bitmap;
-    } else {
-        //返回 读取空白图片()
-        return this.loadEmptyBitmap();
-    }
-};
-
-
-/**请求图片
- * @param {string} filename 文件名
- * @param {number} hue 色相 
- */
-ImageManager.requestBitmap = function (folder, filename, hue, smooth, filename2) {
-    if (filename) {
-        var path = folder + encodeURIComponent(filename) + '.png';
-        var bitmap = this.requestNormalBitmap(path, hue || 0);
-        bitmap.smooth = smooth;
-
-        ImageManager.loadBitmapOnError(bitmap, folder, filename2)
-
-        return bitmap;
-    } else {
-        return this.loadEmptyBitmap();
-    }
-};
-
-
-
-ImageManager.loadBitmapOnError = function (bitmap, folder, filename2) {
+ww.loadBitmapOnError.addOtherUrl = function (bitmap, folder, filename2) {
 
     var filename2 = filename2 || ""
-    var names = ww && ww.loadBitmapOnError
+    var names = ww && ww.loadBitmapOnError.names
     if(!names){
         var names = {default:true}
     }
@@ -192,6 +133,18 @@ ImageManager.loadBitmapOnError = function (bitmap, folder, filename2) {
 
 }
 
+ImageManager.loadBitmap = function (folder, filename, hue, smooth, filename2) {
+    var bitmap =  ww.loadBitmapOnError.loadBitmap.call(this,folder, filename, hue, smooth, filename2)
+    ww.loadBitmapOnError.addOtherUrl(bitmap, folder, filename2)
+    return bitmap
+}
+ImageManager.requestBitmap = function (folder, filename, hue, smooth, filename2) {
+    var bitmap =  ww.loadBitmapOnError.loadBitmap.call(this,folder, filename, hue, smooth, filename2)
+    ww.loadBitmapOnError.addOtherUrl (bitmap, folder, filename2)
+    return bitmap
+}
+ 
+
 
 
 
@@ -202,7 +155,7 @@ ImageManager.loadBitmapOnError = function (bitmap, folder, filename2) {
  * 
  */
 Bitmap.prototype._requestImage = function (url) {
-
+ 
     if (this._otherUrlmust && this._otherUrl) {
         if (this._otherUrl == "none") {
             console.log("useother", url, this._otherUrl)
@@ -247,7 +200,7 @@ Bitmap.prototype._requestImage = function (url) {
 
 
 
-
+/*
 Bitmap.prototype._requestImage = function (url) {
 
     if (this._otherUrlmust) {
@@ -293,4 +246,4 @@ Bitmap.prototype._requestImage = function (url) {
     }
 
     this._otherUrlmust = !this._otherUrlmust
-};
+};*/

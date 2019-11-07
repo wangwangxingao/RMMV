@@ -403,12 +403,19 @@ Game_Action.prototype.decideRandomTarget = function() {
         this.clear();
     }
 };
-/**设置混乱*/
+/**设置混乱
+ *  将动作设置为攻击
+*/
 Game_Action.prototype.setConfusion = function() {
     //设置攻击
     this.setAttack();
 };
-/**准备*/
+/**准备
+ * 
+ * 如果 是混乱并且不是强制 则设置混乱(设置为攻击)
+ * 
+ * 
+*/
 Game_Action.prototype.prepare = function() {
     //如果 (主体 是混乱的 并且 不是 强制的)
     if (this.subject().isConfused() && !this._forcing) {

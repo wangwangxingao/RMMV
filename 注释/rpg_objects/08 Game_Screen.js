@@ -461,8 +461,8 @@ Game_Screen.prototype.startFlashForDamage = function() {
 /**显示图片
  * @param {number} pictureId 图片id
  * @param {number} origin 原点
- * @param {number} x x
- * @param {number} y y
+ * @param {number} x x坐标
+ * @param {number} y y坐标
  * @param {number} scaleX 比例x
  * @param {number} scaleY 比例y
  * @param {number} opacity 不透明度

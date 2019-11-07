@@ -113,12 +113,16 @@ BattleManager.onEncounter = function() {
     //突然袭击 = 数学 随机数() < 突然袭击比例() 并且 不是 先发制人
     this._surprise = (Math.random() < this.rateSurprise() && !this._preemptive);
 };
-/**先发制人比例 */
+/**先发制人比例
+ * @returns {number}
+ */
 BattleManager.ratePreemptive = function() {
     //返回 游戏队伍 先发制人比例( 游戏敌群 敏捷() )
     return $gameParty.ratePreemptive($gameTroop.agility());
 };
-/**突然袭击比例 */
+/**突然袭击比例
+ * @returns {number} 
+ */
 BattleManager.rateSurprise = function() {
     //返回 游戏队伍 突然袭击比例( 游戏敌群 敏捷() )
     return $gameParty.rateSurprise($gameTroop.agility());
@@ -260,7 +264,11 @@ BattleManager.updateEventMain = function() {
     //返回 falae
     return false;
 };
-/**是忙碌 */
+/**是忙碌
+ * 
+ * @returns {boolean}
+ *  
+ */
 BattleManager.isBusy = function() {
     //返回 (游戏消息 是忙碌()  或者 精灵组 是忙碌() 或者 日志窗口 是忙碌() )
     return ($gameMessage.isBusy() || this._spriteset.isBusy() ||
@@ -307,7 +315,9 @@ BattleManager.isEscaped = function() {
     //返回 逃跑的
     return this._escaped;
 };
-/**角色 */
+/**角色 
+ * @returns {Game_Battler|null} 战斗者
+*/
 BattleManager.actor = function() {
     //返回 角色索引  >= 0  ? 游戏队伍 成员组 角色索引 : null
     return this._actorIndex >= 0 ? $gameParty.members()[this._actorIndex] : null;
@@ -318,8 +328,8 @@ BattleManager.clearActor = function() {
     this.changeActor(-1, '');
 };
 /**改变角色
- * @param {Number} newActorIndex 新角色索引
- * @param {Number} lastActorActionState 上一个角色动作状态
+ * @param {number} newActorIndex 新角色索引
+ * @param {number} lastActorActionState 上一个角色动作状态
  * */
 BattleManager.changeActor = function(newActorIndex, lastActorActionState) {
     //上一个角色
@@ -385,7 +395,10 @@ BattleManager.startInput = function() {
         this.startTurn();
     }
 };
-/**输入角色 */
+/**输入动作
+ * @return {Game_Action|null} 动作对象
+ * 
+ */
 BattleManager.inputtingAction = function() {
     //返回   角色() ? 角色() 输入动作() : null
     return this.actor() ? this.actor().inputtingAction() : null;
@@ -450,13 +463,25 @@ BattleManager.startTurn = function() {
     //日志窗口 开始回合()
     this._logWindow.startTurn();
 };
-/**更新回合 */
+/**更新回合
+ * 
+ * 请求动作刷新
+ * 
+ * 获取主体
+ * 如果 有 主体 则 进行回合
+ *      无 主体   结束回合
+ * 
+ */
 BattleManager.updateTurn = function() {
     //游戏队伍 请求动作刷新()
     $gameParty.requestMotionRefresh();
     //如果 (不是 主体)
     if (!this._subject) {
         //主体 = 获得下一个主体()
+        /**
+         * 主体
+         * @type {Game_Battler}    
+         */
         this._subject = this.getNextSubject();
     }
     //如果 ( 主体 )
@@ -469,19 +494,27 @@ BattleManager.updateTurn = function() {
         this.endTurn();
     }
 };
-/**进行回合 */
+/**进行回合
+ * 主体 动作 
+ * 动作准备 (如果是混乱则变成攻击)
+ * 如果动作有效
+ * 
+ */
 BattleManager.processTurn = function() {
     //主体 = 主体
     var subject = this._subject;
     //动作 = 当前的动作()
-    var action = subject.currentAction();
+    /**
+     * @type  {Game_Action} action
+     */
+    var action = subject.currentAction(); 
     //如果 动作(动作 存在)
     if (action) {
-        //动作 准备
+        //动作 准备()
         action.prepare();
-        //如果 动作 是有效的
+        //如果 动作 是有效的()
         if (action.isValid()) {
-            //开始 动作
+            //开始动作()
             this.startAction();
         }
         //主体 移除当前的动作
@@ -539,6 +572,9 @@ BattleManager.getNextSubject = function() {
     //循环
     for (;;) {
         //战斗者 = 动作战斗者组 移除头部()
+        /**
+         * @type {Game_Battler} battler
+         */
         var battler = this._actionBattlers.shift();
         //如果 不是 战斗者(战斗者 不存在) 
         if (!battler) {
@@ -583,7 +619,15 @@ BattleManager.makeActionOrders = function() {
     //动作战斗者组 = 战斗者组
     this._actionBattlers = battlers;
 };
-/**开始动作 */
+/**开始动作
+ * 主体 当前动作  目标
+ * 
+ * 进行动作阶段
+ * 
+ * 主体使用(消耗物品/mp)
+ * 应用通用(公共事件)
+ * 
+ */
 BattleManager.startAction = function() {
     //主体 = 主体
     var subject = this._subject;
@@ -597,11 +641,11 @@ BattleManager.startAction = function() {
     this._action = action;
     //目标组
     this._targets = targets;
-    //主体 用项目(动作 项目) 
+    //主体 用项目(动作 项目()) 
     subject.useItem(action.item());
-    //动作 应用通用的
+    //动作 应用通用的()
     this._action.applyGlobal();
-    //刷新状态
+    //刷新状态()
     this.refreshStatus();
     //日志窗口 开始动作(主体,动作,目标组)
     this._logWindow.startAction(subject, action, targets);
@@ -628,9 +672,12 @@ BattleManager.endAction = function() {
     this._phase = 'turn';
 };
 /**调用动作 
- * @param {{}} subject 主体 
- * @param {{}} target 目标 
+ * @param {Game_Battler} subject 主体 
+ * @param {Game_Battler} target 目标 
  * 
+ * 添加基础行
+ * 调用不同动作情况
+ * 移除基础行
  */
 BattleManager.invokeAction = function(subject, target) {
     //日志窗口 添加 ('pushBaseLine'//添加基础行)
@@ -655,8 +702,8 @@ BattleManager.invokeAction = function(subject, target) {
     this.refreshStatus();
 };
 /**调用正常动作 
- * @param {{}} subject 主体 
- * @param {{}} target 目标 
+ * @param {Game_Battler} subject 主体 
+ * @param {Game_Battler} target 目标 
  * 
  */
 BattleManager.invokeNormalAction = function(subject, target) {
@@ -668,8 +715,8 @@ BattleManager.invokeNormalAction = function(subject, target) {
     this._logWindow.displayActionResults(subject, realTarget);
 };
 /**调用反击 
- * @param {{}} subject 主体 
- * @param {{}} target 目标 
+ * @param {Game_Battler} subject 主体 
+ * @param {Game_Battler} target 目标 
  * 
  */
 BattleManager.invokeCounterAttack = function(subject, target) {
@@ -685,8 +732,8 @@ BattleManager.invokeCounterAttack = function(subject, target) {
     this._logWindow.displayActionResults(target, subject);
 };
 /**调用魔法反射 
- * @param {{}} subject 主体 
- * @param {{}} target 目标 
+ * @param {Game_Battler} subject 主体 
+ * @param {Game_Battler} target 目标 
  * 
  */
 BattleManager.invokeMagicReflection = function(subject, target) {
@@ -700,7 +747,7 @@ BattleManager.invokeMagicReflection = function(subject, target) {
     this._logWindow.displayActionResults(target, subject);
 };
 /**应用替代 
- * @param {{}} target 目标 
+ * @param {Game_Battler} target 目标 
  */
 BattleManager.applySubstitute = function(target) {
     //检查替代(目标)
@@ -718,9 +765,9 @@ BattleManager.applySubstitute = function(target) {
     //返回 目标
     return target;
 };
-/**检查替代 
- * @param {{}} target 目标 
- * 
+/**检查替代 (需要替代者)
+ * @param {Game_Battler} target 目标 
+ * 如果 是濒死 并且动作不是必中 
  */
 BattleManager.checkSubstitute = function(target) {
     //返回 是濒死的() 并且  不是 动作 是必中()  
@@ -732,7 +779,7 @@ BattleManager.isActionForced = function() {
     return !!this._actionForcedBattler;
 };
 /**强制动作
- * @param {{}} battler 战斗者 
+ * @param {Game_Battler} battler 战斗者 
  * 
  */
 BattleManager.forceAction = function(battler) {
@@ -742,7 +789,7 @@ BattleManager.forceAction = function(battler) {
     var index = this._actionBattlers.indexOf(battler);
     //如果(索引 >=0)
     if (index >= 0) {
-        //动作战斗者组 剪接 (索引,1)
+        //动作战斗者组 剪接 (索引,1)  //删除该角色
         this._actionBattlers.splice(index, 1);
     }
 };
@@ -791,7 +838,9 @@ BattleManager.checkBattleEnd = function() {
     //返回 false
     return false;
 };
-/**检查中止 */
+/**检查中止
+ * @returns {false}
+ */
 BattleManager.checkAbort = function() { 
     //如果 (游戏队伍 是空的() 或者 是中止() ) 
     if ($gameParty.isEmpty() || this.isAborting()) {
@@ -799,7 +848,7 @@ BattleManager.checkAbort = function() {
         SoundManager.playEscape();
         //逃跑的 = true 
         this._escaped = true;
-        //检查中止()
+        //进行中止()
         this.processAbort();
     }
     //返回 false 
@@ -827,7 +876,9 @@ BattleManager.processVictory = function() {
     //结束战斗(0)
     this.endBattle(0);
 };
-/**进行逃跑 */
+/**进行逃跑
+ * @returns {boolean}  
+ */
 BattleManager.processEscape = function() {
     //游戏队伍 表现逃跑()
     $gameParty.performEscape();
@@ -884,7 +935,12 @@ BattleManager.processDefeat = function() {
     //结束战斗(2)
     this.endBattle(2);
 };
-/**结束战斗 */
+/**结束战斗
+ * @param {0|1|2} result  结果  
+ * 0 胜利  
+ * 1 中止  
+ * 2 失败  
+ */
 BattleManager.endBattle = function(result) {
     //阶段 = "battleEnd" //战斗结束
     this._phase = 'battleEnd';
@@ -996,7 +1052,8 @@ BattleManager.displayGold = function() {
         $gameMessage.add('\\.' + TextManager.obtainGold.format(gold));
     }
 };
-/**显示掉落物品组 */
+/**显示掉落物品组
+ */
 BattleManager.displayDropItems = function() {
     //物品组 = 奖励 物品组
     var items = this._rewards.items;
@@ -1011,7 +1068,10 @@ BattleManager.displayDropItems = function() {
         });
     }
 };
-/**获得奖励 */
+/**获得奖励
+ * 
+ * 获得经验金钱物品
+ */
 BattleManager.gainRewards = function() {
     //获得经验值()
     this.gainExp();
