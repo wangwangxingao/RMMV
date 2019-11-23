@@ -10,8 +10,18 @@
  * @desc 插件 表格文件读取 ,作者:汪汪
  * @default  汪汪
  *
+ * @param  pluginMust 
+ * @desc 插件需要的其他插件支持
+ * @default  xlsxcoremin
+ * 
  * @help 
  * 表格的读取
+ * 保存
+ * ww.lsxls.save(表格/二维数组,名称)
+ * 下载 
+ * ww.lsxls.down(表格/二维数组,名称)
+ * 读取 
+ * ww.lsxls.load(地址)
  * 
  */
 

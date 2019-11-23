@@ -14,6 +14,18 @@
  * 
  * ConfigManager.language = i   需要翻译的内容在表格中的位置
  * ConfigManager.save();        保存
+ * 
+ * 
+ * 可以在 ww.trch.translates 中获取 
+ * 方法为 第一个参数写法为  ["名称"]     
+ * 可用  ww.trch.translates["名称"]  获取当前的值
+ * 
+ * 如 第一列为  ["语言"]   ,第二列为  汉语  ,第三列 为  英语
+ * 则 当 ConfigManager.language  为0时 ,
+ * ww.trch.translates["语言"]  的值为 汉语
+ * 
+ * 则 当 ConfigManager.language  为1时 ,
+ * ww.trch.translates["语言"]  的值为 英语
  */
 
 ww = ww || {}

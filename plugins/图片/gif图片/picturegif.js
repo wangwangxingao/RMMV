@@ -54,6 +54,6 @@ Sprite_Picture.prototype.loadBitmap = function () {
             this.addChild(this._window)
         }
     } else {
-        ww.gif._Sprite_Picture_prototype_loadBitmap.call(this)
+        ww.picturegif._Sprite_Picture_prototype_loadBitmap.call(this)
     }
 }

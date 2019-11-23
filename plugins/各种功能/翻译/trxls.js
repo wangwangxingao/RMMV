@@ -3,13 +3,17 @@
 // trxls.js
 //=============================================================================
 /*:
- * @plugindesc 翻译数据保存到表格
+ * @plugindesc 生成翻译数据
  * @author wangwang
  * 
  * @param  trxls 
- * @desc 插件 翻译数据保存到表格 ,作者:汪汪
+ * @desc 插件 生成翻译数据 ,作者:汪汪
  * @default  汪汪
  *
+ * @param  pluginMust 
+ * @desc 插件需要的其他插件支持
+ * @default  xlsxcoremin,lsxls,data2xls,
+ * 
  * @help
  * f8 / f12
  * console 选项
@@ -21,18 +25,7 @@
  * 不需要修改的可以删除那一行,当进行翻译时不会处理
  * 
  * 
- * 
  * translate.xls中的数据为  其他数据 ,
- * 可以在 ww.trch.translates中获取 
- * 方法为 第一个参数写法为  ["名称"]     
- * 可用  ww.trch.translates["名称"]  获取当前的值
- * 
- * 如 第一列为  ["语言"]   ,第二列为  汉语  ,第三列 为  英语
- * 则 当 ConfigManager.language  为0时 ,
- * ww.trch.translates["语言"]  的值为 汉语
- * 
- * 则 当 ConfigManager.language  为1时 ,
- * ww.trch.translates["语言"]  的值为 英语
  * 
  */
 

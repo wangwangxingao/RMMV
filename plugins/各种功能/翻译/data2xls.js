@@ -10,9 +10,22 @@
  * @desc 插件 表格与对象的转换 ,作者:汪汪
  * @default  汪汪
  *
- * @help 
- * 表格与对象的转换
  * 
+ * @param  pluginMust 
+ * @desc 插件需要的其他插件支持
+ * @default  xlsxcoremin,lsxls
+ * 
+ * 
+ * @help 
+ * 对象转换为表格
+ * ww.data2xls.copyo2l(that, re, setslist, father) 
+ * @param {*} that 源 源对象
+ * @param {*} re 返回数组 
+ * @param {*} setslist 设置列表
+ * @param {*} father 父
+ * 
+ * 表格转化为对象
+ * ww.data2xls.copyl2o()
  */
 
 var ww = ww || {}
@@ -36,34 +49,34 @@ ww.data2xls.parse = function (that) {
 }
 
 /**
- * 深度复制 
- * @param {*} that 源
- * @param {*} obj 对象
+ * 深度复制  对象转化为数组
+ * @param {*} that 源 源对象
+ * @param {*} re 返回数组 
  * @param {*} setslist 设置列表
- * @param {*} father 父
+ * @param {*} path 父地址
  */
-ww.data2xls.copyo2l = function (that, obj, setslist, father) {
+ww.data2xls.copyo2l = function (that, re, setslist, path) {
     var that = that
     var i;
     var setslist = setslist || []
-    var obj = obj || []
-    var father = father || []
+    var re = re || []
+    var path = path || []
     if (typeof (that) === "object") {
         if (that === null) {
-            obj.push([JSON.stringify(father), ww.data2xls.stringify(that)])
+            re.push([JSON.stringify(path), ww.data2xls.stringify(that)])
         } else if (Array.isArray(that)) {
             for (var i = 0; i < that.length; i++) {
-                this.check(that, obj, setslist, father, i)
+                this.check(that, re, setslist, path, i)
             }
         } else {
             for (i in that) {
-                this.check(that, obj, setslist, father, i)
+                this.check(that, re, setslist, path, i)
             }
         }
     } else {
-        obj.push([JSON.stringify(father), ww.data2xls.stringify(that)])
+        re.push([JSON.stringify(path), ww.data2xls.stringify(that)])
     }
-    return obj;
+    return re;
 };
 
 
@@ -71,34 +84,34 @@ ww.data2xls.copyo2l = function (that, obj, setslist, father) {
 /**
  * 检查并处理
  * @param {*} that 原始数据
- * @param {*} obj 对象
+ * @param {*} re 对象
  * @param {*} setslist 设置列表
- * @param {*} father 父组
+ * @param {*} path 父地址
  * @param {*} i 子变量名  
  */
-ww.data2xls.check = function (that, obj, setslist, father, i) {
+ww.data2xls.check = function (that, re, setslist, path, i) {
     var list = setslist
     var save = {}
     var ch = (list.length == 0)
     for (var sl = 0; sl < list.length; sl++) {
         var sets = list[sl]
-        var re = this.checksets(that, father, i, sets)
-        if (!re) {
+        var r = this.checksets(that, path, i, sets)
+        if (!r) {
             save[sl] = list[sl]
             list[sl] = 1
         } else {
-            ch = re > ch ? re : ch
+            ch = r > ch ? r : ch
         }
     }
     if (ch) {
         if (ch == 2) {
-            father.push(i)
-            obj.push([JSON.stringify(father), ww.data2xls.stringify(that[i])])
-            father.pop()
+            path.push(i)
+            re.push([JSON.stringify(path), ww.data2xls.stringify(that[i])])
+            path.pop()
         } else {
-            father.push(i)
-            this.copyo2l(that[i], obj, setslist, father)
-            father.pop()
+            path.push(i)
+            this.copyo2l(that[i], re, setslist, path)
+            path.pop()
         }
     }
     for (var sl in save) {
@@ -109,19 +122,19 @@ ww.data2xls.check = function (that, obj, setslist, father, i) {
 /**
  * 检查是否继续 根据设置组
  * @param {*} that 原始数据
- * @param {*} father 父组
+ * @param {*} path 父组
  * @param {*} i 子变量名
  * @param {*} sets 设置 
  */
-ww.data2xls.checksets = function (that, father, i, sets) {
+ww.data2xls.checksets = function (that, path, i, sets) {
     if (typeof sets == "object" && sets !== null) {
         if (Array.isArray(sets)) {
-            var l = father.length
+            var l = path.length
             var set = sets[l]
-            return this.checkset(that, father, i, set)
+            return this.checkset(that, path, i, set)
         } else {
             var set = sets
-            return this.checkset(that, father, i, set)
+            return this.checkset(that, path, i, set)
         }
     }
     return false
@@ -131,7 +144,7 @@ ww.data2xls.checksets = function (that, father, i, sets) {
 /** 
  * 检查是否继续 根据设置 
  * @param {*} that 原始数据
- * @param {*} father 父组
+ * @param {*} path 父组地址
  * @param {*} i 子变量名
  * @param {*} set 设置  
  * 无  允许  
@@ -149,7 +162,7 @@ ww.data2xls.checksets = function (that, father, i, sets) {
  * 2 子变量值 为字符串  
  * -1 不允许
  */
-ww.data2xls.checkset = function (that, father, i, set) {
+ww.data2xls.checkset = function (that, path, i, set) {
     if (!set) {
         return true
     } else {
@@ -241,6 +254,7 @@ ww.data2xls.checktype = function (that) {
 
 /**
  * 拷贝  列表到对象
+ * 
  * @param {*} list 列表
  * @param {*} obj 对象
  * @param {*} type 种类

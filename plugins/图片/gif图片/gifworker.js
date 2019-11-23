@@ -14,6 +14,7 @@ ww.gif = {}
  * 
 */
 ww.gif.parse = function (buffer, name) {
+   
     //转化为uint8array 
     var view = new Uint8Array(buffer),
         offset = 0,
@@ -28,14 +29,14 @@ ww.gif.parse = function (buffer, name) {
         frame;
 
     //读取
-    function read(len) {
+    var  read = function  (len) {
         return view.slice(offset, offset += len);
     }
 
     /**
      * 获取头
      */
-    function getHeader() {
+    var getHeader = function () {
         info.header = '';
         read(6).forEach(function (e, i, arr) {
             info.header += String.fromCharCode(e);
@@ -44,7 +45,7 @@ ww.gif.parse = function (buffer, name) {
     /**
      * 得到 scr 降序
      */
-    function getScrDesc() {
+    var getScrDesc= function() {
         var arr = read(7),
             i;
         info.w = arr[0] + (arr[1] << 8);
@@ -64,7 +65,7 @@ ww.gif.parse = function (buffer, name) {
     /**
      * 解码 
      **/
-    function decode() {
+    var decode = function() {
         var arr = read(1),
             s, codeSize, i, ss,
             srcBuf = [];
@@ -116,7 +117,7 @@ ww.gif.parse = function (buffer, name) {
     /**
      * 延期
      */
-    function extension() {
+    var extension  = function() {
         var arr = read(1),
             o, s;
         switch (arr[0]) {

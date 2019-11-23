@@ -9,6 +9,10 @@
  * @desc 插件 读取翻译数据并翻译,保存数据到文件夹 ,作者:汪汪
  * @default  汪汪
  *
+ * @param  pluginMust 
+ * @desc 插件需要的其他插件支持
+ * @default  xlsxcoremin,lsxls,data2xls,trxls,
+ * 
  * @help 
  *  
  * ww.trchTo.trTo(l)  l 语言编号

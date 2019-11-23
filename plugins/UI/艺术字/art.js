@@ -129,7 +129,7 @@ Bitmap.prototype._drawTextOutline = function (text, tx, ty, maxWidth) {
 };
 
 
-Bitmap.prototype._makeFontNameText = function () {
+Bitmap.prototype._makeArtFontNameText = function () {
     //黑体 + 斜体 + 大小 + 字体
     return (this.fontBold ? "Bold " : '') + (this.fontItalic ? 'Italic ' : '') +
         this.fontSize + 'px ' + this.fontFace;
@@ -217,7 +217,7 @@ ArtWord.prototype.standardFontFace = function () {
 /**字体设置 */
 ArtWord.prototype.fontSettings = function (i) {
     if (i || !this.contents._fontnametext) {
-        this.contents._fontnametext = this.contents._makeFontNameText()
+        this.contents._fontnametext = this.contents._makeArtFontNameText()
     }
     return this.contents._fontnametext
 };
