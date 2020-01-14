@@ -57,3 +57,7 @@ plugins/UI/列表显示/Sprite_listscene.js
 .gitignore
 plugins/游戏/阻占棋/zuzhanqi.js
 .gitignore
+*.png
+/.vscode/launch.json
+/run.ps1
+/yuidoc.json
