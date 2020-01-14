@@ -1,9 +1,9 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Interpreter*/
-/** 游戏事件解释器*/
-/** The interpreter for running event commands.*/
-/** 运转事件命令的解释器*/
+/**-----------------------------------------------------------------------------  
+ * Game_Interpreter  
+ * 游戏事件解释器  
+ * The interpreter for running event commands.  
+ * 运转事件命令的解释器*/
 
 function Game_Interpreter() {
     this.initialize.apply(this, arguments);

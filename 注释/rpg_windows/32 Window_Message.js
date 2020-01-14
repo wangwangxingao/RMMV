@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_Message */
-/** 窗口消息 */
-/** The window for displaying text messages. */
-/** 显示文本消息的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_Message   
+ * 窗口消息   
+ * The window for displaying text messages.   
+ * 显示文本消息的窗口 */
 
 function Window_Message() {
     this.initialize.apply(this, arguments);

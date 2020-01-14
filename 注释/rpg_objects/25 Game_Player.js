@@ -1,9 +1,9 @@
-/**-----------------------------------------------------------------------------*/
-/** Game_Player*/
-/** 游戏游戏者     $gamePlayer*/
-/** The game object class for the player. It contains event starting*/
-/** determinants and map scrolling functions.*/
-/** 游戏者的游戏对象类.包含事件开始判定和地图滚动方法*/
+/**-----------------------------------------------------------------------------  
+ * Game_Player  
+ * 游戏游戏者     $gamePlayer  
+ * The game object class for the player. It contains event starting  
+ * determinants and map scrolling functions.  
+ * 游戏者的游戏对象类.包含事件开始判定和地图滚动方法*/
 
 function Game_Player() {
     this.initialize.apply(this, arguments);

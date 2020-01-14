@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_ItemCategory */
-/** 窗口物品种类 */
-/** The window for selecting a category of items on the item and shop screens. */
-/** 物品和商店画面选择一个种类物品的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_ItemCategory   
+ * 窗口物品种类   
+ * The window for selecting a category of items on the item and shop screens.   
+ * 物品和商店画面选择一个种类物品的窗口 */
 
 function Window_ItemCategory() {
     this.initialize.apply(this, arguments);

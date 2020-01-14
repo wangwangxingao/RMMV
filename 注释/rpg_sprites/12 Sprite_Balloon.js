@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_Balloon */
-/** 精灵气球 */
-/** The sprite for displaying a balloon icon. */
-/** 显示气球图标的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Balloon   
+ * 精灵气球   
+ * The sprite for displaying a balloon icon.   
+ * 显示气球图标的精灵 */
 
 function Sprite_Balloon() {
     this.initialize.apply(this, arguments);

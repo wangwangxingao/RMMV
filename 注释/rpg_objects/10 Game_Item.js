@@ -1,9 +1,9 @@
-/**-----------------------------------------------------------------------------*/
-/** Game_Item*/
-/** 游戏项目*/
-/** The game object class for handling skills, items, weapons, and armor. It is*/
-/** required because save data should not include the database object itself.*/
-/** 处理技能物品武器盔甲的游戏对象类,它是必须的因为保存数据不会包括游戏数据库自己*/
+/**-----------------------------------------------------------------------------  
+ * Game_Item  
+ * 游戏项目  
+ * The game object class for handling skills, items, weapons, and armor. It is  
+ * required because save data should not include the database object itself.  
+ * 处理技能物品武器盔甲的游戏对象类,它是必须的因为保存数据不会包括游戏数据库自己*/
 
 function Game_Item() {
     this.initialize.apply(this, arguments);

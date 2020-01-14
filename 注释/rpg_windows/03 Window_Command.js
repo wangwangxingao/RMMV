@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_Command */
-/** 窗口命令 */
-/** The superclass of windows for selecting a command. */
-/** 窗口选择命令的超级类 */
+/**-----------------------------------------------------------------------------   
+ * Window_Command   
+ * 窗口命令   
+ * The superclass of windows for selecting a command.   
+ * 窗口选择命令的超级类 */
 
 function Window_Command() {
     this.initialize.apply(this, arguments);

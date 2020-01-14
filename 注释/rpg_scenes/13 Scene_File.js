@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_File */
-/** 场景文件 */
-/** The superclass of Scene_Save and Scene_Load. */
-/** 保存 和 读取 场景 的 超级类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_File   
+ * 场景文件   
+ * The superclass of Scene_Save and Scene_Load.   
+ * 保存 和 读取 场景 的 超级类 */
 
 function Scene_File() {
     this.initialize.apply(this, arguments);

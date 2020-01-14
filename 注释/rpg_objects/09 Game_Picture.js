@@ -1,8 +1,8 @@
-/**-----------------------------------------------------------------------------*/
-/** Game_Picture*/
-/** 游戏图片*/
-/** The game object class for a picture.*/
-/** 图片的游戏对象类*/
+/**-----------------------------------------------------------------------------  
+ * Game_Picture  
+ * 游戏图片  
+ * The game object class for a picture.  
+ * 图片的游戏对象类*/
 
 function Game_Picture() {
     this.initialize.apply(this, arguments);

@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_BattleEnemy */
-/** 窗口战斗敌人 */
-/** The window for selecting a target enemy on the battle screen. */
-/** 战斗画面选择一个目标敌人的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_BattleEnemy   
+ * 窗口战斗敌人   
+ * The window for selecting a target enemy on the battle screen.   
+ * 战斗画面选择一个目标敌人的窗口 */
 
 function Window_BattleEnemy() {
     this.initialize.apply(this, arguments);

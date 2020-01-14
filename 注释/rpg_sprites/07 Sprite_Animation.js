@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Sprite_Animation */
-/** 精灵动画 */
-/** The sprite for displaying an animation. */
-/** 一个显示动画的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Animation   
+ * 精灵动画   
+ * The sprite for displaying an animation.   
+ * 一个显示动画的精灵 */
 
 function Sprite_Animation() {
     this.initialize.apply(this, arguments);

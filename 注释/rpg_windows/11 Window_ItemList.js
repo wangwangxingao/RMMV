@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_ItemList */
-/** 窗口物品列表 */
-/** The window for selecting an item on the item screen. */
-/** 物品画面选择物品的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_ItemList   
+ * 窗口物品列表   
+ * The window for selecting an item on the item screen.   
+ * 物品画面选择物品的窗口 */
 
 function Window_ItemList() {
     this.initialize.apply(this, arguments);

@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_SkillList */
-/** 窗口技能列表 */
-/** The window for selecting a skill on the skill screen. */
-/** 技能画面选择技能的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_SkillList   
+ * 窗口技能列表   
+ * The window for selecting a skill on the skill screen.   
+ * 技能画面选择技能的窗口 */
 
 function Window_SkillList() {
     this.initialize.apply(this, arguments);

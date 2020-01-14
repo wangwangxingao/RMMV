@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_Load */
-/** 场景读取 */
-/** The scene class of the load screen. */
-/** 处理 读取画面 的 场景类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Load   
+ * 场景读取   
+ * The scene class of the load screen.   
+ * 处理 读取画面 的 场景类 */
 
 function Scene_Load() {
     this.initialize.apply(this, arguments);

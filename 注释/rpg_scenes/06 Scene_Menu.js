@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_Menu */
-/** 场景菜单 */
-/** The scene class of the menu screen. */
-/** 处理 菜单画面 的 场景类  */
+/**-----------------------------------------------------------------------------   
+ * Scene_Menu   
+ * 场景菜单   
+ * The scene class of the menu screen.   
+ * 处理 菜单画面 的 场景类  */
 
 function Scene_Menu() {
     this.initialize.apply(this, arguments);

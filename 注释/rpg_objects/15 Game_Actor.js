@@ -1,8 +1,8 @@
-/**-----------------------------------------------------------------------------*/
-/** Game_Actor*/
-/** 游戏角色*/
-/** The game object class for an actor.*/
-/** 角色的游戏对象类*/
+/**-----------------------------------------------------------------------------  
+ * Game_Actor  
+ * 游戏角色  
+ * The game object class for an actor.  
+ * 角色的游戏对象类*/
 
 function Game_Actor() {
     this.initialize.apply(this, arguments);

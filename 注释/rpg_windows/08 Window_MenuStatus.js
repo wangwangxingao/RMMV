@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_MenuStatus */
-/** 窗口状态 */
-/** The window for displaying party member status on the menu screen. */
-/** 菜单画面中显示队伍成员状态的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_MenuStatus   
+ * 窗口状态   
+ * The window for displaying party member status on the menu screen.   
+ * 菜单画面中显示队伍成员状态的窗口 */
 
 function Window_MenuStatus() {
     this.initialize.apply(this, arguments);

@@ -1062,8 +1062,8 @@ Tilemap.isWaterfallTypeAutotile = function(tileId) {
     return this.isWaterfallTile(tileId);
 };
 
-/** Autotile shape number to coordinates of tileset images*/
-/**基底自动图块表*/
+/** Autotile shape number to coordinates of tileset images  
+ * 基底自动图块表*/
 Tilemap.FLOOR_AUTOTILE_TABLE = [
     [
         [2, 4],

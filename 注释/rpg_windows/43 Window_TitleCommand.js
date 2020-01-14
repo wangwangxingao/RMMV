@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_TitleCommand */
-/** 窗口标题命令 */
-/** The window for selecting New Game/Continue on the title screen. */
-/** 标题画面选择新游戏或继续的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_TitleCommand   
+ * 窗口标题命令   
+ * The window for selecting New Game/Continue on the title screen.   
+ * 标题画面选择新游戏或继续的窗口 */
 
 function Window_TitleCommand() {
     this.initialize.apply(this, arguments);

@@ -1,9 +1,9 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Enemy*/
-/** 游戏敌人*/
-/** The game object class for an enemy.*/
-/** 敌人的游戏对象类*/
+/**-----------------------------------------------------------------------------  
+ * Game_Enemy  
+ * 游戏敌人  
+ * The game object class for an enemy.  
+ * 敌人的游戏对象类*/
 
 function Game_Enemy() {
     this.initialize.apply(this, arguments);

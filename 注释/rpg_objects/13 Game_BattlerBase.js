@@ -1,8 +1,8 @@
-/**-----------------------------------------------------------------------------*/
-/**Game_BattlerBase*/
-/**游戏战斗基础*/
-/**The superclass of Game_Battler. It mainly contains parameters calculation.*/
-/**游戏战斗者的超级类,它主要包含战斗参数*/
+/**-----------------------------------------------------------------------------  
+ *Game_BattlerBase  
+ *游戏战斗基础  
+ *The superclass of Game_Battler. It mainly contains parameters calculation.  
+ *游戏战斗者的超级类,它主要包含战斗参数*/
 
 function Game_BattlerBase() {
     this.initialize.apply(this, arguments);

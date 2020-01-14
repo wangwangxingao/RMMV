@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_Character */
-/** 精灵人物 */
-/** The sprite for displaying a character. */
-/** 显示人物的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Character   
+ * 精灵人物   
+ * The sprite for displaying a character.   
+ * 显示人物的精灵 */
 
 function Sprite_Character() {
     this.initialize.apply(this, arguments);

@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_BattleActor */
-/** 窗口战斗角色 */
-/** The window for selecting a target actor on the battle screen. */
-/** 战斗画面选择一个目标角色的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_BattleActor   
+ * 窗口战斗角色   
+ * The window for selecting a target actor on the battle screen.   
+ * 战斗画面选择一个目标角色的窗口 */
 
 function Window_BattleActor() {
     this.initialize.apply(this, arguments);

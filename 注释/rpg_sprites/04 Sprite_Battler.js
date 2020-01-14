@@ -1,8 +1,8 @@
 
-/**----------------------------------------------------------------------------- */
-/** Sprite_Battler */
-/** 精灵战斗者 */
-/** The superclass of Sprite_Actor and Sprite_Enemy. */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Battler   
+ * 精灵战斗者   
+ * The superclass of Sprite_Actor and Sprite_Enemy. */
 
 function Sprite_Battler() {
     this.initialize.apply(this, arguments);

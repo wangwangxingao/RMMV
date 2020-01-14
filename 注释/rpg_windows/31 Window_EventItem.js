@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_EventItem */
-/** 窗口事件物品 */
-/** The window used for the event command [Select Item]. */
-/** 用于事件命令的窗口(选择物品) */
+/**-----------------------------------------------------------------------------   
+ * Window_EventItem   
+ * 窗口事件物品   
+ * The window used for the event command [Select Item].   
+ * 用于事件命令的窗口(选择物品) */
 
 function Window_EventItem() {
     this.initialize.apply(this, arguments);

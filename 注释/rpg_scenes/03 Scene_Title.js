@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_Title */
-/** 场景标题  */
-/** The scene class of the title screen. */
-/** 处理 标题画面 的 场景类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Title   
+ * 场景标题    
+ * The scene class of the title screen.   
+ * 处理 标题画面 的 场景类 */
 
 function Scene_Title() {
     this.initialize.apply(this, arguments);

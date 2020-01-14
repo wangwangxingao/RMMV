@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_DebugRange */
-/** 窗口调试范围 */
-/** The window for selecting a block of switches/variables on the debug screen. */
-/** 调试画面选择一部分开关变量的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_DebugRange   
+ * 窗口调试范围   
+ * The window for selecting a block of switches/variables on the debug screen.   
+ * 调试画面选择一部分开关变量的窗口 */
 
 function Window_DebugRange() {
     this.initialize.apply(this, arguments);

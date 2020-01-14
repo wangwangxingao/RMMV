@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_EquipCommand */
-/** 窗口装备命令 */
-/** The window for selecting a command on the equipment screen. */
-/** 装备画面选择命令的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_EquipCommand   
+ * 窗口装备命令   
+ * The window for selecting a command on the equipment screen.   
+ * 装备画面选择命令的窗口 */
 
 function Window_EquipCommand() {
     this.initialize.apply(this, arguments);

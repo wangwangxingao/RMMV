@@ -1,9 +1,9 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Character*/
-/** 游戏人物*/
-/** The superclass of Game_Player, Game_Follower, GameVehicle, and Game_Event.*/
-/** 游戏游戏者,游戏从者,游戏交通工具,游戏事件的超级类*/
+/**-----------------------------------------------------------------------------  
+ * Game_Character  
+ * 游戏人物  
+ * The superclass of Game_Player, Game_Follower, GameVehicle, and Game_Event.  
+ * 游戏游戏者,游戏从者,游戏交通工具,游戏事件的超级类*/
 
 function Game_Character() {
     this.initialize.apply(this, arguments);

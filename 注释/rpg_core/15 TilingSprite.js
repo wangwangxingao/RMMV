@@ -1,5 +1,5 @@
-/**-----------------------------------------------------------------------------*/
-/**为平铺图像的精灵对象
+/**-----------------------------------------------------------------------------  
+ * 为平铺图像的精灵对象
  * The sprite object for a tiling image.
  * 远景精灵
  * @class TilingSprite
@@ -219,8 +219,8 @@ TilingSprite.prototype._renderWebGL = function(renderer) {
 };
 
 
-/** The important members from Pixi.js*/
-/**Pixi.js的重要成员*/
+/** The important members from Pixi.js  
+ * Pixi.js的重要成员*/
 
 /**平铺精灵的可见性
  * The visibility of the tiling sprite.

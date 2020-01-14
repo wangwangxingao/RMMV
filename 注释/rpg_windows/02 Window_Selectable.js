@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Window_Selectable */
-/** 窗口选择 */
-/** The window class with cursor movement and scroll functions. */
-/** 光标活动和滚动方法的窗口类 */
+/**-----------------------------------------------------------------------------   
+ * Window_Selectable   
+ * 窗口选择   
+ * The window class with cursor movement and scroll functions.   
+ * 光标活动和滚动方法的窗口类 */
 
 function Window_Selectable() {
     this.initialize.apply(this, arguments);

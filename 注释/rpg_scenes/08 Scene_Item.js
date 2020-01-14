@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_Item */
-/** 场景物品 */
-/** The scene class of the item screen. */
-/** 处理 物品画面的类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Item   
+ * 场景物品   
+ * The scene class of the item screen.   
+ * 处理 物品画面的类 */
 
 function Scene_Item() {
     this.initialize.apply(this, arguments);

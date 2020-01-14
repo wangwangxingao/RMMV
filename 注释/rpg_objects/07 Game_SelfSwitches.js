@@ -1,9 +1,9 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_SelfSwitches*/
-/** 游戏独立开关组      $gameSelfSwitches*/
-/** The game object class for self switches.*/
-/** 独立开关的游戏对象类*/
+/**-----------------------------------------------------------------------------  
+ * Game_SelfSwitches  
+ * 游戏独立开关组      $gameSelfSwitches  
+ * The game object class for self switches.  
+ * 独立开关的游戏对象类*/
 
 function Game_SelfSwitches() {
     this.initialize.apply(this, arguments);

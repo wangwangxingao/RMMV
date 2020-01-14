@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_MenuCommand */
-/** 窗口菜单命令 */
-/** The window for selecting a command on the menu screen. */
-/** 选择菜单画面命令的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_MenuCommand   
+ * 窗口菜单命令   
+ * The window for selecting a command on the menu screen.   
+ * 选择菜单画面命令的窗口 */
 
 function Window_MenuCommand() {
     this.initialize.apply(this, arguments);

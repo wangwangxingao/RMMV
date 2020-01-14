@@ -1,9 +1,9 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Unit*/
-/** 游戏小组*/
-/** The superclass of Game_Party and Game_Troop.*/
-/** 队伍和敌群 的 超级类*/
+/**-----------------------------------------------------------------------------  
+ * Game_Unit  
+ * 游戏小组  
+ * The superclass of Game_Party and Game_Troop.  
+ * 队伍和敌群 的 超级类*/
 
 function Game_Unit() {
     this.initialize.apply(this, arguments);

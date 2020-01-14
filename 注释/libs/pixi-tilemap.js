@@ -29,6 +29,7 @@ var PIXI;
 (function (PIXI) {
     var tilemap;
     (function (tilemap) {
+        //复合矩形瓷砖层
         var CompositeRectTileLayer = (function (_super) {
             __extends(CompositeRectTileLayer, _super);
             function CompositeRectTileLayer(zIndex, bitmaps, useSquare, texPerChild) {
@@ -192,6 +193,7 @@ var PIXI;
 (function (PIXI) {
     var tilemap;
     (function (tilemap) {
+        //图形层
         var GraphicsLayer = (function (_super) {
             __extends(GraphicsLayer, _super);
             function GraphicsLayer(zIndex) {
@@ -229,6 +231,7 @@ var PIXI;
 (function (PIXI) {
     var tilemap;
     (function (tilemap) {
+        //矩形瓷砖层
         var RectTileLayer = (function (_super) {
             __extends(RectTileLayer, _super);
             function RectTileLayer(zIndex, texture) {

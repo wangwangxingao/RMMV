@@ -1,5 +1,5 @@
-/**-----------------------------------------------------------------------------*/
-/**包含游戏窗口的层
+/**-----------------------------------------------------------------------------  
+ * 包含游戏窗口的层
  * The layer which contains game windows.
  * 窗口层
  * @class WindowLayer
@@ -44,8 +44,8 @@ WindowLayer.voidFilter = new PIXI.filters.VoidFilter();
  *
  * @property width
  * @type Number
- */
-/**定义属性 */
+   
+ * 定义属性 */
 Object.defineProperty(WindowLayer.prototype, 'width', {
     get: function() {
         return this._width;
@@ -238,8 +238,8 @@ WindowLayer.prototype._maskWindow = function(window, shift) {
 };
 
 
-/** The important members from Pixi.js*/
-/**Pixi.js的重要成员*/
+/** The important members from Pixi.js  
+ * Pixi.js的重要成员*/
 
 /**窗口层的x坐标
  * The x coordinate of the window layer.

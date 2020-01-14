@@ -1,9 +1,9 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Variables*/
-/** 游戏变量组  $gameVariables*/
-/** The game object class for variables.*/
-/** 变量的游戏对象类*/
+/**-----------------------------------------------------------------------------  
+ * Game_Variables  
+ * 游戏变量组  $gameVariables  
+ * The game object class for variables.  
+ * 变量的游戏对象类*/
 
 function Game_Variables() {
     this.initialize.apply(this, arguments);

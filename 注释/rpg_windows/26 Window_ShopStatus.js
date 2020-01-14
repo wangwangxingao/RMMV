@@ -1,10 +1,10 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_ShopStatus */
-/** 窗口商店状态 */
-/** The window for displaying number of items in possession and the actor's */
-/** equipment on the shop screen. */
-/** 商店画面显示拥有物品数目和角色装备的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_ShopStatus   
+ * 窗口商店状态   
+ * The window for displaying number of items in possession and the actor's   
+ * equipment on the shop screen.   
+ * 商店画面显示拥有物品数目和角色装备的窗口 */
 
 function Window_ShopStatus() {
     this.initialize.apply(this, arguments);

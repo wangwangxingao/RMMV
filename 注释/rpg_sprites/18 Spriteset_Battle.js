@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Spriteset_Battle */
-/** 精灵组战斗 */
-/** The set of sprites on the battle screen. */
-/** 在战斗画面上 的 精灵组 */
+/**-----------------------------------------------------------------------------   
+ * Spriteset_Battle   
+ * 精灵组战斗   
+ * The set of sprites on the battle screen.   
+ * 在战斗画面上 的 精灵组 */
 
 function Spriteset_Battle() {
     this.initialize.apply(this, arguments);

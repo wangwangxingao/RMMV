@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Scene_Debug */
-/** 场景调试 */
-/** The scene class of the debug screen. */
-/** 处理 调试画面 的场景 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Debug   
+ * 场景调试   
+ * The scene class of the debug screen.   
+ * 处理 调试画面 的场景 */
 
 function Scene_Debug() {
     this.initialize.apply(this, arguments);

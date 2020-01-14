@@ -13,8 +13,8 @@ function ShaderTilemap() {
 ShaderTilemap.prototype = Object.create(Tilemap.prototype);
 ShaderTilemap.prototype.constructor = ShaderTilemap;
 
-/** we need this constant for some platforms (Samsung S4, S5, Tab4, HTC One H8)*/
-/**我们需要此常量对一些平台（三星S4, S5, Tab4, HTC One H8）*/
+/** we need this constant for some platforms (Samsung S4, S5, Tab4, HTC One H8)  
+ * 我们需要此常量对一些平台（三星S4, S5, Tab4, HTC One H8）*/
 PIXI.glCore.VertexArrayObject.FORCE_NATIVE = true;
 PIXI.settings.GC_MODE = PIXI.GC_MODES.AUTO;
 PIXI.tilemap.TileRenderer.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
@@ -64,8 +64,8 @@ ShaderTilemap.prototype.renderWebGL = function(renderer) {
  * Forces to repaint the entire tilemap AND update bitmaps list if needed
  *
  * @method refresh
- */
-/**刷新*/
+   
+ * 刷新*/
 ShaderTilemap.prototype.refresh = function() {
     if (this._lastBitmapLength !== this.bitmaps.length) {
         this._lastBitmapLength = this.bitmaps.length;
@@ -78,8 +78,7 @@ ShaderTilemap.prototype.refresh = function() {
  * Call after you update tileset
  *
  * @method updateBitmaps
- */
-/**刷新图块设置*/
+ * 刷新图块设置*/
 ShaderTilemap.prototype.refreshTileset = function() {
     var bitmaps = this.bitmaps.map(function(x) { return x._baseTexture ? new PIXI.Texture(x._baseTexture) : x; });
     this.lowerLayer.setBitmaps(bitmaps);

@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_EquipSlot */
-/** 窗口装备槽 */
-/** The window for selecting an equipment slot on the equipment screen. */
-/** 装备画面选择一个装备槽的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_EquipSlot   
+ * 窗口装备槽   
+ * The window for selecting an equipment slot on the equipment screen.   
+ * 装备画面选择一个装备槽的窗口 */
 
 function Window_EquipSlot() {
     this.initialize.apply(this, arguments);

@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_Save */
-/** 场景保存 */
-/** The scene class of the save screen. */
-/** 处理 保存画面 的 场景类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Save   
+ * 场景保存   
+ * The scene class of the save screen.   
+ * 处理 保存画面 的 场景类 */
 
 function Scene_Save() {
     this.initialize.apply(this, arguments);

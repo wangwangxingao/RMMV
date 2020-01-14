@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_MenuActor */
-/** 窗口菜单角色 */
-/** The window for selecting a target actor on the item and skill screens. */
-/** 物品技能画面选择目标角色的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_MenuActor   
+ * 窗口菜单角色   
+ * The window for selecting a target actor on the item and skill screens.   
+ * 物品技能画面选择目标角色的窗口 */
 
 function Window_MenuActor() {
     this.initialize.apply(this, arguments);

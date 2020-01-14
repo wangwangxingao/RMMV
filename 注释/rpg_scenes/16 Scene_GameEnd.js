@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_GameEnd */
-/** 场景游戏末 */
-/** The scene class of the game end screen. */
-/** 处理 游戏末画面 的 场景类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_GameEnd   
+ * 场景游戏末   
+ * The scene class of the game end screen.   
+ * 处理 游戏末画面 的 场景类 */
 
 function Scene_GameEnd() {
     this.initialize.apply(this, arguments);

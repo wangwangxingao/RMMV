@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Scene_ItemBase */
-/** 场景物品基础 */
-/** The superclass of Scene_Item and Scene_Skill. */
-/** 场景物品 和 场景技能 的 超级类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_ItemBase   
+ * 场景物品基础   
+ * The superclass of Scene_Item and Scene_Skill.   
+ * 场景物品 和 场景技能 的 超级类 */
 
 function Scene_ItemBase() {
     this.initialize.apply(this, arguments);

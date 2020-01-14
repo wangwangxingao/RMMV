@@ -1,9 +1,9 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Troop*/
-/** 游戏敌群     $gameTroop*/
-/** The game object class for a troop and the battle-related data.*/
-/** 敌群和战斗相关数据的游戏对象类*/
+/**-----------------------------------------------------------------------------  
+ * Game_Troop  
+ * 游戏敌群     $gameTroop  
+ * The game object class for a troop and the battle-related data.  
+ * 敌群和战斗相关数据的游戏对象类*/
 function Game_Troop() {
     this.initialize.apply(this, arguments);
 }

@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_Gold */
-/** 窗口金钱 */
-/** The window for displaying the party's gold. */
-/** 显示队伍金钱的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_Gold   
+ * 窗口金钱   
+ * The window for displaying the party's gold.   
+ * 显示队伍金钱的窗口 */
 
 function Window_Gold() {
     this.initialize.apply(this, arguments);

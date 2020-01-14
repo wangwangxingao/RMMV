@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_NameEdit */
-/** 窗口名称编辑 */
-/** The window for editing an actor's name on the name input screen. */
-/** 名称输入画面编辑一个角色名称的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_NameEdit   
+ * 窗口名称编辑   
+ * The window for editing an actor's name on the name input screen.   
+ * 名称输入画面编辑一个角色名称的窗口 */
 
 function Window_NameEdit() {
     this.initialize.apply(this, arguments);

@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_Damage */
-/**精灵伤害 */
-/** The sprite for displaying a popup damage. */
-/** 显示跃出伤害的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Damage   
+ *精灵伤害   
+ * The sprite for displaying a popup damage.   
+ * 显示跃出伤害的精灵 */
 
 function Sprite_Damage() {
     this.initialize.apply(this, arguments);

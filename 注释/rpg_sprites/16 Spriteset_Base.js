@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Spriteset_Base */
-/** 精灵组基础 */
-/** The superclass of Spriteset_Map and Spriteset_Battle. */
-/** 处理 精灵组地图 和 精灵组战斗 的超级类 */
+/**-----------------------------------------------------------------------------   
+ * Spriteset_Base   
+ * 精灵组基础   
+ * The superclass of Spriteset_Map and Spriteset_Battle.   
+ * 处理 精灵组地图 和 精灵组战斗 的超级类 */
 
 function Spriteset_Base() {
     this.initialize.apply(this, arguments);

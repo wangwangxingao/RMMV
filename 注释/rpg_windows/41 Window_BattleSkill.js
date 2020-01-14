@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_BattleSkill */
-/** 窗口战斗技能 */
-/** The window for selecting a skill to use on the battle screen. */
-/** 战斗画面选择一个技能使用的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_BattleSkill   
+ * 窗口战斗技能   
+ * The window for selecting a skill to use on the battle screen.   
+ * 战斗画面选择一个技能使用的窗口 */
 
 function Window_BattleSkill() {
     this.initialize.apply(this, arguments);

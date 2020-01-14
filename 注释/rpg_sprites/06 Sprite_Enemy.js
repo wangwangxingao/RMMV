@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_Enemy */
-/** 精灵敌人 */
-/** The sprite for displaying an enemy. */
-/** 显示一个敌人的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Enemy   
+ * 精灵敌人   
+ * The sprite for displaying an enemy.   
+ * 显示一个敌人的精灵 */
 
 function Sprite_Enemy() {
     this.initialize.apply(this, arguments);

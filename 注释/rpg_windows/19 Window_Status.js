@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_Status */
-/** 窗口状态 */
-/** The window for displaying full status on the status screen. */
-/** 状态画面显示完整状态的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_Status   
+ * 窗口状态   
+ * The window for displaying full status on the status screen.   
+ * 状态画面显示完整状态的窗口 */
 
 function Window_Status() {
     this.initialize.apply(this, arguments);

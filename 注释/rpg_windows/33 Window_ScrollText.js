@@ -1,10 +1,10 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_ScrollText */
-/** 窗口滚动文本 */
-/** The window for displaying scrolling text. No frame is displayed, but it */
-/** is handled as a window for convenience. */
-/** 显示滚动文本的窗口.没有显示框但运用一个窗口比较方便 */
+/**-----------------------------------------------------------------------------   
+ * Window_ScrollText   
+ * 窗口滚动文本   
+ * The window for displaying scrolling text. No frame is displayed, but it   
+ * is handled as a window for convenience.   
+ * 显示滚动文本的窗口.没有显示框但运用一个窗口比较方便 */
 
 function Window_ScrollText() {
     this.initialize.apply(this, arguments);

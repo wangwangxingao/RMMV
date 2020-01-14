@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_Gameover */
-/** 场景游戏结束 */
-/** The scene class of the game over screen. */
-/** 处理 游戏结束画面 的 场景类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Gameover   
+ * 场景游戏结束   
+ * The scene class of the game over screen.   
+ * 处理 游戏结束画面 的 场景类 */
 
 function Scene_Gameover() {
     this.initialize.apply(this, arguments);

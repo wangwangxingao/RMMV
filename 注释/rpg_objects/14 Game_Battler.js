@@ -1,10 +1,10 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Battler*/
-/** 游戏战斗者*/
-/** The superclass of Game_Actor and Game_Enemy. It contains methods for sprites*/
-/** and actions.*/
-/** 游戏角色和游戏敌人的超级类.包含精灵和动作的方法*/
+/**-----------------------------------------------------------------------------  
+ * Game_Battler  
+ * 游戏战斗者  
+ * The superclass of Game_Actor and Game_Enemy. It contains methods for sprites  
+ * and actions.  
+ * 游戏角色和游戏敌人的超级类.包含精灵和动作的方法*/
 
 function Game_Battler() {
     this.initialize.apply(this, arguments);

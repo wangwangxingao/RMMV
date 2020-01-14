@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** ImageManager */
-/** 图像管理器 */
-/** The static class that loads images, creates bitmap objects and retains them. */
-/** 这个静态的类 读取 图像 创造图片对象 和 保存他们 */
+/**-----------------------------------------------------------------------------   
+ * ImageManager   
+ * 图像管理器   
+ * The static class that loads images, creates bitmap objects and retains them.   
+ * 这个静态的类 读取 图像 创造图片对象 和 保存他们 */
 
 function ImageManager() {
     throw new Error('This is a static class');

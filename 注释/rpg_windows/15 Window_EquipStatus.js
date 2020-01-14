@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_EquipStatus */
-/** 窗口装备状态 */
-/** The window for displaying parameter changes on the equipment screen. */
-/** 装备画面显示参数改变的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_EquipStatus   
+ * 窗口装备状态   
+ * The window for displaying parameter changes on the equipment screen.   
+ * 装备画面显示参数改变的窗口 */
 
 function Window_EquipStatus() {
     this.initialize.apply(this, arguments);

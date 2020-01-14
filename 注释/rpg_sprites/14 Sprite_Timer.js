@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_Timer */
-/** 精灵计时器 */
-/** The sprite for displaying the timer. */
-/** 显示计时器 的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Timer   
+ * 精灵计时器   
+ * The sprite for displaying the timer.   
+ * 显示计时器 的精灵 */
 
 function Sprite_Timer() {
     this.initialize.apply(this, arguments);

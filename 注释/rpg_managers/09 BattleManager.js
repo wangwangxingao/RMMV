@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** BattleManager */
-/** 战斗管理器 */
-/** The static class that manages battle progress. */
-/** 这个静态的类 管理 战斗进行 */
+/**-----------------------------------------------------------------------------   
+ * BattleManager   
+ * 战斗管理器   
+ * The static class that manages battle progress.   
+ * 这个静态的类 管理 战斗进行 */
 
 function BattleManager() {
     throw new Error('This is a static class');

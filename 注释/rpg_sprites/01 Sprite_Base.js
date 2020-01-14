@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_Base */
-/** 精灵基础 */
-/** The sprite class with a feature which displays animations. */
-/** 显示一个动画特征的精灵类 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Base   
+ * 精灵基础   
+ * The sprite class with a feature which displays animations.   
+ * 显示一个动画特征的精灵类 */
 
 function Sprite_Base() {
     this.initialize.apply(this, arguments);

@@ -1,9 +1,9 @@
-/**-----------------------------------------------------------------------------*/
-/** Game_Map*/
-/** 游戏地图     $gameMap*/
-/** The game object class for a map. It contains scrolling and passage*/
-/** determination functions.*/
-/** 一个地图的游戏对象类,它包含滚动和通行决定功能*/
+/**-----------------------------------------------------------------------------  
+ * Game_Map  
+ * 游戏地图     $gameMap  
+ * The game object class for a map. It contains scrolling and passage  
+ * determination functions.  
+ * 一个地图的游戏对象类,它包含滚动和通行决定功能*/
 
 function Game_Map() {
     this.initialize.apply(this, arguments);

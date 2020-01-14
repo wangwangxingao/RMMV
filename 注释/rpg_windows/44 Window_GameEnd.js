@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_GameEnd */
-/** 窗口游戏末 */
-/** The window for selecting "Go to Title" on the game end screen. */
-/** 游戏末画面 选择回到标题的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_GameEnd   
+ * 窗口游戏末   
+ * The window for selecting "Go to Title" on the game end screen.   
+ * 游戏末画面 选择回到标题的窗口 */
 
 function Window_GameEnd() {
     this.initialize.apply(this, arguments);

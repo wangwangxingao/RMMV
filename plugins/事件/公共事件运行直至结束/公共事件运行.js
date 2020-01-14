@@ -1,8 +1,15 @@
 
 
+var ww= ww ||{}
 
+ww.runCommonEvent ={}
 
-
+ww.runCommonEvent.run =function(i){
+    if(!this._interpreter){
+        this._interpreter = new Game_Interpreter()
+    }
+    this._interpreter.setupChildToEnd(i) 
+} 
 /**安装公共事件并且更新直到结束 */
 Game_Interpreter.prototype.setupChildToEnd = function (i,z) {
     //公共事件 = 数据公共事件组[参数组[0]]

@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Scene_Shop */
-/** 场景商店 */
-/** The scene class of the shop screen. */
-/** 处理 商店画面 的 场景类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Shop   
+ * 场景商店   
+ * The scene class of the shop screen.   
+ * 处理 商店画面 的 场景类 */
 
 function Scene_Shop() {
     this.initialize.apply(this, arguments);

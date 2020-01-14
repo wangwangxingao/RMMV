@@ -1,8 +1,8 @@
-/**-----------------------------------------------------------------------------*/
-/** Game_Action*/
-/** 游戏动作*/
-/** The game object class for a battle action.*/
-/** 战斗动作的游戏对象类*/
+/**-----------------------------------------------------------------------------  
+ * Game_Action  
+ * 游戏动作  
+ * The game object class for a battle action.  
+ * 战斗动作的游戏对象类*/
 
 function Game_Action() {
     this.initialize.apply(this, arguments);

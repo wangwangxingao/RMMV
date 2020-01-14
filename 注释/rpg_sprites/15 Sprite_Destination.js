@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_Destination */
-/** 精灵目的地 */
-/** The sprite for displaying the destination place of the touch input. */
-/** 显示触摸输入目的地的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Destination   
+ * 精灵目的地   
+ * The sprite for displaying the destination place of the touch input.   
+ * 显示触摸输入目的地的精灵 */
 
 function Sprite_Destination() {
     this.initialize.apply(this, arguments);

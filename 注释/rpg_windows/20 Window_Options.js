@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_Options */
-/** 窗口选项 */
-/** The window for changing various settings on the options screen. */
-/** 在选项画面改变一些设置的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_Options   
+ * 窗口选项   
+ * The window for changing various settings on the options screen.   
+ * 在选项画面改变一些设置的窗口 */
 
 function Window_Options() {
     this.initialize.apply(this, arguments);

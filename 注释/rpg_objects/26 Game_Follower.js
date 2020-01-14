@@ -1,10 +1,10 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Follower*/
-/** 游戏从者*/
-/** The game object class for a follower. A follower is an allied character, */
-/** other than the front character, displayed in the party.*/
-/**  对于跟随者的游戏对象类。追随者是一个专职的人物，不同于前面的人物，在队伍的显示。*/
+/**-----------------------------------------------------------------------------  
+ * Game_Follower  
+ * 游戏从者  
+ * The game object class for a follower. A follower is an allied character,   
+ * other than the front character, displayed in the party.  
+ *  对于跟随者的游戏对象类。追随者是一个专职的人物，不同于前面的人物，在队伍的显示。*/
 
 function Game_Follower() {
     this.initialize.apply(this, arguments);

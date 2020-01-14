@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** PluginManager */
-/** 插件管理器 */
-/** The static class that manages the plugins. */
-/** 这个静态的类 管理 插件 */
+/**-----------------------------------------------------------------------------   
+ * PluginManager   
+ * 插件管理器   
+ * The static class that manages the plugins.   
+ * 这个静态的类 管理 插件 */
 
 function PluginManager() {
     throw new Error('This is a static class');

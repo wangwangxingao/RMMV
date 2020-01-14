@@ -1,10 +1,10 @@
-/**----------------------------------------------------------------------------- */
-/** Window_BattleLog */
-/** 窗口战斗记录 */
-/** The window for displaying battle progress. No frame is displayed, but it is */
-/** handled as a window for convenience. */
-/** 显示战斗进行的窗口.没有显示框但运用一个窗口比较方便 */
-/**
+/**-----------------------------------------------------------------------------   
+ * Window_BattleLog   
+ * 窗口战斗记录   
+ * The window for displaying battle progress. No frame is displayed, but it is   
+ * handled as a window for convenience.   
+ * 显示战斗进行的窗口.没有显示框但运用一个窗口比较方便   
+ *
  * 
  * 通过 push(methodName,...) 来实现调用的方法缓存
  * update 更新,如果不是等待则进行下一个调用方法

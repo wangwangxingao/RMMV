@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** StorageManager */
-/** 存储管理器 */
-/** The static class that manages storage for saving game data. */
-/** 这个静态的类 管理存储 保存游戏数据 */
+/**-----------------------------------------------------------------------------   
+ * StorageManager   
+ * 存储管理器   
+ * The static class that manages storage for saving game data.   
+ * 这个静态的类 管理存储 保存游戏数据 */
 
 function StorageManager() {
     throw new Error('This is a static class');

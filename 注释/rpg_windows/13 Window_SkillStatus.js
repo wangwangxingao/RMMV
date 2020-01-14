@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_SkillStatus */
-/** 窗口技能状态 */
-/** The window for displaying the skill user's status on the skill screen. */
-/** 技能画面显示技能使用状态的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_SkillStatus   
+ * 窗口技能状态   
+ * The window for displaying the skill user's status on the skill screen.   
+ * 技能画面显示技能使用状态的窗口 */
 
 function Window_SkillStatus() {
     this.initialize.apply(this, arguments);

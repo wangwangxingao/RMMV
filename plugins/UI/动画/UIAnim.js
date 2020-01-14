@@ -2,6 +2,7 @@ var ww = ww || {}
 
 ww.anim = {}
 
+
 ww.anim.deepClone = function (that) {
     var that = that
     var obj, i;
@@ -25,10 +26,53 @@ ww.anim.deepClone = function (that) {
     return obj;
 };
 
+/**补全运动值 
+ *  
+ * @param {*} t 时间
+ * @param {*} dx 移动值
+ * @param {*} fx 开始值
+ * @param {*} tx 目标值
+ * @param {*} x 默认值
+ */
+ww.anim.getMoveValue = function (t, dx, fx, tx, x) {
+    var fx = fx === undefined ? x : fx
+    if (t === undefined) {
+        if (dx) {
+            if (tx === undefined) {
+                var tx = fx + dx
+                var t = 0
+            } else {
+                var t = (tx - fx) / dx
+                if (t < 0) {
+                    dx = -dx
+                    t = -t
+                }
+            }
+        } else {
+            var tx = tx === undefined ? x : tx
+            var dx = tx - fx
+            var t = 0
+        }
+    } else {
+        if (dx === undefined) {
+            if (tx === undefined) {
+                var tx = fx
+                var dx = 0
+            } else {
+                var dx = (tx - fx) / (t || 1)
+            }
+        } else {
+            if (tx === undefined) {
+                var tx = dx * t + fx
+            }
+        }
+    }
+    return [t, dx, fx, tx, x]
+}
 
-ww.anim.evalIni = function (animNow) {
-    if (animNow) {
-        animNow.value = {}
+ww.anim.evalIni = function (animGroup, index) {
+    if (animGroup.value) {
+        animGroup.value[index] = {}
     }
 }
 
@@ -38,31 +82,31 @@ ww.anim.evalIni = function (animNow) {
  * @param {string} sn 精灵项目名称
  * @param {{st:{},ed:{},t:number,up:{}}} anim 动画数据对象
  * @param {string} an 动画对象参数名称 
- * @param {{st:{},ed:{},t:number,up:{}}} animNow 当前动画数据
+ * @param {{st:{},ed:{},t:number,up:{}}} animData 当前动画数据
  * @param {{name: string,index: number,list: [],re:false}}  animGroup 本名称动画数据组
  */
-ww.anim.evalSet = function (s, sn, anim, an, animNow, animGroup) {
+ww.anim.evalSet = function (s, sn, anim, an, animData, animValue, animGroup) {
     if (anim) {
         var animfun = anim[an]
         var t = typeof animfun
         if (t == "function") {
-            animfun(s, sn, anim, an, animNow, animGroup)
+            animfun(s, sn, anim, an, animData, animValue, animGroup)
         } else if (t == "object") {
             if (sn) {
-                ww.anim.evalSet2(s, sn, anim, an, animNow, animGroup)
+                ww.anim.evalSet2(s, sn, anim, an, animData, animValue, animGroup)
             } else {
                 for (var i in animfun) {
-                    ww.anim.evalSet(s, i, animfun, i, animNow, animGroup)
+                    ww.anim.evalSet(s, i, animfun, i, animData, animValue, animGroup)
                 }
             }
         } else {
             if (sn) {
                 if (typeof s[sn] == "function") {
-                    animNow.value[sn] = s[sn](animfun)
+                    animValue[sn] = s[sn](animfun)
                 } else if (animfun === undefined) {
-                    animNow.value[sn] = s[sn]
+                    animValue[sn] = s[sn]
                 } else {
-                    animNow.value[sn] = s[sn] = animfun
+                    animValue[sn] = s[sn] = animfun
                 }
             }
         }
@@ -74,11 +118,11 @@ ww.anim.evalSet = function (s, sn, anim, an, animNow, animGroup) {
  * @param {string} sn 精灵项目名称
  * @param {{st:{},ed:{},t:number,up:{}}} anim 动画数据对象
  * @param {string} an 动画对象参数名称 
- * @param {{st:{},ed:{},t:number,up:{}}} animNow 当前动画数据
+ * @param {{st:{},ed:{},t:number,up:{}}} animData 当前动画数据
  * @param {{name: string,index: number,list: [],re:false}}  animGroup 本名称动画数据组
  */
-ww.anim.evalSet2 = function (s, sn, anim, an, animNow, animGroup) {
-    var animfun = anim[an]
+ww.anim.evalSet2 = function (s, sn, anim, an, animData, animValue, animGroup) {
+    var animfun = anim[an]  
     if (typeof s[sn] == "function") {
         return s[sn](animfun)
     } else {
@@ -95,30 +139,29 @@ ww.anim.evalSet2 = function (s, sn, anim, an, animNow, animGroup) {
  * @param {string} sn 精灵项目名称
  * @param {{st:{},ed:{},t:number,up:{}}} anim 动画数据对象
  * @param {string} an 动画对象参数名称 
- * @param {{st:{},ed:{},t:number,up:{}}} animNow 当前动画数据
+ * @param {{st:{},ed:{},t:number,up:{}}} animData 当前动画数据
  * @param {{name: string,index: number,list: [],re:false}}  animGroup 本名称动画数据组
  */
-ww.anim.evalReturn = function (s, sn, anim, an, animNow, animGroup) {
+ww.anim.evalReturn = function (s, sn, anim, an, animData, animValue, animGroup) {
     if (anim) {
         var animfun = anim[an]
         var t = typeof animfun
         //为数值时,判断值
         if (t == "number") {
-            animNow.value[an] = animNow.value[an] || 0
-            animNow.value[an]++
-            return animfun >= animNow.value[an]
-
+            animValue[an] = animValue[an] || 0
+            animValue[an]++
+            return animfun >= animValue[an] 
             //没有时,永远运行
         } else if (t == "function") {
-            return animfun(s, sn, anim, an, animNow, animGroup)
+            return animfun(s, sn, anim, an, animData, animValue, animGroup)
         } else if (animfun && t == "object") {
             if (sn) {
-                return ww.anim.evalSet2(s, sn, anim, an, animNow, animGroup)
+                return ww.anim.evalSet2(s, sn, anim, an, animData, animValue, animGroup)
             } else {
                 var re = false
                 //为对象时,判断值是否符合范围 
                 for (var i in animfun) {
-                    re = ww.anim.evalReturn(s, i, animfun, i, animNow, animGroup) || re
+                    re = ww.anim.evalReturn(s, i, animfun, i, animData, animValue, animGroup) || re
                 }
                 return re
             }
@@ -134,34 +177,34 @@ ww.anim.evalReturn = function (s, sn, anim, an, animNow, animGroup) {
  * @param {string} sn 精灵项目名称
  * @param {{st:{},ed:{},t:number,up:{}}} anim 动画数据对象
  * @param {string} an 动画对象参数名称 
- * @param {{st:{},ed:{},t:number,up:{}}} animNow 当前动画数据
+ * @param {{st:{},ed:{},t:number,up:{}}} animData 当前动画数据
  * @param {{name: string,index: number,list: [],re:false}}  animGroup 本名称动画数据组
  */
-ww.anim.evalReturn2 = function (s, sn, anim, an, animNow, animGroup) {
+ww.anim.evalReturn2 = function (s, sn, anim, an, animData, animValue, animGroup) {
     if (anim) {
         var animfun = anim[an]
         var t = typeof animfun
         //为数值时,判断值
         if (t == "number") {
-            animNow.value[an] = animNow.value[an] || 0
-            animNow.value[an]++
-            if (animfun <= animNow.value[an]) {
-                animNow.value[an] = 0
+            animValue[an] = animValue[an] || 0
+            animValue[an]++
+            if (animfun <= animValue[an]) {
+                animValue[an] = 0
                 return true
             } else {
                 return false
             }
             //没有时,永远运行
         } else if (t == "function") {
-            return animfun(s, sn, anim, an, animNow, animGroup)
+            return animfun(s, sn, anim, an, animData, animValue, animGroup)
         } else if (animfun && t == "object") {
             if (sn) {
-                return ww.anim.evalSet2(s, sn, anim, an, animNow, animGroup)
+                return ww.anim.evalSet2(s, sn, anim, an, animData, animValue, animGroup)
             } else {
                 var re = false
                 //为对象时,判断值是否符合范围 
                 for (var i in animfun) {
-                    re = ww.anim.evalReturn2(s, i, animfun, i, animNow, animGroup) || re
+                    re = ww.anim.evalReturn2(s, i, animfun, i, animData, animValue, animGroup) || re
                 }
                 return re
             }
@@ -183,22 +226,22 @@ ww.anim.evalReturn2 = function (s, sn, anim, an, animNow, animGroup) {
  * @param {string} sn 精灵项目名称
  * @param {{st:{},ed:{},t:number,up:{}}} anim 动画数据对象
  * @param {string} an 动画对象参数名称 
- * @param {{st:{},ed:{},t:number,up:{}}} animNow 当前动画数据
+ * @param {{st:{},ed:{},t:number,up:{}}} animData 当前动画数据
  * @param {{name: string,index: number,list: [],re:false}}  animGroup 本名称动画数据组
  * 
  */
-ww.anim.evalUpdate = function (s, sn, anim, an, animNow, animGroup) {
+ww.anim.evalUpdate = function (s, sn, anim, an, animData, animValue, animGroup) {
     if (anim) {
         var animfun = anim[an]
         var t = typeof animfun
         if (t == "function") {
-            animfun(s, sn, anim, an, animNow, animGroup)
+            animfun(s, sn, anim, an, animData, animValue, animGroup)
         } else if (t == "object") {
             if (sn) {
-                ww.anim.evalSet2(s, sn, anim, an, animNow, animGroup)
+                ww.anim.evalSet2(s, sn, anim, an, animData, animValue, animGroup)
             } else {
                 for (var i in animfun) {
-                    this.evalUpdate(s, i, animfun, i, animNow, animGroup)
+                    this.evalUpdate(s, i, animfun, i, animData, animValue, animGroup)
                 }
             }
         } else if (sn) {
@@ -218,14 +261,40 @@ ww.anim.evalUpdate = function (s, sn, anim, an, animNow, animGroup) {
  * 转化为anim对象
  * @param {*} obj 
  */
-Sprite.prototype.animTo = function (obj) {
+ww.anim.animTo = function (list) {
+    var l = []
+    if (Array.isArray(list)) {
+        if (list._isAnim) {
+            return list
+        }
+        for (var i = 0; i < list.length; i++) {
+            var animData = ww.anim.animToObject(list[i])
+            if (animData) {
+                l.push(animData)
+            }
+        }
+    } else {
+        var animData = ww.anim.animToObject(list)
+        if (animData) {
+            l.push(animData)
+        }
+    }
+    l._isAnim = true
+    return l
+}
+
+/**
+ * 转化为anim对象
+ * @param {*} obj 
+ */
+ww.anim.animToObject = function (obj) {
     var tl = typeof obj
     if (tl == "number") {
         return {
             t: obj
         }
     } else if (tl && tl == "object") {
-        return ww.anim.deepClone(obj)
+        return obj//ww.anim.deepClone(obj)
     } else {
         return 0
     }
@@ -305,28 +374,16 @@ Sprite.prototype.animSt = function (name, list, re) {
         return this.animClear(name, list)
     }
     //如果不是数组  
-    var l = []
-    if (Array.isArray(list)) {
-        for (var i = 0; i < list.length; i++) {
-            var animNow = this.animTo(list[i])
-            if (animNow) {
-                l.push(animNow)
-            }
-        }
-    } else {
-        var animNow = this.animTo(list)
-        if (animNow) {
-            l.push(animNow)
-        }
-    }
-    var animNow = l[0]
-    if (!animNow) {
+    var l = ww.anim.animTo(list)
+    var animData = l[0]
+    if (!animData) {
         return this.animClear(name, l)
     }
     var animGroup = {
         name: name,
         index: 0,
-        list: l,
+        data: l,
+        value: [],
         re: re
     }
     //console.log(animGroup)
@@ -348,23 +405,10 @@ Sprite.prototype.animRe = function (name, re) {
 Sprite.prototype.animAdd = function (name, list) {
     this._anim = this._anim || {}
     var animGroup = this._anim[name]
-    if (animGroup && animGroup.list.length) {
+    if (animGroup && animGroup.data.length) {
         if (list) {
-            var l = []
-            if (Array.isArray(list)) {
-                for (var i = 0; i < list.length; i++) {
-                    var o = this.animTo(list[i])
-                    if (o) {
-                        l.push(o)
-                    }
-                }
-            } else {
-                var o = this.animTo(list)
-                if (o) {
-                    l.push(o)
-                }
-            }
-            animGroup.list = animGroup.list.concat(l)
+            var l = ww.anim.animTo(list)
+            animGroup.data = animGroup.data.concat(l)
         }
     } else {
         this.animSt(name, list)
@@ -434,14 +478,15 @@ Sprite.prototype.__runAnimSt = function (name) {
     if (this._anim) {
         var animGroup = this._anim[name]
         if (animGroup) {
-            var animNow = animGroup.list[animGroup.index]
-            if (animNow) {
-                ww.anim.evalIni(animNow)
-                ww.anim.evalSet(this, "", animNow, "st", animNow, animGroup)
-                if (typeof animNow.anim == "object") {
-                    for (var i in animNow.anim) {
-                        var anim = animNow.anim[i]
-                        ww.anim.evalSet(this, i, anim, "st", animNow, animGroup)
+            var animData = animGroup.data[animGroup.index]
+            if (animData) {
+                ww.anim.evalIni(animGroup, animGroup.index)
+                var animValue = animGroup.value[animGroup.index]
+                ww.anim.evalSet(this, "", animData, "st", animData, animValue, animGroup)
+                if (typeof animData.anim == "object") {
+                    for (var i in animData.anim) {
+                        var anim = animData.anim[i]
+                        ww.anim.evalSet(this, i, anim, "st", animData, animValue, animGroup)
                     }
                 }
                 return
@@ -460,8 +505,9 @@ Sprite.prototype.__runAnimRun = function (name) {
     if (this._anim) {
         var animGroup = this._anim[name]
         if (animGroup) {
-            var animNow = animGroup.list[animGroup.index]
-            return ww.anim.evalReturn(this, '', animNow, "t", animNow, animGroup)
+            var animData = animGroup.data[animGroup.index]
+            var animValue = animGroup.value[animGroup.index]
+            return ww.anim.evalReturn(this, '', animData, "t", animData, animValue, animGroup)
         }
     }
     return false
@@ -476,14 +522,15 @@ Sprite.prototype.__runAnimUpdate = function (name) {
     if (this._anim) {
         var animGroup = this._anim[name]
         if (animGroup) {
-            var animNow = animGroup.list[animGroup.index]
-            if (ww.anim.evalReturn2(this, "", animNow, "d", animNow, animGroup)) {
-                ww.anim.evalUpdate(this, "", animNow, "up", animNow, animGroup)
-                if (typeof animNow.anim == "object") {
-                    for (var i in animNow.anim) {
-                        var anim = animNow.anim[i]
-                        if (ww.anim.evalReturn2(this, i, anim, "d", animNow, animGroup)) {
-                            ww.anim.evalUpdate(this, i, anim, "up", animNow, animGroup)
+            var animData = animGroup.data[animGroup.index]
+            var animValue = animGroup.value[animGroup.index]
+            if (ww.anim.evalReturn2(this, "", animData, "d", animData, animValue, animGroup)) {
+                ww.anim.evalUpdate(this, "", animData, "up", animData, animValue, animGroup)
+                if (typeof animData.anim == "object") {
+                    for (var i in animData.anim) {
+                        var anim = animData.anim[i]
+                        if (ww.anim.evalReturn2(this, i, anim, "d", animData, animValue, animGroup)) {
+                            ww.anim.evalUpdate(this, i, anim, "up", animData, animValue, animGroup)
                         }
                     }
                 }
@@ -503,14 +550,16 @@ Sprite.prototype.__runAnimNext = function (name) {
     if (this._anim) {
         var animGroup = this._anim[name]
         if (animGroup) {
-            var list = animGroup.list
-            var animNow = list[animGroup.index]
-            if (animNow) {
-                ww.anim.evalSet(this, "", animNow, "ed", animNow, animGroup)
-                if (typeof animNow.anim == "object") {
-                    for (var i in animNow.anim) {
-                        var anim = animNow.anim[i]
-                        ww.anim.evalSet(s, i, anim, "ed", animNow, animGroup)
+            var list = animGroup.data
+            var animData = list[animGroup.index]
+            if (animData) {
+                ww.anim.evalIni(animGroup, animGroup.index)
+                var animValue = animGroup.value[animGroup.index]
+                ww.anim.evalSet(this, "", animData, "ed", animData, animValue, animGroup)
+                if (typeof animData.anim == "object") {
+                    for (var i in animData.anim) {
+                        var anim = animData.anim[i]
+                        ww.anim.evalSet(s, i, anim, "ed", animData, animValue, animGroup)
                     }
                 }
             }

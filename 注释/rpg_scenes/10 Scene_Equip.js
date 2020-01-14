@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_Equip */
-/** 场景装备 */
-/** The scene class of the equipment screen. */
-/** 处理 装备画面 的 场景类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Equip   
+ * 场景装备   
+ * The scene class of the equipment screen.   
+ * 处理 装备画面 的 场景类 */
 
 function Scene_Equip() {
     this.initialize.apply(this, arguments);

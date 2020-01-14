@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_StateOverlay */
-/** 精灵状态覆盖 */
-/** The sprite for displaying an overlay image for a state. */
-/** 显示状态覆盖图像的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_StateOverlay   
+ * 精灵状态覆盖   
+ * The sprite for displaying an overlay image for a state.   
+ * 显示状态覆盖图像的精灵 */
 
 function Sprite_StateOverlay() {
     this.initialize.apply(this, arguments);

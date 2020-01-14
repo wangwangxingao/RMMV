@@ -1,9 +1,9 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Switches*/
-/** 游戏开关组    $gameSwitches*/
-/** The game object class for switches.*/
-/** 开关组的游戏对象类*/
+/**-----------------------------------------------------------------------------  
+ * Game_Switches  
+ * 游戏开关组    $gameSwitches  
+ * The game object class for switches.  
+ * 开关组的游戏对象类*/
 
 function Game_Switches() {
     this.initialize.apply(this, arguments);

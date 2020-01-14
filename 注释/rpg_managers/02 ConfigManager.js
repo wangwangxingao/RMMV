@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** ConfigManager */
-/** 配置管理器 */
-/** The static class that manages the configuration data. */
-/**这个静态的类 管理 配置数据 */
+/**-----------------------------------------------------------------------------   
+ * ConfigManager   
+ * 配置管理器   
+ * The static class that manages the configuration data.   
+ *这个静态的类 管理 配置数据 */
 
 function ConfigManager() {
     throw new Error('This is a static class');

@@ -1,9 +1,9 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Actors*/
-/** 游戏角色组         $gameActors*/
-/** The wrapper class for an actor array.*/
-/** 角色数组的包装类*/
+/**-----------------------------------------------------------------------------  
+ * Game_Actors  
+ * 游戏角色组         $gameActors  
+ * The wrapper class for an actor array.  
+ * 角色数组的包装类*/
 
 function Game_Actors() {
     this.initialize.apply(this, arguments);

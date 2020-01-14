@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_Base */
-/** 窗口基础 */
-/** The superclass of all windows within the game. */
-/** 游戏中所有窗口的超级类 */
+/**-----------------------------------------------------------------------------   
+ * Window_Base   
+ * 窗口基础   
+ * The superclass of all windows within the game.   
+ * 游戏中所有窗口的超级类 */
 
 function Window_Base() {
     this.initialize.apply(this, arguments);

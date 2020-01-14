@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_ChoiceList */
-/** 窗口选择列表 */
-/** The window used for the event command [Show Choices]. */
-/** 用于事件命令的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_ChoiceList   
+ * 窗口选择列表   
+ * The window used for the event command [Show Choices].   
+ * 用于事件命令的窗口 */
 
 function Window_ChoiceList() {
     this.initialize.apply(this, arguments);

@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_MenuBase */
-/** 场景菜单基础  */
-/** The superclass of all the menu-type scenes. */
-/** 所有 菜单种类 的 超级类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_MenuBase   
+ * 场景菜单基础    
+ * The superclass of all the menu-type scenes.   
+ * 所有 菜单种类 的 超级类 */
 
 function Scene_MenuBase() {
     this.initialize.apply(this, arguments);

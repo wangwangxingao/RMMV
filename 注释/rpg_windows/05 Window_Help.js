@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_Help */
-/** 窗口帮助 */
-/** The window for displaying the description of the selected item. */
-/** 显示选择项目说明的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_Help   
+ * 窗口帮助   
+ * The window for displaying the description of the selected item.   
+ * 显示选择项目说明的窗口 */
 
 function Window_Help() {
     this.initialize.apply(this, arguments);

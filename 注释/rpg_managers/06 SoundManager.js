@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** SoundManager */
-/** 声音管理器 */
-/** The static class that plays sound effects defined in the database. */
-/** 这个静态的类 定义 数据库 播放 声音 效果 */
+/**-----------------------------------------------------------------------------   
+ * SoundManager   
+ * 声音管理器   
+ * The static class that plays sound effects defined in the database.   
+ * 这个静态的类 定义 数据库 播放 声音 效果 */
 
 function SoundManager() {
     throw new Error('This is a static class');

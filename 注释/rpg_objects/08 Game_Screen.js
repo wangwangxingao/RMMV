@@ -1,9 +1,9 @@
-/**-----------------------------------------------------------------------------*/
-/** Game_Screen*/
-/** 游戏画面   $gameScreen*/
-/** The game object class for screen effect data, such as changes in color tone*/
-/** and flashes.*/
-/** 像色彩和闪烁 等改变的画面效果数据的游戏对象类*/
+/**-----------------------------------------------------------------------------  
+ * Game_Screen  
+ * 游戏画面   $gameScreen  
+ * The game object class for screen effect data, such as changes in color tone  
+ * and flashes.  
+ * 像色彩和闪烁 等改变的画面效果数据的游戏对象类*/
 
 function Game_Screen() {
     this.initialize.apply(this, arguments);

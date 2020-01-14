@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_HorzCommand */
-/** 窗口水平命令 */
-/** The command window for the horizontal selection format. */
-/** 为了横向选择的命令窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_HorzCommand   
+ * 窗口水平命令   
+ * The command window for the horizontal selection format.   
+ * 为了横向选择的命令窗口 */
 
 function Window_HorzCommand() {
     this.initialize.apply(this, arguments);

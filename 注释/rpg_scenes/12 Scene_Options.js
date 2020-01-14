@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_Options */
-/** 场景选项 */
-/** The scene class of the options screen. */
-/** 处理 选项画面 的类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Options   
+ * 场景选项   
+ * The scene class of the options screen.   
+ * 处理 选项画面 的类 */
 
 function Scene_Options() {
     this.initialize.apply(this, arguments);

@@ -1,6 +1,6 @@
 
-/**-----------------------------------------------------------------------------*/
-/** 
+/**-----------------------------------------------------------------------------  
+ * 
  * Game_Party 
  * 游戏队伍  $gameParty 
  * The game object class for the party. Information such as gold and items is included. 

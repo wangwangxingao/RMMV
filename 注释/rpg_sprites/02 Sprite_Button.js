@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_Button */
-/** 精灵按钮 */
-/** The sprite for displaying a button. */
-/** 显示按钮的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Button   
+ * 精灵按钮   
+ * The sprite for displaying a button.   
+ * 显示按钮的精灵 */
 
 function Sprite_Button() {
     this.initialize.apply(this, arguments);

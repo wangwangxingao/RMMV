@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_Weapon */
-/** 精灵武器 */
-/** The sprite for displaying a weapon image for attacking. */
-/** 攻击中 显示武器图像的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Weapon   
+ * 精灵武器   
+ * The sprite for displaying a weapon image for attacking.   
+ * 攻击中 显示武器图像的精灵 */
 
 function Sprite_Weapon() {
     this.initialize.apply(this, arguments);

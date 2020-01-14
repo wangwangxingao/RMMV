@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_DebugEdit */
-/** 窗口调试编辑 */
-/** The window for displaying switches and variables on the debug screen. */
-/** 显示调试画面开关变量的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_DebugEdit   
+ * 窗口调试编辑   
+ * The window for displaying switches and variables on the debug screen.   
+ * 显示调试画面开关变量的窗口 */
 
 function Window_DebugEdit() {
     this.initialize.apply(this, arguments);

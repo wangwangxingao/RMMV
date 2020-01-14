@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_StateIcon */
-/** 精灵状态图标 */
-/** The sprite for displaying state icons. */
-/** 显示状态图标的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_StateIcon   
+ * 精灵状态图标   
+ * The sprite for displaying state icons.   
+ * 显示状态图标的精灵 */
 
 function Sprite_StateIcon() {
     this.initialize.apply(this, arguments);

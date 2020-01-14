@@ -1,11 +1,10 @@
-/**-----------------------------------------------------------------------------*/
-/**这不是一个类,但是包含一些方法添加到标准js中方法
+/**-----------------------------------------------------------------------------  
+ *这不是一个类,但是包含一些方法添加到标准js中方法  
  * This is not a class, but contains some methods that will be added to the
- * standard Javascript objects.
- * js扩展
+ * standard Javascript objects.  
+ * js扩展  
  * @class JsExtensions
- */
-/**js扩展*/
+ * */
 function JsExtensions() {
     throw new Error('This is not a class');
 }

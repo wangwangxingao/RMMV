@@ -1,8 +1,8 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Vehicle*/
-/** 交通工具的游戏对象*/
-/** The game object class for a vehicle.*/
+/**-----------------------------------------------------------------------------  
+ * Game_Vehicle  
+ * 交通工具的游戏对象  
+ * The game object class for a vehicle.*/
 
 function Game_Vehicle() {
     this.initialize.apply(this, arguments);

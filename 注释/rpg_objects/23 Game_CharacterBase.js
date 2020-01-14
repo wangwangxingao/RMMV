@@ -1,9 +1,9 @@
-/**-----------------------------------------------------------------------------*/
-/** Game_CharacterBase*/
-/** 游戏人物基础*/
-/** The superclass of Game_Character. It handles basic information, such as*/
-/** coordinates and images, shared by all characters.*/
-/** 游戏人物的超级类.包含所有人物坐标图像之类的基础信息*/
+/**-----------------------------------------------------------------------------  
+ * Game_CharacterBase  
+ * 游戏人物基础  
+ * The superclass of Game_Character. It handles basic information, such as  
+ * coordinates and images, shared by all characters.  
+ * 游戏人物的超级类.包含所有人物坐标图像之类的基础信息*/
 
 function Game_CharacterBase() {
     this.initialize.apply(this, arguments);

@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_BattleItem */
-/** 窗口战斗物品 */
-/** The window for selecting an item to use on the battle screen. */
-/** 战斗画面选择一个物品使用的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_BattleItem   
+ * 窗口战斗物品   
+ * The window for selecting an item to use on the battle screen.   
+ * 战斗画面选择一个物品使用的窗口 */
 
 function Window_BattleItem() {
     this.initialize.apply(this, arguments);

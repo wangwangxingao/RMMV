@@ -1,10 +1,11 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Message*/
-/** 游戏消息   $gameMessage*/
-/** The game object class for the state of the message window that displays text*/
-/** or selections, etc.*/
-/** 显示文本,选项或其他 消息窗口 的游戏数据类*/
+/**-----------------------------------------------------------------------------  
+ * Game_Message  
+ * 游戏消息   $gameMessage  
+ * The game object class for the state of the message window that displays text  
+ * or selections, etc.  
+ * 显示文本,选项或其他 消息窗口 的游戏数据类
+ * */
 
 function Game_Message() {
     this.initialize.apply(this, arguments);

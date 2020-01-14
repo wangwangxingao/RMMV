@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_ShopCommand */
-/** 窗口商店命令 */
-/** The window for selecting buy/sell on the shop screen. */
-/** 商店画面为了选择买卖的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_ShopCommand   
+ * 窗口商店命令   
+ * The window for selecting buy/sell on the shop screen.   
+ * 商店画面为了选择买卖的窗口 */
 
 function Window_ShopCommand() {
     this.initialize.apply(this, arguments);

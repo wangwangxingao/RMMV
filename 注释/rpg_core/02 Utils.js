@@ -1,6 +1,6 @@
 
-/**-----------------------------------------------------------------------------*/
-/**静态的类 定义公用程序方法
+/**-----------------------------------------------------------------------------  
+ *静态的类 定义公用程序方法
  * The static class that defines utility methods.
  * 公用程序
  * @class Utils
@@ -16,8 +16,7 @@ function Utils() {
  * @property RPGMAKER_NAME
  * @type String
  * @final
- */
-/** RPG Maker 的名称 = "MV"*/
+ * RPG Maker 的名称 = "MV"*/
 Utils.RPGMAKER_NAME = 'MV';
 
 /** RPG Maker  版本
@@ -27,8 +26,7 @@ Utils.RPGMAKER_NAME = 'MV';
  * @property RPGMAKER_VERSION
  * @type String
  * @final
- */
-/** RPGMaker版本 = "1.6.1"*/
+ * RPGMaker版本 = "1.6.1"*/
 Utils.RPGMAKER_VERSION = "1.6.1";
 
 

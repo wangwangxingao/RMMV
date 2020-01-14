@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_Skill */
-/** 场景技能  */
-/** The scene class of the skill screen. */
-/** 处理技能画面的类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Skill   
+ * 场景技能    
+ * The scene class of the skill screen.   
+ * 处理技能画面的类 */
 
 function Scene_Skill() {
     this.initialize.apply(this, arguments);

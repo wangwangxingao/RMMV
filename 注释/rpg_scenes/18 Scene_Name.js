@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Scene_Name */
-/** 场景名称 */
-/** The scene class of the name input screen. */
-/** 处理 名称输入画面 的 场景类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Name   
+ * 场景名称   
+ * The scene class of the name input screen.   
+ * 处理 名称输入画面 的 场景类 */
 
 function Scene_Name() {
     this.initialize.apply(this, arguments);

@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_Actor */
-/** 精灵角色 */
-/** The sprite for displaying an actor. */
-/** 显示一个角色的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Actor   
+ * 精灵角色   
+ * The sprite for displaying an actor.   
+ * 显示一个角色的精灵 */
 
 function Sprite_Actor() {
     this.initialize.apply(this, arguments);

@@ -1,13 +1,16 @@
-/**-----------------------------------------------------------------------------*/
-/** Game_System*/
-/** 游戏系统   $gameSystem */
-/** The game object class for the system data.*/
-/** 游戏系统数据的游戏对象类*/
+/**-----------------------------------------------------------------------------  
+ * Game_System  
+ * 游戏系统   $gameSystem   
+ * The game object class for the system data.  
+ * 游戏系统数据的游戏对象类
+ **/
 
 function Game_System() {
     this.initialize.apply(this, arguments);
 }
-/**初始化*/
+/**初始化
+ * @method initialize
+ */
 Game_System.prototype.initialize = function() {
     //保存启用 = true
     this._saveEnabled = true;
@@ -47,6 +50,7 @@ Game_System.prototype.initialize = function() {
     this._walkingBgm = null;
 };
 /**是日语
+ * @method isJapanese
  * @return {boolean}
  */
 Game_System.prototype.isJapanese = function() {
@@ -54,6 +58,7 @@ Game_System.prototype.isJapanese = function() {
     return $dataSystem.locale.match(/^ja/);
 };
 /**是中文
+ * @method isChinese
  * @return {boolean}
  */
 Game_System.prototype.isChinese = function() {
@@ -61,6 +66,7 @@ Game_System.prototype.isChinese = function() {
     return $dataSystem.locale.match(/^zh/);
 };
 /**是韩语
+ * @method isKorean
  * @return {boolean}
  */
 Game_System.prototype.isKorean = function() {
@@ -68,6 +74,7 @@ Game_System.prototype.isKorean = function() {
     return $dataSystem.locale.match(/^ko/);
 };
 /**是中文日文韩文
+ * @method isCJK
  * @return {boolean}
  */
 Game_System.prototype.isCJK = function() {
@@ -75,6 +82,7 @@ Game_System.prototype.isCJK = function() {
     return $dataSystem.locale.match(/^(ja|zh|ko)/);
 };
 /**是俄语
+ * @method isRussian
  * @return {boolean}
  */
 Game_System.prototype.isRussian = function() {
@@ -82,6 +90,7 @@ Game_System.prototype.isRussian = function() {
     return $dataSystem.locale.match(/^ru/);
 };
 /**是侧视
+ * @method isSideView
  * @return {boolean}
  */
 Game_System.prototype.isSideView = function() {
@@ -89,74 +98,95 @@ Game_System.prototype.isSideView = function() {
     return $dataSystem.optSideView;
 };
 /**是启用保存
+ * @method isSaveEnabled
  * @return {boolean}
  */
 Game_System.prototype.isSaveEnabled = function() {
     //返回 保存启用
     return this._saveEnabled;
 };
-/**禁止保存*/
+/**禁止保存
+ * @method disableSave
+ */
 Game_System.prototype.disableSave = function() {
     //保存启用 = false
     this._saveEnabled = false;
 };
-/**启用保存*/
+/**启用保存
+ * @method enableSave
+ */
 Game_System.prototype.enableSave = function() {
     //保存启用 = true
     this._saveEnabled = true;
 };
 /**是启用菜单
+ * @method isMenuEnabled
  * @return {boolean}
  */
 Game_System.prototype.isMenuEnabled = function() {
     //返回 菜单启用
     return this._menuEnabled;
 };
-/**禁止菜单*/
+/**禁止菜单
+ * @method disableMenu
+ */
 Game_System.prototype.disableMenu = function() {
     //菜单启用 = false
     this._menuEnabled = false;
 };
-/**启用菜单*/
+/**启用菜单
+ * @method enableMenu
+ */
 Game_System.prototype.enableMenu = function() {
     //菜单启用 = true
     this._menuEnabled = true;
 };
 /**是启用遭遇
+ * @method isEncounterEnabled
  * @return {boolean}
  */
 Game_System.prototype.isEncounterEnabled = function() {
     //返回 遭遇启用
     return this._encounterEnabled;
 };
-/**禁止遭遇*/
+/**禁止遭遇
+ * @method disableEncounter
+ */
 Game_System.prototype.disableEncounter = function() {
     //遭遇启用 = false
     this._encounterEnabled = false;
 };
-/**启用遭遇*/
+/**启用遭遇
+ * @method enableEncounter
+ */
 Game_System.prototype.enableEncounter = function() {
     //遭遇启用 = true
     this._encounterEnabled = true;
 };
 /**是启用编队
+ * @method isFormationEnabled
  * @return {boolean}
  */
 Game_System.prototype.isFormationEnabled = function() {
     //返回 编队启用
     return this._formationEnabled;
 };
-/**禁止编队*/
+/**禁止编队
+ * @method disableFormation
+ */
 Game_System.prototype.disableFormation = function() {
     //编队启用 = false
     this._formationEnabled = false;
 };
-/**启用编队*/
+/**启用编队
+ * @method enableFormation
+ */
 Game_System.prototype.enableFormation = function() {
     //编队启用 = true
     this._formationEnabled = true;
 };
 /**战斗计数
+ * @method battleCount
  * @return {number}
  */
 Game_System.prototype.battleCount = function() {
@@ -164,6 +194,7 @@ Game_System.prototype.battleCount = function() {
     return this._battleCount;
 };
 /**胜利计数
+ * @method winCount
  * @return {number}
  */
 Game_System.prototype.winCount = function() {
@@ -171,6 +202,7 @@ Game_System.prototype.winCount = function() {
     return this._winCount;
 };
 /**逃跑计数
+ * @method escapeCount
  * @return {number}
  */
 Game_System.prototype.escapeCount = function() {
@@ -178,6 +210,7 @@ Game_System.prototype.escapeCount = function() {
     return this._escapeCount;
 };
 /**保存计数 
+ * @method saveCount
  * @return {number}
  */
 Game_System.prototype.saveCount = function() {
@@ -185,6 +218,7 @@ Game_System.prototype.saveCount = function() {
     return this._saveCount;
 };
 /**版本id 
+ * @method versionId
  * @return {number}
  */
 Game_System.prototype.versionId = function() {
@@ -192,6 +226,7 @@ Game_System.prototype.versionId = function() {
     return this._versionId;
 };
 /**窗口色调
+ * @method windowTone
  * @return {[number]}
  */
 Game_System.prototype.windowTone = function() {
@@ -199,6 +234,7 @@ Game_System.prototype.windowTone = function() {
     return this._windowTone || $dataSystem.windowTone;
 };
 /**设置窗口色调
+ * @method setWindowTone
  * @param {[number]} value 值色调数组
  */
 Game_System.prototype.setWindowTone = function(value) {
@@ -206,6 +242,7 @@ Game_System.prototype.setWindowTone = function(value) {
     this._windowTone = value;
 };
 /**战斗bgm
+ * @method battleBgm
  * @return {{}}  
  */
 Game_System.prototype.battleBgm = function() {
@@ -213,14 +250,15 @@ Game_System.prototype.battleBgm = function() {
     return this._battleBgm || $dataSystem.battleBgm;
 };
 /**设置战斗bgm
+ * @method setBattleBgm
  * @param {{}}  value bgm值
- * 
  */
 Game_System.prototype.setBattleBgm = function(value) {
     //战斗bgm = value
     this._battleBgm = value;
 };
 /**胜利me
+ * @method victoryMe
  * @return {{}}
  */
 Game_System.prototype.victoryMe = function() {
@@ -228,6 +266,7 @@ Game_System.prototype.victoryMe = function() {
     return this._victoryMe || $dataSystem.victoryMe;
 };
 /**设置胜利me
+ * @method setVictoryMe
  * @param {{}} value  
  */
 Game_System.prototype.setVictoryMe = function(value) {
@@ -235,6 +274,7 @@ Game_System.prototype.setVictoryMe = function(value) {
     this._victoryMe = value;
 };
 /**失败me
+ * @method defeatMe
  * @return {{}} 
  */
 Game_System.prototype.defeatMe = function() {
@@ -242,28 +282,37 @@ Game_System.prototype.defeatMe = function() {
     return this._defeatMe || $dataSystem.defeatMe;
 };
 /**设置失败me
+ * @method setDefeatMe
  * @param {{}} value    
  */
 Game_System.prototype.setDefeatMe = function(value) {
     //失败me = value
     this._defeatMe = value;
 };
-/**当战斗开始*/
+/**当战斗开始
+ * @method onBattleStart
+ */
 Game_System.prototype.onBattleStart = function() {
     //战斗计数++
     this._battleCount++;
 };
-/**当战斗胜利*/
+/**当战斗胜利
+ * @method onBattleWin
+ */
 Game_System.prototype.onBattleWin = function() {
     //胜利计数++
     this._winCount++;
 };
-/**当战斗逃跑*/
+/**当战斗逃跑
+ * @method onBattleEscape
+ */
 Game_System.prototype.onBattleEscape = function() {
     //逃跑计数 ++
     this._escapeCount++;
 };
-/**当保存之前*/
+/**当保存之前
+ * @method onBeforeSave
+ */
 Game_System.prototype.onBeforeSave = function() {
     //保存计数 ++
     this._saveCount++;
@@ -276,7 +325,9 @@ Game_System.prototype.onBeforeSave = function() {
     //bgs当保存 =  音频管理器 保存bgs
     this._bgsOnSave = AudioManager.saveBgs();
 };
-/**当读取以后*/
+/**当读取以后
+ * @method onAfterLoad
+ */
 Game_System.prototype.onAfterLoad = function() {
     //图形 帧计数 =  帧数当保存
     Graphics.frameCount = this._framesOnSave;
@@ -286,6 +337,7 @@ Game_System.prototype.onAfterLoad = function() {
     AudioManager.playBgs(this._bgsOnSave);
 };
 /**游戏时间
+ * @method playtime
  * @return {number}
  */
 Game_System.prototype.playtime = function() {
@@ -293,6 +345,7 @@ Game_System.prototype.playtime = function() {
     return Math.floor(Graphics.frameCount / 60);
 };
 /**播放时间文本
+ * @method playtimeText
  * @return {string} 
  */
 Game_System.prototype.playtimeText = function() {
@@ -306,12 +359,16 @@ Game_System.prototype.playtimeText = function() {
     //返回 小时( 填充0(2位) ) + ":" + 分钟( 填充0(2位) )  + ":" + 秒( 填充0(2位) )  
     return hour.padZero(2) + ':' + min.padZero(2) + ':' + sec.padZero(2);
 };
-/**保存bgm*/
+/**保存bgm
+ * @method saveBgm
+ */
 Game_System.prototype.saveBgm = function() {
     //保存bgm = 音频管理器 保存bgm
     this._savedBgm = AudioManager.saveBgm();
 };
-/**重播bgm*/
+/**重播bgm
+ * @method replayBgm
+ */
 Game_System.prototype.replayBgm = function() {
     //如果 保存bgm (保存bgm存在)
     if (this._savedBgm) {
@@ -319,12 +376,16 @@ Game_System.prototype.replayBgm = function() {
         AudioManager.replayBgm(this._savedBgm);
     }
 };
-/**保存行走bgm*/
+/**保存行走bgm
+ * @method saveWalkingBgm
+ */
 Game_System.prototype.saveWalkingBgm = function() {
     //行走bgm = 音频管理器 保存bgm
     this._walkingBgm = AudioManager.saveBgm();
 };
-/**重播行走bgm*/
+/**重播行走bgm
+ * @method replayWalkingBgm
+ */
 Game_System.prototype.replayWalkingBgm = function() {
     //如果 行走bgm (行走bgm存在)
     if (this._walkingBgm) {

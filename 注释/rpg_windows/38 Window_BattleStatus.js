@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_BattleStatus */
-/** 窗口战斗状态 */
-/** The window for displaying the status of party members on the battle screen. */
-/** 战斗画面显示队伍成员状态的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_BattleStatus   
+ * 窗口战斗状态   
+ * The window for displaying the status of party members on the battle screen.   
+ * 战斗画面显示队伍成员状态的窗口 */
 
 function Window_BattleStatus() {
     this.initialize.apply(this, arguments);

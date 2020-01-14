@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_Map */
-/** 场景地图  */
-/** The scene class of the map screen. */
-/** 处理 地图画面 的 场景类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Map   
+ * 场景地图    
+ * The scene class of the map screen.   
+ * 处理 地图画面 的 场景类 */
 
 function Scene_Map() {
     this.initialize.apply(this, arguments);

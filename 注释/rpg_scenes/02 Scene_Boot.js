@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_Boot */
-/** 场景引导 */
-/** The scene class for initializing the entire game. */
-/** 这个场景类为了初始化整个游戏 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Boot   
+ * 场景引导   
+ * The scene class for initializing the entire game.   
+ * 这个场景类为了初始化整个游戏 */
 
 function Scene_Boot() {
 	//调用 初始化

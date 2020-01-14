@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Scene_Status */
-/** 场景状态 */
-/** The scene class of the status screen. */
-/** 处理 状态画面 的 场景类 */
+/**-----------------------------------------------------------------------------   
+ * Scene_Status   
+ * 场景状态   
+ * The scene class of the status screen.   
+ * 处理 状态画面 的 场景类 */
 
 function Scene_Status() {
     this.initialize.apply(this, arguments);

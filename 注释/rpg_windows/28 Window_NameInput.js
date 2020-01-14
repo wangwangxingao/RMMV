@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_NameInput */
-/** 窗口名称输入 */
-/** The window for selecting text characters on the name input screen. */
-/** 名称输入画面选择文本字符的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_NameInput   
+ * 窗口名称输入   
+ * The window for selecting text characters on the name input screen.   
+ * 名称输入画面选择文本字符的窗口 */
 
 function Window_NameInput() {
     this.initialize.apply(this, arguments);

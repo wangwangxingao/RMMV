@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_MapName */
-/** 窗口地图名称 */
-/** The window for displaying the map name on the map screen. */
-/** 地图画面显示地图名称的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_MapName   
+ * 窗口地图名称   
+ * The window for displaying the map name on the map screen.   
+ * 地图画面显示地图名称的窗口 */
 
 function Window_MapName() {
     this.initialize.apply(this, arguments);

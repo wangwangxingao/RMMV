@@ -1,10 +1,10 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Event*/
-/** 游戏事件*/
-/** The game object class for an event. It contains functionality for event page*/
-/** switching and running parallel process events.*/
-/** 事件的游戏对象类.包含事件页开关和运转并行事件*/
+/**-----------------------------------------------------------------------------  
+ * Game_Event  
+ * 游戏事件  
+ * The game object class for an event. It contains functionality for event page  
+ * switching and running parallel process events.  
+ * 事件的游戏对象类.包含事件页开关和运转并行事件*/
 
 function Game_Event() {
     this.initialize.apply(this, arguments);

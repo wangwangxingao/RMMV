@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** TextManager */
-/** 文本管理器 */
-/** The static class that handles terms and messages. */
-/** 这个静态的类 操作 术语 和 消息 */
+/**-----------------------------------------------------------------------------   
+ * TextManager   
+ * 文本管理器   
+ * The static class that handles terms and messages.   
+ * 这个静态的类 操作 术语 和 消息 */
 
 function TextManager() {
     throw new Error('This is a static class');

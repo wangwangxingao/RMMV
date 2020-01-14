@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Sprite_Picture */
-/** 精灵图片 */
-/** The sprite for displaying a picture. */
-/** 显示图片的精灵 */
+/**-----------------------------------------------------------------------------   
+ * Sprite_Picture   
+ * 精灵图片   
+ * The sprite for displaying a picture.   
+ * 显示图片的精灵 */
 
 function Sprite_Picture() {
     this.initialize.apply(this, arguments);

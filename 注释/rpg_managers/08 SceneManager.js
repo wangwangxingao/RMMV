@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** SceneManager */
-/** 场景管理器 */
-/** The static class that manages scene transitions. */
-/** 这个静态的类 管理 场景转换 */
+/**-----------------------------------------------------------------------------   
+ * SceneManager   
+ * 场景管理器   
+ * The static class that manages scene transitions.   
+ * 这个静态的类 管理 场景转换 */
 
 function SceneManager() {
     throw new Error('This is a static class');

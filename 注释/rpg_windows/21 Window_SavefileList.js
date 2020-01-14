@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_SavefileList */
-/** 窗口保存文件列表 */
-/** The window for selecting a save file on the save and load screens. */
-/** 存储读取画面选择存档文件的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_SavefileList   
+ * 窗口保存文件列表   
+ * The window for selecting a save file on the save and load screens.   
+ * 存储读取画面选择存档文件的窗口 */
 
 function Window_SavefileList() {
     this.initialize.apply(this, arguments);

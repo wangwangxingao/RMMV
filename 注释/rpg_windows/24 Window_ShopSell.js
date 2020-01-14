@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Window_ShopSell */
-/** 窗口商店卖 */
-/** The window for selecting an item to sell on the shop screen. */
-/** 商店画面选择一个物品卖的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_ShopSell   
+ * 窗口商店卖   
+ * The window for selecting an item to sell on the shop screen.   
+ * 商店画面选择一个物品卖的窗口 */
 
 function Window_ShopSell() {
     this.initialize.apply(this, arguments);

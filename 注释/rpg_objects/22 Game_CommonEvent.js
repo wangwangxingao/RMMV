@@ -1,10 +1,10 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_CommonEvent*/
-/** 游戏公共事件*/
-/** The game object class for a common event. It contains functionality for*/
-/** running parallel process events.*/
-/** 公共事件的游戏对象类.它包含运转事件的功能*/
+/**-----------------------------------------------------------------------------  
+ * Game_CommonEvent  
+ * 游戏公共事件  
+ * The game object class for a common event. It contains functionality for  
+ * running parallel process events.  
+ * 公共事件的游戏对象类.它包含运转事件的功能*/
 
 function Game_CommonEvent() {
     this.initialize.apply(this, arguments);

@@ -1,9 +1,9 @@
-/**----------------------------------------------------------------------------- */
-/** Window_ShopNumber */
-/** 窗口商店数目 */
-/** The window for inputting quantity of items to buy or sell on the shop */
-/** screen. */
-/** 商店画面输入物品买卖数量的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_ShopNumber   
+ * 窗口商店数目   
+ * The window for inputting quantity of items to buy or sell on the shop   
+ * screen.   
+ * 商店画面输入物品买卖数量的窗口 */
 
 function Window_ShopNumber() {
     this.initialize.apply(this, arguments);

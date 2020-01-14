@@ -177,7 +177,7 @@
             if (this._TouchInputMoveIn != movein) {
                 this._TouchInputMoveIn = movein ? {
                     x: TouchInput.x,
-                    y: TouchInput
+                    y: TouchInput.y
                 } : 0
                 this._TouchInputisTouchInPressMove = false
                 this.onTouchInputMoveIn(this._TouchInputMoveIn)

@@ -1,9 +1,9 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_Followers*/
-/** 游戏从者组*/
-/** The wrapper class for a follower array.*/
-/** 包装类为了从者数组*/
+/**-----------------------------------------------------------------------------  
+ * Game_Followers  
+ * 游戏从者组  
+ * The wrapper class for a follower array.  
+ * 包装类为了从者数组*/
 
 function Game_Followers() {
     this.initialize.apply(this, arguments);

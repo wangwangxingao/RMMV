@@ -1,5 +1,5 @@
-/**-----------------------------------------------------------------------------*/
-/**呈现游戏画面的基本对象。
+/**-----------------------------------------------------------------------------  
+ * 呈现游戏画面的基本对象。
  * The basic object that is rendered to the game screen.
  * 精灵
  * @class Sprite
@@ -42,8 +42,8 @@ Sprite.prototype.initialize = function(bitmap) {
 
     this.bitmap = bitmap;
 };
-/**创建的对象的数量*/
-/** Number of the created objects.*/
+/**创建的对象的数量  
+ *  Number of the created objects.*/
 Sprite._counter = 0;
 
 /**图像
@@ -497,8 +497,8 @@ Sprite.prototype._renderWebGL = function(renderer) {
 };
 
 
-/** The important members from Pixi.js*/
-/** Pixi.js的重要成员*/
+/** The important members from Pixi.js  
+ *  Pixi.js的重要成员*/
 
 /**精灵的可见度
  * The visibility of the sprite.

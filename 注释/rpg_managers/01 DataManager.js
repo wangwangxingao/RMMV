@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** DataManager */
-/** 数据管理器 */
-/** The static class that manages the database and game objects. */
-/** 这个静态的类 管理 数据库 和 游戏对象 */
+/**-----------------------------------------------------------------------------   
+ * DataManager   
+ * 数据管理器   
+ * The static class that manages the database and game objects.   
+ * 这个静态的类 管理 数据库 和 游戏对象 */
 
 function DataManager() {
     throw new Error('This is a static class');

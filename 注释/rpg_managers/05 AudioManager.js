@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** AudioManager */
-/** 音频管理器 */
-/** The static class that handles BGM, BGS, ME and SE. */
-/** 这个静态的类 处理 bgm bgs me se */
+/**-----------------------------------------------------------------------------   
+ * AudioManager   
+ * 音频管理器   
+ * The static class that handles BGM, BGS, ME and SE.   
+ * 这个静态的类 处理 bgm bgs me se */
 
 function AudioManager() {
     throw new Error('This is a static class');

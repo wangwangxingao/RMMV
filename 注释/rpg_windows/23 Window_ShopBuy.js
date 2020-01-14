@@ -1,8 +1,8 @@
-/**----------------------------------------------------------------------------- */
-/** Window_ShopBuy */
-/** 窗口商店买 */
-/** The window for selecting an item to buy on the shop screen. */
-/** 商店画面选择买物品的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_ShopBuy   
+ * 窗口商店买   
+ * The window for selecting an item to buy on the shop screen.   
+ * 商店画面选择买物品的窗口 */
 
 function Window_ShopBuy() {
     this.initialize.apply(this, arguments);

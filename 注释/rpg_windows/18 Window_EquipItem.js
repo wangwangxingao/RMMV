@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_EquipItem */
-/** 窗口装备物品 */
-/** The window for selecting an equipment item on the equipment screen. */
-/** 装备画面选择一个装备物品的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_EquipItem   
+ * 窗口装备物品   
+ * The window for selecting an equipment item on the equipment screen.   
+ * 装备画面选择一个装备物品的窗口 */
 
 function Window_EquipItem() {
     this.initialize.apply(this, arguments);

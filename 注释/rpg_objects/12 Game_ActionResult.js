@@ -1,10 +1,10 @@
 
-/**-----------------------------------------------------------------------------*/
-/** Game_ActionResult*/
-/** 游戏动作结果*/
-/** The game object class for a result of a battle action. For convinience, all*/
-/** member variables in this class are public.*/
-/** 这个游戏对象类为了一个战斗动作结果.*/
+/**-----------------------------------------------------------------------------  
+ * Game_ActionResult  
+ * 游戏动作结果  
+ * The game object class for a result of a battle action. For convinience, all  
+ * member variables in this class are public.  
+ * 这个游戏对象类为了一个战斗动作结果.*/
 
 function Game_ActionResult() {
     this.initialize.apply(this, arguments);

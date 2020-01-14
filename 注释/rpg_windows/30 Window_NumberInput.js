@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_NumberInput */
-/** 窗口数字输入 */
-/** The window used for the event command [Input Number]. */
-/** 用于事件命令的窗口(输入数字) */
+/**-----------------------------------------------------------------------------   
+ * Window_NumberInput   
+ * 窗口数字输入   
+ * The window used for the event command [Input Number].   
+ * 用于事件命令的窗口(输入数字) */
 
 function Window_NumberInput() {
     this.initialize.apply(this, arguments);

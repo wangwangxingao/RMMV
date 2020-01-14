@@ -1,9 +1,9 @@
 
-/**----------------------------------------------------------------------------- */
-/** Window_PartyCommand */
-/** 窗口队伍命令 */
-/** The window for selecting whether to fight or escape on the battle screen. */
-/** 战斗画面选择打架或逃跑的窗口 */
+/**-----------------------------------------------------------------------------   
+ * Window_PartyCommand   
+ * 窗口队伍命令   
+ * The window for selecting whether to fight or escape on the battle screen.   
+ * 战斗画面选择打架或逃跑的窗口 */
 
 function Window_PartyCommand() {
     this.initialize.apply(this, arguments);
